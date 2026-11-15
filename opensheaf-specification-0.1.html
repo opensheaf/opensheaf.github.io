@@ -224,8 +224,8 @@
       <li>
         <p>
           <dfn>Genesis record</dfn>: the file <tt class="verbatim">genesis.json</tt>,
-          written when an object is first sealed and kept unchanged in all its
-          later versions and in its branches; its digest is the object's name
+          written when an object is sealed and kept unchanged in all its later
+          versions and in its branches; its digest is the object's name
           (section 6.5).
         </p>
       </li>
@@ -276,10 +276,10 @@
       <li>
         <p>
           <dfn>Document version</dfn>: the version of the work, a positive
-          integer numbered by the owner of the line (for an archive's own
-          documents, the archive), in <tt class="verbatim">object.json</tt> and <tt
-          class="verbatim">datacite.json</tt>. It changes exactly when the document's
-          own files change (section 7.3).
+          integer numbered by the owner of the line (for a draft, or an
+          archive's own documents, the archive), in <tt class="verbatim">object.json</tt>
+          and <tt class="verbatim">datacite.json</tt>. It changes exactly when the
+          document's own files change (section 7.3).
         </p>
       </li>
       <li>
@@ -332,6 +332,13 @@
           <dfn>Presentation</dfn>: files generated from the archive for
           readers (web pages, indexes, HTML versions of documents). It is
           never authoritative.
+        </p>
+      </li>
+      <li>
+        <p>
+          <dfn>Custodian</dfn>: anyone who keeps copies of other archives'
+          objects, or indexes of them, apart from those archives (section 6.6,
+          #13).
         </p>
       </li>
       <li>
@@ -634,10 +641,11 @@
       resolved parent as confirmation (section 14) only when it reached it at
       a base URL of the parent's archive known independently of the branch:
       the <tt class="verbatim">archiveUrl</tt> of a member of a collection the verifier
-      trusts, or a location configured by its user (and the mirrors listed in
-      the discovery document found there). External copies (a DOI deposit) can
-      attest the parent version, but do not resolve it, since they hold no
-      inventory.
+      trusts (not a collection of the branch's own archive or owner, unless
+      its user configured it), or a location configured by its user (and the
+      mirrors listed in the discovery document found there). External copies
+      (a DOI deposit) can attest the parent version, but do not resolve it,
+      since they hold no inventory.
     </p>
     <p>
       Any copy whose bytes match the pinned digest is acceptable: integrity
@@ -668,16 +676,17 @@
       (shared privately, for instance submitted to a journal, or published;
       #29), its owner writes the genesis record, the JSON file <tt class="verbatim">genesis.json</tt>
       at the root of the content, with <tt class="verbatim">format</tt> (<tt class="verbatim">&quot;opensheaf-genesis/0.1&quot;</tt>),
-      <tt class="verbatim">kind</tt> (<tt class="verbatim">document</tt> or <tt class="verbatim">collection</tt>),
-      <tt class="verbatim">created</tt> (the date and time, in UTC), <tt class="verbatim">originator</tt>
-      (the owner of the first line, a URI) and <tt class="verbatim">nonce</tt> (at least
-      128 random bits, in lowercase hexadecimal). The genesis record MUST be
-      part of every later object version of the object and of its branches,
-      byte for byte. It contains neither the name nor the object identifier,
-      so that the name does not depend on itself. It SHOULD be written in
-      UTF-8 without a byte order mark, with LF line ends; since the name is
-      the digest of its bytes as stored, tools MUST NOT rewrite or
-      re-serialise it, and need no canonical form to check it.
+      <tt class="verbatim">kind</tt> (<tt class="verbatim">document</tt> or <tt class="verbatim">collection</tt>,
+      the <tt class="verbatim">kind</tt> of the object), <tt class="verbatim">created</tt> (the
+      date and time, in UTC), <tt class="verbatim">originator</tt> (the owner of the
+      first line, a URI) and <tt class="verbatim">nonce</tt> (at least 128 random bits,
+      in lowercase hexadecimal). The genesis record MUST be part of every
+      later object version of the object and of its branches, byte for byte.
+      It contains neither the name nor the object identifier, so that the name
+      does not depend on itself. It SHOULD be written in UTF-8 without a byte
+      order mark, with LF line ends; since the name is the digest of its bytes
+      as stored, tools MUST NOT rewrite or re-serialise it, and need no
+      canonical form to check it.
     </p>
     <p>
       <strong>Name.</strong> The name of the object is the SHA-512 digest of
@@ -916,26 +925,29 @@
     </p>
     <p>
       **The <tt class="verbatim">sheaf</tt> URI.** A line, a document version of a line,
-      or one object version, is written as a URI of the scheme <tt class="verbatim">sheaf</tt>:
+      one object version, or the object as a whole, is written as a URI of the
+      scheme <tt class="verbatim">sheaf</tt>:
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
-sheaf:&lt;name&gt;                            the object, all its lines
+sheaf:&lt;name&gt;                            the line of the originator
 sheaf:&lt;name&gt;:&lt;owner id&gt;                 the line of that owner
+sheaf:&lt;name&gt;:*                          the object as a whole, all its lines
 sheaf:&lt;name&gt;/v&lt;n&gt;                       document version n of the originator's line
 sheaf:&lt;name&gt;:&lt;owner id&gt;/v&lt;n&gt;            document version n of that owner's line
 sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one object version holding it</pre>
     </div>
     <p>
       The parts are, in this order: <tt class="verbatim">sheaf:</tt> and the name;
-      optionally <tt class="verbatim">:</tt> and an owner identifier; optionally <tt
-      class="verbatim">/v</tt> and a document version, a positive integer without
-      leading zeros; optionally <tt class="verbatim">?</tt> and a query of parameters
-      <tt class="verbatim">key=value</tt> joined by <tt class="verbatim">&amp;</tt>, among them at
-      most one <tt class="verbatim">sha512</tt>, only after a document version, whose
-      value is the SHA-512 digest of an inventory file, 128 lowercase
-      hexadecimal digits, as in a pin (section 10.2), and at most one <tt
-      class="verbatim">at</tt>, after <tt class="verbatim">sha512</tt> if both are present
+      optionally <tt class="verbatim">:</tt> and an owner identifier, or <tt class="verbatim">:*</tt>,
+      which names all the lines and takes no document version and no query;
+      optionally <tt class="verbatim">/v</tt> and a document version, a positive integer
+      without leading zeros; optionally <tt class="verbatim">?</tt> and a query of
+      parameters <tt class="verbatim">key=value</tt> joined by <tt class="verbatim">&amp;</tt>,
+      among them at most one <tt class="verbatim">sha512</tt>, only after a document
+      version, whose value is the SHA-512 digest of an inventory file, 128
+      lowercase hexadecimal digits, as in a pin (section 10.2), and at most
+      one <tt class="verbatim">at</tt>, after <tt class="verbatim">sha512</tt> if both are present
       (below). A resolver ignores parameters it does not know; this proposal
       defines no fragment. The scheme, the name, the owner identifier, <tt
       class="verbatim">v</tt>, the digest and the parameter names are lowercase, and a
@@ -945,18 +957,18 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <ul>
       <li>
         <p>
-          <strong>The owner.</strong> Without an owner part, a URI with a
-          document version names the line of the originator, the owner named
-          by <tt class="verbatim">originator</tt> in the genesis record, which every
-          copy of the object and of its branches carries. It does not mean the
-          latest line or the most authoritative one: the versions of any other
-          line, such as a journal's or a co-author's, are written with their
-          owner, and if the originator stops and another owner continues the
-          work in a deep branch, the URI still names the originator's line.
-          Without a document version, <tt class="verbatim">sheaf:&lt;name&gt;</tt> names
-          the object as a whole, with all its lines (a resolver shows the
-          lines it knows), and <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner
-          id&gt;</tt> the line.
+          <strong>The owner.</strong> Without an owner part, a URI names the
+          line of the originator, the owner named by <tt class="verbatim">originator</tt>
+          in the genesis record, which every copy of the object and of its
+          branches carries. It does not mean the latest line or the most
+          authoritative one: the versions of any other line, such as a
+          journal's or a co-author's, are written with their owner, and if the
+          originator stops and another owner continues the work in a deep
+          branch, the URI still names the originator's line. <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>
+          names the object as a whole, with all its lines: a resolver shows
+          the lines it knows. A resolver rejects <tt class="verbatim">:*</tt> with a
+          document version or a query, since every line has its own document
+          versions (section 10.5).
         </p>
       </li>
       <li>
@@ -978,7 +990,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           different heads may answer differently: a resolver uses the latest
           head among the confirmed copies that agree (section 6.5, and below),
           and reports a later head found only in unconfirmed copies as an
-          unconfirmed extension, without using it.
+          unconfirmed extension, without using it; with no confirmed copy, it
+          uses the latest head among the unconfirmed copies that agree, and
+          reports the result as unconfirmed, and if they disagree it lists
+          them and does not choose.
         </p>
       </li>
       <li>
@@ -1008,12 +1023,13 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           <strong>Equality.</strong> The canonical form of a <tt class="verbatim">sheaf:</tt>
           URI has complete parts, lowercase where the case is folded, no owner
           part when the owner is the originator (read from the genesis record,
-          which any copy carries and the name certifies, section 6.5), and no
-          <tt class="verbatim">at</tt> and no unknown parameters. Two URIs name the same
-          thing when their canonical forms are equal, byte for byte, and files
-          that record a <tt class="verbatim">sheaf:</tt> URI (for instance among the
-          relations of <tt class="verbatim">datacite.json</tt>) record its canonical
-          form.
+          which any copy carries and the name certifies, section 6.5, so that
+          deciding equality may need one copy of <tt class="verbatim">genesis.json</tt>),
+          and no <tt class="verbatim">at</tt> and no unknown parameters. Two URIs name
+          the same thing when their canonical forms are equal, byte for byte,
+          and files that record a <tt class="verbatim">sheaf:</tt> URI (for instance
+          among the relations of <tt class="verbatim">datacite.json</tt>) record its
+          canonical form.
         </p>
       </li>
     </ul>
@@ -1029,15 +1045,21 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       only when it reached it at a base URL of the archive that keeps the line
       (the archive named by <tt class="verbatim">archiveId</tt> in the copy's <tt class="verbatim">object.json</tt>),
       known independently of the URI and of indexes kept by others, as section
-      6.4 says, or when the owner is keyed and its signatures hold. This
-      confirms the archive that keeps the line, not the person or body its
-      owner names, which owner proofs would show (#13); it MUST report every
-      other copy (one found through <tt class="verbatim">at</tt>, or through an index
-      kept by a custodian) as unconfirmed, with where it was found. When
-      confirmed copies of a line disagree (for a keyed owner, copies whose
-      signatures hold), they are a fork (section 6.5): the resolver reports it
-      and does not choose. An unconfirmed copy that disagrees with a confirmed
-      one is reported as a warning, and does not stop the resolution.
+      6.4 says, or when the owner is keyed and its signatures hold;
+      confirmation reads <tt class="verbatim">archiveId</tt> from the copy's own <tt
+      class="verbatim">object.json</tt>, never from an index entry. This confirms the
+      archive that keeps the line, not the person or body its owner names,
+      which owner proofs would show (#13); it MUST report every other copy
+      (one found through <tt class="verbatim">at</tt>, or through an index kept by a
+      custodian) as unconfirmed, with where it was found. When confirmed
+      copies of a line disagree (for a keyed owner, copies whose signatures
+      hold), they are a fork (section 6.5): the resolver reports it and does
+      not choose. Confirmed copies of the same named owner and name whose <tt
+      class="verbatim">archiveId</tt> differ are a conflict about which archive keeps
+      the line, since a line has one archive identifier (section 6.5): the
+      resolver reports it with the archives, and does not choose. An
+      unconfirmed copy that disagrees with a confirmed one is reported as a
+      warning, and does not stop the resolution.
     </p>
     <p>
       <strong>Short forms.</strong> For people reading and typing them, the
@@ -1062,14 +1084,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       </li>
       <li>
         <p>
-          if there are confirmed candidates, all of the same owner, the short
-          form names the first of them in that owner's order: the line whose
-          first object version of that owner (for the originator, the version
-          that sealed it; for a shallow branch, its first version; for a deep
-          branch, its first version after the branch point) has the earliest
-          <tt class="verbatim">created</tt> in its inventory, compared as instants. The
-          unconfirmed candidates MUST NOT win: the resolver shows them beside
-          its answer, as warnings;
+          if there are confirmed candidates, all of the same owner and, for a
+          named owner, kept by the same archive (the same <tt class="verbatim">archiveId</tt>),
+          the short form names the first of them in that owner's order: the
+          line whose first object version of that owner (for the originator,
+          the version that sealed it; for a shallow branch, its first version;
+          for a deep branch, its first version after the branch point) has the
+          earliest <tt class="verbatim">created</tt> in its inventory, compared as
+          instants. The unconfirmed candidates MUST NOT win: the resolver
+          shows them beside its answer, as warnings;
         </p>
       </li>
       <li>
@@ -1080,29 +1103,32 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       </li>
       <li>
         <p>
-          otherwise (confirmed candidates of different owners, two with the
-          same <tt class="verbatim">created</tt>, or several unconfirmed candidates and
-          no confirmed one), the short form is ambiguous: the resolver MUST
-          NOT choose one, and lists the candidates with their full forms and
-          their originators.
+          otherwise (confirmed candidates of different owners, or of one named
+          owner in different archives, two with the same <tt class="verbatim">created</tt>,
+          or several unconfirmed candidates and no confirmed one), the short
+          form is ambiguous: the resolver MUST NOT choose one, and lists the
+          candidates with their full forms, their originators and the archives
+          that keep them.
         </p>
       </li>
     </ul>
     <p>
-      The order of an owner's lines is trusted only where the owner is: in its
-      own archive, or under its key. Anyone can write a line under a named
-      owner's URI, with any <tt class="verbatim">created</tt>, and search for a name
-      with a given prefix (8 characters are 40 bits), but such a line is
-      unconfirmed: it is seen, and cannot take the short form over. Another
-      owner, confirmed in an archive of its own, can at most make a short form
-      without an owner part ambiguous. A resolver knows only the lines it has
-      seen, and confirms only those whose owner's archive it knows, so two
-      resolvers may expand a short form differently, and a short form that is
-      unique today may become ambiguous later, while a full form never
+      The order of an owner's lines is trusted only within one archive that
+      keeps them, or under the owner's key. Anyone can write a line under a
+      named owner's URI, with any <tt class="verbatim">created</tt>, and search for a
+      name with a given prefix (8 characters are 40 bits); such a line is
+      unconfirmed, unless its maker also runs an archive the resolver knows,
+      and then it is confirmed in another archive than the owner's lines, so
+      the short form becomes ambiguous: it is seen, and cannot take the short
+      form over. Another owner, confirmed in an archive of its own, can
+      likewise at most make a short form ambiguous. A resolver knows only the
+      lines it has seen, and confirms only those whose archives it knows, so
+      two resolvers may expand a short form differently, and a short form that
+      is unique today may become ambiguous later, while a full form never
       changes. Short forms are therefore for people (text, citations, a lookup
       typed by hand): pins, <tt class="verbatim">parent</tt>, <tt class="verbatim">members.json</tt>
       and every other file defined by this specification MUST use complete
-      names and owners, a resolver SHOULD show the full form of what it
+      parts, never prefixes, a resolver SHOULD show the full form of what it
       resolved, and landing pages and citation metadata SHOULD give the full
       form, and MAY add a short one. A short form printed or kept where it
       cannot be corrected (a paper, a slide) SHOULD have at least 16
@@ -1194,10 +1220,11 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           it MUST answer with a real HTTP status: a page (200) showing what it
-          resolved, or a redirect (302 or 303) to a copy; a URI with a digest
-          MAY be cached or redirected permanently, one without a digest MUST
-          NOT, since what it names changes; <tt class="verbatim">sheaf:&lt;name&gt;</tt>
-          shows the lines it knows;
+          resolved, or a redirect to a copy (302 or 303, or, for a URI with a
+          digest, 301 or 308); a URI with a digest MAY be cached or redirected
+          permanently, one without a digest MUST NOT, since what it names
+          changes; <tt class="verbatim">sheaf:&lt;name&gt;:*</tt> shows the lines it
+          knows;
         </p>
       </li>
       <li>
@@ -2092,25 +2119,27 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     </ul>
     <p>
       Consistency is all that these prove: anyone can make a parent inventory
-      that agrees with itself. They do not prove that the parent's owner made
-      the parent version. For that a verifier resolves the parent (section
-      6.4); or, when the parent's owner is keyed, checks its signature of the
-      parent version, which the branch SHOULD keep among its witnesses
-      (section 13.2); or relies on other witnesses (timestamps, external
-      records).
+      that agrees with itself. They do not prove that the parent version is
+      the one its archive keeps. For that a verifier resolves the parent
+      (section 6.4), which confirms the archive that keeps the parent's line,
+      not the person or body its owner names (section 6.6); or, when the
+      parent's owner is keyed, checks its signature of the parent version,
+      which the branch SHOULD keep among its witnesses (section 13.2); or
+      relies on other witnesses (timestamps, external records).
     </p>
     <p>
       <strong>Moving the branch point.</strong> A branch MAY take a later
       version of its parent's line as a new branch point: a journal that vets
       the authors' corrected version. The new parent has the same <tt class="verbatim">owner</tt>,
       <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt> and <tt class="verbatim">objectId</tt>
-      as the previous one, a higher object version and a higher document
-      version (a parent version that only changes the description, such as a
-      DOI added, is not a new branch point); a branch point never moves back,
-      and is never dropped. The object version that moves it is the one whose
-      <tt class="verbatim">parent</tt> differs from the previous version's; it holds
-      exactly the files of the new parent version, as the first version of a
-      shallow branch does, with new copies of <tt class="verbatim">parent.inventory.json</tt>
+      as the previous one, a higher object version, and a document version
+      later in the parent's history (section 7.3), not merely a higher number
+      (a parent version that only changes the description, such as a DOI
+      added, is not a new branch point); a branch point never moves back, and
+      is never dropped. The object version that moves it is the one whose <tt
+      class="verbatim">parent</tt> differs from the previous version's; it holds exactly
+      the files of the new parent version, as the first version of a shallow
+      branch does, with new copies of <tt class="verbatim">parent.inventory.json</tt>
       and <tt class="verbatim">parent.object.json</tt>, and is checked like that first
       version (this drops the branch's own files, such as the files of its
       notices, which section 7.3 keeps in every later version: how a move
@@ -2334,8 +2363,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       </li>
     </ul>
     <p>
-      Witness files are named as follows, all in the extension folder (or
-      under <tt class="verbatim">witnesses/&lt;object id&gt;/</tt>):
+      Witness files are named as follows, all in the extension folder (or,
+      except for keyed lines, under <tt class="verbatim">witnesses/&lt;object
+      id&gt;/</tt>):
     </p>
     <ul>
       <li>
@@ -2491,24 +2521,28 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           is the same in every object version from the first that holds it,
           that <tt class="verbatim">name</tt> is its digest, that its <tt class="verbatim">kind</tt>
           is the <tt class="verbatim">kind</tt> of <tt class="verbatim">object.json</tt>, that <tt
-          class="verbatim">owner</tt> and <tt class="verbatim">name</tt> do not change from the
-          first version of the line, that the discovery document lists the
-          head's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, that a line
-          whose owner is not the originator declares a parent and that the
-          originator's line declares none, and, for a keyed owner, the
-          signature of every object version of the line;
+          class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>
+          and <tt class="verbatim">objectId</tt> do not change from the first version of
+          the line, that owners are written in the forms of section 6.5, that
+          the discovery document lists the head's <tt class="verbatim">name</tt> and <tt
+          class="verbatim">owner</tt>, that a line whose owner is not the originator
+          declares a parent and that the originator's line declares none, and,
+          for a keyed owner, the signature of every object version of the
+          line;
         </p>
       </li>
       <li>
         <p>
           for each branch (section 10.5): for a deep branch, with first branch
-          point <tt class="verbatim">vk</tt>, that <tt class="verbatim">objectVersion</tt> of its
-          first <tt class="verbatim">parent</tt> is <tt class="verbatim">vk</tt>, that the
-          inventory of <tt class="verbatim">vk</tt> has the digest <tt class="verbatim">inventorySha512</tt>
-          of <tt class="verbatim">parent</tt>, that <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>,
-          <tt class="verbatim">archiveId</tt>, <tt class="verbatim">objectId</tt> and <tt class="verbatim">documentVersion</tt>
-          of <tt class="verbatim">parent</tt> equal those of the <tt class="verbatim">object.json</tt>
-          of <tt class="verbatim">vk</tt>, that <tt class="verbatim">vk</tt> holds the genesis
+          point <tt class="verbatim">vk</tt>, that its own versions hold no <tt class="verbatim">parent.inventory.json</tt>
+          or <tt class="verbatim">parent.object.json</tt> until one moves its branch
+          point, that <tt class="verbatim">objectVersion</tt> of its first <tt class="verbatim">parent</tt>
+          is <tt class="verbatim">vk</tt>, that the inventory of <tt class="verbatim">vk</tt> has
+          the digest <tt class="verbatim">inventorySha512</tt> of <tt class="verbatim">parent</tt>,
+          that <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>,
+          <tt class="verbatim">objectId</tt> and <tt class="verbatim">documentVersion</tt> of <tt
+          class="verbatim">parent</tt> equal those of the <tt class="verbatim">object.json</tt> of
+          <tt class="verbatim">vk</tt>, that <tt class="verbatim">vk</tt> holds the genesis
           record, and that this <tt class="verbatim">parent</tt> first appears in <tt
           class="verbatim">v(k+1)</tt>; for a shallow branch, the evidence of its first
           version, and that its later versions keep the identity files
@@ -2517,27 +2551,33 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           of <tt class="verbatim">parent</tt>, that the <tt class="verbatim">name</tt> of <tt
           class="verbatim">parent</tt> is its own <tt class="verbatim">name</tt>, and that the
           parent's owner is the <tt class="verbatim">originator</tt> of the genesis
-          record or <tt class="verbatim">parent.object.json</tt> declares a <tt class="verbatim">parent</tt>
-          of its own; for every version that moves the branch point, the same
-          evidence, that the new parent has the same <tt class="verbatim">owner</tt>,
-          <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt> and <tt class="verbatim">objectId</tt>
-          as the previous one and a higher object version and document
-          version, and the continuity of the two parent inventories (section
-          10.5); for each branch point, report the first of these verdicts
-          that applies: inconsistent (a check fails, or the parent was
-          resolved and does not match), confirmed (the parent was resolved,
-          through a location known independently of the branch (section 6.4),
-          and matches; or, for a keyed parent owner, its signature of the
-          branch point holds), attested (one of these witnesses of the parent
-          version holds: an OpenTimestamps proof of its checksum file, kept in
-          <tt class="verbatim">parent/&lt;w&gt;/</tt> (or, for the first branch point of
-          a deep branch, with the copied versions), which proves only that the
-          parent version existed by the date of the proof, reported with that
-          date; a third party's signature with its sidecar, when the
-          verifier's user trusts the signer (a signature by any other key is
-          reported, and leaves the verdict unconfirmed, since the branch's
-          owner can make keys of its own); an external record, such as a DOI
-          deposit, whose files match the parent version; the signature of the
+          record or the parent version's <tt class="verbatim">object.json</tt> (<tt
+          class="verbatim">parent.object.json</tt>, or, for the first branch point <tt
+          class="verbatim">vk</tt> of a deep branch, <tt class="verbatim">vk/object.json</tt>)
+          declares a <tt class="verbatim">parent</tt> of its own, and declares none when
+          the parent's owner is the originator; for every version that moves
+          the branch point, the same evidence, that the new parent has the
+          same <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>
+          and <tt class="verbatim">objectId</tt> as the previous one and a higher object
+          version holding a document version later in the parent's history,
+          and the continuity of the two parent inventories (section 10.5); for
+          each branch point, report the first of these verdicts that applies:
+          inconsistent (a check fails, or the parent was resolved and does not
+          match), confirmed (the parent was resolved, through a location known
+          independently of the branch (section 6.4), and matches; or, for a
+          keyed parent owner, its signature of the branch point holds),
+          attested (one of these witnesses of the parent version holds: an
+          OpenTimestamps proof of its checksum file, kept in <tt class="verbatim">parent/&lt;w&gt;/</tt>
+          (or, for the first branch point of a deep branch, with the copied
+          versions), which proves only that the parent version existed by the
+          date of the proof, reported with that date; a third party's
+          signature with its sidecar, when the verifier's user trusts the
+          signer (a signature by any other key is reported, and leaves the
+          verdict unconfirmed, since the branch's owner can make keys of its
+          own); an external record, such as a DOI deposit, whose files match
+          the parent version, when the verifier's user trusts its depositor or
+          the verifier reached it independently of the branch (others are
+          reported, and leave the verdict unconfirmed); the signature of the
           branch's own owner does not count), unconfirmed (consistent, with
           nothing outside the branch); report as the branch's verdict the
           weakest of those of its branch points (inconsistent, unconfirmed,
@@ -2551,7 +2591,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           where several copies of a line are known (mirrors, members,
           branches' parents), that they agree (section 6.5); two that do not
           are a fork of the line, reported with the owner's signatures when it
-          is keyed, and with whether each copy is confirmed (section 6.6).
+          is keyed, and with whether each copy is confirmed and by which
+          archive (section 6.6).
         </p>
       </li>
     </ul>
@@ -2887,6 +2928,25 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           the archive that keeps the line (its <tt class="verbatim">archiveId</tt>),
           which confirms the archive, not the person; a line keeps one archive
           and one object identifier.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 15 November 2026, proposal revised after a seventh
+          review (branch <tt class="verbatim">proposal/identity</tt>):** <tt class="verbatim">sheaf:&lt;name&gt;</tt>
+          names the originator's line and <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>
+          the object as a whole, so that the canonical form always omits the
+          originator's owner part; resolution without a digest and with no
+          confirmed copy is defined; short forms of a named owner are ordered
+          only within one archive, and copies of one line confirmed in
+          different archives are reported as a conflict; confirmation reads
+          <tt class="verbatim">archiveId</tt> from the copy, never from an index;
+          external records attest only from a trusted depositor or when
+          reached independently; a branch's own collections do not confirm its
+          parent; resolving a parent confirms its archive, not its owner; a
+          branch point moves to a version later in the parent's history;
+          checks added for deep branches of branches, owner forms, and fixed
+          archive and object identifiers; custodian defined.
         </p>
       </li>
     </ul>
@@ -3316,7 +3376,7 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     </div>
     <p>
       A genesis record (proposal, section 6.5), written when the authors'
-      paper was first sealed; its digest gives the name <tt class="verbatim">53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma</tt>
+      paper was sealed; its digest gives the name <tt class="verbatim">53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma</tt>
       (the bytes as shown, with a final line feed):
     </p>
     <div class="language-json">
@@ -3390,6 +3450,8 @@ sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:sfhd2dwtwfacdj6c6ffjk
 sheaf:53c4nq6d/v3
 sheaf:53c4nq6d:sfhd2dwt/v3
     the same two, in short form
+sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:*
+    the paper as a whole: the authors' line, the journal's and any other
 https://opensheaf.org/sheaf:53c4nq6d/v3
     the first, through a gateway</pre>
     </div>
@@ -3488,9 +3550,10 @@ https://opensheaf.org/sheaf:53c4nq6d/v3
           by digests; a journal needs only the version it vetted, and may not
           be allowed to copy the others. A shallow branch carries the parent's
           inventory and <tt class="verbatim">object.json</tt>, so that its consistency
-          can be checked after the parent has gone; that the parent's owner
-          made the parent version needs the parent, its signature or other
-          witnesses.
+          can be checked after the parent has gone; that the parent version is
+          the one its archive keeps needs the parent, reached through that
+          archive, its owner's signature or other witnesses; that the owner
+          named is the person it claims needs owner proofs (#13).
         </p>
       </li>
       <li>

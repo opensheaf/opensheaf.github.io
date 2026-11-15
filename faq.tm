@@ -79,13 +79,13 @@
 
   <os-alert|note|Note.|This answer describes a proposal (sections 6.5 and 10.5 of the specification, on the branch <verbatim|proposal/identity>), not yet agreed.>
 
-  An object has a <dfn|name>, the digest of the genesis record written when it is first shared or published (sealed), and an <dfn|owner>, the one who decides its versions. The pair (owner, name) identifies a <dfn|line>: one history, with a single writer. The archive that keeps the object is only where it lives: mirrors keep the same line elsewhere.
+  An object has a <dfn|name>, the digest of the genesis record written when it is sealed, at its owner's request, before it is first shared, and an <dfn|owner>, the one who decides its versions. The pair (owner, name) identifies a <dfn|line>: one history, with a single writer. The archive that keeps the object is only where it lives: mirrors keep the same line elsewhere.
 
   The owner can be light or strong. A draft has none, and no genesis record: that absence is what marks it as a draft. A named owner is a URI the owner asserts (an archive identifier, an ORCID iD, a web address): enough for most authors. A keyed owner is a public key: every version is signed, so the line can be checked even when its archive has gone.
 
   Anyone can copy a genesis record, so the name alone cannot say whose history is the right one. That is why the owner is part of the identity: a copy kept by another owner is a <dfn|branch>, which declares the version it starts from. A <strong|deep> branch copies all earlier versions and continues them (a co-author carrying the work on). A <strong|shallow> branch keeps only the version it starts from, with the parent's inventory and <verbatim|object.json> as evidence, and adds its own versions (a journal keeping the version it vetted, then its corrections). An accepted copy is a shallow branch kept by a selection.
 
-  A shallow branch can be checked without its parent: the genesis record gives the name, the copied inventory gives the parent pin, the files match that inventory, and the copied <verbatim|object.json> says whose version it was. This shows only that the branch is consistent. Whether the parent's owner really made that version is confirmed by resolving the parent, by the parent owner's signature, or by other witnesses; failing these, it rests on the branch owner's word.
+  A shallow branch can be checked without its parent: the genesis record gives the name, the copied inventory gives the parent pin, the files match that inventory, and the copied <verbatim|object.json> says whose version it was. This shows only that the branch is consistent. Whether the parent version is the one its archive keeps is confirmed by resolving the parent through that archive, by the parent owner's signature, or by other witnesses; failing these, it rests on the branch owner's word. Resolving confirms the archive, not the person the owner names: that would need owner proofs (#13).
 
   <section*|Can documents be linked in richer ways (a short account and its full proof)?><label|can-documents-be-linked-in-richer-ways-a-short-account-and-its-full-proof>
 
