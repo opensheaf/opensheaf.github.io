@@ -1008,48 +1008,65 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       resolver expands a short form among the lines it knows of (from the
       indexes below, the archives and collections it reads, and its user's
       configuration), counting only the lines whose copies pass the checks
-      below:
+      above:
     </p>
     <ul>
       <li>
         <p>
           the candidates are the lines whose name starts with the name part
           and whose owner identifier starts with the owner part; without an
-          owner part, the lines of the originators;
+          owner part, the lines of the originators. Each is confirmed or
+          unconfirmed, as above: confirmed when a copy was reached through its
+          owner's own archive, at a location known independently, or is signed
+          by its keyed owner;
         </p>
       </li>
       <li>
         <p>
-          if all the candidates have the same owner, the short form names the
-          first of them in that owner's order: the line whose first object
-          version written by that owner (for an originator, the version that
-          sealed it; for a branch, its first version after the branch point)
-          has the earliest <tt class="verbatim">created</tt> in its inventory;
+          if there are confirmed candidates, all of the same owner, the short
+          form names the first of them in that owner's order: the line whose
+          first object version of that owner (for the originator, the version
+          that sealed it; for a shallow branch, its first version; for a deep
+          branch, its first version after the branch point) has the earliest
+          <tt class="verbatim">created</tt> in its inventory, compared as instants. The
+          unconfirmed candidates never win: the resolver shows them beside its
+          answer, as warnings;
         </p>
       </li>
       <li>
         <p>
-          if candidates have different owners, or two have the same <tt class="verbatim">created</tt>,
-          the short form is ambiguous: the resolver MUST NOT choose one, and
-          lists the candidates with their full forms.
+          if there is no confirmed candidate and exactly one unconfirmed one,
+          the short form names it, and the resolver reports it as unconfirmed;
+        </p>
+      </li>
+      <li>
+        <p>
+          otherwise (confirmed candidates of different owners, two with the
+          same <tt class="verbatim">created</tt>, or several unconfirmed candidates and
+          no confirmed one), the short form is ambiguous: the resolver MUST
+          NOT choose one, and lists the candidates with their full forms.
         </p>
       </li>
     </ul>
     <p>
-      Only an owner orders its own lines, and only that owner can add to them,
-      so no one else can take a short form over: another owner can at most
-      make it ambiguous, by publishing a name or an owner identifier with the
-      same prefix (8 characters are 40 bits, which can be searched for). A
-      resolver knows only the lines it has seen, so a short form that is
-      unique today may become ambiguous later, while a full form never does.
-      Short forms are therefore for people (text, citations, a lookup typed by
-      hand): pins, <tt class="verbatim">parent</tt>, <tt class="verbatim">members.json</tt> and
-      every other file defined by this specification MUST use complete names
-      and owners, a resolver SHOULD show the full form of what it resolved,
-      and landing pages and citation metadata SHOULD give the full form, and
-      MAY add a short one. A short form printed or kept where it cannot be
-      corrected (a paper, a slide) SHOULD have at least 16 characters in each
-      part (80 bits), which cannot be searched for.
+      The order of an owner's lines is trusted only where the owner is: in its
+      own archive, or under its key. Anyone can write a line under a named
+      owner's URI, with any <tt class="verbatim">created</tt>, and search for a name
+      with a given prefix (8 characters are 40 bits), but such a line is
+      unconfirmed: it is seen, and cannot take the short form over. Another
+      owner, confirmed in an archive of its own, can at most make a short form
+      without an owner part ambiguous. A resolver knows only the lines it has
+      seen, and confirms only those whose owner's archive it knows, so two
+      resolvers may expand a short form differently, and a short form that is
+      unique today may become ambiguous later, while a full form never
+      changes. Short forms are therefore for people (text, citations, a lookup
+      typed by hand): pins, <tt class="verbatim">parent</tt>, <tt class="verbatim">members.json</tt>
+      and every other file defined by this specification MUST use complete
+      names and owners, a resolver SHOULD show the full form of what it
+      resolved, and landing pages and citation metadata SHOULD give the full
+      form, and MAY add a short one. A short form printed or kept where it
+      cannot be corrected (a paper, a slide) SHOULD have at least 16
+      characters in each part (80 bits), which cannot be searched for.
     </p>
     <p>
       <strong>Indexes.</strong> To find objects by name, by owner or by
@@ -2527,11 +2544,14 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       </li>
       <li>
         <p>
-          <strong>Short names (proposal).</strong> A short form of a <tt
-          class="verbatim">sheaf:</tt> URI (section 6.6) can be made ambiguous by anyone
-          who publishes a name or an owner identifier with the same prefix,
-          but not taken over; resolvers list ambiguous candidates instead of
-          choosing, and files record only complete names.
+          <strong>Short names (proposal).</strong> Anyone can publish a line
+          under a named owner's URI whose name starts with a given short form,
+          dated as they like; resolvers therefore order only confirmed lines,
+          reached through the owner's own archive or signed by its key, and
+          show unconfirmed ones as warnings (section 6.6). Another owner can
+          make a short form ambiguous, but not take it over; files record only
+          complete names, and printed short forms are long enough (16
+          characters) not to be searched for.
         </p>
       </li>
       <li>
@@ -2750,14 +2770,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           version; copies found without a digest are confirmed only through
           the owner's archive or keys, others reported as unconfirmed, forks
           reported; gateways answer with real statuses, do not serve archives'
-          files, and fetch safely; indexes declared (<tt class="verbatim">indexes</tt>,
-          <tt class="verbatim">indexes.json</tt>) with prefixes of 2 to 4 characters,
-          sealed versions only, tombstones kept as <tt class="verbatim">removed</tt>,
-          <tt class="verbatim">owners/</tt> listing each owner's names; resolvers as a
-          conformance class; printed short forms of 16 characters; the
-          replacement of #14's <tt class="verbatim">tag:</tt> decision stated; the
-          example ORCID iD given a valid check digit, and the example name
-          recomputed.
+          files, and fetch safely; short forms ordered only among confirmed
+          lines, unconfirmed ones shown as warnings; indexes declared (<tt
+          class="verbatim">indexes</tt>, <tt class="verbatim">indexes.json</tt>) with prefixes of
+          2 to 4 characters, sealed versions only, tombstones kept as <tt
+          class="verbatim">removed</tt>, <tt class="verbatim">owners/</tt> listing each owner's
+          names; resolvers as a conformance class; printed short forms of 16
+          characters; the replacement of #14's <tt class="verbatim">tag:</tt> decision
+          stated; the example ORCID iD given a valid check digit, and the
+          example name recomputed.
         </p>
       </li>
     </ul>
