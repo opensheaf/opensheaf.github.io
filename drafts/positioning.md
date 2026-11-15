@@ -12,9 +12,9 @@ a common way to fix, name, keep and point at scholarly documents, on which
 announcement, filtering and evaluation can be built by anyone, separately,
 and composed. It then compares OpenSheaf with federated and distributed
 systems (Mastodon and ActivityPub, Bluesky and the AT Protocol, Nostr,
-IPFS, distributed hash tables, git, OAI-PMH, LOCKSS, DOI registries), weighs what unbundling
-costs (money, abuse, rights, anonymity), and lists ideas and open
-questions.*
+IPFS, distributed hash tables, git, OAI-PMH, LOCKSS, DOI registries),
+weighs what unbundling costs (money, abuse, rights, anonymity), and lists
+ideas and open questions.*
 
 ## 1. The functions
 
