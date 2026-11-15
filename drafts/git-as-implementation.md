@@ -28,8 +28,9 @@ on top of git.
 
 The specification today takes the first view: git hashes are not part of the
 integrity of an archive (section 13.2 of the specification), and the FAQ
-explains why OCFL rather than git. This paper does not change that; it looks
-at what the second view would give, and at a middle way.
+explains why OCFL rather than git ([Why OCFL? Isn't git
+enough?](../FAQ.md#why-ocfl-isnt-git-enough)). This paper does not change
+that; it looks at what the second view would give, and at a middle way.
 
 ## 2. What OpenSheaf needs
 
@@ -82,8 +83,10 @@ text, or any file, to commits and other objects after the fact, under
 references of their own. Commits and tags can be **signed** (OpenPGP, SSH or
 X.509). The **transport** fetches only the objects missing from a clone, over
 the git protocol or HTTP; the "dumb" HTTP protocol works from a static web
-server. **Shallow** clones hold the last commits without their ancestors;
-**partial** clones hold commits and trees without all blobs.
+server, once `git update-server-info` has written the list of references
+there. **Shallow** clones hold the last commits without their ancestors;
+**partial** clones hold commits without all their blobs, or without all their
+trees.
 
 ### Software Heritage
 
@@ -161,7 +164,7 @@ Its limits:
 | collection version | `members.json` with pins | a tree of gitlinks, with `members.json` |
 | mirror | a byte copy of an object folder | a fetch of the object's reference |
 | deep branch (#30) | the earlier versions copied, continued | a fork |
-| shallow branch (#30) | a new object holding the parent's inventory and `object.json` at the branch point | loosely, a shallow clone: a parent named but not held |
+| shallow branch (#30) | another OCFL object, a line of the same name, holding the parent's files, inventory and `object.json` at the branch point | loosely, a shallow clone: a parent named but not held |
 | self-certifying name (#20, #30) | the digest of `genesis.json` | the blob hash of `genesis.json` |
 | witness | files in `extensions/opensheaf-witnesses/` | signed tags, notes |
 | withdrawal | a description-only version | a commit leaving the document's files unchanged |
@@ -170,12 +173,13 @@ Its limits:
 The match is close. A commit hash fixes its whole history, as an OpenSheaf pin
 does through the inventory. A fork is a deep branch; a shallow branch
 resembles a shallow clone, whose boundary commit names a parent it does not
-hold, though in PR #30 it is a new object rather than a cut history (section
-7). A gitlink, the tree entry that submodules use, is a pin inside a tree. The
-references of a repository are a mutable map, checked against the objects, as
-the discovery document is. And the owner and line of PR #30 resemble git's own
-practice: one writer per branch, copies that agree when one is a prefix of the
-other, and a fork when they diverge.
+hold, though in PR #30 it is another OCFL object, a line of the same name,
+rather than a cut history (section 7). A gitlink, the tree entry that
+submodules use, is a pin inside a tree. The references of a repository are a
+mutable map, checked against the objects, as the discovery document is. And
+the owner and line of PR #30 resemble git's own practice: one writer per
+branch, copies that agree when one is a prefix of the other, and a fork when
+they diverge.
 
 ## 5. Three designs
 
@@ -233,11 +237,14 @@ knows.
   root, readable by the tools of libraries.
 
 Carrying the inventories in the commits, as the git view of section 5.2 does,
-would answer three of these costs even here: pins would stay the SHA-512
-digests of inventories, with the commit hash only an address; every file would
-have its SHA-512 digest in the inventory; and a pin would survive a deleted
-file, since only the commit hashes, now addresses, would change. Reading with
-HTTP, long-term readability, paths and standards remain.
+would answer three of these costs even here, for pinned versions: pins would
+stay the SHA-512 digests of inventories, with the commit hash only an address;
+every file would have its SHA-512 digest in the inventory; and a pin would
+survive a deleted file, since only the commit hashes, now addresses, would
+change. The bytes of earlier inventories would still rest on git's hash
+(section 5.2), and a deletion would still change the commits and their
+identifiers in Software Heritage. Reading with HTTP, long-term readability,
+paths and standards remain.
 
 ### 5.2 Git as a view of OCFL
 
@@ -246,11 +253,12 @@ The archive stays an OCFL storage root, and each object version also has a
 that anyone can recompute it from the OCFL object alone.
 
 - the tree: three entries (a collection has two more, below), `inventory.json`
-  (the root inventory as it was after this version, the copy that OpenSheaf
-  requires in the version folder), `inventory.json.sha512` (its checksum file,
-  which holds the digest of the pin), and `content/`, the logical state of the
-  version, every file with mode `100644` at its logical path, folders as
-  trees;
+  (the copy in the version folder, `vN/inventory.json`, which OpenSheaf
+  requires and OCFL 1.1, section 3.7, makes identical to the root inventory
+  while the version is the head), `inventory.json.sha512` (its checksum file,
+  `vN/inventory.json.sha512`, which holds the digest of the pin), and
+  `content/`, the logical state of the version, every file with mode `100644`
+  at its logical path, folders as trees;
 - the parent: the commit of the previous version (none for `v1`; branches need
   more, section 6);
 - the author and committer: the `user` of the inventory version (its `name`,
@@ -284,8 +292,9 @@ all under SHA-512:
   at least one state (OCFL 1.1, section 3.5.2), and the manifest gives every
   content path to write them to (OCFL allows several for one digest, and a
   copy in a version folder that no state lists);
-- the inventory of each version is in its commit, written to
-  `vN/inventory.json`, and the head's at the root;
+- the inventory of each version and its checksum file are in its commit,
+  written to `vN/inventory.json` and `vN/inventory.json.sha512`, and the
+  head's also at the root;
 - the declaration file `0=ocfl_object_1.1` is the same for every object, and
   is written by the rebuild;
 - the object's `extensions/` (witnesses) and `logs/` are not in the commits,
@@ -311,7 +320,7 @@ before sealing.
 
 The subtree `content/` is the logical state of the version: the document's
 files with `datacite.json` and `object.json` (and, under PR #30,
-`genesis.json`, and in the first version of a shallow branch
+`genesis.json`, and in every version of a shallow branch
 `parent.inventory.json` and `parent.object.json`). Its `swh:1:dir:` identifier
 is the same as that of any tree holding exactly those files, none executable.
 Keeping the document under `content/` also avoids a clash with a document file
@@ -332,8 +341,13 @@ pin of `members.json`, each the view commit of the pinned version; and
 each gitlink and the URL of the repository it is fetched from. `content/`
 stays exactly the state of the version. For the view to remain a function of
 the OCFL object, the paths and the URLs must be derived from `members.json` by
-a stated convention; otherwise collection views cannot be recomputed, and are
-only published (section 6).
+a stated convention, and the bytes of `.gitmodules` (order of entries, section
+names, indentation) fixed; otherwise collection views cannot be recomputed,
+and are only published (section 6). A gitlink is the view commit of the
+member's version, so it is recomputed from the member's whole object up to
+that version, not from the pin alone; and checking it (fetching the commit and
+comparing its inventory with the pin) fixes, under git's hash, more than the
+pin does: the member's earlier inventories too.
 
 **Gains.**
 
@@ -386,26 +400,33 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   newline), with the message written as it is, without the clean-up that `git
   commit` applies (`git commit-tree` reading the message from standard input
   leaves it as given; with `-m` it completes the last line); the date format
-  and time zone; the order of tree entries (git's own); no signature and no
-  extra header, since a `gpgsig` header changes the hash (signatures go in
-  signed tags or notes, which leave the commit alone). Blobs are made from the
-  bytes as stored, with no filters (`git hash-object -w --no-filters`, for
-  instance): building them with `git add` in a work tree lets the builder's
+  and time zone; the order of tree entries (git's own); the bytes of
+  `.gitmodules` in a collection's view; no signature and no extra header,
+  since a `gpgsig` header changes the hash (signatures go in signed tags or
+  notes, which leave the commit alone). Blobs are made from the bytes as
+  stored, with no filters (`git hash-object -w --no-filters`, for instance):
+  building them with `git add` in a work tree lets the builder's
   `core.autocrlf`, `.gitattributes` or Git LFS change them, and so the hashes.
-  A version that cannot be mapped must be reported, not silently changed.
-  Empty folders are no problem: the logical state of OCFL lists only files.
-  The inventory and its checksum file are copied as stored, never
-  re-serialised.
+  The commit itself is best written byte for byte as well (`git hash-object -t
+  commit -w`, which checks the object without changing it): `git commit-tree`
+  rewrites names and addresses, stripping spaces, quotes, commas and
+  semicolons at their ends and removing `<` and `>` within them, so a tool
+  that writes the bytes directly and one that uses `commit-tree` would compute
+  different commits, unless git's rules are adopted and stated. A version that
+  cannot be mapped must be reported, not silently changed. Empty folders are
+  no problem: the logical state of OCFL lists only files. The inventory and
+  its checksum file are copied as stored, never re-serialised.
 - **Depositors and dates.** Section 7.1 of the specification requires a `user`
   with a `name` and a `message` in every version, so neither can be missing;
   the `address` only SHOULD be there, and is a URI (`mailto:` with an e-mail,
   an ORCID iD, another URI), where git expects an e-mail address. The mapping
   must fix the author of a version without an address, whether `mailto:` is
   dropped, how other URIs are written, and how `<`, `>` and line ends in names
-  and addresses are replaced; an empty name (which git's checks refuse) or a
-  NUL character in a name or message must be reported. OCFL `created` is an
-  RFC 3339 date, which may have fractions of a second, a leap second (`60`),
-  and an offset written `Z` or `-00:00`; git keeps whole seconds and a numeric
+  and addresses are replaced; an empty name (which git's checks refuse), a NUL
+  character in a name or message, or a string with no UTF-8 form (an unpaired
+  surrogate escaped in the JSON) must be reported. OCFL `created` is an RFC
+  3339 date, which may have fractions of a second, a leap second (`60`), and
+  an offset written `Z` or `-00:00`; git keeps whole seconds and a numeric
   offset. The rules (truncation, `+0000`, for instance) must be fixed, or two
   tools compute different commits.
 - **Paths.** Logical paths git cannot store must be reported: `.git` in any
@@ -420,14 +441,15 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   build with `git archive`.
 - **Parents of branches.** The rule of section 5.2 gives the first version of
   an object no parent. A deep branch of PR #30 copies the parent's versions,
-  so its views are the parent's commits, continued. A shallow branch is a new
-  object whose first version holds its own `genesis.json`, and the parent's
-  inventory and `object.json` at the branch point (`parent.inventory.json`,
-  `parent.object.json`): its first view is a root commit, unless the rule
-  gives it the parent's view as a git parent, which ties the views of two
-  objects together. Moving the branch point to a later parent version could
-  likewise be a commit with two parents, as PR #30's open question suggests
-  ("probably a merge keeping both"). Either needs a rule.
+  so its views are the parent's commits, continued. A shallow branch is
+  another OCFL object, a line of the same name, whose first version holds the
+  parent's files, the same `genesis.json` included, and the parent's inventory
+  and `object.json` at the branch point (`parent.inventory.json`,
+  `parent.object.json`, kept in every later version): its first view is a root
+  commit, unless the rule gives it the parent's view as a git parent, which
+  ties the views of two objects together. Moving the branch point to a later
+  parent version could likewise be a commit with two parents, as PR #30's open
+  question suggests ("probably a merge keeping both"). Either needs a rule.
 - **Where the commit hash is recorded.** A version cannot hold its own commit
   hash (the hash depends on the content). It can be recorded outside: in the
   discovery document (`gitCommit` next to `inventorySha512`), in the next
@@ -481,9 +503,10 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   root commit of its own, and the sealing commit is not in its history at all.
   The sealing commit names at best the object, within the originator's line
   and its deep branches. The git analogue of the name is the blob hash of
-  `genesis.json`. The self-certifying name of #20 is the digest of the genesis
-  record alone (its format, kind, date, originator and nonce), which does not
-  depend on git's commit metadata or on later versions, and should stay so.
+  `genesis.json`. The self-certifying name of PR #30 (section 6.5, from #20)
+  is the digest of the genesis record alone (its format, kind, date,
+  originator and nonce), which does not depend on git's commit metadata or on
+  later versions, and should stay so.
 - **Takedown.** In a repository of views each object has its own reference, so
   a takedown deletes the reference and prunes the commits; a rewrite of
   history, as in section 9 of [OpenSheaf archives in
@@ -505,15 +528,17 @@ in git terms:
   no one else does;
 - two copies of a line agree when one is a prefix of the other, which is git's
   fast-forward; when neither is, the line has forked, which git detects in the
-  same way;
+  same way. Git is stricter: PR #30 compares the inventories of each version,
+  while a view commit also depends on every earlier inventory, so copies that
+  agree for PR #30 but are not byte copies of each other can differ as views;
 - a **deep branch** is a fork: the history copied, then continued under
   another owner;
 - a **shallow branch** resembles a shallow clone: a parent named but not held.
-  The likeness is loose: in PR #30 a shallow branch is a new object, whose
-  first version holds the parent's inventory and `object.json` as evidence and
-  names the parent by a pin, not a history cut at a boundary as git's
-  `.git/shallow` records; in the views of section 5.2 its first commit is a
-  root commit (section 6);
+  The likeness is loose: in PR #30 a shallow branch is another OCFL object, a
+  line of the same name, whose versions hold the parent's inventory and
+  `object.json` as evidence and names the parent by a pin, not a history cut
+  at a boundary as git's `.git/shallow` records; in the views of section 5.2
+  its first commit is a root commit (section 6);
 - **moving the branch point** forward to a later version of the parent's line
   could be shown as a merge of that version into the branch, a commit with two
   parents. PR #30 says that the moving version holds the new parent version's
@@ -530,11 +555,11 @@ moves of the branch point need the rules for parents of section 6.
 ## 8. Assessment
 
 Git instead of OCFL (section 5.1) would give OpenSheaf a ready transport and
-archiving. Its weak digests could be made up for by carrying the inventories
-in the commits, but not its price on two foundations of the format: archives
-readable as plain files over HTTP, and storage in a standard of preservation
-that libraries read. The price seems too high, and the gains can be had
-otherwise.
+archiving. Its weak digests could be made up for, for pinned versions, by
+carrying the inventories in the commits, but not its price on two foundations
+of the format: archives readable as plain files over HTTP, and storage in a
+standard of preservation that libraries read. The price seems too high, and
+the gains can be had otherwise.
 
 Git as a view (section 5.2) keeps the format and adds what git does best:
 incremental copies, a familiar interface to histories, collections fetched in
