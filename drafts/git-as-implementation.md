@@ -229,8 +229,9 @@ knows.
   verification reports as missing, since the pin fixes the inventory. Git can
   hold a tree whose blob is absent (partial clones do), but its tools treat
   that as damage.
-- **Paths.** Tree entries cannot be named `.git`, and some forges refuse other
-  names; OCFL logical paths have no such limits.
+- **Paths.** Git's checks reject tree entries named `.git`, checkout refuses
+  them, and forges refuse them and some other names on push; OCFL logical
+  paths have no such limits.
 - **Standards.** OpenSheaf's first principle is to use existing standards for
   storage and description. Git is a de facto standard of software, not of
   preservation, and an archive in git alone would no longer be an OCFL storage
@@ -345,9 +346,14 @@ a stated convention, and the bytes of `.gitmodules` (order of entries, section
 names, indentation) fixed; otherwise collection views cannot be recomputed,
 and are only published (section 6). A gitlink is the view commit of the
 member's version, so it is recomputed from the member's whole object up to
-that version, not from the pin alone; and checking it (fetching the commit and
-comparing its inventory with the pin) fixes, under git's hash, more than the
-pin does: the member's earlier inventories too.
+that version, not from the pin alone; and checking it means fetching the
+commit and comparing its inventory with the pin. The gitlink is outside
+`content/`, so the collection's pin does not fix it, and a forged repository
+of views could serve a forged one. It fixes the member's earlier inventories
+under git's hash, more than the pin does, only when it is itself known
+independently: when the collection's view commit is recorded, witnessed or in
+a snapshot of Software Heritage (above); otherwise it is an address, like any
+commit hash.
 
 **Gains.**
 
@@ -409,26 +415,28 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   `core.autocrlf`, `.gitattributes` or Git LFS change them, and so the hashes.
   The commit itself is best written byte for byte as well (`git hash-object -t
   commit -w`, which checks the object without changing it): `git commit-tree`
-  rewrites names and addresses, stripping spaces, quotes, commas and
-  semicolons at their ends and removing `<` and `>` within them, so a tool
-  that writes the bytes directly and one that uses `commit-tree` would compute
-  different commits, unless git's rules are adopted and stated. A version that
-  cannot be mapped must be reported, not silently changed. Empty folders are
-  no problem: the logical state of OCFL lists only files. The inventory and
-  its checksum file are copied as stored, never re-serialised.
+  rewrites names and addresses, trimming spaces and certain punctuation
+  (quotes, commas, colons, semicolons, backslashes) at their ends and removing
+  `<`, `>` and line ends within them, so a tool that writes the bytes directly
+  and one that uses `commit-tree` would compute different commits, unless
+  git's rules are adopted and stated. A version that cannot be mapped must be
+  reported, not silently changed. Empty folders are no problem: the logical
+  state of OCFL lists only files. The inventory and its checksum file are
+  copied as stored, never re-serialised.
 - **Depositors and dates.** Section 7.1 of the specification requires a `user`
   with a `name` and a `message` in every version, so neither can be missing;
   the `address` only SHOULD be there, and is a URI (`mailto:` with an e-mail,
   an ORCID iD, another URI), where git expects an e-mail address. The mapping
   must fix the author of a version without an address, whether `mailto:` is
   dropped, how other URIs are written, and how `<`, `>` and line ends in names
-  and addresses are replaced; an empty name (which git's checks refuse), a NUL
-  character in a name or message, or a string with no UTF-8 form (an unpaired
-  surrogate escaped in the JSON) must be reported. OCFL `created` is an RFC
-  3339 date, which may have fractions of a second, a leap second (`60`), and
-  an offset written `Z` or `-00:00`; git keeps whole seconds and a numeric
-  offset. The rules (truncation, `+0000`, for instance) must be fixed, or two
-  tools compute different commits.
+  and addresses are replaced; an empty name (which `git commit-tree` refuses,
+  though `git hash-object` accepts it), a NUL character in a name or message,
+  or a string with no UTF-8 form (an unpaired surrogate escaped in the JSON)
+  must be reported. OCFL `created` is an RFC 3339 date, which may have
+  fractions of a second, a leap second (`60`), and an offset written `Z` or
+  `-00:00`; git keeps whole seconds and a numeric offset. The rules
+  (truncation, `+0000`, for instance) must be fixed, or two tools compute
+  different commits.
 - **Paths.** Logical paths git cannot store must be reported: `.git` in any
   case, and the names that git's checks (which GitHub runs on every push)
   treat as `.git` on other file systems, such as `git~1` and names with
@@ -528,9 +536,10 @@ in git terms:
   no one else does;
 - two copies of a line agree when one is a prefix of the other, which is git's
   fast-forward; when neither is, the line has forked, which git detects in the
-  same way. Git is stricter: PR #30 compares the inventories of each version,
-  while a view commit also depends on every earlier inventory, so copies that
-  agree for PR #30 but are not byte copies of each other can differ as views;
+  same way. Git is stricter: PR #30 compares one inventory,
+  `vk/inventory.json` of the shorter copy, while a view commit also depends on
+  every earlier inventory, so copies that agree for PR #30 but are not byte
+  copies of each other can differ as views;
 - a **deep branch** is a fork: the history copied, then continued under
   another owner;
 - a **shallow branch** resembles a shallow clone: a parent named but not held.
