@@ -113,7 +113,8 @@ only what its two standards leave open:
   re-serialised. The **name** is its SHA-512, truncated to 256 bits, in
   lowercase base32: 52 characters, `^[a-z2-7]{52}$`; the last character
   also holds the algorithm number in its 4 spare bits (0 gives `a` or
-  `q`; 1 is SHA3-256, 2 BLAKE2b-256).
+  `q`; 1 is SHA3-256, 2 BLAKE2b-256, 3 to 15 SHA-256 over the seed
+  `opensheaf-name-<k>` and a line feed, then the record).
 - **Clashes** (6.5): an archive keeps at most one object per line (owner,
   name). Sealing draws a new nonce if the line is taken; a branch whose
   line is taken by another genesis record is named by the next algorithm

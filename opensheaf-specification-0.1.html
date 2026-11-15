@@ -698,8 +698,12 @@
       bits, the number of the algorithm that made the name: 0 for this one, so
       that the last character is <tt class="verbatim">a</tt> or <tt class="verbatim">q</tt>; 1 for
       SHA3-256 and 2 for BLAKE2b with a 256-bit output, each over the same
-      bytes of <tt class="verbatim">genesis.json</tt> and written in the same way; other
-      numbers are reserved. Names made by different algorithms never coincide.
+      bytes of <tt class="verbatim">genesis.json</tt>; and k from 3 to 15 for SHA-256
+      over the seed <tt class="verbatim">opensheaf-name-&lt;k&gt;</tt> (ASCII, with k in
+      decimal, followed by a line feed) and then those bytes; every one
+      written in the same way. Algorithms 1 and 2, of other families than
+      SHA-2, also serve if SHA-2 weakens; the seeded ones only give further
+      names after a clash. Names made by different algorithms never coincide.
       Names are made by algorithm 0, except a branch named by another
       algorithm to avoid a clash (below); a later version of this
       specification MAY change the default. Since RFC 4648 sets those bits to
@@ -3066,11 +3070,12 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           archive: an archive keeps at most one object per line (owner, name);
           sealing draws a new nonce when the line is taken; a branch whose
           line is taken by another genesis record is named by the next
-          algorithm over the same record (1 SHA3-256, 2 BLAKE2b-256), its <tt
-          class="verbatim">parent</tt> keeping the parent's name, and found under it
-          through <tt class="verbatim">parentName</tt> in the indexes; a mirror whose
-          line is taken cannot be kept; a full name with several originators
-          is ambiguous; aliases left to #44 as a last resort.
+          algorithm over the same record (1 SHA3-256, 2 BLAKE2b-256, 3 to 15
+          seeded SHA-256), its <tt class="verbatim">parent</tt> keeping the parent's
+          name, and found under it through <tt class="verbatim">parentName</tt> in the
+          indexes; a mirror whose line is taken cannot be kept; a full name
+          with several originators is ambiguous; aliases left to #44 as a last
+          resort.
         </p>
       </li>
     </ul>
@@ -3503,7 +3508,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       paper was sealed; its digest gives the name <tt class="verbatim">53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma</tt>
       (the bytes as shown, with a final line feed; a branch named by algorithm
       1 after a clash, section 6.5, would be <tt class="verbatim">cdu6s2l2ruotfxmzrhgeca2oqzxkpoeighrvjx74xs6werwyhxpb</tt>,
-      its SHA3-256 digest with 1 in the last character):
+      its SHA3-256 digest with 1 in the last character; by algorithm 3, <tt
+      class="verbatim">azhb5aa6ejongifwd3bx7tzru5m2cmfexyxxq7xbakwjq5zqo6sd</tt>):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
