@@ -10,11 +10,12 @@ the functions, shows which of them OpenSheaf carries and which it leaves to
 others, and argues that OpenSheaf is best understood as a transport layer:
 a common way to fix, name, keep and point at scholarly documents, on which
 announcement, filtering and evaluation can be built by anyone, separately,
-and composed. It then compares OpenSheaf with federated and distributed
-systems (Mastodon and ActivityPub, Bluesky and the AT Protocol, Nostr,
-IPFS, distributed hash tables, git, OAI-PMH, LOCKSS, DOI registries),
-weighs what unbundling costs (money, abuse, rights, anonymity), and lists
-ideas and open questions.*
+and composed; preservation too, by federations of institutions that keep
+copies of the archives at the edge. It then compares OpenSheaf with
+federated and distributed systems (Mastodon and ActivityPub, Bluesky and
+the AT Protocol, Nostr, IPFS, distributed hash tables, git, OAI-PMH,
+LOCKSS, DOI registries), weighs what unbundling costs (money, abuse,
+rights, anonymity), and lists ideas and open questions.*
 
 ## 1. The functions
 
@@ -132,7 +133,118 @@ whole objects, and a pin says which copy is right. External deposits
 a Zenodo record holds the content files without the inventory, so it cannot
 yet be checked against a pin (issue #22). What
 OpenSheaf does not give is a guarantee that someone keeps the files: that
-is a matter of institutions (section 6).
+is a matter of institutions, and of the next layer.
+
+### Preserve: federated archiving on top
+
+Preservation can be built on the layer like the other functions:
+<dfn>federated archiving</dfn>. Institutions (libraries, universities,
+learned societies) run networks of archives, peer to peer, that keep
+copies of what the leaves hold: the personal and group archives at the
+edge of the network, which come and go. A federation is a consortium of
+peers that trust one another, academic institutions or communities with
+other means of establishing a minimum of real-world trust; joining it is
+a social act, as in LOCKSS, not an open protocol. When a leaf disappears
+(a domain lapses, an author dies, a hosting service closes), its objects
+can still be resolved, from the copies the network holds, and the pins in
+every collection still say which copies are right. Custody is shared
+between the author, who keeps the archive and is its single writer, and
+the federation, which keeps it alive.
+
+The format already has most of the parts. A mirror is a byte-for-byte
+copy of a whole object, updated only by copying the original's versions,
+and an archive's list of mirrored objects is a catalogue; a preservation
+node is an archive whose objects are mirrors. Resolution (section 6.4 of
+the specification) tries the mirrors listed in a collection member, then
+those listed in the archive's discovery document. Three things are
+missing:
+
+- **Finding the network when the leaf is gone.** The leaf's discovery
+  document, with its list of mirrors, disappears with it; a member lists
+  mirrors only if its curator recorded them. A federation needs its own
+  way to be asked: a registry, a well-known address per network, or a DHT
+  from archive identifiers and inventory digests to the copies it holds
+  (section 4, and issues #14, #20).
+- **What may be copied.** A mirror is allowed only if the licences of
+  all the versions copied allow redistribution. Licences belong to
+  versions, but pins and storage belong to histories (a pin fixes every
+  earlier version, and later versions reuse the stored files of earlier
+  ones), so an object whose versions have different licences is hard to
+  copy. A simple rule for now is to mirror only objects with one
+  standard licence: every version copied states the same licence, by its
+  SPDX identifier, from a list of licences that allow verbatim
+  redistribution (CC0 and the Creative Commons licences); a mirror stops
+  at the last version that keeps the rule. It can be checked from the
+  files, and needs no legal reading (issue #34). What may not be served
+  can still be kept as a dark copy, under an agreement with the author,
+  released only after a trigger such as the leaf being gone for good, as
+  CLOCKSS does for journals; that is an agreement of the federation, not
+  a state of the format (#13).
+- **Takedowns.** When a leaf takes a document down for legal reasons, its
+  copies in the federation must follow, or resolution falls through to
+  them (#33).
+
+Federated archiving keeps the rest of the design as it is: the leaves
+stay static files, authors stay the single writers of their objects, and
+any copy, from any node, is checked by the same pins. It is LOCKSS for
+documents that are named and versioned at the edge.
+
+### Resolution through the federation
+
+The same network can resolve as well as keep. Nodes contact one another
+for the objects they exchange, and can exchange resolution information
+with them: which archives they know, where those archives are now, which
+nodes hold which objects up to which version. A reader, or a verifier,
+can then ask any node for an object whose archive is unreachable, and
+the network answers with copies that the pins check.
+
+Integrity is not the difficulty: a pin checks every byte, whichever node
+supplied it. The difficulty is everything a pin does not fix: where
+things are, what is current, what was removed, and who an archive is.
+Content is self-certifying; state is not. In a federation of trusted
+peers, false nodes are not a concern, but these remain:
+
+- **Freshness.** Pinned members are safe, but whatever follows the latest
+  version, and whoever asks for the current version, depends on the last
+  discovery document a node has seen. A node with an old one hides newer
+  versions, notices and withdrawals, and a withdrawal that never arrives
+  looks like none. Inventories help in part: a newer inventory lists all
+  earlier versions, so going back is visible once a newer one has been
+  seen.
+- **Removals spread badly.** Additions travel well between nodes;
+  withdrawals, tombstones and takedowns must reach every node that holds
+  a copy, or a node that missed one brings the object back (#33).
+- **Authority after the leaf.** The archive is the single writer of its
+  objects. If it is unreachable for a while, nodes may hold different
+  heads; if it is gone, nobody may add versions; and if its author
+  starts again elsewhere, or someone else claims the same archive
+  identifier, nothing in today's `tag:` identifiers tells a continuation
+  from an impostor (#13, #20).
+- **Answers depend on the node.** Nodes keep different subsets, so
+  "unavailable" may mean only "unknown to this node", and two verifiers
+  may report the same collection differently, unless a report says where
+  it was made, or the federation guarantees what each node holds.
+- **Privacy.** Resolution queries tell nodes what is being read, and
+  exchanging holdings tells the federation what each member keeps.
+- **Browsers.** The Explorer and readers speak HTTP, not a peer-to-peer
+  protocol, so HTTP gateways would become new central points, unless
+  they are untrusted: they return records and pins that the client
+  checks.
+- **The protocol stays outside the core.** The nodes run software and
+  speak a protocol, with its own specification and versions; the format
+  must not come to depend on it, or OpenSheaf would need the network it
+  was meant to do without.
+
+Trust between institutions is not trust in their servers: a compromised
+or misconfigured node of a trusted member still spreads stale or wrong
+state. The common answer to all of this is that state be stated by the
+archive itself: heads, moves and tombstones as records signed with keys
+bound to the archive identifier, ordered by sequence numbers or
+timestamps, and spread on purpose. In a trusted federation these
+signatures guard against accidents and intrusions rather than enemies,
+but they are what makes resolution through the network sound. They lead
+back to the open questions of keys and self-certifying names (#13, #20)
+before any federation protocol.
 
 ### Announce
 
@@ -335,9 +447,12 @@ are part of the format, not a feature of an aggregator.
 ### LOCKSS
 
 LOCKSS (Lots Of Copies Keep Stuff Safe) is a network of libraries that
-keep copies of the same content and compare them to repair damage. It is
-the model for the custody side of OpenSheaf: mirrors are copies kept by
-other parties, and pins let anyone tell a good copy from a damaged one.
+keep copies of the same content and compare them to repair damage; CLOCKSS,
+built on it, keeps dark copies of journals, released only when a publisher
+stops providing them. It is the model for federated archiving on top of
+OpenSheaf (section 3): mirrors are copies kept by other parties, and pins
+let anyone tell a good copy from a damaged one, without the nodes having
+to compare their copies with one another.
 
 ### DOI registries
 
@@ -459,11 +574,13 @@ anything enters the specification.
   career. The reverse index (which selections include this document?)
   needs an index service over many archives; references and applications
   in general are discussed in #21.
-- **Custody.** Personal archives are fragile: a domain lapses, an account
-  is closed. Mirrors by institutions, external deposits and snapshots
-  answer part of this; who commits to keep what, and how authors keep
-  control of objects held by others, is open (#13, #22). Takedowns and
-  mirrors interact (#33).
+- **Federated archiving.** Consortia of trusted institutions run
+  peer-to-peer networks of preservation nodes that mirror the leaves and
+  resolve them, so that objects stay resolvable when a leaf disappears
+  (section 3). Open: how a network is found once the leaf is gone (a
+  registry, or a DHT), signed heads and tombstones (#13, #20), mirroring
+  only objects with one standard licence (#34), dark copies by agreement,
+  who commits to keep what, and takedowns across the network (#33).
 - **Identity.** Names that do not depend on a domain, and objects whose
   name can be checked from their content (#14, #20); a DHT as an optional
   resolver from digests and archive identifiers to locations (section 4).
