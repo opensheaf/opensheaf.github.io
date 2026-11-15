@@ -6,7 +6,8 @@ refers to "a deployment guide, outside this specification"). It sets out
 what a host must do, which kinds of host do it (static hosting, object
 storage, institutional web space, and with conditions WebDAV servers and
 Nextcloud shares), which do not (consumer cloud drives, reference
-managers), how to upload, and how to check a deployment. Facts about
+managers), how to upload, how to check a deployment, and middle layers
+for those who use neither git nor the command line. Facts about
 services are as of November 2026, and change: check them before relying
 on them.*
 
@@ -277,3 +278,48 @@ against more (see the [positioning paper](positioning.md), section 3).
   `--digests` to download and check every content file).
 - **The website.** Open a landing page in a browser: it should display,
   not download or show source.
+
+## 8. Without git: easier ways to deposit and publish
+
+Everything above assumes someone who can run `osheaf` and, usually, git.
+Most researchers do neither. Middle layers can hide both; from the
+cheapest to the most ambitious:
+
+1. **GitHub's web pages and Actions.** The template sets an archive up
+   from a workflow run in the browser, with a short form, and takes
+   deposits as issues filled with a form, the PDF and sources dragged in
+   as attachments; a workflow checks that the issue comes from the
+   owner, runs `osheaf`, commits, publishes, and answers with the link.
+   No git, no installation, no server; GitHub only, and limited by the
+   size of attachments. Proposed in opensheaf/archive-template#2.
+2. **A deposit tool in the browser**, beside the Explorer: the author
+   picks files and fills a form (pre-filled from an arXiv identifier, a
+   DOI or an ORCID record); the page computes the inventories itself,
+   shows the result, and writes the new version to a host: GitHub through
+   its API, object storage, a WebDAV server, a Nextcloud share, or a
+   local folder. It works with every host of section 2, but is a second
+   implementation of deposits, which must agree with `osheaf` byte for
+   byte. Writing to GitHub needs the author's authorisation, and
+   GitHub's sign-in cannot be completed by a page alone: the step that
+   turns the sign-in into a token needs the application's secret, which
+   cannot be put in a public page, and GitHub's sign-in endpoints do not
+   allow cross-origin requests from browsers. A small service (a few
+   lines, for instance a serverless function) is needed for that step;
+   alternatively the author pastes a personal access token limited to the
+   archive's repository, which needs no service but is less convenient.
+3. **Inside the authoring tool.** A "publish to my archive" command in
+   TeXmacs (which has a profile in the specification), and later in
+   others, sends the document, its sources and its PDF to the archive in
+   one step, through one of the other routes.
+4. **Archives hosted by institutions or communities.** A library or a
+   learned society runs a portal: the researcher signs in (with ORCID),
+   deposits through a form, and the portal keeps the archive, under the
+   researcher's archive identifier. Unlike a repository, the archive
+   stays the author's: it is plain files, which the author can download
+   or move at any time without changing its identifier or its pins. The
+   portal's operator is also a natural custodian and preservation node.
+
+Importing what an author already has (arXiv papers, with `osheaf arxiv
+import`) makes a new archive start full rather than empty, whichever
+route is taken.
+
