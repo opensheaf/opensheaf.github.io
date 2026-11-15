@@ -12,7 +12,7 @@ a common way to fix, name, keep and point at scholarly documents, on which
 announcement, filtering and evaluation can be built by anyone, separately,
 and composed. It then compares OpenSheaf with federated and distributed
 systems (Mastodon and ActivityPub, Bluesky and the AT Protocol, Nostr,
-IPFS, git, OAI-PMH, LOCKSS, DOI registries), weighs what unbundling
+IPFS, distributed hash tables, git, OAI-PMH, LOCKSS, DOI registries), weighs what unbundling
 costs (money, abuse, rights, anonymity), and lists ideas and open
 questions.*
 
@@ -280,6 +280,38 @@ available: someone must hold the bytes. The words collide too: to *pin* in
 IPFS means to keep content available on a node, while a pin in OpenSheaf
 is a reference fixed by a digest, and keeps nothing.
 
+### Distributed hash tables
+
+A distributed hash table (DHT), such as Kademlia in BitTorrent and IPFS,
+is a lookup service run by peers: given a key, usually a hash, the network
+routes the query to the nodes that hold the value or know who does. It
+answers a question that OpenSheaf does not ask. A pin carries no address:
+it says whether a copy is right, not where to find one. OpenSheaf finds
+documents from a name and a location (the archive's address in a
+collection member, its discovery document, its list of mirrors), and uses
+the digest only to check what it found. A DHT is exactly the missing
+"where".
+
+The two also differ in custody. In a DHT, data stays reachable while some
+peer chooses to serve it, and records expire unless they are published
+again; in OpenSheaf an archive keeps its objects, and mirrors are kept by
+named parties. A DHT needs nodes that are always online; an archive needs
+only a static web server. Mutable data in a DHT are records signed with a
+key (IPNS in IPFS, BEP 44 in BitTorrent); in OpenSheaf the mutable map is
+the discovery document, served by the archive itself. A DHT has weak
+points of its own: routing can be attacked by many fake nodes (Sybil and
+eclipse attacks), which hashes do not prevent, and queries tell the
+network what its users read.
+
+A DHT could still serve OpenSheaf as an optional resolver, a further step
+when an archive's own address fails, like the external copies of section
+6.4 of the specification: from the digest of an inventory to the copies
+that match it (issues #20, #22), and from an archive identifier to its
+current base URL, as a record signed by the archive, so that an archive
+can move without a registry (issues #13, #14). The format would stay as it
+is; the pins would still check whatever the DHT returned, and custody
+would still rest with archives and mirrors.
+
 ### Git, forges and Software Heritage
 
 Git is the most successful distributed system for versioned work: every
@@ -327,6 +359,7 @@ own prefix, issue #8); the pin then says which bytes the DOI's work is.
 | AT Protocol (Bluesky) | record in a repository | mutable, signed | relays | yes (host, relay) | signed repository | DID, portable |
 | Nostr | signed event | fixed, some kinds replaceable | relays | relays | signature | key |
 | IPFS | file or tree | new address per change | peer to peer | a node | content address | the hash |
+| DHT (Kademlia) | key and value | records expire unless republished | routed lookup | online peers | the key, when it is a hash | the key |
 | Git | commit | append, history rewritable | clone, pull | no | SHA-1 or SHA-256 chain | none of its own |
 | OAI-PMH | metadata record | updated in place | harvest | yes | none | repository identifiers |
 | DOI registries | registered work | metadata updated, target may move | resolution | yes (registry, resolver) | none | DOI |
@@ -432,7 +465,8 @@ anything enters the specification.
   control of objects held by others, is open (#13, #22). Takedowns and
   mirrors interact (#33).
 - **Identity.** Names that do not depend on a domain, and objects whose
-  name can be checked from their content (#14, #20).
+  name can be checked from their content (#14, #20); a DHT as an optional
+  resolver from digests and archive identifiers to locations (section 4).
 - **Adoption.** OpenSheaf works alongside existing services: a document can
   be on arXiv (`IsIdenticalTo`), have a DOI, and be found by Google
   Scholar; `osheaf arxiv import` brings an author's arXiv papers into an
