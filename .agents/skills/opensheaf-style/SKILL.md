@@ -77,7 +77,7 @@ of it: they are pages of their own, with a look of their own.
 |---|---|---|
 | this site | `resources/opensheaf.css` | the file itself |
 | the Explorer (`opensheaf/explorer`) | `style.css` | `literate/31-style.md` |
-| the default pages of an archive (`opensheaf/opensheaf-py`) | `templates/style.css` | `literate/31-templates.md`; then copied to `archive-template` and `collection-template` (`templates/`, `style.css`) |
+| the default pages of an archive (`opensheaf/opensheaf-py`) | `templates/style.css` | `literate/31-templates.md`; then copied to `archive-template` (`templates/`, `style.css`) |
 
 ### The pieces
 

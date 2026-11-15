@@ -112,13 +112,12 @@ on GitHub, and archives made with them.
   page: open it with the address of an archive
   ([example](https://opensheaf.org/explorer/?url=https://mgubi.org/papers/)),
   link it from an archive's pages, or keep a copy in an archive.
-- **Templates:** [archive-template](https://github.com/opensheaf/archive-template),
-  a ready repository for your own archive of papers, and
-  [collection-template](https://github.com/opensheaf/collection-template), for
-  a curated collection of papers from any archive (a reading list, written as
-  a selection, or a catalogue); both are published with
-  GitHub Pages ("Use this template", then `osheaf init`), and both are testing
-  grounds that run every workflow of the tools on every push.
+- **Template:** [archive-template](https://github.com/opensheaf/archive-template),
+  a ready repository for an archive of papers and for collections of papers
+  from any archive (a reading list or a journal issue, written as a
+  selection, or a catalogue), kept from the browser with GitHub's forms or
+  with `osheaf`, and published with GitHub Pages; it is also a testing ground
+  that runs every workflow of the tools on every push.
 - **Test data:** [example-papers](https://github.com/opensheaf/example-papers),
   papers to deposit (invented ones, TeXmacs papers and slides, real openly
   licensed preprints from arXiv and slides from Zenodo) with their metadata.
