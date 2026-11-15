@@ -303,10 +303,18 @@ cheapest to the most ambitious:
    GitHub's sign-in cannot be completed by a page alone: the step that
    turns the sign-in into a token needs the application's secret, which
    cannot be put in a public page, and GitHub's sign-in endpoints do not
-   allow cross-origin requests from browsers. A small service (a few
-   lines, for instance a serverless function) is needed for that step;
-   alternatively the author pastes a personal access token limited to the
-   archive's repository, which needs no service but is less convenient.
+   allow cross-origin requests from browsers. A small service is needed for
+   that step. One runs at `https://opensheaf-gh-auth.opensheaf.workers.dev`
+   ([opensheaf/gh-auth](https://github.com/opensheaf/gh-auth)): a
+   Cloudflare Worker that completes the sign-in for a GitHub App and gives
+   the token only to pages at the origins on its list (for now
+   `https://opensheaf.org`); it stores nothing. The app's tokens reach only
+   the repositories where the author installed it, with permission to write
+   their contents, and expire after eight hours, renewed through the same
+   service. Anyone can run a copy, with their own GitHub App, for their own
+   pages. Alternatively the author pastes a personal access token limited
+   to the archive's repository, which needs no service but is less
+   convenient.
 3. **Inside the authoring tool.** A "publish to my archive" command in
    TeXmacs (which has a profile in the specification), and later in
    others, sends the document, its sources and its PDF to the archive in
