@@ -281,7 +281,7 @@
     <item>The journal's issues are selections of its own documents, or catalogues of them: the journal's own documents change only by its own acts in either case.
   </itemize>
 
-  <os-alert|note|Note.|Under the identity proposal (section 10.5, not yet agreed), the version of record is not a separate document: it is a later version of the journal's branch of the authors' document (its accepted copy), with the same name, the journal as <verbatim|publisher> and the relations above. A derived work, such as a translation, would be a separate document.>
+  <os-alert|note|Note.|Under the identity proposal (section 10.5, not yet agreed), the version of record is not a separate document: it is a later version of the journal's branch of the authors' document (its accepted copy), with the same name (or, after a clash in the journal's archive, another name of the same genesis record), the journal as <verbatim|publisher> and the relations above. A derived work, such as a translation, would be a separate document.>
 
   <subsection*|A short account of a proof, with its detailed argument><label|a-short-account-of-a-proof-with-its-detailed-argument>
 

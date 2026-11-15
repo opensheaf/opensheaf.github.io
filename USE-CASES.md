@@ -274,8 +274,9 @@ publishes it under its licence, with the authors' agreement.
 > [!NOTE]
 > Under the identity proposal (section 10.5, not yet agreed), the version of
 > record is not a separate document: it is a later version of the journal's
-> branch of the authors' document (its accepted copy), with the same name,
-> the journal as `publisher` and the relations above. A derived work, such
+> branch of the authors' document (its accepted copy), with the same name
+> (or, after a clash in the journal's archive, another name of the same
+> genesis record), the journal as `publisher` and the relations above. A derived work, such
 > as a translation, would be a separate document.
 
 ### A short account of a proof, with its detailed argument

@@ -268,12 +268,36 @@
     "name": {
       "type": "string",
       "pattern": "^[a-z2-7]{52}$",
-      "$comment": "proposal (section 6.5): 256 bits of the SHA-512 digest of genesis.json, lowercase base32"
+      "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
     },
     "owner": {
       "type": "string",
       "format": "uri",
       "$comment": "proposal (section 6.5): a named owner (archive identifier, ORCID iD, web address) or a keyed owner (did:key:, openpgp4fpr:)"
+    },
+    "sealed": {
+      "type": "object",
+      "$comment": "proposal (section 6.5): the originator's sealing version, copied unchanged by every branch",
+      "required": [
+        "archiveId",
+        "objectId",
+        "objectVersion"
+      ],
+      "properties": {
+        "archiveId": {
+          "type": "string",
+          "format": "uri"
+        },
+        "objectId": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "maxLength": 64
+        },
+        "objectVersion": {
+          "type": "string",
+          "pattern": "^v[1-9][0-9]*$"
+        }
+      }
     },
     "parent": {
       "type": "object",
@@ -296,7 +320,7 @@
         "name": {
           "type": "string",
           "pattern": "^[a-z2-7]{52}$",
-          "$comment": "proposal (section 6.5): 256 bits of the SHA-512 digest of genesis.json, lowercase base32"
+          "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
         },
         "archiveId": {
           "type": "string",
@@ -498,13 +522,17 @@
   ],
   "dependentRequired": {
     "name": [
-      "owner"
+      "owner",
+      "sealed"
     ],
     "parent": [
       "name",
       "owner"
     ],
     "owner": [
+      "name"
+    ],
+    "sealed": [
       "name"
     ]
   }

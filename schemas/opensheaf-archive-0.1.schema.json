@@ -113,7 +113,7 @@
           "name": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): 256 bits of the SHA-512 digest of genesis.json, lowercase base32"
+            "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
           },
           "owner": {
             "type": "string",
@@ -173,7 +173,7 @@
           "name": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): 256 bits of the SHA-512 digest of genesis.json, lowercase base32"
+            "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
           },
           "owner": {
             "type": "string",

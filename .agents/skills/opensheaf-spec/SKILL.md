@@ -115,14 +115,18 @@ only what its two standards leave open:
   base32: 52 characters, `^[a-z2-7]{52}$`; the last character's 4 spare
   bits hold k, from 0 to 15 (0, the default, gives `a` or `q`).
 - **Clashes** (6.5): an archive keeps at most one object per line (owner,
-  name). Sealing draws a new nonce if the line is taken; a branch whose
-  line is taken by another genesis record is named by the next algorithm
-  over the same record (`parent` keeps the parent's name); a mirror whose
-  line is taken cannot be kept. A work is searched for under all 16 names
-  of its genesis record, keeping entries whose record is byte-identical
-  (`names/` entries carry `genesis`). At creation an archive also refuses
-  a genesis record reused for another work (a different first sealed
-  version) and an owner identifier equal to another owner's; aliases are
+  name). Sealing draws a new nonce if the line is taken, so an
+  originator's line is named by algorithm 0. A branch takes `parent.name`,
+  unless its line is taken and its branch point cannot be moved there; it
+  then takes the smallest free algorithm number above the parent's (an
+  unjustified rename is only a warning). A mirror whose line is taken
+  cannot be kept. Every line records `sealed` (the originator's sealing
+  version: `archiveId`, `objectId`, `objectVersion`), copied by branches;
+  an archive refuses a genesis record reused for another work (a
+  different `sealed`) and an owner identifier equal to another owner's at
+  its heads. A work is searched for under all 16 names of its genesis
+  record, keeping entries whose record is byte-identical (`names/` entries
+  carry `genesis` and `sealed`) and grouping them by `sealed`. Aliases are
   open (#44).
 - **Draft and sealing** (6.5): a draft is an object without a genesis
   record; no pin may name its versions. Sealing adds the genesis record,
@@ -137,9 +141,9 @@ only what its two standards leave open:
 - **Line** (6.5): (owner, name), one writer, one archive identifier and one
   object identifier in all its copies. Copies agree when their version
   inventories are byte-identical; otherwise it is a **fork**.
-- **Branches** (10.5): lines of other owners with the same name, declaring
-  `parent`. **Deep**: copies the earlier versions and continues them (a
-  co-author). **Shallow**: holds only the branch point plus
+- **Branches** (10.5): lines of other owners with the same genesis record,
+  declaring `parent`. **Deep**: copies the earlier versions and continues
+  them (a co-author). **Shallow**: holds only the branch point plus
   `parent.inventory.json` and `parent.object.json` as evidence (a journal).
   The branch point moves only forward, to a version later in the parent
   line's history, taking the branch's next document version; how a move
@@ -261,7 +265,8 @@ other way round.
   processes and anonymous referees, #33 takedowns and copies, #34 mirrors
   and licences, #37 and #38 resolution and pins through mirrors, #35 a
   gateway for `sheaf:` URIs, #36 registering `sheaf` with IANA, #42 an
-  inconsistency in the appendix E examples. PR #30 holds the identity
+  inconsistency in the appendix E examples, #44 name collisions and
+  aliases. PR #30 holds the identity
   proposal. Read the relevant issue before touching its topic.
 
 ## Design principles to keep
