@@ -696,18 +696,22 @@
       SHA-512, not SHA-512/256, which uses other initial values. The last
       character carries the last bit of the digest and, in its four remaining
       bits, the number of the algorithm that made the name: 0 for this one, so
-      that the last character is <tt class="verbatim">a</tt> or <tt class="verbatim">q</tt>; a
-      later version of the genesis record MAY use another algorithm with
-      another number, so that names made by different algorithms never
-      coincide. Since RFC 4648 sets those bits to zero, names are compared as
-      strings and never decoded; a reader that meets a name whose last
-      character is neither <tt class="verbatim">a</tt> nor <tt class="verbatim">q</tt> reports a
-      name of an algorithm it does not know, not a malformed name. Anyone
-      holding a copy can compute it; it is unique without a registry in
-      practice, since the record holds a random nonce, but a name is used to
-      refer to objects, so what happens when two different works have the same
-      name is open (#44). <tt class="verbatim">object.json</tt> records it as <tt class="verbatim">name</tt>.
-      An archive MAY use the name as the object identifier.
+      that the last character is <tt class="verbatim">a</tt> or <tt class="verbatim">q</tt>; 1 for
+      SHA3-256 and 2 for BLAKE2b with a 256-bit output, each over the same
+      bytes of <tt class="verbatim">genesis.json</tt> and written in the same way; other
+      numbers are reserved. Names made by different algorithms never coincide.
+      Names are made by algorithm 0, except a branch named by another
+      algorithm to avoid a clash (below); a later version of this
+      specification MAY change the default. Since RFC 4648 sets those bits to
+      zero, names are compared as strings and never decoded; a reader that
+      meets a name whose last character is neither <tt class="verbatim">a</tt> nor <tt
+      class="verbatim">q</tt> reports a name of an algorithm it does not know, not a
+      malformed name. Anyone holding a copy can compute it; it is unique
+      without a registry in practice, since the record holds a random nonce,
+      but a name is used to refer to objects, so what happens when two
+      different works have the same name is open (#44). <tt class="verbatim">object.json</tt>
+      records it as <tt class="verbatim">name</tt>. An archive MAY use the name as the
+      object identifier.
     </p>
     <p>
       <strong>Owner.</strong> The owner of a line is a URI, recorded in <tt
@@ -804,6 +808,24 @@
       repository, a journal handing a report to its referee), the new owner
       makes a deep branch (section 10.5), and the previous owner MAY add a
       notice to its own line pointing to the branch.
+    </p>
+    <p>
+      <strong>Clashes.</strong> A name is used to refer to objects, so the
+      format does not assume that two works never share one: in an archive, an
+      object is identified by its line, and no two objects of an archive have
+      the same owner and name (section 14). A clash can arise only when an
+      object is created in an archive, and is resolved there. When sealing, a
+      tool checks the line (owner, name) against the archive and, if it is
+      taken, draws a new nonce. A branch of an object of another archive keeps
+      the parent's genesis record; if its line (owner, name) is taken in its
+      archive by an object of the same genesis record, it is the owner's own
+      earlier branch, whose branch point the owner moves instead (section
+      10.5); if it is taken by an object of another genesis record, the branch
+      is named by the next algorithm, over the same genesis record, whose name
+      gives a line free in the archive, and its <tt class="verbatim">parent</tt> keeps
+      the parent's name. A mirror whose line is taken in the archive by
+      another genesis record cannot be kept there. Other owners' lines of the
+      same name (a mirror, a branch) are different lines, and never clash.
     </p>
     <p>
       <strong>Existing objects.</strong> This draft assumes that every sealed
@@ -906,13 +928,11 @@
       </li>
       <li>
         <p>
-          Collisions: what happens when two different works have the same name
-          (a collision of the digest, or a genesis record reused), and whether
-          a holder may keep both through an alias, a new genesis record that
-          wraps the old one; how resolvers detect collisions (the full digest
-          of the genesis record in the indexes); collisions of owner
-          identifiers, and writing the owner itself in a URI as a way out
-          (#44).
+          Clashes not covered by the rule of section 6.5: a genesis record
+          reused for two works by one owner, where a holder could keep both
+          only through an alias, a new genesis record that wraps the old one;
+          collisions of owner identifiers, and writing the owner itself in a
+          URI as a way out (#44).
         </p>
       </li>
       <li>
@@ -985,17 +1005,19 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           <strong>The owner.</strong> Without an owner part, a URI names the
           line of the originator, the owner named by <tt class="verbatim">originator</tt>
           in the genesis record, which every copy of the object and of its
-          branches carries. It does not mean the latest line or the most
-          authoritative one: the versions of any other line, such as a
-          journal's or a co-author's, are written with their owner, and if the
-          originator stops and another owner continues the work in a deep
-          branch, the URI still names the originator's line. <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>
-          names the object as a whole, with all its lines: a resolver shows
-          the lines it knows that pass the checks below, each marked confirmed
-          or unconfirmed. A resolver rejects <tt class="verbatim">:*</tt> with a
-          document version or <tt class="verbatim">sha512</tt>, since every line has its
-          own document versions (section 10.5); <tt class="verbatim">at</tt> is allowed
-          with it.
+          branches carries. If a resolver finds several genesis records under
+          one name, with different originators, the URI is ambiguous: it lists
+          them with their originators and does not choose. It does not mean
+          the latest line or the most authoritative one: the versions of any
+          other line, such as a journal's or a co-author's, are written with
+          their owner, and if the originator stops and another owner continues
+          the work in a deep branch, the URI still names the originator's
+          line. <tt class="verbatim">sheaf:&lt;name&gt;:*</tt> names the object as a
+          whole, with all its lines: a resolver shows the lines it knows that
+          pass the checks below, each marked confirmed or unconfirmed. A
+          resolver rejects <tt class="verbatim">:*</tt> with a document version or <tt
+          class="verbatim">sha512</tt>, since every line has its own document versions
+          (section 10.5); <tt class="verbatim">at</tt> is allowed with it.
         </p>
       </li>
       <li>
@@ -1179,7 +1201,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           is the first characters of a name: the objects whose names start
           with them, each entry with <tt class="verbatim">name</tt>, <tt class="verbatim">originator</tt>
           (from the genesis record), <tt class="verbatim">owner</tt>, <tt class="verbatim">ownerId</tt>
-          and <tt class="verbatim">objectId</tt>;
+          and <tt class="verbatim">objectId</tt>, and, for a branch named by another
+          algorithm after a clash, <tt class="verbatim">parentName</tt>, the parent's
+          name, so that the branch is also found under it;
         </p>
       </li>
       <li>
@@ -1229,14 +1253,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       keeping the entries whose <tt class="verbatim">ownerId</tt> matches the owner
       part, or, without an owner part, those whose <tt class="verbatim">owner</tt> is
       their <tt class="verbatim">originator</tt>, or, for <tt class="verbatim">:*</tt>, every
-      entry of the name (each line checked and confirmed separately), then
-      reads the history of the object it finds; it looks up a pin in <tt
-      class="verbatim">sha512/</tt>, and an owner in <tt class="verbatim">owners/</tt>; at an
-      archive that keeps no indexes, it MAY read <tt class="verbatim">objects</tt> of
-      the discovery document instead, which gives each object's <tt class="verbatim">name</tt>
-      and <tt class="verbatim">owner</tt>. Like the discovery document, indexes are
-      maps, not witnesses: they are rewritten when objects change, and a
-      resolver checks what it finds as above.
+      entry of the name, and the entries whose <tt class="verbatim">parentName</tt> is
+      that name (each line checked and confirmed separately), then reads the
+      history of the object it finds; it looks up a pin in <tt class="verbatim">sha512/</tt>,
+      and an owner in <tt class="verbatim">owners/</tt>; at an archive that keeps no
+      indexes, it MAY read <tt class="verbatim">objects</tt> of the discovery document
+      instead, which gives each object's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>.
+      Like the discovery document, indexes are maps, not witnesses: they are
+      rewritten when objects change, and a resolver checks what it finds as
+      above.
     </p>
     <p>
       <strong>Gateways.</strong> Browsers do not resolve <tt class="verbatim">sheaf:</tt>
@@ -2060,8 +2085,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       A branch is a line of another owner continuing an object from one of its
       versions, the branch point: a co-author carrying the work on, a journal
       keeping the version it vetted and correcting it afterwards. Its genesis
-      record is the object's, so it has the same name (section 6.5). From its
-      first version after the branch point, its <tt class="verbatim">object.json</tt>
+      record is the object's, so it has the same name (section 6.5), or, after
+      a clash in its archive, the name of the same genesis record by another
+      algorithm. From its first version after the branch point, its <tt class="verbatim">object.json</tt>
       records its own <tt class="verbatim">owner</tt> and <tt class="verbatim">parent</tt>: the
       <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>,
       <tt class="verbatim">objectId</tt>, <tt class="verbatim">objectVersion</tt> (the branch
@@ -2145,11 +2171,13 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>,
           <tt class="verbatim">objectId</tt> and <tt class="verbatim">documentVersion</tt> of <tt
           class="verbatim">parent.object.json</tt>; the <tt class="verbatim">name</tt> of <tt
-          class="verbatim">parent</tt> is the branch's own <tt class="verbatim">name</tt>, the
-          branch's <tt class="verbatim">owner</tt> differs from the parent's, and the
-          parent's owner is the <tt class="verbatim">originator</tt> of the genesis
-          record, or <tt class="verbatim">parent.object.json</tt> declares a <tt class="verbatim">parent</tt>
-          of its own (the parent is itself a branch);
+          class="verbatim">parent</tt> is the branch's own <tt class="verbatim">name</tt>, or the
+          name of the same genesis record by the algorithm of <tt class="verbatim">parent</tt>
+          (the branch being named by another algorithm after a clash, section
+          6.5), the branch's <tt class="verbatim">owner</tt> differs from the parent's,
+          and the parent's owner is the <tt class="verbatim">originator</tt> of the
+          genesis record, or <tt class="verbatim">parent.object.json</tt> declares a <tt
+          class="verbatim">parent</tt> of its own (the parent is itself a branch);
         </p>
       </li>
       <li>
@@ -2564,18 +2592,18 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
         <p>
           for each object with a genesis record (section 6.5): that <tt class="verbatim">genesis.json</tt>
           is the same in every object version from the first that holds it,
-          that <tt class="verbatim">name</tt> is its digest, that its <tt class="verbatim">kind</tt>
-          is the <tt class="verbatim">kind</tt> of <tt class="verbatim">object.json</tt>, that <tt
-          class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>
-          and <tt class="verbatim">objectId</tt> do not change from the first version of
-          the line, that no two objects of the archive (mirrors included) have
-          the same <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> at their
-          heads, that owners are written in the forms of section 6.5, that the
-          discovery document lists the head's <tt class="verbatim">name</tt> and <tt
-          class="verbatim">owner</tt>, that a line whose owner is not the originator
-          declares a parent and that the originator's line declares none, and,
-          for a keyed owner, the signature of every object version of the
-          line;
+          that <tt class="verbatim">name</tt> is its digest by the algorithm named in
+          its last character, that its <tt class="verbatim">kind</tt> is the <tt class="verbatim">kind</tt>
+          of <tt class="verbatim">object.json</tt>, that <tt class="verbatim">owner</tt>, <tt
+          class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt> and <tt class="verbatim">objectId</tt>
+          do not change from the first version of the line, that no two
+          objects of the archive (mirrors included) have the same <tt class="verbatim">name</tt>
+          and <tt class="verbatim">owner</tt> at their heads, that owners are written in
+          the forms of section 6.5, that the discovery document lists the
+          head's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, that a line
+          whose owner is not the originator declares a parent and that the
+          originator's line declares none, and, for a keyed owner, the
+          signature of every object version of the line;
         </p>
       </li>
       <li>
@@ -2596,27 +2624,30 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           unchanged until a version that moves the branch point; for every
           branch, that its <tt class="verbatim">owner</tt> differs from the <tt class="verbatim">owner</tt>
           of <tt class="verbatim">parent</tt>, that the <tt class="verbatim">name</tt> of <tt
-          class="verbatim">parent</tt> is its own <tt class="verbatim">name</tt>, and that the
-          parent's owner is the <tt class="verbatim">originator</tt> of the genesis
-          record or the parent version's <tt class="verbatim">object.json</tt> (<tt
-          class="verbatim">parent.object.json</tt>, or, for the first branch point <tt
-          class="verbatim">vk</tt> of a deep branch, <tt class="verbatim">vk/object.json</tt>)
-          declares a <tt class="verbatim">parent</tt> of its own, and declares none when
-          the parent's owner is the originator; for every version that moves
-          the branch point, the same evidence, that the new parent has the
-          same <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>
-          and <tt class="verbatim">objectId</tt> as the previous one and a higher object
-          version holding a document version later than the previous branch
-          point's in the history of the new parent version, and the continuity
-          of the two parent inventories (section 10.5); for each branch point,
-          report the first of these verdicts that applies: inconsistent (a
-          check fails, or the parent was resolved and does not match),
-          confirmed (the parent was resolved, through a location known
-          independently of the branch (section 6.4), and matches; or, for a
-          keyed parent owner, its signature of the branch point holds),
-          attested (one of these witnesses of the parent version holds: an
-          OpenTimestamps proof of its checksum file, kept in <tt class="verbatim">parent/&lt;w&gt;/</tt>
-          (or, for the first branch point of a deep branch, with the copied
+          class="verbatim">parent</tt> is its own <tt class="verbatim">name</tt> or the name of
+          the same genesis record by another algorithm, and in that case that
+          the line of the parent's name is taken in the archive by an object
+          of another genesis record, and that the parent's owner is the <tt
+          class="verbatim">originator</tt> of the genesis record or the parent version's
+          <tt class="verbatim">object.json</tt> (<tt class="verbatim">parent.object.json</tt>, or,
+          for the first branch point <tt class="verbatim">vk</tt> of a deep branch, <tt
+          class="verbatim">vk/object.json</tt>) declares a <tt class="verbatim">parent</tt> of its
+          own, and declares none when the parent's owner is the originator;
+          for every version that moves the branch point, the same evidence,
+          that the new parent has the same <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>,
+          <tt class="verbatim">archiveId</tt> and <tt class="verbatim">objectId</tt> as the
+          previous one and a higher object version holding a document version
+          later than the previous branch point's in the history of the new
+          parent version, and the continuity of the two parent inventories
+          (section 10.5); for each branch point, report the first of these
+          verdicts that applies: inconsistent (a check fails, or the parent
+          was resolved and does not match), confirmed (the parent was
+          resolved, through a location known independently of the branch
+          (section 6.4), and matches; or, for a keyed parent owner, its
+          signature of the branch point holds), attested (one of these
+          witnesses of the parent version holds: an OpenTimestamps proof of
+          its checksum file, kept in <tt class="verbatim">parent/&lt;w&gt;/</tt> (or,
+          for the first branch point of a deep branch, with the copied
           versions), which proves only that the parent version existed by the
           date of the proof, reported with that date; a third party's
           signature with its sidecar, when the verifier's user trusts the
@@ -3026,6 +3057,20 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           truncated to 256 bits, so that existing names are unchanged and
           names of other algorithms never coincide with them; collisions and
           aliases listed as an open question (#44).
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 15 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>):**
+          clashes of names are resolved where an object is created in an
+          archive: an archive keeps at most one object per line (owner, name);
+          sealing draws a new nonce when the line is taken; a branch whose
+          line is taken by another genesis record is named by the next
+          algorithm over the same record (1 SHA3-256, 2 BLAKE2b-256), its <tt
+          class="verbatim">parent</tt> keeping the parent's name, and found under it
+          through <tt class="verbatim">parentName</tt> in the indexes; a mirror whose
+          line is taken cannot be kept; a full name with several originators
+          is ambiguous; aliases left to #44 as a last resort.
         </p>
       </li>
     </ul>
@@ -3456,7 +3501,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <p>
       A genesis record (proposal, section 6.5), written when the authors'
       paper was sealed; its digest gives the name <tt class="verbatim">53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma</tt>
-      (the bytes as shown, with a final line feed):
+      (the bytes as shown, with a final line feed; a branch named by algorithm
+      1 after a clash, section 6.5, would be <tt class="verbatim">cdu6s2l2ruotfxmzrhgeca2oqzxkpoeighrvjx74xs6werwyhxpb</tt>,
+      its SHA3-256 digest with 1 in the last character):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
