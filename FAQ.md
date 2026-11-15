@@ -175,7 +175,7 @@ list) never extends to its members.
 ## Who owns an object, and what is a branch?
 
 > [!NOTE]
-> This answer describes a proposal (section 6.5 and 10.5 of the
+> This answer describes a proposal (sections 6.5 and 10.5 of the
 > specification, on the branch `proposal/identity`), not yet agreed.
 
 An object has a <dfn>name</dfn>, the digest of the genesis record written when

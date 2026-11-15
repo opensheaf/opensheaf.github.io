@@ -77,7 +77,7 @@
 
   <section*|Who owns an object, and what is a branch?><label|who-owns-an-object-and-what-is-a-branch>
 
-  <os-alert|note|Note.|This answer describes a proposal (section 6.5 and 10.5 of the specification, on the branch <verbatim|proposal/identity>), not yet agreed.>
+  <os-alert|note|Note.|This answer describes a proposal (sections 6.5 and 10.5 of the specification, on the branch <verbatim|proposal/identity>), not yet agreed.>
 
   An object has a <dfn|name>, the digest of the genesis record written when it is first shared or published (sealed), and an <dfn|owner>, the one who decides its versions. The pair (owner, name) identifies a <dfn|line>: one history, with a single writer. The archive that keeps the object is only where it lives: mirrors keep the same line elsewhere.
 

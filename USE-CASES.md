@@ -373,8 +373,8 @@ mirrors its companions too, or reports that their licences forbid it.
 Keeping an accepted copy of the account does the same, and records the
 relation again in the copy's own `object.json`, since an accepted copy has
 its own `object.json` (section 10.5; under the identity proposal it keeps the
-original only as evidence, in `parent.object.json`). Presentations show "the full
-argument, version 3, as reviewed" beside the account. A selection could
+original only as evidence, in `parent.object.json`). Presentations show "the
+full argument, version 3, as reviewed" beside the account. A selection could
 also treat the companions, in their pinned versions, as vetted with the
 account; whether an extension may do so is one of the questions of #28, and
 in the core the journal pins them itself, in a selection such as

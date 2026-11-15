@@ -210,6 +210,19 @@
       </li>
       <li>
         <p>
+          <dfn>Draft</dfn>: an object without a genesis record, not yet
+          sealed; no pin may name its versions (section 6.5).
+        </p>
+      </li>
+      <li>
+        <p>
+          <dfn>Sealing</dfn>: the object version that adds the genesis record,
+          made at the owner's request before a version first leaves the
+          owner's hands (section 6.5).
+        </p>
+      </li>
+      <li>
+        <p>
           <dfn>Genesis record</dfn>: the file <tt class="verbatim">genesis.json</tt>,
           written when an object is first sealed and kept unchanged in all its
           later versions and in its branches; its digest is the object's name
@@ -263,9 +276,10 @@
       <li>
         <p>
           <dfn>Document version</dfn>: the version of the work, a positive
-          integer numbered by the archive, in <tt class="verbatim">object.json</tt> and
-          <tt class="verbatim">datacite.json</tt>. It changes exactly when the
-          document's own files change (section 7.3).
+          integer numbered by the owner of the line (for an archive's own
+          documents, the archive), in <tt class="verbatim">object.json</tt> and <tt
+          class="verbatim">datacite.json</tt>. It changes exactly when the document's
+          own files change (section 7.3).
         </p>
       </li>
       <li>
@@ -407,8 +421,9 @@
     <p>
       The JSON files defined here (<tt class="verbatim">opensheaf.json</tt>, <tt class="verbatim">object.json</tt>,
       <tt class="verbatim">members.json</tt>, <tt class="verbatim">genesis.json</tt>, the index
-      files of section 6.6) MUST validate against the JSON Schemas of appendix
-      D for their declared format version.
+      files and <tt class="verbatim">indexes.json</tt> of section 6.6) MUST validate
+      against the JSON Schemas of appendix D for their declared format
+      version.
     </p>
     <h2 id="auto-6"><a id="5-layout"></a>5. Layout<span style="margin-left: 1em"></span></h2>
     <p>
@@ -467,9 +482,11 @@
       conversion of line endings or character sets, no compression that
       changes the bytes delivered after decoding. Archives kept in git SHOULD
       mark these files as binary (for instance with <tt class="verbatim">.gitattributes</tt>
-      lines <tt class="verbatim">ocfl/** -text</tt> and <tt class="verbatim">opensheaf.json
-      -text</tt>). Archives SHOULD be served over HTTPS and SHOULD allow
-      cross-origin requests to these files (<tt class="verbatim">Access-Control-Allow-Origin:
+      lines <tt class="verbatim">ocfl/** -text</tt>, <tt class="verbatim">opensheaf.json
+      -text</tt> and, where used, <tt class="verbatim">witnesses/** -text</tt>, <tt
+      class="verbatim">names/** -text</tt>, <tt class="verbatim">owners/** -text</tt> and <tt
+      class="verbatim">sha512/** -text</tt>). Archives SHOULD be served over HTTPS and
+      SHOULD allow cross-origin requests to these files (<tt class="verbatim">Access-Control-Allow-Origin:
       *</tt>), so that tools running in a browser can resolve members.
     </p>
     <p>
@@ -646,11 +663,11 @@
       name are branches (section 10.5).
     </p>
     <p>
-      <strong>Genesis record.</strong> When an object is first sealed, that is
-      when a version of it first leaves its owner's hands (shared privately,
-      for instance submitted to a journal, or published; #29), its owner
-      writes the genesis record, the JSON file <tt class="verbatim">genesis.json</tt> at
-      the root of the content, with <tt class="verbatim">format</tt> (<tt class="verbatim">&quot;opensheaf-genesis/0.1&quot;</tt>),
+      <strong>Genesis record.</strong> When an object is sealed, at its
+      owner's request, before a version of it first leaves its owner's hands
+      (shared privately, for instance submitted to a journal, or published;
+      #29), its owner writes the genesis record, the JSON file <tt class="verbatim">genesis.json</tt>
+      at the root of the content, with <tt class="verbatim">format</tt> (<tt class="verbatim">&quot;opensheaf-genesis/0.1&quot;</tt>),
       <tt class="verbatim">kind</tt> (<tt class="verbatim">document</tt> or <tt class="verbatim">collection</tt>),
       <tt class="verbatim">created</tt> (the date and time, in UTC), <tt class="verbatim">originator</tt>
       (the owner of the first line, a URI) and <tt class="verbatim">nonce</tt> (at least
@@ -751,22 +768,26 @@
     </p>
     <p>
       <strong>Sealing and transfer.</strong> The object version that seals a
-      draft adds the genesis record and makes its owner the first writer.
-      Sealing happens when the owner first shares or publishes a version, and
-      tools SHOULD seal explicitly, at the owner's request, rather than as a
-      side effect. Versions made before sealing stay in the object's history,
-      fixed by every later pin like any earlier version, but belong to no line
-      and cannot be named by a pin or vetted (whether sealing may instead
-      rewrite them is open, below). This proposal does not hand lines over (an
-      open question, below): when another owner continues the work (an author
-      leaving an institution's repository, a journal handing a report to its
-      referee), the new owner makes a deep branch (section 10.5), and the
-      previous owner MAY add a notice to its own line pointing to the branch.
+      draft adds the genesis record and makes its owner the first writer. The
+      owner seals an object before first sharing or publishing a version of
+      it, and tools SHOULD seal only at the owner's request, not as a side
+      effect. A draft MAY be kept in a served archive and listed in its
+      discovery document, but cannot be pinned: a catalogue that follows it
+      (section 10.2) pins it only once it is sealed. Versions made before
+      sealing stay in the object's history, fixed by every later pin like any
+      earlier version, but belong to no line and cannot be named by a pin or
+      vetted (whether sealing may instead rewrite them is open, below). This
+      proposal does not hand lines over (an open question, below): when
+      another owner continues the work (an author leaving an institution's
+      repository, a journal handing a report to its referee), the new owner
+      makes a deep branch (section 10.5), and the previous owner MAY add a
+      notice to its own line pointing to the branch.
     </p>
     <p>
       <strong>Existing objects.</strong> This draft assumes that every sealed
       object has a genesis record: archives made under earlier drafts are
-      rebuilt, as section 12 allows before version 1.0.
+      rebuilt, as the warning at the head of this specification allows before
+      version 1.0.
     </p>
     <p>
       <strong>Open questions.</strong>
@@ -776,10 +797,10 @@
         <p>
           Registering the scheme <tt class="verbatim">sheaf</tt> with IANA, as a
           provisional scheme (RFC 7595), since section 6.6 uses it in place of
-          the <tt class="verbatim">tag:</tt> or ARK form chosen in #14; whether the pair
-          (archive identifier, object identifier) keeps a URI form of its own
-          beside <tt class="verbatim">sheaf:</tt> URIs; the form of archive identifiers
-          (<tt class="verbatim">tag:</tt> or ARK) (#14).
+          the <tt class="verbatim">tag:</tt> or ARK form chosen in #14 (#36); whether
+          the pair (archive identifier, object identifier) keeps a URI form of
+          its own beside <tt class="verbatim">sheaf:</tt> URIs; the form of archive
+          identifiers (<tt class="verbatim">tag:</tt> or ARK) (#14).
         </p>
       </li>
       <li>
@@ -790,7 +811,7 @@
           gateway (section 6.6): at <tt class="verbatim">https://opensheaf.org/sheaf:&hellip;</tt>,
           as written provisionally, or on a domain used only for resolution,
           such as <tt class="verbatim">https://sheaf.pub/</tt>, without <tt class="verbatim">sheaf:</tt>
-          in the path (#13, #20).
+          in the path (#13, #20, #35).
         </p>
       </li>
       <li>
@@ -810,14 +831,17 @@
       </li>
       <li>
         <p>
-          Whether a draft may be rewritten before it is sealed, against the
-          rule that versions are fixed (#29).
+          Whether a line may be handed over to another owner, instead of being
+          continued by a deep branch.
         </p>
       </li>
       <li>
         <p>
-          Whether a line may be handed over to another owner, instead of being
-          continued by a deep branch.
+          Moving a branch point when the branch has files of its own (the
+          files of its notices, of a withdrawal, of its version of record):
+          the moving version should probably be a merge keeping both, the new
+          parent version's files and the branch's own, with evidence that
+          tells them apart (section 10.5).
         </p>
       </li>
       <li>
@@ -831,8 +855,9 @@
       </li>
       <li>
         <p>
-          Whether sealing should be explicit only, and whether it may rewrite
-          the draft versions before it (#29).
+          Whether a draft may be rewritten before it is sealed, against the
+          rule that versions are fixed, and whether tools MUST seal only at
+          the owner's request (#29).
         </p>
       </li>
       <li>
@@ -845,8 +870,9 @@
       </li>
       <li>
         <p>
-          Takedowns and branches: a branch keeps the parent version after the
-          parent is taken down (#33).
+          Takedowns: a branch keeps the parent version after the parent is
+          taken down, and mirrors, indexes kept by others and gateways may go
+          on serving a taken-down object (#33).
         </p>
       </li>
       <li>
@@ -963,8 +989,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           <strong>The hint.</strong> <tt class="verbatim">at</tt> names an archive where
-          a copy is expected, for a resolver that knows of none: its value is
-          the archive's base URL, an <tt class="verbatim">https</tt> URL ending with <tt
+          a copy is expected, where a resolver looks first: its value is the
+          archive's base URL, an <tt class="verbatim">https</tt> URL ending with <tt
           class="verbatim">/</tt>, percent-encoded in full (every character outside the
           unreserved characters of RFC 3986 is encoded, as <tt class="verbatim">encodeURIComponent</tt>
           does) and decoded once: <tt class="verbatim">sheaf:&lt;name&gt;/v3?sha512=&lt;digest&gt;&amp;at=https%3A%2F%2Fauthors.example.org%2F</tt>.
@@ -991,10 +1017,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       object version named by a URI with a digest, wherever it was found,
       since the pin fixes it. Without a digest, a copy shows only that someone
       published versions under that owner and name, which a named owner cannot
-      prevent (section 6.5): a resolver reports such a copy as confirmed only
-      when it reached it at a base URL of the owner's archive known
+      prevent (section 6.5): a resolver MUST report such a copy as confirmed
+      only when it reached it at a base URL of the owner's archive known
       independently of the URI and of indexes kept by others, as section 6.4
-      says, or when the owner is keyed and its signatures hold; it reports
+      says, or when the owner is keyed and its signatures hold; it MUST report
       every other copy (one found through <tt class="verbatim">at</tt>, or through an
       index kept by a custodian) as unconfirmed, with where it was found. When
       copies of a line disagree, they are a fork (section 6.5): the resolver
@@ -1029,8 +1055,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           that sealed it; for a shallow branch, its first version; for a deep
           branch, its first version after the branch point) has the earliest
           <tt class="verbatim">created</tt> in its inventory, compared as instants. The
-          unconfirmed candidates never win: the resolver shows them beside its
-          answer, as warnings;
+          unconfirmed candidates MUST NOT win: the resolver shows them beside
+          its answer, as warnings;
         </p>
       </li>
       <li>
@@ -1092,8 +1118,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           <tt class="verbatim">owners/&lt;p&gt;.json</tt>, where <tt class="verbatim">&lt;p&gt;</tt>
           is the first characters of an owner identifier: the owners whose
           identifiers start with them, each entry with <tt class="verbatim">ownerId</tt>,
-          <tt class="verbatim">owner</tt> and <tt class="verbatim">names</tt>, the names of that
-          owner's objects, so that the lines of an owner can be listed;
+          <tt class="verbatim">owner</tt> and <tt class="verbatim">names</tt> (in an index kept
+          for several archives, one entry for each owner and archive), the
+          names of that owner's objects, so that the lines of an owner can be
+          listed;
         </p>
       </li>
       <li>
@@ -1132,9 +1160,12 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       keeping, without an owner part, the entries whose <tt class="verbatim">owner</tt>
       is their <tt class="verbatim">originator</tt>, then reads the history of the
       object it finds; it looks up a pin in <tt class="verbatim">sha512/</tt>, and an
-      owner in <tt class="verbatim">owners/</tt>. Like the discovery document, indexes
-      are maps, not witnesses: they are rewritten when objects change, and a
-      resolver checks what it finds as above.
+      owner in <tt class="verbatim">owners/</tt>; at an archive that keeps no indexes,
+      it MAY read <tt class="verbatim">objects</tt> of the discovery document instead,
+      which gives each object's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>.
+      Like the discovery document, indexes are maps, not witnesses: they are
+      rewritten when objects change, and a resolver checks what it finds as
+      above.
     </p>
     <p>
       <strong>Gateways.</strong> Browsers do not resolve <tt class="verbatim">sheaf:</tt>
@@ -1148,7 +1179,7 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <ul>
       <li>
         <p>
-          it answers with a real HTTP status: a page (200) showing what it
+          it MUST answer with a real HTTP status: a page (200) showing what it
           resolved, or a redirect (302 or 303) to a copy; a URI with a digest
           MAY be cached or redirected permanently, one without a digest MUST
           NOT, since what it names changes; <tt class="verbatim">sheaf:&lt;name&gt;</tt>
@@ -1157,21 +1188,22 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       </li>
       <li>
         <p>
-          it shows whether what it resolved is confirmed or unconfirmed, and
-          where it was found, and treats a copy found only through <tt class="verbatim">at</tt>,
-          for a URI without a digest, as unconfirmed;
+          it MUST show whether what it resolved is confirmed or unconfirmed,
+          and where it was found, and treats a copy found only through <tt
+          class="verbatim">at</tt>, for a URI without a digest, as unconfirmed;
         </p>
       </li>
       <li>
         <p>
-          it does not serve the files of an archive from its own origin, but
+          it MUST NOT serve the files of an archive from its own origin, but
           redirects or links to the archive (section 15);
         </p>
       </li>
       <li>
         <p>
-          when it fetches on behalf of its users, it fetches only <tt class="verbatim">https</tt>
-          URLs at public addresses, with limits on size and time.
+          when it fetches on behalf of its users, it MUST fetch only <tt
+          class="verbatim">https</tt> URLs at public addresses, with limits on size and
+          time.
         </p>
       </li>
     </ul>
@@ -1179,7 +1211,7 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       Whether the project runs a gateway, on which domain, and whether a
       domain used only for resolution (such as <tt class="verbatim">sheaf.pub</tt>)
       drops <tt class="verbatim">sheaf:</tt> from the path, as <tt class="verbatim">https://doi.org/</tt>
-      drops <tt class="verbatim">doi:</tt>, is still to be decided (section 6.5).
+      drops <tt class="verbatim">doi:</tt>, is still to be decided (section 6.5, #35).
     </p>
     <h2 id="auto-14"><a id="7-objects"></a>7. Objects<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-15"><a id="71-common-rules"></a>7.1 Common rules<span style="margin-left: 1em"></span></h3>
@@ -1268,20 +1300,24 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     </p>
     <h3 id="auto-17"><a id="73-document-versions"></a>7.3 Document versions<span style="margin-left: 1em"></span></h3>
     <p>
-      <strong>Numbering.</strong> Document versions are numbered by the
-      archive, from 1, without gaps, independently of any external numbering:
-      a work whose versions 1, 3 and 4 are available on arXiv has document
-      versions 1, 2 and 3. A branch (section 10.5) starts from the document
-      version of its first branch point, and continues without gaps from it
-      (provisionally: option (a) of the open question of section 10.5); an
-      object version that moves the branch point is the branch's next document
-      version, and <tt class="verbatim">parent</tt> keeps the parent's own number.
+      <strong>Numbering.</strong> Document versions are numbered by the owner
+      of the line (for an archive's own documents, the archive), from 1,
+      without gaps, independently of any external numbering: a work whose
+      versions 1, 3 and 4 are available on arXiv has document versions 1, 2
+      and 3. A branch (section 10.5) starts from the document version of its
+      first branch point, and continues without gaps from it (provisionally:
+      option (a) of the open question of section 10.5); an object version that
+      moves the branch point is the branch's next document version, and <tt
+      class="verbatim">parent</tt> keeps the parent's own number.
     </p>
     <p>
-      <strong>Identity versions.</strong> The object version that seals an
-      object adds only identity files (section 7.1), which are not files of
-      the document's own: it keeps the document version it holds, and is
-      otherwise treated as a description-only version. External labels
+      <strong>Identity versions.</strong> An object version that seals an
+      existing draft without adding files of the document's own adds only
+      identity files (section 7.1), which are not files of the document's own:
+      it keeps the document version it holds, and is otherwise treated as a
+      description-only version. An object sealed by a version that also adds
+      files of its own (for instance an object sealed at its first version)
+      takes a new document version, as any new version does. External labels
       (arXiv's <tt class="verbatim">v3</tt>) are recorded in <tt class="verbatim">external</tt>
       (section 9), and presentations SHOULD show them with the document
       version.
@@ -1953,10 +1989,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       resolved (section 6.4). Its <tt class="verbatim">datacite.json</tt> describes it
       with the branch owner (for a selection, its archive) as <tt class="verbatim">publisher</tt>
       and keeps the relations of the parent version; the first version of a
-      shallow branch links the parent version with <tt class="verbatim">IsIdenticalTo</tt>,
-      a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt> of <tt class="verbatim">parent</tt>),
-      or, when the parent has none, a DOI of the parent version if it has one.
-      A branch is deep or shallow.
+      shallow branch, and every version that moves its branch point, SHOULD
+      link the parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if
+      it has one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt> of
+      <tt class="verbatim">parent</tt>). A branch is deep or shallow.
     </p>
     <ul>
       <li>
@@ -2025,7 +2061,12 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           the parent: the fields of <tt class="verbatim">parent</tt> equal the <tt
           class="verbatim">owner</tt>, <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>,
           <tt class="verbatim">objectId</tt> and <tt class="verbatim">documentVersion</tt> of <tt
-          class="verbatim">parent.object.json</tt>;
+          class="verbatim">parent.object.json</tt>; the <tt class="verbatim">name</tt> of <tt
+          class="verbatim">parent</tt> is the branch's own <tt class="verbatim">name</tt>, the
+          branch's <tt class="verbatim">owner</tt> differs from the parent's, and the
+          parent's owner is the <tt class="verbatim">originator</tt> of the genesis
+          record, or <tt class="verbatim">parent.object.json</tt> declares a <tt class="verbatim">parent</tt>
+          of its own (the parent is itself a branch);
         </p>
       </li>
       <li>
@@ -2049,21 +2090,28 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       version of its parent's line as a new branch point: a journal that vets
       the authors' corrected version. The new parent has the same <tt class="verbatim">owner</tt>,
       <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt> and <tt class="verbatim">objectId</tt>
-      as the previous one, and a higher object version; a branch point never
-      moves back, and is never dropped. The object version that moves it is
-      the one whose <tt class="verbatim">parent</tt> differs from the previous
-      version's; it holds exactly the files of the new parent version, as the
-      first version of a shallow branch does, with new copies of <tt class="verbatim">parent.inventory.json</tt>
+      as the previous one, a higher object version and a higher document
+      version (a parent version that only changes the description, such as a
+      DOI added, is not a new branch point); a branch point never moves back,
+      and is never dropped. The object version that moves it is the one whose
+      <tt class="verbatim">parent</tt> differs from the previous version's; it holds
+      exactly the files of the new parent version, as the first version of a
+      shallow branch does, with new copies of <tt class="verbatim">parent.inventory.json</tt>
       and <tt class="verbatim">parent.object.json</tt>, and is checked like that first
-      version, and also for continuity: the new parent inventory continues the
-      previous one when both have the same <tt class="verbatim">id</tt>, every entry of
-      <tt class="verbatim">versions</tt> in the previous one is equal, as a JSON value,
-      to the entry of the same version in the new one, and every digest of
-      those entries is in the manifest of the new one. This shows, from the
-      branch alone, that the corrected version continues the version first
-      vetted. A deep branch moves its branch point in the same way; the checks
-      of a deep branch apply to its first branch point only. The branch stays
-      one sequence of versions under one owner, numbered as section 7.3 says.
+      version (this drops the branch's own files, such as the files of its
+      notices, which section 7.3 keeps in every later version: how a move
+      keeps them is open, section 6.5), and also for continuity: the new
+      parent inventory continues the previous one when both have the same <tt
+      class="verbatim">id</tt>, every entry of <tt class="verbatim">versions</tt> in the previous
+      one is equal, as a JSON value, to the entry of the same version in the
+      new one, and every digest of those entries is in the manifest of the new
+      one. This shows, from the branch alone, that the corrected version
+      continues the version first vetted. A deep branch moves its branch point
+      in the same way; the checks of a deep branch apply to its first branch
+      point only, and for its first move the previous parent inventory is that
+      of its first branch point, <tt class="verbatim">vk/inventory.json</tt>. The branch
+      stays one sequence of versions under one owner, numbered as section 7.3
+      says.
     </p>
     <p>
       <strong>Accepted copies.</strong> An accepted copy is a shallow branch
@@ -2307,15 +2355,16 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           a branch keeps the witnesses of each of its branch points in the
-          folder <tt class="verbatim">parent/&lt;w&gt;/</tt>, where <tt class="verbatim">&lt;w&gt;</tt>
-          is its own object version that took that branch point (the first
-          version after it, or the version that moved it): the parent's
-          checksum file <tt class="verbatim">&lt;v&gt;.inventory.json.sha512</tt> (where
-          <tt class="verbatim">&lt;v&gt;</tt> is <tt class="verbatim">objectVersion</tt> of that
-          <tt class="verbatim">parent</tt>), checked against <tt class="verbatim">parent.inventory.json</tt>
-          of <tt class="verbatim">&lt;w&gt;</tt>; when the parent's owner is keyed, its
-          signature <tt class="verbatim">&lt;v&gt;.inventory.json.sha512.sig</tt> and,
-          for an OpenPGP key, <tt class="verbatim">keys/&lt;fingerprint&gt;.asc</tt>;
+          folder <tt class="verbatim">parent/&lt;w&gt;/</tt> (except the first branch
+          point of a deep branch, whose witnesses it copies with the parent's
+          versions, as above), where <tt class="verbatim">&lt;w&gt;</tt> is its own
+          object version that took that branch point (the first version after
+          it, or the version that moved it): the parent's checksum file <tt
+          class="verbatim">&lt;v&gt;.inventory.json.sha512</tt> (where <tt class="verbatim">&lt;v&gt;</tt>
+          is <tt class="verbatim">objectVersion</tt> of that <tt class="verbatim">parent</tt>),
+          checked against <tt class="verbatim">parent.inventory.json</tt> of <tt class="verbatim">&lt;w&gt;</tt>;
+          when the parent's owner is keyed, its signature <tt class="verbatim">&lt;v&gt;.inventory.json.sha512.sig</tt>
+          and, for an OpenPGP key, <tt class="verbatim">keys/&lt;fingerprint&gt;.asc</tt>;
           and any other witness of the parent version, named as above (<tt
           class="verbatim">&lt;v&gt;.inventory.json.sha512.ots</tt>, <tt class="verbatim">&lt;v&gt;.inventory.json.sha512.&lt;label&gt;.sig</tt>
           with its <tt class="verbatim">.json</tt>).
@@ -2431,8 +2480,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           class="verbatim">owner</tt> and <tt class="verbatim">name</tt> do not change from the
           first version of the line, that the discovery document lists the
           head's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, that a line
-          whose owner is not the originator declares a parent, and, for a
-          keyed owner, the signature of every object version of the line;
+          whose owner is not the originator declares a parent and that the
+          originator's line declares none, and, for a keyed owner, the
+          signature of every object version of the line;
         </p>
       </li>
       <li>
@@ -2448,8 +2498,17 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           record, and that this <tt class="verbatim">parent</tt> first appears in <tt
           class="verbatim">v(k+1)</tt>; for a shallow branch, the evidence of its first
           version, and that its later versions keep the identity files
-          unchanged; for every version that moves the branch point, the same
-          evidence and the continuity of the two parent inventories (section
+          unchanged until a version that moves the branch point; for every
+          branch, that its <tt class="verbatim">owner</tt> differs from the <tt class="verbatim">owner</tt>
+          of <tt class="verbatim">parent</tt>, that the <tt class="verbatim">name</tt> of <tt
+          class="verbatim">parent</tt> is its own <tt class="verbatim">name</tt>, and that the
+          parent's owner is the <tt class="verbatim">originator</tt> of the genesis
+          record or <tt class="verbatim">parent.object.json</tt> declares a <tt class="verbatim">parent</tt>
+          of its own; for every version that moves the branch point, the same
+          evidence, that the new parent has the same <tt class="verbatim">owner</tt>,
+          <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt> and <tt class="verbatim">objectId</tt>
+          as the previous one and a higher object version and document
+          version, and the continuity of the two parent inventories (section
           10.5); for each branch point, report the first of these verdicts
           that applies: inconsistent (a check fails, or the parent was
           resolved and does not match), confirmed (the parent was resolved,
@@ -2457,14 +2516,16 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           and matches; or, for a keyed parent owner, its signature of the
           branch point holds), attested (one of these witnesses of the parent
           version holds: an OpenTimestamps proof of its checksum file, kept in
-          <tt class="verbatim">parent/&lt;w&gt;/</tt>; a third party's signature with
-          its sidecar; an external record, such as a DOI deposit, whose files
-          match the parent version; the signature of the branch's own owner
-          does not count), unconfirmed (consistent, with nothing outside the
-          branch); report as the branch's verdict the weakest of those of its
-          branch points (inconsistent, unconfirmed, attested, confirmed, from
-          the weakest); and report separately whether the parent was found,
-          unavailable or removed (tombstoned), and whether it is withdrawn;
+          <tt class="verbatim">parent/&lt;w&gt;/</tt> (or, for the first branch point of
+          a deep branch, with the copied versions); a third party's signature
+          with its sidecar; an external record, such as a DOI deposit, whose
+          files match the parent version; the signature of the branch's own
+          owner does not count), unconfirmed (consistent, with nothing outside
+          the branch); report as the branch's verdict the weakest of those of
+          its branch points (inconsistent, unconfirmed, attested, confirmed,
+          from the weakest); and report separately whether the parent was
+          found, unavailable or removed (tombstoned), and whether it is
+          withdrawn;
         </p>
       </li>
       <li>
@@ -2544,7 +2605,7 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       </li>
       <li>
         <p>
-          <strong>Short names (proposal).</strong> Anyone can publish a line
+          <strong>Short forms (proposal).</strong> Anyone can publish a line
           under a named owner's URI whose name starts with a given short form,
           dated as they like; resolvers therefore order only confirmed lines,
           reached through the owner's own archive or signed by its key, and
@@ -2588,8 +2649,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
         <p>
           <strong>Metadata.</strong> <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>,
           <tt class="verbatim">members.json</tt>, inventories and the discovery document
-          are placed under CC0, so that they can be harvested and mirrored
-          freely.
+          (and, with the proposal of section 6.5, <tt class="verbatim">genesis.json</tt>,
+          <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>
+          and the index files) are placed under CC0, so that they can be
+          harvested and mirrored freely.
         </p>
       </li>
       <li>
@@ -2779,6 +2842,25 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           characters; the replacement of #14's <tt class="verbatim">tag:</tt> decision
           stated; the example ORCID iD given a valid check digit, and the
           example name recomputed.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 15 November 2026, proposal revised after a sixth
+          review (branch <tt class="verbatim">proposal/identity</tt>):** a branch point
+          moves only to a higher document version; how a move keeps the
+          branch's own files (notices, a version of record) is an open
+          question, probably a merge; identity versions apply to sealing an
+          existing draft; the parent line's validity checked (the parent's
+          owner is the originator or a branch, owners differ, names agree, the
+          originator's line has no parent); deep branches' witnesses and first
+          moves; resolver and gateway rules written with MUST; drafts and
+          sealing defined, sealing at the owner's request before sharing;
+          document versions numbered by the line's owner; open questions
+          merged and linked to #35 and #36, takedowns widened (#33); <tt
+          class="verbatim">IsIdenticalTo</tt> prefers a DOI; CC0, <tt class="verbatim">.gitattributes</tt>
+          and validated files list the new files; examples: placeholders
+          stated, the accepted copy listed by the selection.
         </p>
       </li>
     </ul>
@@ -3024,8 +3106,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     </p>
     <h2 id="auto-45"><a id="appendix-e-examples-non-normative"></a>Appendix E. Examples (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
-      The values below come from the first archive. Digests are shortened, and
-      the DOIs and ORCID iDs are placeholders (with valid check digits).
+      The values below come from the first archive, except the names and
+      owners added by the proposal of section 6.5, which are placeholders.
+      Digests are shortened, and the DOIs and ORCID iDs are placeholders (with
+      valid check digits).
     </p>
     <p>
       A discovery document:
@@ -3038,7 +3122,7 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
   &quot;specification&quot;: &quot;0.1&quot;,
   &quot;archiveId&quot;: &quot;tag:opensheaf.org,2026:mgubi&quot;,
   &quot;name&quot;: &quot;Papers of Massimiliano Gubinelli&quot;,
-  &quot;contact&quot;: &quot;https://orcid.org/0000-0000-0000-0000&quot;,
+  &quot;contact&quot;: &quot;https://orcid.org/0000-0000-0000-0001&quot;,
   &quot;storageRoot&quot;: &quot;ocfl/&quot;,
   &quot;storageLayout&quot;: &quot;0002-flat-direct-storage-layout&quot;,
   &quot;mainCollection&quot;: &quot;collection-papers&quot;,
@@ -3224,11 +3308,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <p>
       The <tt class="verbatim">object.json</tt> of the first version of the journal's
       accepted copy of that paper, a shallow branch from the authors' document
-      version 3 (proposal, section 10.5). Its content also holds <tt class="verbatim">genesis.json</tt>,
-      <tt class="verbatim">parent.inventory.json</tt> and <tt class="verbatim">parent.object.json</tt>;
-      since its owner is keyed, its extension folder holds the signature <tt
-      class="verbatim">v1.inventory.json.sha512.sig</tt>, made with that key (section
-      13.2):
+      version 3, the corrected version the editors accepted (proposal, section
+      10.5; with the selection above, the journal would rather start from
+      version 2 and move its branch point to version 3). With the proposal,
+      the selection lists this accepted copy as its member, a member of its
+      own archive, and MAY keep the authors' revision set as well. Its content
+      also holds <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">parent.inventory.json</tt>
+      and <tt class="verbatim">parent.object.json</tt>; since its owner is keyed, its
+      extension folder holds the signature <tt class="verbatim">v1.inventory.json.sha512.sig</tt>,
+      made with that key (section 13.2):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
