@@ -749,16 +749,19 @@
       <strong>One writer per line.</strong> The object versions of a line form
       a single sequence, each extending the one before, as OCFL objects do: an
       owner MUST NOT publish two different object versions with the same
-      number for the same line, in one archive or in several. Since every
-      version directory keeps the inventory as of that version (section 7.1),
-      two copies of a line can be compared from their inventories alone: two
-      copies whose heads are <tt class="verbatim">vk</tt> and <tt class="verbatim">vm</tt>, with k
-      not greater than m, agree when <tt class="verbatim">vk/inventory.json</tt> is the
-      same file, byte for byte, in both. Two copies that do not agree are a
-      fork of the line. For a keyed owner the signatures show that the owner
-      made both, and the fork is its error; for a named owner it shows only
-      that two parties wrote under the same URI, since anyone can assert it. A
-      fork is found only by someone who sees both copies.
+      number for the same line, in one archive or in several. A line keeps one
+      archive identifier and one object identifier in all its copies (a mirror
+      keeps them unchanged, section 6.3); moving a line to another archive is
+      open, with handing it over (below). Since every version directory keeps
+      the inventory as of that version (section 7.1), two copies of a line can
+      be compared from their inventories alone: two copies whose heads are <tt
+      class="verbatim">vk</tt> and <tt class="verbatim">vm</tt>, with k not greater than m, agree
+      when <tt class="verbatim">vk/inventory.json</tt> is the same file, byte for byte,
+      in both. Two copies that do not agree are a fork of the line. For a
+      keyed owner the signatures show that the owner made both, and the fork
+      is its error; for a named owner it shows only that two parties wrote
+      under the same URI, since anyone can assert it. A fork is found only by
+      someone who sees both copies.
     </p>
     <p>
       <strong>Origin.</strong> The line of the originator is the origin of the
@@ -832,7 +835,8 @@
       <li>
         <p>
           Whether a line may be handed over to another owner, instead of being
-          continued by a deep branch.
+          continued by a deep branch, or moved to another archive, under
+          another archive identifier.
         </p>
       </li>
       <li>
@@ -972,7 +976,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           of the line holding n (section 7.3). What it names can then change
           as the line grows, by a description or a notice, and copies with
           different heads may answer differently: a resolver uses the latest
-          head among the copies that agree (section 6.5).
+          head among the confirmed copies that agree (section 6.5, and below),
+          and reports a later head found only in unconfirmed copies as an
+          unconfirmed extension, without using it.
         </p>
       </li>
       <li>
@@ -1000,7 +1006,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           <strong>Equality.</strong> The canonical form of a <tt class="verbatim">sheaf:</tt>
-          URI has complete parts, lowercase where the case is folded, and no
+          URI has complete parts, lowercase where the case is folded, no owner
+          part when the owner is the originator (read from the genesis record,
+          which any copy carries and the name certifies, section 6.5), and no
           <tt class="verbatim">at</tt> and no unknown parameters. Two URIs name the same
           thing when their canonical forms are equal, byte for byte, and files
           that record a <tt class="verbatim">sheaf:</tt> URI (for instance among the
@@ -1018,13 +1026,18 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       since the pin fixes it. Without a digest, a copy shows only that someone
       published versions under that owner and name, which a named owner cannot
       prevent (section 6.5): a resolver MUST report such a copy as confirmed
-      only when it reached it at a base URL of the owner's archive known
-      independently of the URI and of indexes kept by others, as section 6.4
-      says, or when the owner is keyed and its signatures hold; it MUST report
-      every other copy (one found through <tt class="verbatim">at</tt>, or through an
-      index kept by a custodian) as unconfirmed, with where it was found. When
-      copies of a line disagree, they are a fork (section 6.5): the resolver
-      reports it and does not choose.
+      only when it reached it at a base URL of the archive that keeps the line
+      (the archive named by <tt class="verbatim">archiveId</tt> in the copy's <tt class="verbatim">object.json</tt>),
+      known independently of the URI and of indexes kept by others, as section
+      6.4 says, or when the owner is keyed and its signatures hold. This
+      confirms the archive that keeps the line, not the person or body its
+      owner names, which owner proofs would show (#13); it MUST report every
+      other copy (one found through <tt class="verbatim">at</tt>, or through an index
+      kept by a custodian) as unconfirmed, with where it was found. When
+      confirmed copies of a line disagree (for a keyed owner, copies whose
+      signatures hold), they are a fork (section 6.5): the resolver reports it
+      and does not choose. An unconfirmed copy that disagrees with a confirmed
+      one is reported as a warning, and does not stop the resolution.
     </p>
     <p>
       <strong>Short forms.</strong> For people reading and typing them, the
@@ -1042,9 +1055,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           the candidates are the lines whose name starts with the name part
           and whose owner identifier starts with the owner part; without an
           owner part, the lines of the originators. Each is confirmed or
-          unconfirmed, as above: confirmed when a copy was reached through its
-          owner's own archive, at a location known independently, or is signed
-          by its keyed owner;
+          unconfirmed, as above: confirmed when a copy was reached through the
+          archive that keeps the line, at a location known independently, or
+          is signed by its keyed owner;
         </p>
       </li>
       <li>
@@ -1070,7 +1083,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           otherwise (confirmed candidates of different owners, two with the
           same <tt class="verbatim">created</tt>, or several unconfirmed candidates and
           no confirmed one), the short form is ambiguous: the resolver MUST
-          NOT choose one, and lists the candidates with their full forms.
+          NOT choose one, and lists the candidates with their full forms and
+          their originators.
         </p>
       </li>
     </ul>
@@ -2517,15 +2531,19 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           branch point holds), attested (one of these witnesses of the parent
           version holds: an OpenTimestamps proof of its checksum file, kept in
           <tt class="verbatim">parent/&lt;w&gt;/</tt> (or, for the first branch point of
-          a deep branch, with the copied versions); a third party's signature
-          with its sidecar; an external record, such as a DOI deposit, whose
-          files match the parent version; the signature of the branch's own
-          owner does not count), unconfirmed (consistent, with nothing outside
-          the branch); report as the branch's verdict the weakest of those of
-          its branch points (inconsistent, unconfirmed, attested, confirmed,
-          from the weakest); and report separately whether the parent was
-          found, unavailable or removed (tombstoned), and whether it is
-          withdrawn;
+          a deep branch, with the copied versions), which proves only that the
+          parent version existed by the date of the proof, reported with that
+          date; a third party's signature with its sidecar, when the
+          verifier's user trusts the signer (a signature by any other key is
+          reported, and leaves the verdict unconfirmed, since the branch's
+          owner can make keys of its own); an external record, such as a DOI
+          deposit, whose files match the parent version; the signature of the
+          branch's own owner does not count), unconfirmed (consistent, with
+          nothing outside the branch); report as the branch's verdict the
+          weakest of those of its branch points (inconsistent, unconfirmed,
+          attested, confirmed, from the weakest); and report separately
+          whether the parent was found, unavailable or removed (tombstoned),
+          and whether it is withdrawn;
         </p>
       </li>
       <li>
@@ -2533,7 +2551,7 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           where several copies of a line are known (mirrors, members,
           branches' parents), that they agree (section 6.5); two that do not
           are a fork of the line, reported with the owner's signatures when it
-          is keyed.
+          is keyed, and with whether each copy is confirmed (section 6.6).
         </p>
       </li>
     </ul>
@@ -2608,11 +2626,11 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           <strong>Short forms (proposal).</strong> Anyone can publish a line
           under a named owner's URI whose name starts with a given short form,
           dated as they like; resolvers therefore order only confirmed lines,
-          reached through the owner's own archive or signed by its key, and
-          show unconfirmed ones as warnings (section 6.6). Another owner can
-          make a short form ambiguous, but not take it over; files record only
-          complete names, and printed short forms are long enough (16
-          characters) not to be searched for.
+          reached through the archive that keeps them or signed by the owner's
+          key, and show unconfirmed ones as warnings (section 6.6). Another
+          owner can make a short form ambiguous, but not take it over; files
+          record only complete names, and printed short forms are long enough
+          (16 characters) not to be searched for.
         </p>
       </li>
       <li>
@@ -2621,9 +2639,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           owner's line can be forked by anyone, so a copy found through an <tt
           class="verbatim">at</tt> hint, an index kept by others or a gateway is only a
           copy: resolvers and gateways report it as unconfirmed unless it was
-          reached through the owner's own archive or is signed by a keyed
-          owner (section 6.6). A gateway that fetches URLs given in links
-          guards against requests to private addresses and against large
+          reached through the archive that keeps the line or is signed by a
+          keyed owner (section 6.6). A gateway that fetches URLs given in
+          links guards against requests to private addresses and against large
           responses, and does not serve archives' files from its own origin.
         </p>
       </li>
@@ -2860,7 +2878,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           merged and linked to #35 and #36, takedowns widened (#33); <tt
           class="verbatim">IsIdenticalTo</tt> prefers a DOI; CC0, <tt class="verbatim">.gitattributes</tt>
           and validated files list the new files; examples: placeholders
-          stated, the accepted copy listed by the selection.
+          stated, the accepted copy listed by the selection; resolution uses
+          the latest head and declares forks among confirmed copies only,
+          unconfirmed ones reported as warnings; a third party's signature
+          attests only when the verifier trusts the signer, and a timestamp
+          proves existence by its date; the canonical form of a <tt class="verbatim">sheaf:</tt>
+          URI omits the originator's owner part; a copy is confirmed through
+          the archive that keeps the line (its <tt class="verbatim">archiveId</tt>),
+          which confirms the archive, not the person; a line keeps one archive
+          and one object identifier.
         </p>
       </li>
     </ul>
