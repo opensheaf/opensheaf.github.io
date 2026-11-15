@@ -14,9 +14,9 @@ and composed; preservation too, by federations of institutions that keep
 copies of the archives at the edge. It then compares OpenSheaf with
 federated and distributed systems (Mastodon and ActivityPub, Bluesky and
 the AT Protocol, Nostr, IPFS, distributed hash tables, git, OAI-PMH,
-LOCKSS, notification protocols such as COAR Notify, DOI registries),
-weighs what unbundling costs (money, abuse, rights, anonymity), and lists
-ideas and open questions.*
+LOCKSS, notification protocols such as COAR Notify, COAR's Pubfair,
+DOI registries), weighs what unbundling costs (money, abuse, rights,
+anonymity), and lists ideas and open questions.*
 
 ## 1. The functions
 
@@ -524,6 +524,45 @@ writing pins in COAR Notify payloads, which may wait for global names
 `@alice@example.org` into links, could give archives handles too, but
 handles bound to a domain do not solve naming (#14).
 
+### COAR's repository model: Pubfair
+
+The closest relative of this paper's argument comes from the repository
+community. COAR's Next Generation Repositories (2017) set out a vision of
+repositories as a distributed network with services built on top, and
+the white paper *Pubfair* (Ross-Hellauer, Fecher, Shearer and Rodrigues,
+2019) made it a framework for open publishing: a modular, open-source
+publishing layer over a distributed network of repositories, which hold
+the research outputs while separate services review, curate and
+disseminate them. It is the same unbundling as in section 2: archives
+apart from filters, joined by protocols. Pubfair itself is a conceptual
+model, not software; it is being carried out through COAR Notify (above),
+launched in 2021 and developed since with dedicated funding, with working
+implementations such as the review of HAL's preprints by Episciences
+journals. The model is often called "publish, review, curate".
+
+OpenSheaf agrees with this model and differs in what it assumes about
+the archives:
+
+- **Who keeps them.** Pubfair's archives are institutional repositories,
+  running platforms such as DSpace or EPrints. OpenSheaf's can be kept by
+  authors and groups themselves, as static files, with institutions as
+  custodians and preservation nodes (section 3).
+- **What is kept.** A repository holds deposits and their metadata, with
+  versions as the platform allows. An OpenSheaf archive holds every
+  version of a document, with its sources, fixed by digests and
+  verifiable by anyone from the files.
+- **What statements fix.** In Pubfair, a review or an endorsement refers
+  to a resource by its address or DOI. In OpenSheaf, a selection pins the
+  bytes it vetted, across archives, and is itself a versioned object.
+
+The two fit together: an OpenSheaf archive can be a repository in COAR's
+network, with an inbox run beside it, and COAR Notify can carry, with
+pins, the notices between OpenSheaf archives and the services that
+review and select. Repositories can also be the institutional custodians
+of section 3. The repository community is where institutions and review
+services already are, and joining its protocols is the way for OpenSheaf
+to be adopted rather than to compete.
+
 ### DOI registries
 
 Crossref and DataCite register DOIs: persistent names, resolved through
@@ -693,6 +732,9 @@ Open questions for this paper:
   <https://www.episciences.org>.
 - Peer Community In: <https://peercommunityin.org>.
 - COAR Notify, version 1.0.1: <https://coar-notify.net>.
+- Ross-Hellauer, T., Fecher, B., Shearer, K. and Rodrigues, E.,
+  *Pubfair: a framework for sustainable, distributed, open science
+  publishing services*, COAR, 2019 (second version, November 2019).
 - Linked Data Notifications, W3C Recommendation, 2017:
   <https://www.w3.org/TR/ldn/>.
 - WebSub, W3C Recommendation, 2018: <https://www.w3.org/TR/websub/>.
