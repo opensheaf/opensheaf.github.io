@@ -14,8 +14,9 @@ and composed; preservation too, by federations of institutions that keep
 copies of the archives at the edge. It then compares OpenSheaf with
 federated and distributed systems (Mastodon and ActivityPub, Bluesky and
 the AT Protocol, Nostr, IPFS, distributed hash tables, git, OAI-PMH,
-LOCKSS, DOI registries), weighs what unbundling costs (money, abuse,
-rights, anonymity), and lists ideas and open questions.*
+LOCKSS, notification protocols such as COAR Notify, DOI registries),
+weighs what unbundling costs (money, abuse, rights, anonymity), and lists
+ideas and open questions.*
 
 ## 1. The functions
 
@@ -473,6 +474,56 @@ OpenSheaf (section 3): mirrors are copies kept by other parties, and pins
 let anyone tell a good copy from a damaged one, without the nodes having
 to compare their copies with one another.
 
+### Notification protocols
+
+A family of web protocols carries messages between the parties that a
+federation of documents needs, and their use falls on the services built
+on the layer rather than on the archives: a static archive can be read,
+but cannot receive anything.
+
+- **Announcing.** WebSub (W3C, 2018) lets a hub push the updates of a
+  feed to its subscribers: an archive stays static, names a hub in its
+  Atom feed, and aggregators learn of new versions without polling.
+  ActivityPub, as above, lets an archive or an announcement service be an
+  actor that people follow.
+- **Notices between parties.** Linked Data Notifications (W3C, 2017)
+  define an inbox, declared by a resource, to which others post notices
+  about it; Webmention does the same, more simply, for links between
+  pages. They answer the reverse question that a document cannot answer
+  about itself (which selections include it, who reviewed it) without
+  breaking the rule that a document never states the collections that
+  include it: the selection sends a notice to the document's archive, and
+  the notices are kept outside the objects.
+- **COAR Notify.** The Confederation of Open Access Repositories builds on
+  Linked Data Notifications and the ActivityStreams 2.0 vocabulary a
+  protocol (version 1.0.1) that connects repositories with the services
+  that review and endorse what they hold. Its patterns are requests
+  (*Request Review*, *Request Endorsement*), acknowledgements (accept,
+  reject), and announcements (*Announce Review*, *Announce Endorsement*,
+  *Announce Relationship*): a repository offers a preprint to a review
+  service, and the service announces the review back, naming the
+  reviewed resource in the notice's `context`. Repository platforms
+  (DSpace, EPrints, Dataverse, HAL), preprint servers (bioRxiv,
+  Preprints.org, SciELO Preprints) and review and overlay services (Peer
+  Community In, Episciences, PREreview, Sciety) implement it. It is the
+  unbundling of section 2, already at work between filters and archives,
+  and the protocol to follow rather than to reinvent.
+
+What OpenSheaf can add is integrity. A COAR Notify notice identifies
+resources by URI (a landing page, a DOI as `cite-as`), with no digest and
+no signature: it says that a review exists of "the resource at this
+page", not of which bytes. With OpenSheaf, the object of a notice can be
+a pin (the reviewed revision, and the version of the selection that
+includes it), so that whoever receives the notice can check it against
+the files, and the notice stops being only a claim. Two things would be
+needed outside the core: a way for an archive to name its inbox (in the
+discovery document, as it names a `contact`; the inbox can be run
+elsewhere, since the archive itself is static), and a convention for
+writing pins in COAR Notify payloads, which may wait for global names
+(issue #14). WebFinger, which turns a handle such as
+`@alice@example.org` into links, could give archives handles too, but
+handles bound to a domain do not solve naming (#14).
+
 ### DOI registries
 
 Crossref and DataCite register DOIs: persistent names, resolved through
@@ -587,6 +638,11 @@ anything enters the specification.
 - **Overlay journals without an external archive.** Selections over
   authors' own archives, with accepted copies when the journal wants to
   keep the version it published; review records as documents (#29).
+- **Notices with pins.** Selections and reviewers notify the archives of
+  the documents they include or review, with COAR Notify, and give the
+  pin of what they vetted, so that the notice can be checked; archives
+  name an inbox, run elsewhere if they are static. This builds the
+  reverse index from the edge (section 4).
 - **Evidence for merit.** The main collection of an author's archive,
   together with the
   selections that include its documents, is a verifiable record of a
@@ -636,6 +692,10 @@ Open questions for this paper:
 - Episciences, a platform of overlay journals:
   <https://www.episciences.org>.
 - Peer Community In: <https://peercommunityin.org>.
+- COAR Notify, version 1.0.1: <https://coar-notify.net>.
+- Linked Data Notifications, W3C Recommendation, 2017:
+  <https://www.w3.org/TR/ldn/>.
+- WebSub, W3C Recommendation, 2018: <https://www.w3.org/TR/websub/>.
 - ActivityPub, W3C Recommendation, 2018:
   <https://www.w3.org/TR/activitypub/>.
 - AT Protocol: <https://atproto.com>.
