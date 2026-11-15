@@ -141,19 +141,25 @@ only what its two standards leave open:
   the branch, or a keyed parent's signature. Attested: a timestamp, a
   signature of a signer the user trusts, an external record from a trusted
   depositor or reached independently. Confirmation confirms the archive,
-  not the person (owner proofs are discussed in #13).
+  not the person (owner proofs are discussed in #41).
 - **`sheaf:` URIs** (6.6): `sheaf:<name>` (the originator's line),
   `sheaf:<name>:<owner id>` (another owner's line), `sheaf:<name>:*` (all
-  lines), `/v<n>` (a document version), `?sha512=<digest>` (a pin),
-  `&at=<archive URL>` (a hint, not identity). The **owner identifier** is
-  the SHA-512 of the owner's URI, encoded like a name. The canonical form
+  lines; no version, no `sha512`), `/v<n>` (a document version),
+  `sha512=<digest>` (a pin), `at=<archive URL>` (a hint, not identity), the
+  parameters in a query after `?`, `sha512` first. The **owner identifier**
+  is the SHA-512 of the owner's URI, encoded like a name. The canonical form
   omits the originator's owner part and `at`.
 - **Resolution** (6.6): without a digest, copies are confirmed only when
   reached through the archive named by their `archiveId`, known
   independently, or signed by a keyed owner; heads, forks and short-form
-  order are decided among confirmed copies, unconfirmed ones are warnings.
-  **Short forms**: prefixes of at least 8 characters (16 when printed),
-  ordered only within one owner and one archive, otherwise ambiguous.
+  order are decided among confirmed copies, and unconfirmed ones are
+  warnings. With no confirmed copy, the latest head among agreeing
+  unconfirmed copies is used, marked unconfirmed. Confirmed copies of one
+  line in different archives are a conflict, not a choice. **Short
+  forms**: prefixes of at least 8 characters (16 when printed); a single
+  unconfirmed candidate is resolved, marked unconfirmed; confirmed
+  candidates are ordered within one owner (for a named owner, within one
+  archive), otherwise ambiguous.
 - **Indexes** (6.6): `names/<p>.json`, `owners/<p>.json`,
   `sha512/<p>.json`, with prefixes of 2 to 4 characters declared in
   `indexes` (or `indexes.json` for an index of many archives); maps, never
@@ -169,9 +175,10 @@ only what its two standards leave open:
   PDF, recommended), files of notes, `datacite.json`, `object.json`. No HTML
   or other presentation files.
 - **Collection**: `datacite.json`, `object.json`, `members.json`.
-- (Proposal) identity files: `genesis.json` in every sealed version, and,
-  in a shallow branch, `parent.inventory.json` and `parent.object.json`;
-  these names are reserved.
+- (Proposal) identity files: `genesis.json` in every sealed version, and
+  `parent.inventory.json` and `parent.object.json` in every version of a
+  shallow branch, and of a deep branch from a version that moves its
+  branch point; these names are reserved.
 - `datacite.json` (8): MUST `titles`, `creators`, `publicationYear`,
   `types`, `version` (the document version as a string), `publisher`;
   SHOULD abstract, subjects, dates, `rightsList`, `relatedIdentifiers`.
@@ -190,7 +197,8 @@ only what its two standards leave open:
   `extensions`; (proposal) `name` and `owner` from the first sealed
   version, and `parent` in a branch.
 - Metadata files (`datacite.json`, `object.json`, `members.json`,
-  inventories, the discovery document) are CC0 (16).
+  inventories, the discovery document; in the proposal also
+  `genesis.json`, the `parent.*` files and the index files) are CC0 (16).
 
 ## Verification (14)
 
@@ -232,11 +240,14 @@ other way round.
   non-normative but must agree, and the "What happens when ..." table of
   the use cases summarises behaviour.
 - Open questions go to issues on `opensheaf/opensheaf.github.io`. Ongoing
-  designs (as of November 2026): #13 decentralised holding and keys, #14
+  designs (as of November 2026): #13 decentralised holding and keys (split
+  into #39 custodians' copies, #40 statements by collections about their
+  members, #41 owner proofs), #14
   global names, #19 scale, #20 self-certifying names, #21 references and
   applications, #22 external copies and pins, #28 companion documents (an
   extension), #29 private archives, draft/private/public states, review
-  processes and anonymous referees, #33 takedowns and copies, #35 a
+  processes and anonymous referees, #33 takedowns and copies, #34 mirrors
+  and licences, #37 and #38 resolution and pins through mirrors, #35 a
   gateway for `sheaf:` URIs, #36 registering `sheaf` with IANA, #42 an
   inconsistency in the appendix E examples. PR #30 holds the identity
   proposal. Read the relevant issue before touching its topic.

@@ -179,10 +179,11 @@ list) never extends to its members.
 > specification, on the branch `proposal/identity`), not yet agreed.
 
 An object has a <dfn>name</dfn>, the digest of the genesis record written when
-it is sealed, at its owner's request, before it is first shared, and an <dfn>owner</dfn>, the one who
-decides its versions. The pair (owner, name) identifies a <dfn>line</dfn>: one
-history, with a single writer. The archive that keeps the object is only where
-it lives: mirrors keep the same line elsewhere.
+it is sealed, at its owner's request, before it is first shared, and an
+<dfn>owner</dfn>, the one who decides its versions. The pair (owner, name)
+identifies a <dfn>line</dfn>: one history, with a single writer. The archive
+that keeps the object is only where it lives: mirrors keep the same line
+elsewhere.
 
 The owner can be light or strong. A draft has none, and no genesis record:
 that absence is what marks it as a draft. A named owner is a URI the
@@ -206,7 +207,7 @@ only that the branch is consistent. Whether the parent version is the one
 its archive keeps is confirmed by resolving the parent through that archive,
 by the parent owner's signature, or by other witnesses; failing these, it
 rests on the branch owner's word. Resolving confirms the archive, not the
-person the owner names: that would need owner proofs (#13).
+person the owner names: that would need owner proofs (#41).
 
 ## Can documents be linked in richer ways (a short account and its full proof)?
 

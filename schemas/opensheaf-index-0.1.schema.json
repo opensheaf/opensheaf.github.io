@@ -194,7 +194,11 @@
     "prefixes": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": false,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 2,
+        "maximum": 4
+      },
       "properties": {
         "names": {
           "type": "integer",
