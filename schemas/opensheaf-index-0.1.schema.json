@@ -62,8 +62,9 @@
                 "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
                 "maxLength": 64
               },
-              "parentName": {
-                "$ref": "#/$defs/base32"
+              "genesis": {
+                "type": "string",
+                "$comment": "proposal (section 6.6): the exact text of genesis.json"
               },
               "inventorySha512": {
                 "type": "string",
@@ -120,7 +121,8 @@
                     "owner",
                     "ownerId",
                     "objectId",
-                    "status"
+                    "status",
+                    "genesis"
                   ]
                 }
               }

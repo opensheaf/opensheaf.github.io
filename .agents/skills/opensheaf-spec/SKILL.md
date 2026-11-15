@@ -117,9 +117,11 @@ only what its two standards leave open:
 - **Clashes** (6.5): an archive keeps at most one object per line (owner,
   name). Sealing draws a new nonce if the line is taken; a branch whose
   line is taken by another genesis record is named by the next algorithm
-  over the same record (`parent` keeps the parent's name, indexes carry
-  `parentName`); a mirror whose line is taken cannot be kept. Reused
-  genesis records and aliases are open (#44).
+  over the same record (`parent` keeps the parent's name); a mirror whose
+  line is taken cannot be kept. A work is searched for under all 16 names
+  of its genesis record, keeping entries whose record is byte-identical
+  (`names/` entries carry `genesis`). Reused genesis records and aliases
+  are open (#44).
 - **Draft and sealing** (6.5): a draft is an object without a genesis
   record; no pin may name its versions. Sealing adds the genesis record,
   at the owner's request, before a version first leaves the owner's hands.

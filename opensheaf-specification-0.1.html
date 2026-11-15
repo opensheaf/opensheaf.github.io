@@ -1106,16 +1106,33 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       warning, and does not stop the resolution.
     </p>
     <p>
+      <strong>Searching for a work.</strong> A work is its genesis record, and
+      its lines may be named by any of the 16 names the record gives (section
+      6.5: a branch is renamed after a clash). To find every line of a work
+      (for <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>, or a search by work), a
+      resolver: obtains the genesis record (from any entry or copy found under
+      the name, checked against it); computes its 16 names, by every
+      algorithm; looks each of them up in the indexes it knows; and keeps only
+      the entries whose genesis record is, byte for byte, the one it obtained,
+      discarding the others as collisions. The comparison is of bytes, so it
+      does not rely on any hash being free of collisions. Resolving a line
+      needs no search: <tt class="verbatim">sheaf:&lt;name&gt;</tt> names the
+      originator's line, always named by algorithm 0 (a clash when sealing
+      draws a new nonce), and <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner
+      id&gt;</tt> names exactly that line.
+    </p>
+    <p>
       <strong>Short forms.</strong> For people reading and typing them, the
       name and the owner identifier MAY be shortened to a prefix of at least 8
       characters: <tt class="verbatim">sheaf:2kukpn74/v3</tt>, <tt class="verbatim">sheaf:2kukpn74:xx2gb5hz/v3</tt>.
       A part of 52 characters is complete; a shorter one is a prefix. A short
       name with <tt class="verbatim">:*</tt> (<tt class="verbatim">sheaf:2kukpn74:*</tt>) expands
-      among names, whatever their owners: it names the object whose name
-      matches, and is ambiguous when several names match. A resolver expands a
-      short form among the lines it knows of (from the indexes below, the
-      archives and collections it reads, and its user's configuration),
-      counting only the lines whose copies pass the checks above:
+      among names, whatever their owners, and is ambiguous when names of
+      several genesis records match; once expanded, the work is searched for
+      as below. A resolver expands a short form among the lines it knows of
+      (from the indexes below, the archives and collections it reads, and its
+      user's configuration), counting only the lines whose copies pass the
+      checks above:
     </p>
     <ul>
       <li>
@@ -1196,9 +1213,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           is the first characters of a name: the objects whose names start
           with them, each entry with <tt class="verbatim">name</tt>, <tt class="verbatim">originator</tt>
           (from the genesis record), <tt class="verbatim">owner</tt>, <tt class="verbatim">ownerId</tt>
-          and <tt class="verbatim">objectId</tt>, and, for a branch named by another
-          algorithm after a clash, <tt class="verbatim">parentName</tt>, the parent's
-          name, so that the branch is also found under it;
+          and <tt class="verbatim">objectId</tt>, and <tt class="verbatim">genesis</tt>, the exact
+          text of its <tt class="verbatim">genesis.json</tt>, so that a work can be
+          searched for, and collisions removed, from the indexes alone
+          (below);
         </p>
       </li>
       <li>
@@ -1248,15 +1266,14 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       keeping the entries whose <tt class="verbatim">ownerId</tt> matches the owner
       part, or, without an owner part, those whose <tt class="verbatim">owner</tt> is
       their <tt class="verbatim">originator</tt>, or, for <tt class="verbatim">:*</tt>, every
-      entry of the name, and the entries whose <tt class="verbatim">parentName</tt> is
-      that name (each line checked and confirmed separately), then reads the
-      history of the object it finds; it looks up a pin in <tt class="verbatim">sha512/</tt>,
-      and an owner in <tt class="verbatim">owners/</tt>; at an archive that keeps no
-      indexes, it MAY read <tt class="verbatim">objects</tt> of the discovery document
-      instead, which gives each object's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>.
-      Like the discovery document, indexes are maps, not witnesses: they are
-      rewritten when objects change, and a resolver checks what it finds as
-      above.
+      entry found by the search for the work (below), each line checked and
+      confirmed separately, then reads the history of the object it finds; it
+      looks up a pin in <tt class="verbatim">sha512/</tt>, and an owner in <tt class="verbatim">owners/</tt>;
+      at an archive that keeps no indexes, it MAY read <tt class="verbatim">objects</tt>
+      of the discovery document instead, which gives each object's <tt class="verbatim">name</tt>
+      and <tt class="verbatim">owner</tt>. Like the discovery document, indexes are
+      maps, not witnesses: they are rewritten when objects change, and a
+      resolver checks what it finds as above.
     </p>
     <p>
       <strong>Gateways.</strong> Browsers do not resolve <tt class="verbatim">sheaf:</tt>
@@ -3063,8 +3080,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           line is taken by another genesis record is named by the next
           algorithm over the same record (seeded SHA-256, the seed carrying
           the algorithm number), its <tt class="verbatim">parent</tt> keeping the
-          parent's name, and found under it through <tt class="verbatim">parentName</tt>
-          in the indexes; a mirror whose line is taken cannot be kept; a full
+          parent's name, and found under it by searching all the names of its
+          genesis record; a mirror whose line is taken cannot be kept; a full
           name with several originators is ambiguous; aliases left to #44 as a
           last resort.
         </p>
@@ -3077,6 +3094,16 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           0 to 15 written in the last character (replacing SHA-512 truncated
           to 256 bits, SHA3-256, BLAKE2b-256 and the seeded algorithms 3 to
           15); the examples recomputed.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 15 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>):**
+          a work is searched for by all 16 names of its genesis record,
+          keeping only the entries whose genesis record is the same, byte for
+          byte, and discarding collisions; <tt class="verbatim">names/</tt> entries
+          carry the genesis record itself (<tt class="verbatim">genesis</tt>), replacing
+          <tt class="verbatim">parentName</tt>.
         </p>
       </li>
     </ul>
@@ -3603,7 +3630,8 @@ https://opensheaf.org/sheaf:2kukpn74/v3
       &quot;originator&quot;: &quot;https://orcid.org/0000-0002-1234-5677&quot;,
       &quot;owner&quot;: &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
       &quot;ownerId&quot;: &quot;xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda&quot;,
-      &quot;objectId&quot;: &quot;network-discrimination&quot;, &quot;status&quot;: &quot;active&quot; }
+      &quot;objectId&quot;: &quot;network-discrimination&quot;, &quot;status&quot;: &quot;active&quot;,
+      &quot;genesis&quot;: &quot;{\n  \&quot;format\&quot;: \&quot;opensheaf-genesis/0.1\&quot;,\n  \&quot;kind\&quot;: \&quot;document\&quot;,\n  \&quot;created\&quot;: \&quot;2026-03-02T09:14:00Z\&quot;,\n  \&quot;originator\&quot;: \&quot;https://orcid.org/0000-0002-1234-5677\&quot;,\n  \&quot;nonce\&quot;: \&quot;5f2c8e1a9b7d4036c2e1f08a7b6d5c43\&quot;\n}\n&quot; }
   ]
 }</pre>
       </div>
