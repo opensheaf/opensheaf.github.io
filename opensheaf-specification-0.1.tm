@@ -211,7 +211,7 @@
 
   <strong|Genesis record.> When an object is sealed, at its owner's request, before a version of it first leaves its owner's hands (shared privately, for instance submitted to a journal, or published; #29), its owner writes the genesis record, the JSON file <verbatim|genesis.json> at the root of the content, with <verbatim|format> (<verbatim|"opensheaf-genesis/0.1">), <verbatim|kind> (<verbatim|document> or <verbatim|collection>, the <verbatim|kind> of the object), <verbatim|created> (the date and time, in UTC), <verbatim|originator> (the owner of the first line, a URI) and <verbatim|nonce> (at least 128 random bits, in lowercase hexadecimal). The genesis record MUST be part of every later object version of the object and of its branches, byte for byte. It contains neither the name nor the object identifier, so that the name does not depend on itself. It SHOULD be written in UTF-8 without a byte order mark, with LF line ends; since the name is the digest of its bytes as stored, tools MUST NOT rewrite or re-serialise it, and need no canonical form to check it.
 
-  <strong|Name.> The name of the object is the SHA-512 digest of <verbatim|genesis.json>, truncated to its first 256 bits and written in lowercase base32 (RFC 4648, without padding): 52 characters, a valid object identifier (section 6.3). This is a truncation of SHA-512, not SHA-512/256, which uses other initial values. The last character carries the last bit of the digest and, in its four remaining bits, the number of the algorithm that made the name: 0 for this one, so that the last character is <verbatim|a> or <verbatim|q>; 1 for SHA3-256 and 2 for BLAKE2b with a 256-bit output, each over the same bytes of <verbatim|genesis.json>; and k from 3 to 15 for SHA-256 over the seed <verbatim|opensheaf-name-\<less\>k\<gtr\>> (ASCII, with k in decimal, followed by a line feed) and then those bytes; every one written in the same way. Algorithms 1 and 2, of other families than SHA-2, also serve if SHA-2 weakens; the seeded ones only give further names after a clash. Names made by different algorithms never coincide. Names are made by algorithm 0, except a branch named by another algorithm to avoid a clash (below); a later version of this specification MAY change the default. Since RFC 4648 sets those bits to zero, names are compared as strings and never decoded; a reader that meets a name whose last character is neither <verbatim|a> nor <verbatim|q> reports a name of an algorithm it does not know, not a malformed name. Anyone holding a copy can compute it; it is unique without a registry in practice, since the record holds a random nonce, but a name is used to refer to objects, so what happens when two different works have the same name is open (#44). <verbatim|object.json> records it as <verbatim|name>. An archive MAY use the name as the object identifier.
+  <strong|Name.> The name of the object is the SHA-256 digest of the seed <verbatim|opensheaf-name-0> (ASCII, followed by a line feed) followed by the bytes of <verbatim|genesis.json>, written in lowercase base32 (RFC 4648, without padding): 52 characters, a valid object identifier (section 6.3). The last character carries the last bit of the digest and, in its four remaining bits, the number k of the algorithm that made the name, from 0 to 15: algorithm k is the same with the seed <verbatim|opensheaf-name-\<less\>k\<gtr\>> (k in decimal), so that algorithm 0 gives a last character <verbatim|a> or <verbatim|q>. Names are made by algorithm 0, except a branch named by another algorithm to avoid a clash (below); names made by different algorithms never coincide. A later version of the genesis record MAY use another hash function. Since RFC 4648 sets the four bits to zero, names are compared as strings and never decoded. Anyone holding a copy can compute it; it is unique without a registry in practice, since the record holds a random nonce, but a name is used to refer to objects, so what happens when two different works have the same name is open (#44). <verbatim|object.json> records it as <verbatim|name>. An archive MAY use the name as the object identifier.
 
   <strong|Owner.> The owner of a line is a URI, recorded in <verbatim|object.json> as <verbatim|owner> from the first sealed version. There are three cases:
 
@@ -271,7 +271,7 @@
 
   <os-alert|note|Note.|<strong|Proposal.> This section is part of the proposal of section 6.5 (branch <verbatim|proposal/identity>): writing lines, versions and pins as URIs, and finding objects by name (#14, #20). It replaces the decision recorded in #14 (global names as <verbatim|tag:> or ARK URIs built from the archive identifier, with <verbatim|sheaf:> kept in reserve): a line now has a name independent of any archive, and <verbatim|sheaf:> URIs write it; archive identifiers stay as section 6.2 says.>
 
-  <strong|Owner identifier.> The owner identifier of an owner is the SHA-512 digest of its URI as recorded (in the canonical form of section 6.5, where one is defined), encoded in UTF-8 without a line end, truncated to its first 256 bits and written in lowercase base32, as names are, with the same algorithm number in the last character (section 6.5): 52 characters. It names an owner inside a URI, where the owner's own URI, which holds <verbatim|:> and <verbatim|/>, cannot be written. <verbatim|genesis.json>, <verbatim|object.json>, <verbatim|parent> and the members of collections record the owner's URI, never its identifier; indexes record both (below).
+  <strong|Owner identifier.> The owner identifier of an owner is computed as a name by algorithm 0 (section 6.5), over its URI as recorded (in the canonical form of section 6.5, where one is defined), encoded in UTF-8 without a line end, instead of <verbatim|genesis.json>: 52 characters. It names an owner inside a URI, where the owner's own URI, which holds <verbatim|:> and <verbatim|/>, cannot be written. <verbatim|genesis.json>, <verbatim|object.json>, <verbatim|parent> and the members of collections record the owner's URI, never its identifier; indexes record both (below).
 
   **The <verbatim|sheaf> URI.** A line, a document version of a line, one object version, or the object as a whole, is written as a URI of the scheme <verbatim|sheaf>:
 
@@ -305,7 +305,7 @@
 
   <strong|Checks and confirmation.> A resolver checks every copy it finds: the name is the digest of its <verbatim|genesis.json>, the owner in <verbatim|object.json> is the line's, and, with a digest, the rest of the checks of a pin. A copy that passes them is the object version named by a URI with a digest, wherever it was found, since the pin fixes it. Without a digest, a copy shows only that someone published versions under that owner and name, which a named owner cannot prevent (section 6.5): a resolver MUST report such a copy as confirmed only when it reached it at a base URL of the archive that keeps the line (the archive named by <verbatim|archiveId> in the copy's <verbatim|object.json>), known independently of the URI and of indexes kept by others, as section 6.4 says, or when the owner is keyed and its signatures hold; confirmation reads <verbatim|archiveId> from the copy's own <verbatim|object.json>, never from an index entry. This confirms the archive that keeps the line, not the person or body its owner names, which owner proofs would show (#41); it MUST report every other copy (one found through <verbatim|at>, or through an index kept by a custodian) as unconfirmed, with where it was found. When confirmed copies of a line disagree (for a keyed owner, copies whose signatures hold), they are a fork (section 6.5): the resolver reports it and does not choose. Confirmed copies of the same named owner and name whose <verbatim|archiveId> differ are a conflict about which archive keeps the line, since a line has one archive identifier (section 6.5): the resolver reports it with the archives, and does not choose. An unconfirmed copy that disagrees with a confirmed one is reported as a warning, and does not stop the resolution.
 
-  <strong|Short forms.> For people reading and typing them, the name and the owner identifier MAY be shortened to a prefix of at least 8 characters: <verbatim|sheaf:53c4nq6d/v3>, <verbatim|sheaf:53c4nq6d:sfhd2dwt/v3>. A part of 52 characters is complete; a shorter one is a prefix. A short name with <verbatim|:*> (<verbatim|sheaf:53c4nq6d:*>) expands among names, whatever their owners: it names the object whose name matches, and is ambiguous when several names match. A resolver expands a short form among the lines it knows of (from the indexes below, the archives and collections it reads, and its user's configuration), counting only the lines whose copies pass the checks above:
+  <strong|Short forms.> For people reading and typing them, the name and the owner identifier MAY be shortened to a prefix of at least 8 characters: <verbatim|sheaf:2kukpn74/v3>, <verbatim|sheaf:2kukpn74:xx2gb5hz/v3>. A part of 52 characters is complete; a shorter one is a prefix. A short name with <verbatim|:*> (<verbatim|sheaf:2kukpn74:*>) expands among names, whatever their owners: it names the object whose name matches, and is ambiguous when several names match. A resolver expands a short form among the lines it knows of (from the indexes below, the archives and collections it reads, and its user's configuration), counting only the lines whose copies pass the checks above:
 
   <\itemize>
     <item>the candidates are the lines whose name starts with the name part and whose owner identifier starts with the owner part; without an owner part, the lines of the originators. Each is confirmed or unconfirmed, as above: confirmed when a copy was reached through the archive that keeps the line, at a location known independently, or is signed by its keyed owner;
@@ -331,7 +331,7 @@
 
   The length of <verbatim|\<less\>p\<gtr\>> is declared for each index, from 2 to 4 characters: 2 suits a small archive, while an archive of millions of versions declares 4, so that each file stays small. Each index file is a JSON object with <verbatim|format> (<verbatim|"opensheaf-index/0.1">), <verbatim|index> (<verbatim|names>, <verbatim|owners> or <verbatim|sha512>, the folder it is in) and <verbatim|entries>, every entry starting with the file's <verbatim|\<less\>p\<gtr\>>; the declaration (in <verbatim|indexes> of the discovery document, or in <verbatim|indexes.json>, a JSON object with <verbatim|format> and <verbatim|indexes>) maps each index kept to the length of its <verbatim|\<less\>p\<gtr\>>. An index kept for several archives adds to each entry <verbatim|archiveId> and <verbatim|archiveUrl>: the archive serving that copy and its base URL (for a mirror, the mirroring archive). An archive's indexes list every object of its storage root with a genesis record and every sealed version of it, each entry of <verbatim|names/> and <verbatim|sha512/> with <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>); a tombstoned object keeps its entries with <verbatim|status> <verbatim|removed>, so that a resolver can report it as section 11.3 asks. A file with no entries is omitted, so that, where the indexes are declared, a missing file means no entry. A resolver looks up a URI in <verbatim|names/> at the archives and indexes it knows, starting from <verbatim|at>, keeping the entries whose <verbatim|ownerId> matches the owner part, or, without an owner part, those whose <verbatim|owner> is their <verbatim|originator>, or, for <verbatim|:*>, every entry of the name, and the entries whose <verbatim|parentName> is that name (each line checked and confirmed separately), then reads the history of the object it finds; it looks up a pin in <verbatim|sha512/>, and an owner in <verbatim|owners/>; at an archive that keeps no indexes, it MAY read <verbatim|objects> of the discovery document instead, which gives each object's <verbatim|name> and <verbatim|owner>. Like the discovery document, indexes are maps, not witnesses: they are rewritten when objects change, and a resolver checks what it finds as above.
 
-  <strong|Gateways.> Browsers do not resolve <verbatim|sheaf:> URIs. A gateway is a web service that does it for them: it serves a URI at its base URL followed by the URI, unchanged, for instance <verbatim|https://opensheaf.org/sheaf:53c4nq6d:sfhd2dwt/v3?sha512=c07a...>, so that an absolute link and its URI are turned into each other by adding or removing the base URL (a relative link starting with <verbatim|sheaf:> is read as a <verbatim|sheaf:> URI, so gateway links are written in full). A gateway is a resolver like any other, and:
+  <strong|Gateways.> Browsers do not resolve <verbatim|sheaf:> URIs. A gateway is a web service that does it for them: it serves a URI at its base URL followed by the URI, unchanged, for instance <verbatim|https://opensheaf.org/sheaf:2kukpn74:xx2gb5hz/v3?sha512=c07a...>, so that an absolute link and its URI are turned into each other by adding or removing the base URL (a relative link starting with <verbatim|sheaf:> is read as a <verbatim|sheaf:> URI, so gateway links are written in full). A gateway is a resolver like any other, and:
 
   <\itemize>
     <item>it MUST answer with a real HTTP status: a page (200) showing what it resolved, or a temporary redirect (302, 303 or 307) to a copy; it MUST NOT redirect permanently (301 or 308), since copies move and are taken down, and it MAY cache its own result for a URI with a digest, but not for one without; it MUST redirect only to a copy at a base URL of a confirmed archive, never to a location given only by <verbatim|at> or by an index kept by others, and otherwise answers with a page that links to the copy and marks it unconfirmed; <verbatim|sheaf:\<less\>name\<gtr\>:*> shows the lines it knows;
@@ -788,7 +788,9 @@
 
     <item>**0.1 (draft), 15 November 2026, proposal (branch <verbatim|proposal/identity>):** the last character of a name (and of an owner identifier) also carries the number of the algorithm that made it, 0 for SHA-512 truncated to 256 bits, so that existing names are unchanged and names of other algorithms never coincide with them; collisions and aliases listed as an open question (#44).
 
-    <item>**0.1 (draft), 15 November 2026, proposal (branch <verbatim|proposal/identity>):** clashes of names are resolved where an object is created in an archive: an archive keeps at most one object per line (owner, name); sealing draws a new nonce when the line is taken; a branch whose line is taken by another genesis record is named by the next algorithm over the same record (1 SHA3-256, 2 BLAKE2b-256, 3 to 15 seeded SHA-256), its <verbatim|parent> keeping the parent's name, and found under it through <verbatim|parentName> in the indexes; a mirror whose line is taken cannot be kept; a full name with several originators is ambiguous; aliases left to #44 as a last resort.
+    <item>**0.1 (draft), 15 November 2026, proposal (branch <verbatim|proposal/identity>):** clashes of names are resolved where an object is created in an archive: an archive keeps at most one object per line (owner, name); sealing draws a new nonce when the line is taken; a branch whose line is taken by another genesis record is named by the next algorithm over the same record (seeded SHA-256, the seed carrying the algorithm number), its <verbatim|parent> keeping the parent's name, and found under it through <verbatim|parentName> in the indexes; a mirror whose line is taken cannot be kept; a full name with several originators is ambiguous; aliases left to #44 as a last resort.
+
+    <item>**0.1 (draft), 15 November 2026, proposal (branch <verbatim|proposal/identity>):** names and owner identifiers made by one function: SHA-256 over the seed <verbatim|opensheaf-name-\<less\>k\<gtr\>> and the record, k from 0 to 15 written in the last character (replacing SHA-512 truncated to 256 bits, SHA3-256, BLAKE2b-256 and the seeded algorithms 3 to 15); the examples recomputed.
   </itemize>
 
   <section*|Appendix A. Zenodo binding (normative for archives declaring the profile <verbatim|zenodo>)><label|appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo>
@@ -1125,7 +1127,7 @@
   </verbatim-code>
   </html-div-class>
 
-  A genesis record (proposal, section 6.5), written when the authors' paper was sealed; its digest gives the name <verbatim|53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma> (the bytes as shown, with a final line feed; a branch named by algorithm 1 after a clash, section 6.5, would be <verbatim|cdu6s2l2ruotfxmzrhgeca2oqzxkpoeighrvjx74xs6werwyhxpb>, its SHA3-256 digest with 1 in the last character; by algorithm 3, <verbatim|azhb5aa6ejongifwd3bx7tzru5m2cmfexyxxq7xbakwjq5zqo6sd>):
+  A genesis record (proposal, section 6.5), written when the authors' paper was sealed; its name is <verbatim|2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq> (the SHA-256 of <verbatim|opensheaf-name-0>, a line feed and the bytes as shown, with a final line feed); a branch named by algorithm 1 after a clash (section 6.5) would be <verbatim|74xzytlubklklsrjlmnermj4iixalc7665dcot3vbjmuqqxv2tib>:
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1161,7 +1163,7 @@
 
     \ \ "objectId": "network-discrimination",
 
-    \ \ "name": "53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma",
+    \ \ "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
 
     \ \ "owner": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
 
@@ -1169,7 +1171,7 @@
 
     \ \ \ \ "owner": "https://orcid.org/0000-0002-1234-5677",
 
-    \ \ \ \ "name": "53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma",
+    \ \ \ \ "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
 
     \ \ \ \ "archiveId": "tag:example.org,2026:authors",
 
@@ -1201,37 +1203,37 @@
   </verbatim-code>
   </html-div-class>
 
-  URIs of this paper (proposal, section 6.6). The authors' ORCID iD is the originator, and the journal's owner identifier, the digest of its <verbatim|did:key> URI, is <verbatim|sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a>:
+  URIs of this paper (proposal, section 6.6). The authors' ORCID iD is the originator, and the journal's owner identifier, the digest of its <verbatim|did:key> URI, is <verbatim|xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda>:
 
   <\verbatim-code>
-    sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma/v3
+    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3
 
     \ \ \ \ document version 3 of the authors' line
 
-    sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma/v3?sha512=c07a...
+    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3?sha512=c07a...
 
     \ \ \ \ the authors' object version v4, which the journal vetted
 
-    sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a/v3
+    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda/v3
 
     \ \ \ \ document version 3 of the journal's line, its accepted copy
 
-    sheaf:53c4nq6d/v3
+    sheaf:2kukpn74/v3
 
-    sheaf:53c4nq6d:sfhd2dwt/v3
+    sheaf:2kukpn74:xx2gb5hz/v3
 
     \ \ \ \ the same two, in short form
 
-    sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:*
+    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:*
 
     \ \ \ \ the paper as a whole: the authors' line, the journal's and any other
 
-    https://opensheaf.org/sheaf:53c4nq6d/v3
+    https://opensheaf.org/sheaf:2kukpn74/v3
 
     \ \ \ \ the first, through a gateway
   </verbatim-code>
 
-  The entry of the journal's archive for this object, in its index <verbatim|names/53.json> (its archive declares prefixes of 2 characters):
+  The entry of the journal's archive for this object, in its index <verbatim|names/2k.json> (its archive declares prefixes of 2 characters):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1243,13 +1245,13 @@
 
     \ \ "entries": [
 
-    \ \ \ \ { "name": "53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma",
+    \ \ \ \ { "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
 
     \ \ \ \ \ \ "originator": "https://orcid.org/0000-0002-1234-5677",
 
     \ \ \ \ \ \ "owner": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
 
-    \ \ \ \ \ \ "ownerId": "sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a",
+    \ \ \ \ \ \ "ownerId": "xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda",
 
     \ \ \ \ \ \ "objectId": "network-discrimination", "status": "active" }
 

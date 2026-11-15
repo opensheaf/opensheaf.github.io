@@ -689,31 +689,23 @@
       canonical form to check it.
     </p>
     <p>
-      <strong>Name.</strong> The name of the object is the SHA-512 digest of
-      <tt class="verbatim">genesis.json</tt>, truncated to its first 256 bits and
-      written in lowercase base32 (RFC 4648, without padding): 52 characters,
-      a valid object identifier (section 6.3). This is a truncation of
-      SHA-512, not SHA-512/256, which uses other initial values. The last
-      character carries the last bit of the digest and, in its four remaining
-      bits, the number of the algorithm that made the name: 0 for this one, so
-      that the last character is <tt class="verbatim">a</tt> or <tt class="verbatim">q</tt>; 1 for
-      SHA3-256 and 2 for BLAKE2b with a 256-bit output, each over the same
-      bytes of <tt class="verbatim">genesis.json</tt>; and k from 3 to 15 for SHA-256
-      over the seed <tt class="verbatim">opensheaf-name-&lt;k&gt;</tt> (ASCII, with k in
-      decimal, followed by a line feed) and then those bytes; every one
-      written in the same way. Algorithms 1 and 2, of other families than
-      SHA-2, also serve if SHA-2 weakens; the seeded ones only give further
-      names after a clash. Names made by different algorithms never coincide.
+      <strong>Name.</strong> The name of the object is the SHA-256 digest of
+      the seed <tt class="verbatim">opensheaf-name-0</tt> (ASCII, followed by a line
+      feed) followed by the bytes of <tt class="verbatim">genesis.json</tt>, written in
+      lowercase base32 (RFC 4648, without padding): 52 characters, a valid
+      object identifier (section 6.3). The last character carries the last bit
+      of the digest and, in its four remaining bits, the number k of the
+      algorithm that made the name, from 0 to 15: algorithm k is the same with
+      the seed <tt class="verbatim">opensheaf-name-&lt;k&gt;</tt> (k in decimal), so
+      that algorithm 0 gives a last character <tt class="verbatim">a</tt> or <tt class="verbatim">q</tt>.
       Names are made by algorithm 0, except a branch named by another
-      algorithm to avoid a clash (below); a later version of this
-      specification MAY change the default. Since RFC 4648 sets those bits to
-      zero, names are compared as strings and never decoded; a reader that
-      meets a name whose last character is neither <tt class="verbatim">a</tt> nor <tt
-      class="verbatim">q</tt> reports a name of an algorithm it does not know, not a
-      malformed name. Anyone holding a copy can compute it; it is unique
-      without a registry in practice, since the record holds a random nonce,
-      but a name is used to refer to objects, so what happens when two
-      different works have the same name is open (#44). <tt class="verbatim">object.json</tt>
+      algorithm to avoid a clash (below); names made by different algorithms
+      never coincide. A later version of the genesis record MAY use another
+      hash function. Since RFC 4648 sets the four bits to zero, names are
+      compared as strings and never decoded. Anyone holding a copy can compute
+      it; it is unique without a registry in practice, since the record holds
+      a random nonce, but a name is used to refer to objects, so what happens
+      when two different works have the same name is open (#44). <tt class="verbatim">object.json</tt>
       records it as <tt class="verbatim">name</tt>. An archive MAY use the name as the
       object identifier.
     </p>
@@ -959,12 +951,11 @@
     </div>
     <p>
       <strong>Owner identifier.</strong> The owner identifier of an owner is
-      the SHA-512 digest of its URI as recorded (in the canonical form of
-      section 6.5, where one is defined), encoded in UTF-8 without a line end,
-      truncated to its first 256 bits and written in lowercase base32, as
-      names are, with the same algorithm number in the last character (section
-      6.5): 52 characters. It names an owner inside a URI, where the owner's
-      own URI, which holds <tt class="verbatim">:</tt> and <tt class="verbatim">/</tt>, cannot be
+      computed as a name by algorithm 0 (section 6.5), over its URI as
+      recorded (in the canonical form of section 6.5, where one is defined),
+      encoded in UTF-8 without a line end, instead of <tt class="verbatim">genesis.json</tt>:
+      52 characters. It names an owner inside a URI, where the owner's own
+      URI, which holds <tt class="verbatim">:</tt> and <tt class="verbatim">/</tt>, cannot be
       written. <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">object.json</tt>, <tt
       class="verbatim">parent</tt> and the members of collections record the owner's
       URI, never its identifier; indexes record both (below).
@@ -1117,9 +1108,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <p>
       <strong>Short forms.</strong> For people reading and typing them, the
       name and the owner identifier MAY be shortened to a prefix of at least 8
-      characters: <tt class="verbatim">sheaf:53c4nq6d/v3</tt>, <tt class="verbatim">sheaf:53c4nq6d:sfhd2dwt/v3</tt>.
+      characters: <tt class="verbatim">sheaf:2kukpn74/v3</tt>, <tt class="verbatim">sheaf:2kukpn74:xx2gb5hz/v3</tt>.
       A part of 52 characters is complete; a shorter one is a prefix. A short
-      name with <tt class="verbatim">:*</tt> (<tt class="verbatim">sheaf:53c4nq6d:*</tt>) expands
+      name with <tt class="verbatim">:*</tt> (<tt class="verbatim">sheaf:2kukpn74:*</tt>) expands
       among names, whatever their owners: it names the object whose name
       matches, and is ambiguous when several names match. A resolver expands a
       short form among the lines it knows of (from the indexes below, the
@@ -1270,7 +1261,7 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <p>
       <strong>Gateways.</strong> Browsers do not resolve <tt class="verbatim">sheaf:</tt>
       URIs. A gateway is a web service that does it for them: it serves a URI
-      at its base URL followed by the URI, unchanged, for instance <tt class="verbatim">https://opensheaf.org/sheaf:53c4nq6d:sfhd2dwt/v3?sha512=c07a&hellip;</tt>,
+      at its base URL followed by the URI, unchanged, for instance <tt class="verbatim">https://opensheaf.org/sheaf:2kukpn74:xx2gb5hz/v3?sha512=c07a&hellip;</tt>,
       so that an absolute link and its URI are turned into each other by
       adding or removing the base URL (a relative link starting with <tt
       class="verbatim">sheaf:</tt> is read as a <tt class="verbatim">sheaf:</tt> URI, so gateway
@@ -3070,12 +3061,22 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           archive: an archive keeps at most one object per line (owner, name);
           sealing draws a new nonce when the line is taken; a branch whose
           line is taken by another genesis record is named by the next
-          algorithm over the same record (1 SHA3-256, 2 BLAKE2b-256, 3 to 15
-          seeded SHA-256), its <tt class="verbatim">parent</tt> keeping the parent's
-          name, and found under it through <tt class="verbatim">parentName</tt> in the
-          indexes; a mirror whose line is taken cannot be kept; a full name
-          with several originators is ambiguous; aliases left to #44 as a last
-          resort.
+          algorithm over the same record (seeded SHA-256, the seed carrying
+          the algorithm number), its <tt class="verbatim">parent</tt> keeping the
+          parent's name, and found under it through <tt class="verbatim">parentName</tt>
+          in the indexes; a mirror whose line is taken cannot be kept; a full
+          name with several originators is ambiguous; aliases left to #44 as a
+          last resort.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 15 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>):**
+          names and owner identifiers made by one function: SHA-256 over the
+          seed <tt class="verbatim">opensheaf-name-&lt;k&gt;</tt> and the record, k from
+          0 to 15 written in the last character (replacing SHA-512 truncated
+          to 256 bits, SHA3-256, BLAKE2b-256 and the seeded algorithms 3 to
+          15); the examples recomputed.
         </p>
       </li>
     </ul>
@@ -3505,11 +3506,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     </div>
     <p>
       A genesis record (proposal, section 6.5), written when the authors'
-      paper was sealed; its digest gives the name <tt class="verbatim">53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma</tt>
-      (the bytes as shown, with a final line feed; a branch named by algorithm
-      1 after a clash, section 6.5, would be <tt class="verbatim">cdu6s2l2ruotfxmzrhgeca2oqzxkpoeighrvjx74xs6werwyhxpb</tt>,
-      its SHA3-256 digest with 1 in the last character; by algorithm 3, <tt
-      class="verbatim">azhb5aa6ejongifwd3bx7tzru5m2cmfexyxxq7xbakwjq5zqo6sd</tt>):
+      paper was sealed; its name is <tt class="verbatim">2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq</tt>
+      (the SHA-256 of <tt class="verbatim">opensheaf-name-0</tt>, a line feed and the
+      bytes as shown, with a final line feed); a branch named by algorithm 1
+      after a clash (section 6.5) would be <tt class="verbatim">74xzytlubklklsrjlmnermj4iixalc7665dcot3vbjmuqqxv2tib</tt>:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -3545,11 +3545,11 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
   &quot;kind&quot;: &quot;document&quot;,
   &quot;archiveId&quot;: &quot;tag:example.org,2026:journal&quot;,
   &quot;objectId&quot;: &quot;network-discrimination&quot;,
-  &quot;name&quot;: &quot;53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma&quot;,
+  &quot;name&quot;: &quot;2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq&quot;,
   &quot;owner&quot;: &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
   &quot;parent&quot;: {
     &quot;owner&quot;: &quot;https://orcid.org/0000-0002-1234-5677&quot;,
-    &quot;name&quot;: &quot;53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma&quot;,
+    &quot;name&quot;: &quot;2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq&quot;,
     &quot;archiveId&quot;: &quot;tag:example.org,2026:authors&quot;,
     &quot;objectId&quot;: &quot;network-discrimination&quot;,
     &quot;objectVersion&quot;: &quot;v4&quot;,
@@ -3569,27 +3569,27 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <p>
       URIs of this paper (proposal, section 6.6). The authors' ORCID iD is the
       originator, and the journal's owner identifier, the digest of its <tt
-      class="verbatim">did:key</tt> URI, is <tt class="verbatim">sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a</tt>:
+      class="verbatim">did:key</tt> URI, is <tt class="verbatim">xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda</tt>:
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma/v3
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3
     document version 3 of the authors' line
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma/v3?sha512=c07a&hellip;
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3?sha512=c07a&hellip;
     the authors' object version v4, which the journal vetted
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a/v3
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda/v3
     document version 3 of the journal's line, its accepted copy
-sheaf:53c4nq6d/v3
-sheaf:53c4nq6d:sfhd2dwt/v3
+sheaf:2kukpn74/v3
+sheaf:2kukpn74:xx2gb5hz/v3
     the same two, in short form
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:*
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:*
     the paper as a whole: the authors' line, the journal's and any other
-https://opensheaf.org/sheaf:53c4nq6d/v3
+https://opensheaf.org/sheaf:2kukpn74/v3
     the first, through a gateway</pre>
     </div>
     <p>
       The entry of the journal's archive for this object, in its index <tt
-      class="verbatim">names/53.json</tt> (its archive declares prefixes of 2
+      class="verbatim">names/2k.json</tt> (its archive declares prefixes of 2
       characters):
     </p>
     <div class="language-json">
@@ -3599,10 +3599,10 @@ https://opensheaf.org/sheaf:53c4nq6d/v3
   &quot;format&quot;: &quot;opensheaf-index/0.1&quot;,
   &quot;index&quot;: &quot;names&quot;,
   &quot;entries&quot;: [
-    { &quot;name&quot;: &quot;53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma&quot;,
+    { &quot;name&quot;: &quot;2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq&quot;,
       &quot;originator&quot;: &quot;https://orcid.org/0000-0002-1234-5677&quot;,
       &quot;owner&quot;: &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
-      &quot;ownerId&quot;: &quot;sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a&quot;,
+      &quot;ownerId&quot;: &quot;xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda&quot;,
       &quot;objectId&quot;: &quot;network-discrimination&quot;, &quot;status&quot;: &quot;active&quot; }
   ]
 }</pre>

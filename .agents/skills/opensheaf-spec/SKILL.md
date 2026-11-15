@@ -110,11 +110,10 @@ only what its two standards leave open:
 - **Genesis record and name** (6.5): `genesis.json` (`format`, `kind`,
   `created`, `originator`, `nonce`), written when the object is sealed and
   kept byte for byte in every later version and branch, never
-  re-serialised. The **name** is its SHA-512, truncated to 256 bits, in
-  lowercase base32: 52 characters, `^[a-z2-7]{52}$`; the last character
-  also holds the algorithm number in its 4 spare bits (0 gives `a` or
-  `q`; 1 is SHA3-256, 2 BLAKE2b-256, 3 to 15 SHA-256 over the seed
-  `opensheaf-name-<k>` and a line feed, then the record).
+  re-serialised. The **name** is the SHA-256 of the seed
+  `opensheaf-name-<k>` and a line feed, then the record, in lowercase
+  base32: 52 characters, `^[a-z2-7]{52}$`; the last character's 4 spare
+  bits hold k, from 0 to 15 (0, the default, gives `a` or `q`).
 - **Clashes** (6.5): an archive keeps at most one object per line (owner,
   name). Sealing draws a new nonce if the line is taken; a branch whose
   line is taken by another genesis record is named by the next algorithm
@@ -156,7 +155,7 @@ only what its two standards leave open:
   lines; no version, no `sha512`), `/v<n>` (a document version),
   `sha512=<digest>` (a pin), `at=<archive URL>` (a hint, not identity), the
   parameters in a query after `?`, `sha512` first. The **owner identifier**
-  is the SHA-512 of the owner's URI, encoded like a name. The canonical form
+  is made like a name (k = 0) over the owner's URI. The canonical form
   omits the originator's owner part and `at`.
 - **Resolution** (6.6): without a digest, copies are confirmed only when
   reached through the archive named by their `archiveId`, known

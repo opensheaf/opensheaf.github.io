@@ -139,7 +139,7 @@ An object identifier names an object within its archive (section 6.3). An object
 
 **Genesis record.** When an object is sealed, at its owner's request, before a version of it first leaves its owner's hands (shared privately, for instance submitted to a journal, or published; #29), its owner writes the genesis record, the JSON file `genesis.json` at the root of the content, with `format` (`"opensheaf-genesis/0.1"`), `kind` (`document` or `collection`, the `kind` of the object), `created` (the date and time, in UTC), `originator` (the owner of the first line, a URI) and `nonce` (at least 128 random bits, in lowercase hexadecimal). The genesis record MUST be part of every later object version of the object and of its branches, byte for byte. It contains neither the name nor the object identifier, so that the name does not depend on itself. It SHOULD be written in UTF-8 without a byte order mark, with LF line ends; since the name is the digest of its bytes as stored, tools MUST NOT rewrite or re-serialise it, and need no canonical form to check it.
 
-**Name.** The name of the object is the SHA-512 digest of `genesis.json`, truncated to its first 256 bits and written in lowercase base32 (RFC 4648, without padding): 52 characters, a valid object identifier (section 6.3). This is a truncation of SHA-512, not SHA-512/256, which uses other initial values. The last character carries the last bit of the digest and, in its four remaining bits, the number of the algorithm that made the name: 0 for this one, so that the last character is `a` or `q`; 1 for SHA3-256 and 2 for BLAKE2b with a 256-bit output, each over the same bytes of `genesis.json`; and k from 3 to 15 for SHA-256 over the seed `opensheaf-name-<k>` (ASCII, with k in decimal, followed by a line feed) and then those bytes; every one written in the same way. Algorithms 1 and 2, of other families than SHA-2, also serve if SHA-2 weakens; the seeded ones only give further names after a clash. Names made by different algorithms never coincide. Names are made by algorithm 0, except a branch named by another algorithm to avoid a clash (below); a later version of this specification MAY change the default. Since RFC 4648 sets those bits to zero, names are compared as strings and never decoded; a reader that meets a name whose last character is neither `a` nor `q` reports a name of an algorithm it does not know, not a malformed name. Anyone holding a copy can compute it; it is unique without a registry in practice, since the record holds a random nonce, but a name is used to refer to objects, so what happens when two different works have the same name is open (#44). `object.json` records it as `name`. An archive MAY use the name as the object identifier.
+**Name.** The name of the object is the SHA-256 digest of the seed `opensheaf-name-0` (ASCII, followed by a line feed) followed by the bytes of `genesis.json`, written in lowercase base32 (RFC 4648, without padding): 52 characters, a valid object identifier (section 6.3). The last character carries the last bit of the digest and, in its four remaining bits, the number k of the algorithm that made the name, from 0 to 15: algorithm k is the same with the seed `opensheaf-name-<k>` (k in decimal), so that algorithm 0 gives a last character `a` or `q`. Names are made by algorithm 0, except a branch named by another algorithm to avoid a clash (below); names made by different algorithms never coincide. A later version of the genesis record MAY use another hash function. Since RFC 4648 sets the four bits to zero, names are compared as strings and never decoded. Anyone holding a copy can compute it; it is unique without a registry in practice, since the record holds a random nonce, but a name is used to refer to objects, so what happens when two different works have the same name is open (#44). `object.json` records it as `name`. An archive MAY use the name as the object identifier.
 
 **Owner.** The owner of a line is a URI, recorded in `object.json` as `owner` from the first sealed version. There are three cases:
 
@@ -182,7 +182,7 @@ A named owner MAY sign its versions with keys of its own (`keys` of the discover
 > [!NOTE]
 > **Proposal.** This section is part of the proposal of section 6.5 (branch `proposal/identity`): writing lines, versions and pins as URIs, and finding objects by name (#14, #20). It replaces the decision recorded in #14 (global names as `tag:` or ARK URIs built from the archive identifier, with `sheaf:` kept in reserve): a line now has a name independent of any archive, and `sheaf:` URIs write it; archive identifiers stay as section 6.2 says.
 
-**Owner identifier.** The owner identifier of an owner is the SHA-512 digest of its URI as recorded (in the canonical form of section 6.5, where one is defined), encoded in UTF-8 without a line end, truncated to its first 256 bits and written in lowercase base32, as names are, with the same algorithm number in the last character (section 6.5): 52 characters. It names an owner inside a URI, where the owner's own URI, which holds `:` and `/`, cannot be written. `genesis.json`, `object.json`, `parent` and the members of collections record the owner's URI, never its identifier; indexes record both (below).
+**Owner identifier.** The owner identifier of an owner is computed as a name by algorithm 0 (section 6.5), over its URI as recorded (in the canonical form of section 6.5, where one is defined), encoded in UTF-8 without a line end, instead of `genesis.json`: 52 characters. It names an owner inside a URI, where the owner's own URI, which holds `:` and `/`, cannot be written. `genesis.json`, `object.json`, `parent` and the members of collections record the owner's URI, never its identifier; indexes record both (below).
 
 **The `sheaf` URI.** A line, a document version of a line, one object version, or the object as a whole, is written as a URI of the scheme `sheaf`:
 
@@ -205,7 +205,7 @@ The parts are, in this order: `sheaf:` and the name; optionally `:` and an owner
 
 **Checks and confirmation.** A resolver checks every copy it finds: the name is the digest of its `genesis.json`, the owner in `object.json` is the line's, and, with a digest, the rest of the checks of a pin. A copy that passes them is the object version named by a URI with a digest, wherever it was found, since the pin fixes it. Without a digest, a copy shows only that someone published versions under that owner and name, which a named owner cannot prevent (section 6.5): a resolver MUST report such a copy as confirmed only when it reached it at a base URL of the archive that keeps the line (the archive named by `archiveId` in the copy's `object.json`), known independently of the URI and of indexes kept by others, as section 6.4 says, or when the owner is keyed and its signatures hold; confirmation reads `archiveId` from the copy's own `object.json`, never from an index entry. This confirms the archive that keeps the line, not the person or body its owner names, which owner proofs would show (#41); it MUST report every other copy (one found through `at`, or through an index kept by a custodian) as unconfirmed, with where it was found. When confirmed copies of a line disagree (for a keyed owner, copies whose signatures hold), they are a fork (section 6.5): the resolver reports it and does not choose. Confirmed copies of the same named owner and name whose `archiveId` differ are a conflict about which archive keeps the line, since a line has one archive identifier (section 6.5): the resolver reports it with the archives, and does not choose. An unconfirmed copy that disagrees with a confirmed one is reported as a warning, and does not stop the resolution.
 
-**Short forms.** For people reading and typing them, the name and the owner identifier MAY be shortened to a prefix of at least 8 characters: `sheaf:53c4nq6d/v3`, `sheaf:53c4nq6d:sfhd2dwt/v3`. A part of 52 characters is complete; a shorter one is a prefix. A short name with `:*` (`sheaf:53c4nq6d:*`) expands among names, whatever their owners: it names the object whose name matches, and is ambiguous when several names match. A resolver expands a short form among the lines it knows of (from the indexes below, the archives and collections it reads, and its user's configuration), counting only the lines whose copies pass the checks above:
+**Short forms.** For people reading and typing them, the name and the owner identifier MAY be shortened to a prefix of at least 8 characters: `sheaf:2kukpn74/v3`, `sheaf:2kukpn74:xx2gb5hz/v3`. A part of 52 characters is complete; a shorter one is a prefix. A short name with `:*` (`sheaf:2kukpn74:*`) expands among names, whatever their owners: it names the object whose name matches, and is ambiguous when several names match. A resolver expands a short form among the lines it knows of (from the indexes below, the archives and collections it reads, and its user's configuration), counting only the lines whose copies pass the checks above:
 
 - the candidates are the lines whose name starts with the name part and whose owner identifier starts with the owner part; without an owner part, the lines of the originators. Each is confirmed or unconfirmed, as above: confirmed when a copy was reached through the archive that keeps the line, at a location known independently, or is signed by its keyed owner;
 - if there are confirmed candidates, all of the same owner and, for a named owner, kept by the same archive (the same `archiveId`), the short form names the first of them in that owner's order: the line whose first object version of that owner (for the originator, the version that sealed it; for a shallow branch, its first version; for a deep branch, its first version after the branch point) has the earliest `created` in its inventory, compared as instants. The unconfirmed candidates MUST NOT win: the resolver shows them beside its answer, as warnings;
@@ -222,7 +222,7 @@ The order of an owner's lines is trusted only within one archive that keeps them
 
 The length of `<p>` is declared for each index, from 2 to 4 characters: 2 suits a small archive, while an archive of millions of versions declares 4, so that each file stays small. Each index file is a JSON object with `format` (`"opensheaf-index/0.1"`), `index` (`names`, `owners` or `sha512`, the folder it is in) and `entries`, every entry starting with the file's `<p>`; the declaration (in `indexes` of the discovery document, or in `indexes.json`, a JSON object with `format` and `indexes`) maps each index kept to the length of its `<p>`. An index kept for several archives adds to each entry `archiveId` and `archiveUrl`: the archive serving that copy and its base URL (for a mirror, the mirroring archive). An archive's indexes list every object of its storage root with a genesis record and every sealed version of it, each entry of `names/` and `sha512/` with `status` (`active` or `withdrawn`); a tombstoned object keeps its entries with `status` `removed`, so that a resolver can report it as section 11.3 asks. A file with no entries is omitted, so that, where the indexes are declared, a missing file means no entry. A resolver looks up a URI in `names/` at the archives and indexes it knows, starting from `at`, keeping the entries whose `ownerId` matches the owner part, or, without an owner part, those whose `owner` is their `originator`, or, for `:*`, every entry of the name, and the entries whose `parentName` is that name (each line checked and confirmed separately), then reads the history of the object it finds; it looks up a pin in `sha512/`, and an owner in `owners/`; at an archive that keeps no indexes, it MAY read `objects` of the discovery document instead, which gives each object's `name` and `owner`. Like the discovery document, indexes are maps, not witnesses: they are rewritten when objects change, and a resolver checks what it finds as above.
 
-**Gateways.** Browsers do not resolve `sheaf:` URIs. A gateway is a web service that does it for them: it serves a URI at its base URL followed by the URI, unchanged, for instance `https://opensheaf.org/sheaf:53c4nq6d:sfhd2dwt/v3?sha512=c07a...`, so that an absolute link and its URI are turned into each other by adding or removing the base URL (a relative link starting with `sheaf:` is read as a `sheaf:` URI, so gateway links are written in full). A gateway is a resolver like any other, and:
+**Gateways.** Browsers do not resolve `sheaf:` URIs. A gateway is a web service that does it for them: it serves a URI at its base URL followed by the URI, unchanged, for instance `https://opensheaf.org/sheaf:2kukpn74:xx2gb5hz/v3?sha512=c07a...`, so that an absolute link and its URI are turned into each other by adding or removing the base URL (a relative link starting with `sheaf:` is read as a `sheaf:` URI, so gateway links are written in full). A gateway is a resolver like any other, and:
 
 - it MUST answer with a real HTTP status: a page (200) showing what it resolved, or a temporary redirect (302, 303 or 307) to a copy; it MUST NOT redirect permanently (301 or 308), since copies move and are taken down, and it MAY cache its own result for a URI with a digest, but not for one without; it MUST redirect only to a copy at a base URL of a confirmed archive, never to a location given only by `at` or by an index kept by others, and otherwise answers with a page that links to the copy and marks it unconfirmed; `sheaf:<name>:*` shows the lines it knows;
 - it MUST show whether what it resolved is confirmed or unconfirmed, and where it was found, and treats a copy found only through `at`, for a URI without a digest, as unconfirmed;
@@ -547,7 +547,8 @@ A verifier SHOULD check the witnesses it finds, the indexes the archive declares
 - **0.1 (draft), 15 November 2026, proposal revised after a seventh review (branch `proposal/identity`):** `sheaf:<name>` names the originator's line and `sheaf:<name>:*` the object as a whole, so that the canonical form always omits the originator's owner part; resolution without a digest and with no confirmed copy is defined; short forms of a named owner are ordered only within one archive, and copies of one line confirmed in different archives are reported as a conflict; confirmation reads `archiveId` from the copy, never from an index; external records attest only from a trusted depositor or when reached independently; a branch's own collections do not confirm its parent; resolving a parent confirms its archive, not its owner; a branch point moves to a version later in the parent's history; checks added for deep branches of branches, owner forms, and fixed archive and object identifiers; custodian defined.
 - **0.1 (draft), 15 November 2026, proposal revised after an eighth review (branch `proposal/identity`):** gateways redirect only temporarily and only to confirmed archives; `:*` is not an owner part, allows `at`, lists only lines that pass the checks, and works with a short name; a line appears only once in an archive; a branch point is later in the history of the new parent version; the index declarations allow further indexes; a `sheaf:` URI is recorded in DataCite as a `URL`, provisionally; owner proofs refer to #41 and custodians to #39; drafts kept in an archive described; the fallback without a confirmed copy in section 15.
 - **0.1 (draft), 15 November 2026, proposal (branch `proposal/identity`):** the last character of a name (and of an owner identifier) also carries the number of the algorithm that made it, 0 for SHA-512 truncated to 256 bits, so that existing names are unchanged and names of other algorithms never coincide with them; collisions and aliases listed as an open question (#44).
-- **0.1 (draft), 15 November 2026, proposal (branch `proposal/identity`):** clashes of names are resolved where an object is created in an archive: an archive keeps at most one object per line (owner, name); sealing draws a new nonce when the line is taken; a branch whose line is taken by another genesis record is named by the next algorithm over the same record (1 SHA3-256, 2 BLAKE2b-256, 3 to 15 seeded SHA-256), its `parent` keeping the parent's name, and found under it through `parentName` in the indexes; a mirror whose line is taken cannot be kept; a full name with several originators is ambiguous; aliases left to #44 as a last resort.
+- **0.1 (draft), 15 November 2026, proposal (branch `proposal/identity`):** clashes of names are resolved where an object is created in an archive: an archive keeps at most one object per line (owner, name); sealing draws a new nonce when the line is taken; a branch whose line is taken by another genesis record is named by the next algorithm over the same record (seeded SHA-256, the seed carrying the algorithm number), its `parent` keeping the parent's name, and found under it through `parentName` in the indexes; a mirror whose line is taken cannot be kept; a full name with several originators is ambiguous; aliases left to #44 as a last resort.
+- **0.1 (draft), 15 November 2026, proposal (branch `proposal/identity`):** names and owner identifiers made by one function: SHA-256 over the seed `opensheaf-name-<k>` and the record, k from 0 to 15 written in the last character (replacing SHA-512 truncated to 256 bits, SHA3-256, BLAKE2b-256 and the seeded algorithms 3 to 15); the examples recomputed.
 
 ## Appendix A. Zenodo binding (normative for archives declaring the profile `zenodo`)
 
@@ -738,7 +739,7 @@ A `members.json` of a selection: an issue of a journal, with a paper vetted in i
 }
 ```
 
-A genesis record (proposal, section 6.5), written when the authors' paper was sealed; its digest gives the name `53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma` (the bytes as shown, with a final line feed; a branch named by algorithm 1 after a clash, section 6.5, would be `cdu6s2l2ruotfxmzrhgeca2oqzxkpoeighrvjx74xs6werwyhxpb`, its SHA3-256 digest with 1 in the last character; by algorithm 3, `azhb5aa6ejongifwd3bx7tzru5m2cmfexyxxq7xbakwjq5zqo6sd`):
+A genesis record (proposal, section 6.5), written when the authors' paper was sealed; its name is `2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq` (the SHA-256 of `opensheaf-name-0`, a line feed and the bytes as shown, with a final line feed); a branch named by algorithm 1 after a clash (section 6.5) would be `74xzytlubklklsrjlmnermj4iixalc7665dcot3vbjmuqqxv2tib`:
 
 ```json
 {
@@ -759,11 +760,11 @@ The `object.json` of the first version of the journal's accepted copy of that pa
   "kind": "document",
   "archiveId": "tag:example.org,2026:journal",
   "objectId": "network-discrimination",
-  "name": "53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma",
+  "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
   "owner": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
   "parent": {
     "owner": "https://orcid.org/0000-0002-1234-5677",
-    "name": "53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma",
+    "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
     "archiveId": "tag:example.org,2026:authors",
     "objectId": "network-discrimination",
     "objectVersion": "v4",
@@ -780,35 +781,35 @@ The `object.json` of the first version of the journal's accepted copy of that pa
 }
 ```
 
-URIs of this paper (proposal, section 6.6). The authors' ORCID iD is the originator, and the journal's owner identifier, the digest of its `did:key` URI, is `sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a`:
+URIs of this paper (proposal, section 6.6). The authors' ORCID iD is the originator, and the journal's owner identifier, the digest of its `did:key` URI, is `xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda`:
 
 ```
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma/v3
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3
     document version 3 of the authors' line
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma/v3?sha512=c07a...
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3?sha512=c07a...
     the authors' object version v4, which the journal vetted
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a/v3
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda/v3
     document version 3 of the journal's line, its accepted copy
-sheaf:53c4nq6d/v3
-sheaf:53c4nq6d:sfhd2dwt/v3
+sheaf:2kukpn74/v3
+sheaf:2kukpn74:xx2gb5hz/v3
     the same two, in short form
-sheaf:53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma:*
+sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:*
     the paper as a whole: the authors' line, the journal's and any other
-https://opensheaf.org/sheaf:53c4nq6d/v3
+https://opensheaf.org/sheaf:2kukpn74/v3
     the first, through a gateway
 ```
 
-The entry of the journal's archive for this object, in its index `names/53.json` (its archive declares prefixes of 2 characters):
+The entry of the journal's archive for this object, in its index `names/2k.json` (its archive declares prefixes of 2 characters):
 
 ```json
 {
   "format": "opensheaf-index/0.1",
   "index": "names",
   "entries": [
-    { "name": "53c4nq6dc2t4pqvgccx3z5r4aouifgfw6jsnbytswpikhqd6gbma",
+    { "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
       "originator": "https://orcid.org/0000-0002-1234-5677",
       "owner": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
-      "ownerId": "sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a",
+      "ownerId": "xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda",
       "objectId": "network-discrimination", "status": "active" }
   ]
 }
