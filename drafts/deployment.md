@@ -4,10 +4,11 @@
 on where and how to serve an archive, outside the specification (which
 refers to "a deployment guide, outside this specification"). It sets out
 what a host must do, which kinds of host do it (static hosting, object
-storage, institutional web space), which do not (consumer cloud drives,
-shared drives, reference managers), how to upload, and how to check a
-deployment. Facts about services are as of November 2026, and change:
-check them before relying on them.*
+storage, institutional web space, and with conditions WebDAV servers and
+Nextcloud shares), which do not (consumer cloud drives, reference
+managers), how to upload, and how to check a deployment. Facts about
+services are as of November 2026, and change: check them before relying
+on them.*
 
 ## 1. What a host must do
 
@@ -134,7 +135,51 @@ gives two things more:
   Where a server allows anonymous `PROPFIND`, a verifier could check that
   too.
 
-Cloud drives that speak WebDAV are another matter (section 4).
+Cloud drives that speak WebDAV are another matter: see Nextcloud below,
+and section 4.
+
+### Nextcloud public shares, with conditions
+
+Nextcloud and the university services built on it (and, presumably,
+ownCloud, not checked) share folders by links, `https://<host>/s/<token>`,
+which open Nextcloud's web interface and reach the files of a folder by a
+query string (`.../download?path=...&files=...`), not by path. Since
+Nextcloud 29, however, a link share is also served over WebDAV at an
+endpoint that "does not require authentication":
+
+    https://<host>/public.php/dav/files/<share token>/
+
+A folder shared by link, without a password, so has a base URL, and the
+archive's files can be read under it with a plain `GET` (from the
+developer manual; files in subfolders are reached by path, as in any
+WebDAV tree, though the manual gives no example). Conditions:
+
+- **Nextcloud 29 or later**, and link shares allowed by the administrator.
+- **No password.** A share with a password needs HTTP Basic credentials,
+  which readers and tools do not send.
+- **Downloads allowed**: reading "only works if the download permission
+  was not denied by the sharer".
+- **Cross-origin reads only if the administrator adds them.** The
+  documentation says nothing about CORS, and Nextcloud does not appear to
+  send `Access-Control-Allow-Origin`: command-line tools can read the
+  share, browser tools such as the Explorer cannot, unless the header is
+  added in the web server or a proxy in front of Nextcloud.
+- **Limits.** Brute-force protection and rate limits are on by default
+  (`429 Too Many Requests`); how they apply to many reads of a public
+  share is not documented, and a verification makes hundreds of requests.
+- **The base URL is tied to the share.** Deleting and recreating the share
+  changes the token, and so the URL; institutions may also set expiry
+  dates on shares.
+- **No website**: content types and download headers of these responses
+  are not documented, and the share is not meant to display pages.
+- **Writing** to a share (deploying to it) needs a share that allows
+  uploads, and, for methods other than `GET`, the header
+  `X-Requested-With: XMLHttpRequest`.
+
+A Nextcloud share is thus usable as a mirror for command-line tools, and
+for browser tools where the administrator adds the cross-origin header;
+not as the home of an archive's website. This is from the documentation,
+not yet tested on a server.
 
 ## 3. Uploading
 
@@ -174,10 +219,10 @@ and the next upload completes it.
   did serve files by path, stopped serving them for all users on
   1 September 2017; accounts of that time still have a folder of that
   name, but it is an ordinary private folder.
-- **Shared drives built on Nextcloud or ownCloud**, including the
-  university services built on them: their WebDAV endpoints need a login,
-  public shares use a token in place of the archive's paths, and the
-  cross-origin header is usually not sent and cannot be set by the user.
+- **Nextcloud's ordinary share links** (`/s/<token>`, and the WebDAV
+  endpoint for logged-in users, `/remote.php/dav`): they need a login, or
+  reach files by a query string; the public WebDAV endpoint of section 2
+  is the way that works.
 - **Reference managers' storage**, such as Zotero's: files are attachments
   of bibliographic items, reached through an API by keys, not by paths,
   under a model of editable records.
@@ -188,10 +233,18 @@ works.
 
 ## 5. To be tested
 
-- **The Internet Archive.** An item on archive.org holds a tree of files,
-  served at `https://archive.org/download/<item>/<path>`: possibly a free,
-  long-lived copy kept by a library. Whether every file is served byte for
-  byte, and whether cross-origin reads are allowed, needs a test.
+- **Nextcloud public shares** (section 2): files in subfolders, headers
+  (content types, cross-origin), rate limits under a full verification,
+  on a real server.
+- **The Internet Archive.** An item on archive.org holds files served at
+  `https://archive.org/download/<item>/<path>`: possibly a free,
+  long-lived copy kept by a library. A read-only test on existing items
+  found files served byte for byte, but the cross-origin header sent for
+  some types (`.json`, `.txt`, `.gz`) and not others (`.pdf`, `.xml`,
+  `.html`, `.zip`), and derived files (OCR text, page images) added next
+  to every uploaded PDF unless derivation is off at upload, which would
+  put files listed by no inventory inside the storage root. A test
+  upload is planned in issue #43.
 - **IPFS.** A folder published on IPFS is served by gateways at
   `https://<gateway>/ipfs/<CID>/<path>`, but the CID changes with every
   deposit, so a stable base URL needs IPNS or DNSLink, and availability
