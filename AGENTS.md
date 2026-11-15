@@ -26,6 +26,8 @@ notes are for anyone, person or agent, changing it.
 - Keep the Markdown sources in ASCII: the converter writes Latin-1 and stops
   on other characters (write `...`, not an ellipsis, and `->`, not an
   arrow).
+- `drafts/` holds working papers (positions, ideas, comparisons): plain
+  Markdown, non-normative, not built into the site; see its README.
 - Check that the schemas still parse (`python3 -c "import json; json.load(open(F))"`)
   after editing them.
 
