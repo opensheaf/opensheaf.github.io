@@ -210,8 +210,8 @@ only what its two standards leave open:
   `sourceFormat` (or `sourcesMissing`), SHOULD `renditions`, `toolchain`;
   MAY `changes`, `stage` (NISO JAV: `AO`, `SMUR`, `AM`, `P`, `VoR`, ...),
   `history`, `notices`, `licence`, `agreement`, `external`, `withdrawal`,
-  `extensions`; (proposal) `name` and `owner` from the first sealed
-  version, and `parent` in a branch.
+  `extensions`; (proposal) `name`, `owner` and `sealed` from the first
+  version of its line, and `parent` in a branch.
 - Metadata files (`datacite.json`, `object.json`, `members.json`,
   inventories, the discovery document; in the proposal also
   `genesis.json`, the `parent.*` files and the index files) are CC0 (16).

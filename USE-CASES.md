@@ -247,12 +247,12 @@ members:
 
 > [!NOTE]
 > Under the identity proposal (section 10.5, not yet agreed), an accepted copy
-> is a shallow branch: it keeps the document version of the revision it
-> copies (the authors' version 3, say), and keeps the authors' `object.json`
-> as `parent.object.json`. A correction the journal makes itself is the
-> journal's own version 4; when the editors later vet the authors' corrected
-> version, the copy moves its branch point to it, with the same evidence, as
-> the journal's next version.
+> is a shallow branch: it keeps the document version of the revision it copies
+> (the authors' version 3, say), and keeps the authors' `object.json` as
+> `parent.object.json`. A correction the journal makes itself is the journal's
+> own version 4 (provisionally: option (a) of the numbering on branches); when
+> the editors later vet the authors' corrected version, the copy moves its
+> branch point to it, with the same evidence, as the journal's next version.
 
 ### A journal that publishes its own version
 
@@ -274,10 +274,10 @@ publishes it under its licence, with the authors' agreement.
 > [!NOTE]
 > Under the identity proposal (section 10.5, not yet agreed), the version of
 > record is not a separate document: it is a later version of the journal's
-> branch of the authors' document (its accepted copy), with the same name
-> (or, after a clash in the journal's archive, another name of the same
-> genesis record), the journal as `publisher` and the relations above. A derived work, such
-> as a translation, would be a separate document.
+> branch of the authors' document (its accepted copy), with the same name (or,
+> after a clash in the journal's archive, another name of the same genesis
+> record), the journal as `publisher` and the relations above. A derived work,
+> such as a translation, would be a separate document.
 
 ### A short account of a proof, with its detailed argument
 
