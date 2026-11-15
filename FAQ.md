@@ -73,6 +73,11 @@ folder name cannot contain `/`. The archive itself has a URI-like identifier
 (a `tag:` URI, for instance `tag:opensheaf.org,2026:mgubi`), and an object is
 named globally by the pair (archive identifier, object identifier).
 
+The identity proposal (sections 6.5 and 6.6, not yet agreed) adds a name
+independent of any archive, the digest of the object's genesis record, and
+writes lines, versions and pins as `sheaf:` URIs, for instance
+`sheaf:<name>/v3`; the pair stays the address of a copy in an archive.
+
 ## What is the difference between a document version and an object version?
 
 The document version is the version of the work, what readers see and what

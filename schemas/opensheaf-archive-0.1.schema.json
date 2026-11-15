@@ -232,6 +232,29 @@
         "format": "uri"
       },
       "uniqueItems": true
+    },
+    "indexes": {
+      "$comment": "proposal (section 6.6): the indexes kept, each with the length of its prefix",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "names": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 4
+        },
+        "owners": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 4
+        },
+        "sha512": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 4
+        }
+      }
     }
   }
 }

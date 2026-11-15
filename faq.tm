@@ -41,6 +41,8 @@
 
   The flat-direct storage layout puts each object in a folder named by its identifier, so paths stay readable and can be computed over plain HTTP; a folder name cannot contain <verbatim|/>. The archive itself has a URI-like identifier (a <verbatim|tag:> URI, for instance <verbatim|tag:opensheaf.org,2026:mgubi>), and an object is named globally by the pair (archive identifier, object identifier).
 
+  The identity proposal (sections 6.5 and 6.6, not yet agreed) adds a name independent of any archive, the digest of the object's genesis record, and writes lines, versions and pins as <verbatim|sheaf:> URIs, for instance <verbatim|sheaf:\<less\>name\<gtr\>/v3>; the pair stays the address of a copy in an archive.
+
   <section*|What is the difference between a document version and an object version?><label|what-is-the-difference-between-a-document-version-and-an-object-version>
 
   The document version is the version of the work, what readers see and what gets a DOI: it changes only when the document's own files change (sources, renditions, change note). The object version (<verbatim|v1>, <verbatim|v2>, ...) is OCFL's: it changes at every change of the object, including corrections of the description (adding the DOI of the journal version, fixing an affiliation) and notices about earlier versions.
