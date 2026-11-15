@@ -51,8 +51,8 @@ GitHub Pages, GitLab Pages, Codeberg Pages, Cloudflare Pages, Netlify and
 similar services publish a folder as a website, with HTTPS, a custom
 domain and proper content types: the website profile works. They are fed
 from a git repository or by an upload step. This is the default for most
-archives, and GitHub Pages is what the archive and collection templates
-use.
+archives, and GitHub Pages is what the template,
+[archive-template](https://github.com/opensheaf/archive-template), uses.
 
 - **Publishing from git.** How to keep an archive in git and publish it
   without git changing a byte (attributes, Jekyll, workflows) is in
@@ -285,13 +285,33 @@ Everything above assumes someone who can run `osheaf` and, usually, git.
 Most researchers do neither. Middle layers can hide both; from the
 cheapest to the most ambitious:
 
-1. **GitHub's web pages and Actions.** The template sets an archive up
-   from a workflow run in the browser, with a short form, and takes
-   deposits as issues filled with a form, the PDF and sources dragged in
-   as attachments; a workflow checks that the issue comes from the
-   owner, runs `osheaf`, commits, publishes, and answers with the link.
-   No git, no installation, no server; GitHub only, and limited by the
-   size of attachments. Proposed in opensheaf/archive-template#2.
+1. **GitHub's web pages and Actions.** The template,
+   [archive-template](https://github.com/opensheaf/archive-template),
+   serves both an archive of papers and collections (a reading list, a
+   journal issue), and is kept entirely from the browser:
+   - **Set up the archive**, a workflow run from the Actions tab with a
+     short form, sets it up; it asks what the repository is mainly for
+     (papers, a selection or a catalogue) and, for a collection, creates
+     it and features it on the home page. GitHub Pages is turned on by
+     hand, once (the workflow's token cannot), as the run's page says.
+   - **Issue forms** do the rest: a deposit, with the PDF and the sources
+     dragged in as attachments (a new version with the same form), a
+     notice, a withdrawal, a new licence; a new collection (inside another,
+     featured or not); a member added, vetted or removed, from any
+     archive. A workflow checks that the issue comes from someone who may
+     write to the repository, runs `osheaf`, commits and publishes, and
+     answers in the issue, renaming it after what was done, so that the
+     list of issues is a log of the archive; an error is explained in
+     plain words and changes nothing.
+   - **Update the collections**, from the Actions tab, moves catalogues to
+     their members' new versions and lists the versions a selection has
+     not vetted.
+
+   No git, no installation, no server; GitHub only, and limited by the size
+   of attachments (sources best in one zip, since GitHub does not accept
+   every type of file, such as `.tex`, as an attachment). Tested on GitHub,
+   including deposits made by dragging files into the form
+   (opensheaf/archive-template#3 and #4).
 2. **A deposit tool in the browser**, beside the Explorer: the author
    picks files and fills a form (pre-filled from an arXiv identifier, a
    DOI or an ORCID record); the page computes the inventories itself,
