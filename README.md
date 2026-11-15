@@ -130,6 +130,9 @@ on GitHub, and archives made with them.
 - [`FAQ.md`](FAQ.md): answers to common questions about the design.
 - [`USE-CASES.md`](USE-CASES.md): how the specification adapts to authors,
   archives and selections (non-normative).
+- [`opensheaf-git-0.1.md`](opensheaf-git-0.1.md): OpenSheaf archives in git,
+  a companion to the specification: how to keep, publish and copy an archive
+  in a git repository without changing its bytes.
 - [`README.md`](https://github.com/opensheaf/opensheaf.github.io/blob/main/README.md): this text, also the home page of the site.
 - [`schemas/`](https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas): the JSON Schemas of the files defined by the
   specification, also published at `https://opensheaf.org/schemas/`:
@@ -142,7 +145,8 @@ on GitHub, and archives made with them.
 - [`index.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm)/[`index.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html),
   [`opensheaf-specification-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html),
   [`faq.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm)/[`faq.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html),
-  [`use-cases.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm)/[`use-cases.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html): the pages of the site,
+  [`use-cases.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm)/[`use-cases.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html),
+  [`opensheaf-git-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.html): the pages of the site,
   generated from the Markdown files (for TeXmacs and for the web); do not
   edit them.
 - [`notes-meta.ts`](https://github.com/opensheaf/opensheaf.github.io/blob/main/notes-meta.ts): the TeXmacs style package of the

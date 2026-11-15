@@ -1,0 +1,225 @@
+# OpenSheaf archives in git
+
+*Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 15 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.*
+
+> [!WARNING]
+> **Draft for discussion.** This document is a first draft. Its open questions are listed in section 13; none of them is settled.
+
+## 1. Introduction (non-normative)
+
+The [OpenSheaf specification](opensheaf-specification-0.1.md) allows an archive to be kept in git and served by any static web server (section 5 of the specification), and says that git hashes are not part of its integrity (section 13.2). This document says how, for those who keep an archive in git and for the tools that write to such a repository.
+
+Git gives an archive what the format leaves to its keeper:
+
+- **a history of the whole archive**: every state of the discovery document, so every state the archive published, which the format itself does not keep (the discovery document is a mutable map, section 6.1 of the specification);
+- **copies**: every clone is a complete copy of the archive, with its history;
+- **review before publication**: a deposit can be prepared on a branch, checked, and merged;
+- **checks on every change**, by continuous integration;
+- **hosting**, through services such as GitHub Pages.
+
+Git also works against an archive in four ways, which this document answers:
+
+- **Bytes.** By default git may convert line endings, run filters, expand keywords or store large files elsewhere (Git LFS). The files of an archive must be stored and served byte for byte (section 4).
+- **History can be rewritten**, and files edited in place. Object versions must never change (section 5).
+- **History cannot easily forget.** A takedown must remove content; in git, a deleted file stays in every earlier commit, every clone and every fork (section 9).
+- **Size.** Hosts limit files, repositories and sites; an archive keeps every version forever (section 8).
+
+The principle: git is a store and a transport for the files of the archive. The archive is what is on the published branch. Git never changes those bytes, and the published branch never rewrites what it has published.
+
+## 2. Conventions and terms
+
+The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL are to be interpreted as described in BCP 14 (RFC 2119, RFC 8174) when, and only when, they appear in all capitals. Terms of the specification (archive, storage root, discovery document, object, object version, pin, mirror, witness, takedown, tombstone) keep their meaning.
+
+- <dfn>Repository</dfn>: a git repository holding one archive.
+- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, `witnesses/`.
+- <dfn>Presentation files</dfn>: the website of the archive (appendix C of the specification), generated from the archive files.
+- <dfn>Working files</dfn>: every other file of the repository: settings of tools, descriptions of deposits, sources being prepared, scripts, workflows.
+- <dfn>Published branch</dfn>: the branch from which the archive is served (usually `main`). A <dfn>published commit</dfn> is a commit of its first-parent history.
+- <dfn>Deployment</dfn>: the copy of the files of a published commit to the place the archive is served from.
+
+A repository conforms to this document if every published commit satisfies sections 3 to 5 and its deployments satisfy section 7. A tool conforms if every commit it makes on the published branch, and every deployment it makes, keeps the repository conforming. Conformance to this document is not declared in the discovery document (but see section 13, question 1).
+
+## 3. The repository
+
+A repository SHOULD hold one archive, with the discovery document at the top of the repository and the storage root in `ocfl/`. An archive kept in a sub-folder of a larger repository is allowed; what follows then applies to that folder.
+
+Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or `witnesses/`, and they are not published unless the keeper means them to be (section 7).
+
+The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of objects of other archives are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
+
+## 4. Storing bytes
+
+### 4.1 Attributes
+
+The repository MUST contain a `.gitattributes` file at its top with these lines (with `witnesses/**` only if the archive uses that folder, and the paths adjusted if the archive is in a sub-folder):
+
+```
+# OpenSheaf archive files: stored and checked out byte for byte,
+# never merged as text.
+opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
+ocfl/**        -text -filter -ident -working-tree-encoding -export-subst -merge
+witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge
+```
+
+- `-text`: no conversion of line endings, whatever the settings of the clone (`core.autocrlf`, `core.eol`).
+- `-filter`: no clean or smudge filter, such as that of Git LFS.
+- `-ident`: no expansion of `$Id$` in file contents.
+- `-working-tree-encoding`: no conversion of character sets.
+- `-export-subst`: no substitution in copies made by `git archive`.
+- `-merge`: no merge as text (section 6.3).
+
+Attributes in the repository take precedence over those of the user (`core.attributesFile`) and of the system only for the attributes they name; an attribute the repository leaves unspecified falls through to them. A user-wide `*.pdf filter=lfs` would otherwise apply to the PDFs of the archive. For this reason every attribute is named, not only `-text`.
+
+### 4.2 Git LFS
+
+Archive files MUST NOT be stored with Git LFS, or any other mechanism that keeps a pointer in the repository in place of the file, unless every deployment and every copy of the repository used as a copy of the archive replaces the pointers by the files. A deployment that serves the pointer serves a file whose digest does not match its inventory. GitHub Pages, deploying from a branch, serves the pointers.
+
+### 4.3 File names
+
+Git stores file names as bytes, but the file systems it checks them out on are not alike: macOS and Windows ignore case by default, macOS may change the Unicode normalisation of names, Windows forbids some characters (`<>:"|?*`) and names (`CON`, `NUL`, ...) and limits the length of paths. A file whose name cannot be checked out cannot be verified or served from that clone.
+
+OCFL separates the logical path of a file (its name in the version, as the depositor gave it) from its content path (where its bytes are stored in the object). Tools SHOULD choose content paths that check out everywhere: path segments made of ASCII letters, digits, `.`, `_` and `-`, not ending with `.`, no two content paths of an object differing only in case, and each content path at most 200 characters from the top of the repository. Logical paths keep the names given by the depositor.
+
+### 4.4 What git does not keep
+
+Git keeps neither empty folders nor modification times, and records of file modes only whether a file is executable. None of these is part of an OCFL object: inventories list files, not folders, and dates come from the inventories. Tools MUST NOT rely on any of them.
+
+## 5. The published branch
+
+### 5.1 Append-only
+
+Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
+
+1. a new object folder `ocfl/<id>/`, with the files of a complete OCFL object (a new object, or the copy of an object of another archive);
+2. a new version folder `ocfl/<id>/v<N>/`, where `v<N-1>` is the head of the object in C, with the replacement of the object's root `inventory.json` and its checksum file by those of the new version;
+3. files added, replaced or removed in an object's `extensions/opensheaf-witnesses/` folder, or under `witnesses/`;
+4. the replacement of `opensheaf.json`;
+5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
+6. the removal of an object folder, by a takedown (section 9).
+
+No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed. Several changes MAY be made in one commit.
+
+The published branch MUST NOT be rewritten, except for a takedown (section 9). Repositories SHOULD use the protection of their host to refuse force-pushes to the published branch and its deletion (on GitHub: a branch protection rule or a ruleset).
+
+### 5.2 Every published commit is an archive
+
+Every published commit MUST hold a conforming archive: the archive files of the commit, alone, pass the verification of section 14 of the specification. In particular a new object version, the replaced root inventory and the updated discovery document are committed together. Since a deployment serves the files of one commit, readers never see half a deposit.
+
+## 6. Commits, branches and drafts
+
+### 6.1 Commits
+
+A commit MAY add any number of object versions. A commit SHOULD hold one act of the archive (a deposit, an import, an update of the main collection, the addition of witnesses), and its message SHOULD name the object versions it adds (for instance `kpz-details v3: document version 2, the published version`).
+
+The author and committer of a commit record who made the commit; the inventory records who deposited each object version (its `user`) and when (its `created`), and the inventory is authoritative. They may differ: an assistant commits a version deposited by an author.
+
+Commits and tags MAY be signed. They are witnesses of who published a state of the archive, not part of its integrity (section 13.2 of the specification).
+
+### 6.2 Drafts
+
+Branches other than the published branch are working space. They MAY be rewritten, and the object versions they hold are not yet published: a tool MAY rebuild them, changing their pins, until they are merged into the published branch. Once a version is on the published branch it is fixed. (Draft and private states of archives and objects are discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
+
+### 6.3 Merging
+
+A deposit prepared on a branch is published by merging the branch into the published branch. The published branch MUST then satisfy section 5, comparing the merge commit with its first parent.
+
+Two branches may conflict:
+
+- **Versions of the same object.** If both add version `v<N>` of the same object, the second to be merged MUST be redone by the tool as `v<N+1>`, with a new inventory; it MUST NOT be resolved by editing files.
+- **The discovery document and the main collection.** Branches that add versions to different objects both change `opensheaf.json`, and usually the main collection. A merge of these files as text can produce a discovery document that parses but no longer matches the storage root, or a collection version holding the members of only one branch. The `-merge` attribute (section 4.1) makes every such change a conflict; the tool resolves it by writing the discovery document again from the storage root, and by making a new version of the collection, never by combining texts.
+
+A deposit MAY be proposed by a pull request (or merge request) and published by the keeper of the archive when it is merged. The object version is then created (its `created` date in the inventory) before it is published. (When a version becomes public, and how this is recorded, is discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
+
+## 7. Publishing
+
+### 7.1 What is served
+
+A deployment MUST serve the archive files of one published commit, byte for byte (section 5 of the specification), and MAY serve presentation files. It SHOULD NOT serve working files. A deployment SHOULD be made only from a commit whose verification (section 10) has passed.
+
+The bytes MUST be taken from a checkout made with the attributes of section 4.1, or directly from the git objects (for instance with `git archive`, which honours `-export-subst`).
+
+### 7.2 GitHub Pages
+
+GitHub Pages can publish a branch, or the files uploaded by a workflow. Publishing by a workflow is RECOMMENDED: the workflow verifies the commit, copies only the archive and presentation files, and resolves Git LFS pointers if presentation files use them.
+
+A branch published directly is served whole, and is processed by Jekyll unless the branch has a `.nojekyll` file at the top of the published folder. Jekyll leaves out files and folders whose names begin with `_` or `.`, which sources often have (`_preamble.tex`, `.latexmkrc`). A repository published from a branch MUST therefore contain `.nojekyll`.
+
+GitHub Pages compresses responses (`Content-Encoding: gzip`); the bytes after decoding are those stored, as the specification requires. It allows cross-origin requests (`Access-Control-Allow-Origin: *`), as the specification recommends. Its limits are in section 8.
+
+### 7.3 Other hosts
+
+Any static web server, or object storage, can serve a checkout of a published commit, under the same rules. A deployment that copies files (for instance with `rsync`, or to a bucket) MUST copy the files of the checkout without conversion, and SHOULD remove files that are not in the commit.
+
+## 8. Size and limits
+
+An archive keeps every version of every object, so a repository only grows. Hosts set limits; on GitHub, as of November 2026:
+
+| What | Limit |
+|---|---|
+| a file in a repository | a warning at 50 MB; refused above 100 MB |
+| a repository | best below 1 GB; strongly advised below 5 GB |
+| a site on GitHub Pages | at most 1 GB |
+| traffic of a site on GitHub Pages | a soft limit of 100 GB a month |
+
+Git stores identical files once, across objects and versions, as OCFL already does within an object (a file unchanged in a new version is not stored again). A repository's history also keeps every rebuild made while the format is a draft: in the first archive, the storage root takes 132 MB and the history 240 MB.
+
+An archive near these limits can:
+
+- keep only working files and presentation files in git, and the storage root in object storage, whose URL the discovery document gives (`storageRoot`, section 6.1 of the specification); git then no longer keeps the archive, and this document no longer applies to its storage root;
+- store large files with Git LFS, deployed by a workflow (section 4.2);
+- move to a host with other limits, or to its own server.
+
+Tools working on a large archive MAY use a partial clone (`git clone --filter=blob:none`) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. (Archives of millions of objects, their storage layouts and their indexes are discussed in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19) and [issue #32](https://github.com/opensheaf/opensheaf.github.io/issues/32).)
+
+## 9. Takedown
+
+A takedown deletes an object from the storage root and adds a tombstone to the discovery document (section 11.2 of the specification). In git, a commit that deletes the object folder removes it from what is served, but not from the history: the files remain in every earlier commit, every clone, every fork and every archive of the repository.
+
+When content must be removed (by law, or for a breach of rights), the keeper MUST:
+
+1. commit the removal of the object folder and the tombstone, as in section 5.1, item 6;
+2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with `git filter-repo --invert-paths --path ocfl/<id>/`);
+3. force-push the rewritten branches, and delete tags that point to commits holding the files;
+4. ask the host to remove what it keeps of the old history (on GitHub, cached views and the references of pull requests are removed on request to its support; forks are separate repositories, which it does not change).
+
+This is the only rewrite of the published branch allowed. The commit of step 1 SHOULD say that it is a takedown, and name the object, so that a check comparing the history before and after (section 10) can recognise it. The rewrite changes the hash of every commit after the first that held the object: signatures of those commits and tags no longer verify, and clones must be made again. Copies of the repository elsewhere (forks, other clones, Software Heritage) follow their own rules, as external copies do (section 11.3 of the specification).
+
+## 10. Verification
+
+A repository is checked, besides the verification of section 14 of the specification on each published commit, for:
+
+- **attributes**: `git check-attr` reports `text`, `filter`, `ident`, `working-tree-encoding`, `export-subst` and `merge` unset on every archive file (section 4.1);
+- **no pointers, links or submodules** among the archive files: no Git LFS pointer, symbolic link or submodule (sections 3 and 4.2);
+- **append-only**: between each published commit and the next, only the changes of section 5.1 (for a pull request: between its base and its head);
+- **portable names**: the content paths of section 4.3 (a warning, not an error);
+- **the deployment**: after a deployment, the served discovery document, and the files it names, have the digests of the commit.
+
+These checks SHOULD run on every push and every pull request (for instance in a workflow), before any deployment.
+
+## 11. Copies, mirrors and witnesses
+
+A clone of the published branch is a complete copy of the archive. A clone that is served (for instance a fork published with GitHub Pages) is a copy at another base URL; the archive MAY list it in `mirrors` of its discovery document (section 6.1 of the specification). It is not a mirror in the sense of section 10.4 of the specification, which copies one object of another archive into an archive's own storage root.
+
+Mirroring an object of another archive is copying its files and checking them against a pin; it does not need, and SHOULD NOT use, a merge of the other archive's repository.
+
+A public repository SHOULD be archived by [Software Heritage](https://www.softwareheritage.org/), which keeps dated snapshots of it named by SWHIDs. A snapshot is a witness that the archive held these files at that date, as other external copies are (section 13.2 of the specification); its identifiers are git hashes, not part of the integrity of the archive. Together with the history of the published branch, snapshots also witness the successive states of the discovery document.
+
+## 12. Security and privacy
+
+- **What is pushed is public.** Everything committed to a public repository, on any branch, including working files and commits later reverted, is published and copied, and is hard to withdraw (section 9). Private drafts and private reviews (issue [#29](https://github.com/opensheaf/opensheaf.github.io/issues/29)) MUST NOT be pushed to a public repository, even on a branch.
+- **Commit metadata** publishes the names and e-mail addresses of authors and committers, and their time zones. Keepers SHOULD commit with an address meant to be public (on GitHub, a `noreply` address). Commits that concern anonymous referees are made in the name of the journal, not of the referee.
+- **Code.** Filters and hooks are configured by each user, not by the repository; the attributes of section 4.1 keep user filters off the archive files. Workflows SHOULD NOT build or run deposited sources.
+- **Secrets**, such as tokens for Zenodo, MUST NOT be committed; workflows read them from the secrets of the host.
+
+## 13. Open questions
+
+1. **A profile, or a guide?** This document adds nothing that readers see, so it is not declared in the discovery document. Tools that copy archives would gain from knowing where to clone one from: should the discovery document name its repository (a `repository` URL), or the website link to it?
+2. **Takedown without rewriting history.** Section 9 makes takedown a rewrite of history. Alternatives: content files outside git, one repository per object, or the deletion mechanism expected in OCFL 2 (section 11.3 of the specification). Archives that hold documents of others (a journal, an institution) need it most.
+3. **Portable content paths** (section 4.3): a recommendation here, or a rule of the specification itself, since it matters for any copy made on another system?
+4. **Drafts and publication dates** (sections 6.2 and 6.3): the draft state and the date a version becomes public, in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).
+5. **Scale** (section 8): storage layouts and the size of git trees for very large archives, in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19) and [issue #32](https://github.com/opensheaf/opensheaf.github.io/issues/32).
+6. **Objects held by others** ([issue #13](https://github.com/opensheaf/opensheaf.github.io/issues/13)): whether objects controlled by their authors and kept by custodians call for one repository per object, and how such repositories make up an archive without submodules.
+
+## 14. Changelog
+
+- **0.1 (draft), 15 November 2026:** first draft.

@@ -1,6 +1,6 @@
 # OpenSheaf: an open format for document archives and collections
 
-*Specification, version 0.1 (draft), 14 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.*
+*Specification, version 0.1 (draft), 15 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.*
 
 > [!WARNING]
 > **Draft.** This version is a draft. Until version 1.0, any revision may change the format in incompatible ways, and archives and collections made now may have to be rebuilt or migrated. Do not rely on it yet for anything you cannot redo. Changes are listed in the changelog (section 17) and discussed in the [issues](https://github.com/opensheaf/opensheaf.github.io/issues).
@@ -78,7 +78,7 @@ Because OCFL does not allow directories other than objects and extensions inside
 
 All files of the discovery document, the storage root and `witnesses/` (if used) MUST be served byte for byte, as stored: no conversion of line endings or character sets, no compression that changes the bytes delivered after decoding. Archives kept in git SHOULD mark these files as binary (for instance with `.gitattributes` lines `ocfl/** -text` and `opensheaf.json -text`). Archives SHOULD be served over HTTPS and SHOULD allow cross-origin requests to these files (`Access-Control-Allow-Origin: *`), so that tools running in a browser can resolve members.
 
-An archive MAY be kept in git and served by any static web server (GitHub Pages, object storage, a university server). A deployment guide, outside this specification, discusses hosting limits and practices.
+An archive MAY be kept in git and served by any static web server (GitHub Pages, object storage, a university server). The companion document [OpenSheaf archives in git](opensheaf-git-0.1.md), outside this specification, says how to keep, publish and copy an archive in git without changing its bytes.
 
 ## 6. Discovery and identity
 
@@ -378,6 +378,7 @@ A verifier SHOULD check the witnesses it finds, the requirements of the profiles
 - **0.1 (draft), 14 November 2026, revision:** extensions (section 4): specifications published separately, whose data `object.json` records under `extensions`, keyed by their names; the discovery document should list them; they never change the core, and verifiers report those they do not know.
 - **0.1 (draft), 14 November 2026, revision:** the impartial kind of collection is named catalogue (`type` `catalogue` in `members.json`), formerly archive collection, so that it is not confused with an archive.
 - **0.1 (draft), 14 November 2026, revision:** `Presentation` (slides) named among the values of `resourceTypeGeneral` (section 8).
+- **0.1 (draft), 15 November 2026, revision:** section 5 points to the companion document OpenSheaf archives in git, in place of a deployment guide.
 
 ## Appendix A. Zenodo binding (normative for archives declaring the profile `zenodo`)
 

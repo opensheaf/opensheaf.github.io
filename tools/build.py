@@ -2,7 +2,9 @@
 """Build the OpenSheaf pages from their Markdown sources.
 
 README.md becomes the home page (index.tm, index.html), the specification
-opensheaf-specification-0.1.md its own page, and FAQ.md the page faq.html.
+opensheaf-specification-0.1.md its own page, FAQ.md the page faq.html,
+USE-CASES.md the page use-cases.html, and opensheaf-git-0.1.md (archives in
+git) its own page.
 tools/md2tm.py converts each Markdown file to TeXmacs, with links between the
 Markdown files turned into links between the pages, and TeXmacs exports each
 document to HTML. The .tm and .html files are generated: edit the Markdown
@@ -35,6 +37,7 @@ PAGES = {
     "opensheaf-specification-0.1.md": "opensheaf-specification-0.1.tm",
     "FAQ.md": "faq.tm",
     "USE-CASES.md": "use-cases.tm",
+    "opensheaf-git-0.1.md": "opensheaf-git-0.1.tm",
 }
 SPEC = "opensheaf-specification-0.1.md"
 
