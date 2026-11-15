@@ -169,14 +169,22 @@ everyone knows.
   preservation, and an archive in git alone would no longer be an OCFL storage
   root, readable by the tools of libraries.
 
+Carrying the inventories in the commits, as the git view of section 5.2 does,
+would answer two of these costs even here: pins would stay the SHA-512 digests
+of inventories, with the commit hash only an address, and every file would
+have its SHA-512 digest in the inventory. The others remain.
+
 ### 5.2 Git as a view of OCFL
 
 The archive stays an OCFL storage root, and each object version also has a
 <dfn>git view</dfn>: a commit built from the version **deterministically**, so
 that anyone can recompute it from the OCFL object alone.
 
-- the tree: the logical state of the version, every file with mode `100644`,
-  folders as trees;
+- the tree: three entries, `inventory.json` (the root inventory as it was
+  after this version, the copy that OpenSheaf requires in the version folder),
+  `inventory.json.sha512` (its checksum file, which holds the digest of the
+  pin), and `content/`, the logical state of the version, every file with mode
+  `100644` at its logical path, folders as trees;
 - the parent: the commit of the previous version (none for `v1`);
 - the author and committer: the `user` of the inventory version (its `name`,
   and its `address` between angle brackets, empty if absent), with the
@@ -189,19 +197,45 @@ tree, the parent and these fields, the git view of an object version is a
 function of the OCFL object. It adds a second digest to every version without
 changing a byte of the archive.
 
+The inventory can be in the tree because it never describes itself: it lists
+the files under `content/`, as in OCFL it lists the files of the version
+folders beside it. Only an inventory recording its own commit or tree hash
+would be circular, and none does. With the inventory in the tree, a commit and
+a pin are bound by their content: from a commit one reads the inventory,
+computes its SHA-512 digest, compares it with the pin, and checks every file
+of `content/` against the inventory. Integrity rests on SHA-512, as in the
+archive; the git hash is only an address. And the chain of commits rebuilds
+the OCFL object exactly: each version's inventory is in its commit, and the
+manifest says in which version folder each file was first stored, whose
+commit holds its bytes.
+
+The subtree `content/` is the document alone, so its `swh:1:dir:` identifier
+is the same as that of any repository holding exactly those files, such as an
+author's own repository of the paper. Keeping the document under `content/`
+also avoids a clash with a document file that happens to be called
+`inventory.json`.
+
+Another tree is possible: the OCFL object folder itself as it was after the
+version (`inventory.json`, its checksum file, `v1/` to `vn/`). A checkout is
+then the OCFL object byte for byte, and git stores the earlier version folders
+once; but the tree shows storage paths instead of the document, and, since a
+version folder holds only the files that changed, comparing two commits shows
+a new folder and a new inventory, not the changes of the document. The tree
+above keeps both the document and the evidence.
+
 **Gains.**
 
 - **Software Heritage.** If an archive publishes its git views as a
   repository, Software Heritage archives it, and its SWHIDs can be recomputed
   from the OCFL objects: a verifier can confirm that the version it holds is
   the one Software Heritage holds, at the date of its snapshot, without
-  trusting either. This is an external witness that is checkable against a
-  pin, which issue
+  trusting either; or, without recomputing anything, fetch a version from
+  Software Heritage and check its inventory against the pin with SHA-512. This
+  is an external witness that is checkable against a pin, which issue
   [#22](https://github.com/opensheaf/opensheaf.github.io/issues/22) looks for.
 - **Transport.** Mirrors and custodians can follow an archive with `git
   fetch`, receiving only new versions, and rebuild the OCFL objects from the
-  commits and the inventories (which the view would also need to carry; see
-  section 6).
+  commits alone, since they carry the inventories.
 - **Collections as superprojects.** A collection version's git view can hold a
   gitlink for each member pin. Cloning it with its submodules fetches every
   member at the vetted version, each checked by git, from the archives'
@@ -212,9 +246,9 @@ changing a byte of the archive.
   today; the view is optional, and can be added to existing archives.
 
 **Costs.** A second representation to keep in step; a deterministic mapping to
-specify exactly (dates, encodings, names, empty folders, file names git
-refuses); and the views do not carry the inventories, so a repository of views
-alone does not rebuild the archive unless it carries them too.
+specify exactly (dates, encodings, names, file names git refuses); and what
+lies outside the versions (witnesses, the discovery document) needs references
+of its own (section 6).
 
 ### 5.3 Git as the transport only
 
@@ -230,10 +264,11 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
 - **Determinism.** Every field of the commit must be fixed by the OCFL object:
   the encoding of names and messages (UTF-8, line endings, a trailing
   newline), the date format and time zone, the order of tree entries (git's
-  own), the handling of a missing name or address, of empty folders (absent in
-  git), and of logical paths git cannot store (`.git`, paths with a component
-  that a tree cannot name). A version that cannot be mapped must be reported,
-  not silently changed.
+  own), the handling of a missing name or address, and of logical paths git
+  cannot store (`.git`, paths with a component that a tree cannot name). A
+  version that cannot be mapped must be reported, not silently changed. Empty
+  folders are no problem: the logical state of OCFL lists only files. The
+  inventory and its checksum file are copied as stored, never re-serialised.
 - **Where the commit hash is recorded.** A version cannot hold its own commit
   hash (the hash depends on the content). It can be recorded outside: in the
   discovery document (`gitCommit` next to `inventorySha512`), in the next
@@ -241,11 +276,16 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   recompute it. Recording it in the discovery document makes it visible to
   readers who do not compute it.
 - **Inventories and description.** `datacite.json` and `object.json` are in
-  the tree, as files of the version. The inventory is not (it lists the
-  version's files, and would change the tree that it describes). To rebuild an
-  OCFL object from a repository of views, the inventories travel beside the
-  commits: as notes, as files under a separate reference, or in a parallel
-  tree.
+  `content/`, as files of the version; the inventory and its checksum file are
+  beside it, at the root of the tree (section 5.2). The two must agree: the
+  files of `content/` are exactly the state of the version in the inventory,
+  with the digests it gives, and the parent commits follow its versions. A
+  verifier reports a view where they do not.
+- **What is outside the versions.** The witnesses of an object
+  (`extensions/opensheaf-witnesses/`) are outside its versions in OCFL, and
+  are added and upgraded later; the discovery document changes with every
+  deposit. Neither belongs in the commits of a line: they go under references
+  of their own (for instance `refs/opensheaf/witnesses`), or in notes.
 - **Description-only versions** are commits whose tree differs only in
   `datacite.json` or `object.json`, which suits git well.
 - **Collections.** A gitlink records a commit hash, not a version label or an
@@ -254,7 +294,9 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
 - **SHA-1 or SHA-256.** The view can be computed in both object formats. SHA-1
   views match Software Heritage and the forges; SHA-256 views are stronger,
   and could be computed now and published later. Neither replaces the SHA-512
-  pins.
+  pins, and with the inventory in the tree neither needs to: a collision of
+  git hashes could at worst make an address point to the wrong commit, which
+  the check of its inventory against the pin would reject.
 - **Names.** The root commit of a line, built from a version holding
   `genesis.json` (PR #30), is a natural git name for the line; but the
   self-certifying name of #20 is the digest of the genesis record alone, which
@@ -320,12 +362,14 @@ committing to it.
    two independent runs, on different systems, give the same commit hashes.
 2. **The first archive.** The views of `mgubi/papers`, published as a
    repository and saved by Software Heritage; then a verifier that recomputes
-   the SWHIDs from the OCFL objects and finds them in Software Heritage.
+   the SWHIDs from the OCFL objects and finds them in Software Heritage, and
+   one that fetches a version from Software Heritage and checks it against its
+   pin.
 3. **A collection as a superproject.** The view of a selection with members in
    two archives, cloned with its submodules.
 4. **A mirror by fetch.** A copy of an archive kept up to date by `git fetch`
-   of the views and their inventories, rebuilt into an OCFL storage root, and
-   verified byte for byte against the original.
+   of the views alone, rebuilt into an OCFL storage root, and verified byte
+   for byte against the original.
 5. **Reading in a browser.** The cost of reading one document version from a
    repository with isomorphic-git, from a static host, compared with reading
    the OCFL files.
@@ -336,8 +380,9 @@ committing to it.
   the discovery document, a profile), an extension, or only a convention of
   the tools?
 - SHA-1, SHA-256 or both, and for how long SHA-1 views are worth computing.
-- How inventories travel with the views, so that a repository of views is
-  enough to rebuild the archive.
+- Which tree: the document with its inventory (section 5.2), or the OCFL
+  object folder itself.
+- Where witnesses and the discovery document go in a repository of views.
 - Whether the git view of a collection should hold gitlinks, which tools would
   fetch automatically from places the collection does not vouch for.
 - How lines, owners and branches (PR #30) appear in the views: one repository
