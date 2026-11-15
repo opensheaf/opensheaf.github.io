@@ -692,13 +692,22 @@
       <strong>Name.</strong> The name of the object is the SHA-512 digest of
       <tt class="verbatim">genesis.json</tt>, truncated to its first 256 bits and
       written in lowercase base32 (RFC 4648, without padding): 52 characters,
-      the last of which is <tt class="verbatim">a</tt> or <tt class="verbatim">q</tt> (it carries
-      one bit), a valid object identifier (section 6.3). This is a truncation
-      of SHA-512, not SHA-512/256, which uses other initial values. Anyone
-      holding a copy can compute it; it is unique without a registry, since
-      the record holds a random nonce. <tt class="verbatim">object.json</tt> records it
-      as <tt class="verbatim">name</tt>. An archive MAY use the name as the object
-      identifier.
+      a valid object identifier (section 6.3). This is a truncation of
+      SHA-512, not SHA-512/256, which uses other initial values. The last
+      character carries the last bit of the digest and, in its four remaining
+      bits, the number of the algorithm that made the name: 0 for this one, so
+      that the last character is <tt class="verbatim">a</tt> or <tt class="verbatim">q</tt>; a
+      later version of the genesis record MAY use another algorithm with
+      another number, so that names made by different algorithms never
+      coincide. Since RFC 4648 sets those bits to zero, names are compared as
+      strings and never decoded; a reader that meets a name whose last
+      character is neither <tt class="verbatim">a</tt> nor <tt class="verbatim">q</tt> reports a
+      name of an algorithm it does not know, not a malformed name. Anyone
+      holding a copy can compute it; it is unique without a registry in
+      practice, since the record holds a random nonce, but a name is used to
+      refer to objects, so what happens when two different works have the same
+      name is open (#44). <tt class="verbatim">object.json</tt> records it as <tt class="verbatim">name</tt>.
+      An archive MAY use the name as the object identifier.
     </p>
     <p>
       <strong>Owner.</strong> The owner of a line is a URI, recorded in <tt
@@ -897,6 +906,17 @@
       </li>
       <li>
         <p>
+          Collisions: what happens when two different works have the same name
+          (a collision of the digest, or a genesis record reused), and whether
+          a holder may keep both through an alias, a new genesis record that
+          wraps the old one; how resolvers detect collisions (the full digest
+          of the genesis record in the indexes); collisions of owner
+          identifiers, and writing the owner itself in a URI as a way out
+          (#44).
+        </p>
+      </li>
+      <li>
+        <p>
           The field names: <tt class="verbatim">name</tt> also names the archive, in the
           discovery document.
         </p>
@@ -918,10 +938,11 @@
       the SHA-512 digest of its URI as recorded (in the canonical form of
       section 6.5, where one is defined), encoded in UTF-8 without a line end,
       truncated to its first 256 bits and written in lowercase base32, as
-      names are (section 6.5): 52 characters. It names an owner inside a URI,
-      where the owner's own URI, which holds <tt class="verbatim">:</tt> and <tt class="verbatim">/</tt>,
-      cannot be written. <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">object.json</tt>,
-      <tt class="verbatim">parent</tt> and the members of collections record the owner's
+      names are, with the same algorithm number in the last character (section
+      6.5): 52 characters. It names an owner inside a URI, where the owner's
+      own URI, which holds <tt class="verbatim">:</tt> and <tt class="verbatim">/</tt>, cannot be
+      written. <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">object.json</tt>, <tt
+      class="verbatim">parent</tt> and the members of collections record the owner's
       URI, never its identifier; indexes record both (below).
     </p>
     <p>
@@ -2995,6 +3016,16 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           <tt class="verbatim">URL</tt>, provisionally; owner proofs refer to #41 and
           custodians to #39; drafts kept in an archive described; the fallback
           without a confirmed copy in section 15.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 15 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>):**
+          the last character of a name (and of an owner identifier) also
+          carries the number of the algorithm that made it, 0 for SHA-512
+          truncated to 256 bits, so that existing names are unchanged and
+          names of other algorithms never coincide with them; collisions and
+          aliases listed as an open question (#44).
         </p>
       </li>
     </ul>

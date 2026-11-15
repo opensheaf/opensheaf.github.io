@@ -111,7 +111,9 @@ only what its two standards leave open:
   `created`, `originator`, `nonce`), written when the object is sealed and
   kept byte for byte in every later version and branch, never
   re-serialised. The **name** is its SHA-512, truncated to 256 bits, in
-  lowercase base32: 52 characters, `^[a-z2-7]{51}[aq]$`.
+  lowercase base32: 52 characters, `^[a-z2-7]{51}[aq]$`; the last
+  character also holds the algorithm number in its 4 spare bits (0 gives
+  `a` or `q`). Collisions and aliases are open (#44).
 - **Draft and sealing** (6.5): a draft is an object without a genesis
   record; no pin may name its versions. Sealing adds the genesis record,
   at the owner's request, before a version first leaves the owner's hands.
