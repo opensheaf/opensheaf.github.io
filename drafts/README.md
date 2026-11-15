@@ -13,5 +13,5 @@ cases, through an issue.
 
 | Paper | About |
 |---|---|
-| [positioning.md](positioning.md) | The functions of scholarly communication (archive, announce, filter, distribute, assign merit), OpenSheaf as a transport layer for them, a comparison with federated and distributed systems, and what unbundling costs |
+| [positioning.md](positioning.md) | The functions of scholarly communication (record, preserve, announce, filter, distribute, assign merit), OpenSheaf as an exchange layer between the parties that carry them, comparisons with scholarly infrastructure and with federated and distributed systems, what separating the functions costs, and proposals |
 | [git-as-implementation.md](git-as-implementation.md) | Git's commits, trees, references and transport as the implementation of OpenSheaf: git instead of OCFL, a deterministic git view of OCFL objects (checkable through Software Heritage), or git as transport only; the lines of PR #30 in git terms; experiments |
