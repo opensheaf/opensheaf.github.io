@@ -246,6 +246,25 @@ but they are what makes resolution through the network sound. They lead
 back to the open questions of keys and self-certifying names (#13, #20)
 before any federation protocol.
 
+Keys need not wait for a new infrastructure of identity: researchers
+already have one, ORCID, which the descriptions of documents name for
+their authors (`creators` in `datacite.json`). ORCID holds no keys and
+signs nothing for its users, but an author can publish a public key on
+their own ORCID record, as one of the links they edit themselves (for
+instance the key's address on a key server), and the key can name the
+iD in return. A verifier then reads the public record, finds the key,
+and checks the signatures of the object versions (the witnesses of the
+specification) with it: the authors of a document, named by their iDs,
+become the people who can be shown to have deposited it, wherever its
+copies are. Two limits: the record shows the binding now, not at the
+time of signing, so the first binding is best kept as a timestamped
+snapshot of the record with the witnesses; and the link proves only what
+the holder of the ORCID account published. ORCID's own signed login
+tokens, which can carry the digest of an inventory, can witness that the
+holder of an iD approved a deposit at a given time, without any key for
+the author to manage; they rest on ORCID's signature and keys, which
+must be kept to check them later (issue #13).
+
 ### Announce
 
 The specification provides the raw material: each archive MAY publish a
@@ -583,7 +602,9 @@ anything enters the specification.
   who commits to keep what, and takedowns across the network (#33).
 - **Identity.** Names that do not depend on a domain, and objects whose
   name can be checked from their content (#14, #20); a DHT as an optional
-  resolver from digests and archive identifiers to locations (section 4).
+  resolver from digests and archive identifiers to locations (section 4);
+  authors' keys published on their ORCID records, so that signed versions
+  can be traced to the people named as their creators (section 3, #13).
 - **Adoption.** OpenSheaf works alongside existing services: a document can
   be on arXiv (`IsIdenticalTo`), have a DOI, and be found by Google
   Scholar; `osheaf arxiv import` brings an author's arXiv papers into an
