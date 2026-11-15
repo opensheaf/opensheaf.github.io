@@ -14,9 +14,10 @@ and composed; preservation too, by federations of institutions that keep
 copies of the archives at the edge. It then compares OpenSheaf with
 federated and distributed systems (Mastodon and ActivityPub, Bluesky and
 the AT Protocol, Nostr, IPFS, distributed hash tables, git, OAI-PMH,
-LOCKSS, notification protocols such as COAR Notify, COAR's Pubfair,
-DOI registries), weighs what unbundling costs (money, abuse, rights,
-anonymity), and lists ideas and open questions.*
+LOCKSS, institutional repositories (DSpace, EPrints), notification
+protocols such as COAR Notify, COAR's Pubfair, DOI registries), weighs
+what unbundling costs (money, abuse, rights, anonymity), and lists ideas
+and open questions.*
 
 ## 1. The functions
 
@@ -64,6 +65,7 @@ The actors of scholarly communication each carry a bundle of functions:
 | arXiv | yes, with a date that establishes priority | yes, the daily listings | moderation only | yes | little |
 | A journal and its publisher | the version of record | weak (tables of contents, alerts) | yes, refereeing | yes, often behind a paywall | yes, the main signal |
 | An overlay journal (Discrete Analysis, the journals of Episciences) | relies on arXiv | weak | yes | relies on arXiv | yes |
+| SciPost | relies on preprint servers, keeps its published version | weak | yes, refereeing with published reports | yes, open access | yes |
 | Peer Community In | relies on preprint servers | weak | yes, recommendations | relies on preprint servers | some |
 | An institutional repository | yes | no | no | yes | reporting to the institution |
 | Zenodo | yes, with DOIs | no | no | yes | citations through DOIs |
@@ -92,6 +94,61 @@ system; arXiv is one organisation, and much of journal publishing is in
 the hands of a few publishers. There is no common format in
 which an announcement, a selection or a review could be made by someone
 else, over the same documents, and checked by anyone.
+
+### SciPost: a publisher run by scientists
+
+SciPost (<https://scipost.org>) shows that the filter and merit functions
+can be run without a commercial publisher. It is a not-for-profit
+foundation in Amsterdam (Stichting SciPost), founded by J.-S. Caux and run
+largely by working scientists, with eighteen journals in physics,
+astronomy, chemistry and a few other fields (SciPost Physics, SciPost
+Physics Core, Lecture Notes, Codebases, Proceedings and others). Its
+choices answer several of the questions of this paper:
+
+- **Refereeing in the open.** Its "peer-witnessed refereeing" publishes
+  the referees' reports on the submission's page, with the authors'
+  replies and comments from registered contributors; reports are
+  anonymous by default, and referees are encouraged to sign them.
+- **Preprints first.** Submission goes preferably through a preprint
+  server (arXiv, bioRxiv, ChemRxiv or SocArXiv, by field), though direct
+  submission is possible; resubmissions are linked to the earlier
+  manuscripts. The accepted paper is typeset by SciPost and published
+  with its own DOI, under CC BY 4.0, the authors keeping the copyright,
+  and preserved through CLOCKSS.
+- **No fees for anyone.** Neither authors nor readers pay. SciPost asks
+  the organisations that benefit to sponsor it: each paper's cost (a few
+  hundred euros) is divided among the institutions and funders of its
+  authors ("PubFracs"), and universities, consortia and national bodies
+  sponsor it accordingly.
+- **Open infrastructure.** Its software is open source, its finances are
+  public, and its Commentaries pages let contributors comment on papers
+  published elsewhere.
+
+In the terms of this paper, SciPost unbundles the publisher: it takes
+filtering and merit back into the hands of the community, leaves
+announcing and the first archiving to preprint servers, and keeps only
+the version it publishes. It is also the closest existing example of
+what a selection in OpenSheaf would describe:
+
+- **A journal as a selection.** Each SciPost issue vets particular
+  revisions of preprints; with OpenSheaf, it would pin the exact version
+  that was refereed and the one accepted, instead of naming an arXiv
+  identifier, and that record would be verifiable from the files.
+- **Its own version as its own document.** SciPost's typeset paper is
+  the case of a journal that publishes its own version: a document of
+  the journal's archive, related to the authors' version (see the
+  [use cases](../USE-CASES.md)).
+- **Reports as documents.** Published reports, replies and comments are
+  review documents (`PeerReview`) that could be kept, versioned and
+  pinned like the papers, with anonymity as discussed in issue #29.
+- **Licences that allow copying.** Its single, standard licence (CC BY
+  4.0) is exactly what the proposed rule for mirrors asks for (issue
+  #34): its papers could be mirrored by any federation.
+
+The words collide once more: SciPost Selections is the name of one of
+its journals, a multidisciplinary one for outstanding papers; in
+OpenSheaf terms, it too would be a selection, but the name is SciPost's
+own.
 
 ## 3. OpenSheaf as a transport layer
 
@@ -524,6 +581,72 @@ writing pins in COAR Notify payloads, which may wait for global names
 `@alice@example.org` into links, could give archives handles too, but
 handles bound to a domain do not solve naming (#14).
 
+### Institutional repositories
+
+Most universities and research institutes run a repository: a website
+where their researchers' papers, theses, reports and data are deposited
+and published, usually in open access. It is built with one of a few
+platforms: DSpace (begun in 2002 by MIT Libraries and Hewlett-Packard,
+the most widely used), EPrints (begun in 2000 at the University of
+Southampton), Invenio (from CERN, on which Zenodo runs), Fedora (with its
+front ends Islandora and Samvera), and Dataverse for data. Deposit is
+often required by funders and institutions, which is how much of open
+access ("green" open access) comes about.
+
+**What they do.** A repository archives and distributes: it keeps what is
+deposited, under the institution's preservation policy; gives each item
+a stable page and identifier (a Handle, sometimes a DOI); exposes its
+metadata through OAI-PMH to aggregators (BASE, CORE, OpenAIRE); manages
+access, embargoes and licences; and reports to the institution, which
+counts what its researchers produce. It does little announcing and no
+filtering: it holds what its members deposit, often the accepted
+manuscript of a paper published elsewhere. Deposits can come in from
+other systems through SWORD, a protocol for depositing into repositories,
+and recent platforms speak COAR Notify.
+
+**How they differ from an OpenSheaf archive.**
+
+- **Software and operation.** A repository is a server application, with
+  a database, a running web application, and staff to keep it. An
+  OpenSheaf archive is static files on any web server.
+- **Who controls it.** A repository belongs to its institution, which
+  decides what is accepted and how it is shown; a researcher who moves
+  leaves their deposits behind, in another institution's repository. An
+  OpenSheaf archive belongs to whoever keeps it, often the author, and
+  moves with them.
+- **Versions, sources and fixity.** Repositories hold files and metadata
+  per item, with versions as far as the platform allows, and checksums
+  for preservation inside the platform; sources are rarely kept, and the
+  deposit is often a single version. OpenSheaf keeps every version of a
+  document, with its sources, each fixed by an inventory that anyone can
+  check from outside. Fedora 6 already keeps its objects in OCFL, the
+  layout OpenSheaf uses, which shows how close the two can come.
+- **Collections.** A repository's collections group its own items (by
+  department, by type). OpenSheaf's collections are objects that pin
+  their members by digest, across archives, and can be cited and
+  verified as they stood.
+- **Description.** Repositories describe items in their own schemas,
+  often derived from Dublin Core, and map them for harvesting; OpenSheaf
+  uses DataCite throughout.
+
+**How they relate.** Repositories are not what OpenSheaf replaces but
+what it needs: the institutions that keep things for the long term.
+
+- **Custodians and preservation nodes.** A university that runs a
+  repository can mirror its researchers' OpenSheaf archives, or keep them
+  as a node of a federation (section 3), with the same staff and
+  policies.
+- **Two ways in.** A repository can ingest OpenSheaf objects, through
+  SWORD or a dedicated import, or publish what it holds as an OpenSheaf
+  archive, generated from its records, so that its items can be pinned
+  by selections elsewhere.
+- **Messages.** Repositories already speak OAI-PMH and, increasingly,
+  COAR Notify, the protocols through which OpenSheaf archives would join
+  the network of repositories and the services around it (below).
+- **Reporting.** An author's OpenSheaf archive can be the source from
+  which the institution's records are filled, rather than a second place
+  to deposit.
+
 ### COAR's repository model: Pubfair
 
 The closest relative of this paper's argument comes from the repository
@@ -614,7 +737,10 @@ hosting service or a git forge can serve at little or no cost. The other
 functions still need people and money. A separate function can be funded
 separately (a society runs a journal as a selection, a library runs an
 announcement service for its field), but whether it will be is a question
-of institutions, not of format. A risk to name: services that are free
+of institutions, not of format. SciPost's model, in which each paper's
+cost is divided among the institutions and funders of its authors and
+they sponsor accordingly, is one working answer for filtering (section
+2). A risk to name: services that are free
 today (forges, hosting) may change their terms, which is one more reason
 for mirrors.
 
@@ -731,6 +857,7 @@ Open questions for this paper:
 - Episciences, a platform of overlay journals:
   <https://www.episciences.org>.
 - Peer Community In: <https://peercommunityin.org>.
+- SciPost: <https://scipost.org>.
 - COAR Notify, version 1.0.1: <https://coar-notify.net>.
 - Ross-Hellauer, T., Fecher, B., Shearer, K. and Rodrigues, E.,
   *Pubfair: a framework for sustainable, distributed, open science
