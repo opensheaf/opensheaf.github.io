@@ -29,6 +29,10 @@
           "name": {
             "$ref": "#/$defs/base32"
           },
+          "originator": {
+            "type": "string",
+            "format": "uri"
+          },
           "owner": {
             "type": "string",
             "format": "uri"
@@ -84,6 +88,7 @@
             "items": {
               "required": [
                 "name",
+                "originator",
                 "owner",
                 "ownerId",
                 "objectId"
