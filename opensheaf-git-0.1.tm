@@ -191,6 +191,16 @@
 
   Any static web server, or object storage, can serve a checkout of a published commit, under the same rules. A deployment that copies files (for instance with <verbatim|rsync>, or to a bucket) MUST copy the files of the checkout without conversion, and SHOULD remove files that are not in the commit.
 
+  <subsection*|7.4 Raw file servers><label|74-raw-file-servers>
+
+  A forge's raw file server, such as <verbatim|raw.githubusercontent.com> for a public GitHub repository, serves the files of a branch or a commit directly from the git objects, at <verbatim|https://raw.githubusercontent.com/\<less\>owner\<gtr\>/\<less\>repository\<gtr\>/\<less\>branch or commit\<gtr\>/>. With the attributes of section 4.1, it serves the archive files byte for byte, and it allows cross-origin requests (<verbatim|Access-Control-Allow-Origin: *>): it meets the requirements of section 5 of the specification, and tools, including those running in a browser, can read and verify the archive from it.
+
+  It does not serve a website. It sends text files as <verbatim|text/plain> and other files as <verbatim|application/octet-stream>, with <verbatim|X-Content-Type-Options: nosniff>, so browsers show the pages of the website profile as source and download PDFs instead of displaying them; landing pages are not read by search engines. An archive that follows the website profile MUST therefore be published by another deployment (section 7.2 or 7.3).
+
+  A raw file server serves Git LFS pointers, not the files they stand for (section 4.2). Its responses are cached for some minutes, so a new commit appears with a delay. It is not a hosting service, and may limit the rate of requests; a verification makes about one request per metadata file of the archive. Its base URL names the repository and the branch, and changes when either is renamed; a URL with a commit hash names a fixed state of the archive.
+
+  A raw file server is useful as a second location: its base URL MAY be listed in <verbatim|mirrors> of the discovery document, as a copy of the archive that tools can use when the main deployment is unavailable. It is not independent of the forge, and does not replace a copy kept elsewhere (section 11).
+
   <section*|8. Size and limits><label|8-size-and-limits>
 
   An archive keeps every version of every object, so a repository only grows. Hosts set limits; on GitHub, as of November 2026:
@@ -267,6 +277,8 @@
 
   <\itemize>
     <item><strong|0.1 (draft), 15 November 2026:> first draft.
+
+    <item><strong|0.1 (draft), 15 November 2026, revision:> raw file servers (section 7.4): they serve the archive files byte for byte with cross-origin requests allowed, so tools can read an archive from them, but not a website (content types), nor Git LFS files; their base URL may be listed in <verbatim|mirrors>.
 
     <item><strong|0.1 (draft), 15 November 2026, revision:> repairs (section 5.3): a file whose bytes do not match its inventory, such as a Git LFS pointer committed by mistake, is replaced by the right bytes in a new commit, the only change allowed to an existing version folder; the append-only check accepts it.
   </itemize>

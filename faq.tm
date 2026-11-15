@@ -21,6 +21,10 @@
 
   No. The core of the format is an OCFL storage root and a discovery document served over HTTPS. Zenodo, TeXmacs and the website are optional profiles (appendices A, B and C). Git and GitHub Pages are convenient ways to keep and serve an archive, but any static web server will do.
 
+  <section*|Can an archive be served straight from GitHub, without GitHub Pages?><label|can-an-archive-be-served-straight-from-github-without-github-pages>
+
+  For tools, yes; for readers, no. The raw file server of a public GitHub repository (<verbatim|https://raw.githubusercontent.com/\<less\>owner\<gtr\>/\<less\>repository\<gtr\>/main/>) serves every file byte for byte and allows cross-origin requests, so the Explorer, and other tools that read archives over HTTP, can read and verify an archive from it. It does not serve a website: it sends pages as plain text and PDFs as downloads, so landing pages are neither shown nor read by search engines, and it serves the pointers of Git LFS, not the files. It is best listed as a second location in <verbatim|mirrors> of the discovery document, next to a GitHub Pages site or another web server. See section 7.4 of <hlink|OpenSheaf archives in git|opensheaf-git-0.1.tm>.
+
   <section*|Why OCFL? Isn't git enough?><label|why-ocfl-isnt-git-enough>
 
   Git records history, but its layout is internal to git and its hashes (SHA-1 in most repositories) are not meant for long-term preservation. OCFL (the Oxford Common File Layout) is a published specification for exactly this problem: versioned objects stored as plain files, every file fixed by a SHA-512 digest, readable without any special software, with independent validators, used by research libraries. An OpenSheaf archive can still be kept in git; git just is not part of its integrity.

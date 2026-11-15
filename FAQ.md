@@ -30,6 +30,19 @@ served over HTTPS. Zenodo, TeXmacs and the website are optional profiles
 (appendices A, B and C). Git and GitHub Pages are convenient ways to keep and
 serve an archive, but any static web server will do.
 
+## Can an archive be served straight from GitHub, without GitHub Pages?
+
+For tools, yes; for readers, no. The raw file server of a public GitHub
+repository (`https://raw.githubusercontent.com/<owner>/<repository>/main/`)
+serves every file byte for byte and allows cross-origin requests, so the
+Explorer, and other tools that read archives over HTTP, can read and verify
+an archive from it. It does not serve a website: it sends pages as plain text and PDFs
+as downloads, so landing pages are neither shown nor read by search engines,
+and it serves the pointers of Git LFS, not the files. It is best listed as a
+second location in `mirrors` of the discovery document, next to a GitHub
+Pages site or another web server. See section 7.4 of [OpenSheaf archives in
+git](opensheaf-git-0.1.md).
+
 ## Why OCFL? Isn't git enough?
 
 Git records history, but its layout is internal to git and its hashes (SHA-1

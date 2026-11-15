@@ -478,7 +478,43 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       files of the checkout without conversion, and SHOULD remove files that
       are not in the commit.
     </p>
-    <h2 id="auto-22"><a id="8-size-and-limits"></a>8. Size and limits<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-22"><a id="74-raw-file-servers"></a>7.4 Raw file servers<span style="margin-left: 1em"></span></h3>
+    <p>
+      A forge's raw file server, such as <tt class="verbatim">raw.githubusercontent.com</tt>
+      for a public GitHub repository, serves the files of a branch or a commit
+      directly from the git objects, at <tt class="verbatim">https://raw.githubusercontent.com/&lt;owner&gt;/&lt;repository&gt;/&lt;branch
+      or commit&gt;/</tt>. With the attributes of section 4.1, it serves the
+      archive files byte for byte, and it allows cross-origin requests (<tt
+      class="verbatim">Access-Control-Allow-Origin: *</tt>): it meets the requirements
+      of section 5 of the specification, and tools, including those running in
+      a browser, can read and verify the archive from it.
+    </p>
+    <p>
+      It does not serve a website. It sends text files as <tt class="verbatim">text/plain</tt>
+      and other files as <tt class="verbatim">application/octet-stream</tt>, with <tt
+      class="verbatim">X-Content-Type-Options: nosniff</tt>, so browsers show the pages
+      of the website profile as source and download PDFs instead of displaying
+      them; landing pages are not read by search engines. An archive that
+      follows the website profile MUST therefore be published by another
+      deployment (section 7.2 or 7.3).
+    </p>
+    <p>
+      A raw file server serves Git LFS pointers, not the files they stand for
+      (section 4.2). Its responses are cached for some minutes, so a new
+      commit appears with a delay. It is not a hosting service, and may limit
+      the rate of requests; a verification makes about one request per
+      metadata file of the archive. Its base URL names the repository and the
+      branch, and changes when either is renamed; a URL with a commit hash
+      names a fixed state of the archive.
+    </p>
+    <p>
+      A raw file server is useful as a second location: its base URL MAY be
+      listed in <tt class="verbatim">mirrors</tt> of the discovery document, as a copy
+      of the archive that tools can use when the main deployment is
+      unavailable. It is not independent of the forge, and does not replace a
+      copy kept elsewhere (section 11).
+    </p>
+    <h2 id="auto-23"><a id="8-size-and-limits"></a>8. Size and limits<span style="margin-left: 1em"></span></h2>
     <p>
       An archive keeps every version of every object, so a repository only
       grows. Hosts set limits; on GitHub, as of November 2026:
@@ -543,7 +579,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       their indexes are discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a> and <a href="https://github.com/opensheaf/opensheaf.github.io/issues/32">issue
       #32</a>.)
     </p>
-    <h2 id="auto-23"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-24"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
     <p>
       A takedown deletes an object from the storage root and adds a tombstone
       to the discovery document (section 11.2 of the specification). In git, a
@@ -576,7 +612,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       (forks, other clones, Software Heritage) follow their own rules, as
       external copies do (section 11.3 of the specification).
     </p>
-    <h2 id="auto-24"><a id="10-verification"></a>10. Verification<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-25"><a id="10-verification"></a>10. Verification<span style="margin-left: 1em"></span></h2>
     <p>
       A repository is checked, besides the verification of section 14 of the
       specification on each published commit, for:
@@ -624,7 +660,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       These checks SHOULD run on every push and every pull request (for
       instance in a workflow), before any deployment.
     </p>
-    <h2 id="auto-25"><a id="11-copies-mirrors-and-witnesses"></a>11. Copies, mirrors and witnesses<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-26"><a id="11-copies-mirrors-and-witnesses"></a>11. Copies, mirrors and witnesses<span style="margin-left: 1em"></span></h2>
     <p>
       A clone of the published branch is a complete copy of the archive. A
       clone that is served (for instance a fork published with GitHub Pages)
@@ -647,7 +683,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       Together with the history of the published branch, snapshots also
       witness the successive states of the discovery document.
     </p>
-    <h2 id="auto-26"><a id="12-security-and-privacy"></a>12. Security and privacy<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-27"><a id="12-security-and-privacy"></a>12. Security and privacy<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -683,7 +719,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
         </p>
       </li>
     </ul>
-    <h2 id="auto-27"><a id="13-open-questions"></a>13. Open questions<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-28"><a id="13-open-questions"></a>13. Open questions<span style="margin-left: 1em"></span></h2>
     <p>
       1. <strong>A profile, or a guide?</strong> This document adds nothing
       that readers see, so it is not declared in the discovery document. Tools
@@ -706,11 +742,20 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       kept by custodians call for one repository per object, and how such
       repositories make up an archive without submodules.
     </p>
-    <h2 id="auto-28"><a id="14-changelog"></a>14. Changelog<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-29"><a id="14-changelog"></a>14. Changelog<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
           <strong>0.1 (draft), 15 November 2026:</strong> first draft.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 15 November 2026, revision:</strong> raw file
+          servers (section 7.4): they serve the archive files byte for byte
+          with cross-origin requests allowed, so tools can read an archive
+          from them, but not a website (content types), nor Git LFS files;
+          their base URL may be listed in <tt class="verbatim">mirrors</tt>.
         </p>
       </li>
       <li>
