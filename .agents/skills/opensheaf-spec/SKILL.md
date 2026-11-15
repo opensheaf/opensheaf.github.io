@@ -120,8 +120,10 @@ only what its two standards leave open:
   over the same record (`parent` keeps the parent's name); a mirror whose
   line is taken cannot be kept. A work is searched for under all 16 names
   of its genesis record, keeping entries whose record is byte-identical
-  (`names/` entries carry `genesis`). Reused genesis records and aliases
-  are open (#44).
+  (`names/` entries carry `genesis`). At creation an archive also refuses
+  a genesis record reused for another work (a different first sealed
+  version) and an owner identifier equal to another owner's; aliases are
+  open (#44).
 - **Draft and sealing** (6.5): a draft is an object without a genesis
   record; no pin may name its versions. Sealing adds the genesis record,
   at the owner's request, before a version first leaves the owner's hands.
