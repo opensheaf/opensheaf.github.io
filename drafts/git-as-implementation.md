@@ -319,7 +319,9 @@ all under SHA-512:
    inventories that agree, as JSON, with the head's version blocks and
    manifest, but differ in bytes (spacing, the order of keys) or in their
    `fixity` blocks, which the head does not constrain at all. A check against
-   the head pin alone confirms that agreement and nothing more.
+   the head pin alone confirms that agreement and nothing more. The same holds
+   for the archive itself, whatever git does (issue
+   [#46](https://github.com/opensheaf/opensheaf.github.io/issues/46)).
 3. **The bytes of an earlier inventory are fixed** only by evidence from
    outside the archive and the repository that serve it: a pin of that version
    itself (in a collection, for instance); or a commit hash of that version or
@@ -668,5 +670,6 @@ copies and pins),
 [#29](https://github.com/opensheaf/opensheaf.github.io/issues/29) (private
 archives and reviews),
 [#33](https://github.com/opensheaf/opensheaf.github.io/issues/33) (takedowns),
-and the proposal [PR
+[#46](https://github.com/opensheaf/opensheaf.github.io/issues/46) (what a pin
+fixes), and the proposal [PR
 #30](https://github.com/opensheaf/opensheaf.github.io/pull/30).
