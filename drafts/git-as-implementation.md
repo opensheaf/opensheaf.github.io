@@ -185,8 +185,9 @@ fetched as submodules, each checked by git against its hash.
 **Gains.** One mechanism for storage, history, transport, copies and
 archiving. Mirroring becomes incremental and cheap. Software Heritage archives
 an OpenSheaf archive as it archives any repository, and its SWHIDs are the
-pins (or, with inventories in the commits, addresses of the pinned versions). Forks and pull requests are deep branches and proposals, with tools
-everyone knows.
+pins (or, with inventories in the commits, addresses of the pinned versions).
+Forks and pull requests are deep branches and proposals, with tools everyone
+knows.
 
 **Costs.**
 
@@ -321,10 +322,11 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
 - **Determinism.** Every field of the commit must be fixed by the OCFL object:
   the encoding of names and messages (UTF-8, line endings, a trailing
   newline), the date format and time zone, the order of tree entries (git's
-  own), and logical paths git cannot store (`.git`, paths with a component that a tree cannot name). A
-  version that cannot be mapped must be reported, not silently changed. Empty
-  folders are no problem: the logical state of OCFL lists only files. The
-  inventory and its checksum file are copied as stored, never re-serialised.
+  own), and logical paths git cannot store (`.git`, paths with a component
+  that a tree cannot name). A version that cannot be mapped must be reported,
+  not silently changed. Empty folders are no problem: the logical state of
+  OCFL lists only files. The inventory and its checksum file are copied as
+  stored, never re-serialised.
 - **Depositors and dates.** OCFL makes `user` optional in a version, and its
   `address` is a URI (`mailto:` an e-mail, an ORCID iD, a web address), where
   git expects an e-mail address. The mapping must fix the author of a version
@@ -347,8 +349,9 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
 - **What is outside the versions.** Witnesses are outside the versions, in
   each object's `extensions/opensheaf-witnesses/` or under `witnesses/` next
   to the discovery document, and are added and upgraded later; the discovery
-  document changes with every deposit. Neither belongs in the commits of a line: they go under references
-  of their own (for instance `refs/opensheaf/witnesses`), or in notes.
+  document changes with every deposit. Neither belongs in the commits of a
+  line: they go under references of their own (for instance
+  `refs/opensheaf/witnesses`), or in notes.
 - **Description-only versions** are commits whose tree differs only in
   `datacite.json` or `object.json`, which suits git well.
 - **Collections.** A gitlink records a commit hash, not a version label or an
