@@ -268,7 +268,8 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       every deployment and every copy of the repository used as a copy of the
       archive replaces the pointers by the files. A deployment that serves the
       pointer serves a file whose digest does not match its inventory. GitHub
-      Pages, deploying from a branch, serves the pointers.
+      Pages, deploying from a branch, serves the pointers. Pointers committed
+      by mistake are repaired (section 5.3).
     </p>
     <h3 id="auto-8"><a id="43-file-names"></a>4.3 File names<span style="margin-left: 1em"></span></h3>
     <p>
@@ -316,12 +317,13 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
       the configuration of the layout extension, and the loose files allowed
       by section 5 of the specification); 6. the removal of an object folder,
-      by a takedown (section 9).
+      by a takedown (section 9); 7. the repair of a file whose bytes do not
+      match the digest its inventory records (section 5.3).
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
-      folder is changed, renamed or removed. Several changes MAY be made in
-      one commit.
+      folder is changed, renamed or removed, except by a repair. Several
+      changes MAY be made in one commit.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -338,8 +340,34 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       Since a deployment serves the files of one commit, readers never see
       half a deposit.
     </p>
-    <h2 id="auto-13"><a id="6-commits-branches-and-drafts"></a>6. Commits, branches and drafts<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-14"><a id="61-commits"></a>6.1 Commits<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-13"><a id="53-repairs"></a>5.3 Repairs<span style="margin-left: 1em"></span></h3>
+    <p>
+      A published commit may hold a file whose bytes differ from those its
+      inventory records: a Git LFS pointer committed in place of the file
+      (section 4.2), line endings converted by a clone with other attributes,
+      a file damaged on disk. The inventory, and every pin to it, still name
+      the right bytes; only this copy of the file is wrong. The depositor's
+      own clone may hold the right bytes and verify, while every other copy
+      fails.
+    </p>
+    <p>
+      Such a file MUST be repaired by a new commit on the published branch
+      that replaces its bytes by bytes whose digest is the one its inventory
+      records, taken from any copy that matches (the depositor's files, the
+      LFS storage, a mirror, an external deposit). A repair changes no
+      inventory, no checksum file and no discovery document; its commit
+      message SHOULD name the files it repairs and say why. A repair is not a
+      rewrite: the commits holding the wrong bytes stay in the history, as a
+      record of what was served.
+    </p>
+    <p>
+      If no copy with the right bytes can be found, the file is lost. It MUST
+      NOT be replaced by other bytes, and verifiers keep reporting it as
+      missing or corrupt. (Lost and corrupted files are in scope for OCFL
+      version 2; see section 11.3 of the specification.)
+    </p>
+    <h2 id="auto-14"><a id="6-commits-branches-and-drafts"></a>6. Commits, branches and drafts<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-15"><a id="61-commits"></a>6.1 Commits<span style="margin-left: 1em"></span></h3>
     <p>
       A commit MAY add any number of object versions. A commit SHOULD hold one
       act of the archive (a deposit, an import, an update of the main
@@ -359,7 +387,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       state of the archive, not part of its integrity (section 13.2 of the
       specification).
     </p>
-    <h3 id="auto-15"><a id="62-drafts"></a>6.2 Drafts<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-16"><a id="62-drafts"></a>6.2 Drafts<span style="margin-left: 1em"></span></h3>
     <p>
       Branches other than the published branch are working space. They MAY be
       rewritten, and the object versions they hold are not yet published: a
@@ -368,7 +396,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       fixed. (Draft and private states of archives and objects are discussed
       in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
     </p>
-    <h3 id="auto-16"><a id="63-merging"></a>6.3 Merging<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-17"><a id="63-merging"></a>6.3 Merging<span style="margin-left: 1em"></span></h3>
     <p>
       A deposit prepared on a branch is published by merging the branch into
       the published branch. The published branch MUST then satisfy section 5,
@@ -408,8 +436,8 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       inventory) before it is published. (When a version becomes public, and
       how this is recorded, is discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
     </p>
-    <h2 id="auto-17"><a id="7-publishing"></a>7. Publishing<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-18"><a id="71-what-is-served"></a>7.1 What is served<span style="margin-left: 1em"></span></h3>
+    <h2 id="auto-18"><a id="7-publishing"></a>7. Publishing<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-19"><a id="71-what-is-served"></a>7.1 What is served<span style="margin-left: 1em"></span></h3>
     <p>
       A deployment MUST serve the archive files of one published commit, byte
       for byte (section 5 of the specification), and MAY serve presentation
@@ -421,7 +449,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       section 4.1, or directly from the git objects (for instance with <tt
       class="verbatim">git archive</tt>, which honours <tt class="verbatim">-export-subst</tt>).
     </p>
-    <h3 id="auto-19"><a id="72-github-pages"></a>7.2 GitHub Pages<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-20"><a id="72-github-pages"></a>7.2 GitHub Pages<span style="margin-left: 1em"></span></h3>
     <p>
       GitHub Pages can publish a branch, or the files uploaded by a workflow.
       Publishing by a workflow is RECOMMENDED: the workflow verifies the
@@ -442,7 +470,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       specification requires. It allows cross-origin requests (<tt class="verbatim">Access-Control-Allow-Origin:
       *</tt>), as the specification recommends. Its limits are in section 8.
     </p>
-    <h3 id="auto-20"><a id="73-other-hosts"></a>7.3 Other hosts<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-21"><a id="73-other-hosts"></a>7.3 Other hosts<span style="margin-left: 1em"></span></h3>
     <p>
       Any static web server, or object storage, can serve a checkout of a
       published commit, under the same rules. A deployment that copies files
@@ -450,7 +478,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       files of the checkout without conversion, and SHOULD remove files that
       are not in the commit.
     </p>
-    <h2 id="auto-21"><a id="8-size-and-limits"></a>8. Size and limits<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-22"><a id="8-size-and-limits"></a>8. Size and limits<span style="margin-left: 1em"></span></h2>
     <p>
       An archive keeps every version of every object, so a repository only
       grows. Hosts set limits; on GitHub, as of November 2026:
@@ -515,7 +543,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       their indexes are discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a> and <a href="https://github.com/opensheaf/opensheaf.github.io/issues/32">issue
       #32</a>.)
     </p>
-    <h2 id="auto-22"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-23"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
     <p>
       A takedown deletes an object from the storage root and adds a tombstone
       to the discovery document (section 11.2 of the specification). In git, a
@@ -548,7 +576,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       (forks, other clones, Software Heritage) follow their own rules, as
       external copies do (section 11.3 of the specification).
     </p>
-    <h2 id="auto-23"><a id="10-verification"></a>10. Verification<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-24"><a id="10-verification"></a>10. Verification<span style="margin-left: 1em"></span></h2>
     <p>
       A repository is checked, besides the verification of section 14 of the
       specification on each published commit, for:
@@ -573,7 +601,9 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
         <p>
           <strong>append-only</strong>: between each published commit and the
           next, only the changes of section 5.1 (for a pull request: between
-          its base and its head);
+          its base and its head); a change to a file of an existing version
+          folder is accepted only as a repair, when the new bytes have the
+          digest its inventory records and the old bytes did not;
         </p>
       </li>
       <li>
@@ -594,7 +624,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       These checks SHOULD run on every push and every pull request (for
       instance in a workflow), before any deployment.
     </p>
-    <h2 id="auto-24"><a id="11-copies-mirrors-and-witnesses"></a>11. Copies, mirrors and witnesses<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-25"><a id="11-copies-mirrors-and-witnesses"></a>11. Copies, mirrors and witnesses<span style="margin-left: 1em"></span></h2>
     <p>
       A clone of the published branch is a complete copy of the archive. A
       clone that is served (for instance a fork published with GitHub Pages)
@@ -617,7 +647,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       Together with the history of the published branch, snapshots also
       witness the successive states of the discovery document.
     </p>
-    <h2 id="auto-25"><a id="12-security-and-privacy"></a>12. Security and privacy<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-26"><a id="12-security-and-privacy"></a>12. Security and privacy<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -653,7 +683,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
         </p>
       </li>
     </ul>
-    <h2 id="auto-26"><a id="13-open-questions"></a>13. Open questions<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-27"><a id="13-open-questions"></a>13. Open questions<span style="margin-left: 1em"></span></h2>
     <p>
       1. <strong>A profile, or a guide?</strong> This document adds nothing
       that readers see, so it is not declared in the discovery document. Tools
@@ -676,11 +706,20 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       kept by custodians call for one repository per object, and how such
       repositories make up an archive without submodules.
     </p>
-    <h2 id="auto-27"><a id="14-changelog"></a>14. Changelog<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-28"><a id="14-changelog"></a>14. Changelog<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
           <strong>0.1 (draft), 15 November 2026:</strong> first draft.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 15 November 2026, revision:</strong> repairs
+          (section 5.3): a file whose bytes do not match its inventory, such
+          as a Git LFS pointer committed by mistake, is replaced by the right
+          bytes in a new commit, the only change allowed to an existing
+          version folder; the append-only check accepts it.
         </p>
       </li>
     </ul>

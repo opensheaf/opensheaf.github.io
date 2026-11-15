@@ -72,7 +72,7 @@ Attributes in the repository take precedence over those of the user (`core.attri
 
 ### 4.2 Git LFS
 
-Archive files MUST NOT be stored with Git LFS, or any other mechanism that keeps a pointer in the repository in place of the file, unless every deployment and every copy of the repository used as a copy of the archive replaces the pointers by the files. A deployment that serves the pointer serves a file whose digest does not match its inventory. GitHub Pages, deploying from a branch, serves the pointers.
+Archive files MUST NOT be stored with Git LFS, or any other mechanism that keeps a pointer in the repository in place of the file, unless every deployment and every copy of the repository used as a copy of the archive replaces the pointers by the files. A deployment that serves the pointer serves a file whose digest does not match its inventory. GitHub Pages, deploying from a branch, serves the pointers. Pointers committed by mistake are repaired (section 5.3).
 
 ### 4.3 File names
 
@@ -95,15 +95,24 @@ Let C be a published commit and C' the next one on the published branch. Between
 3. files added, replaced or removed in an object's `extensions/opensheaf-witnesses/` folder, or under `witnesses/`;
 4. the replacement of `opensheaf.json`;
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
-6. the removal of an object folder, by a takedown (section 9).
+6. the removal of an object folder, by a takedown (section 9);
+7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
 
-No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed. Several changes MAY be made in one commit.
+No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
 The published branch MUST NOT be rewritten, except for a takedown (section 9). Repositories SHOULD use the protection of their host to refuse force-pushes to the published branch and its deletion (on GitHub: a branch protection rule or a ruleset).
 
 ### 5.2 Every published commit is an archive
 
 Every published commit MUST hold a conforming archive: the archive files of the commit, alone, pass the verification of section 14 of the specification. In particular a new object version, the replaced root inventory and the updated discovery document are committed together. Since a deployment serves the files of one commit, readers never see half a deposit.
+
+### 5.3 Repairs
+
+A published commit may hold a file whose bytes differ from those its inventory records: a Git LFS pointer committed in place of the file (section 4.2), line endings converted by a clone with other attributes, a file damaged on disk. The inventory, and every pin to it, still name the right bytes; only this copy of the file is wrong. The depositor's own clone may hold the right bytes and verify, while every other copy fails.
+
+Such a file MUST be repaired by a new commit on the published branch that replaces its bytes by bytes whose digest is the one its inventory records, taken from any copy that matches (the depositor's files, the LFS storage, a mirror, an external deposit). A repair changes no inventory, no checksum file and no discovery document; its commit message SHOULD name the files it repairs and say why. A repair is not a rewrite: the commits holding the wrong bytes stay in the history, as a record of what was served.
+
+If no copy with the right bytes can be found, the file is lost. It MUST NOT be replaced by other bytes, and verifiers keep reporting it as missing or corrupt. (Lost and corrupted files are in scope for OCFL version 2; see section 11.3 of the specification.)
 
 ## 6. Commits, branches and drafts
 
@@ -190,7 +199,7 @@ A repository is checked, besides the verification of section 14 of the specifica
 
 - **attributes**: `git check-attr` reports `text`, `filter`, `ident`, `working-tree-encoding`, `export-subst` and `merge` unset on every archive file (section 4.1);
 - **no pointers, links or submodules** among the archive files: no Git LFS pointer, symbolic link or submodule (sections 3 and 4.2);
-- **append-only**: between each published commit and the next, only the changes of section 5.1 (for a pull request: between its base and its head);
+- **append-only**: between each published commit and the next, only the changes of section 5.1 (for a pull request: between its base and its head); a change to a file of an existing version folder is accepted only as a repair, when the new bytes have the digest its inventory records and the old bytes did not;
 - **portable names**: the content paths of section 4.3 (a warning, not an error);
 - **the deployment**: after a deployment, the served discovery document, and the files it names, have the digests of the commit.
 
@@ -223,3 +232,4 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 ## 14. Changelog
 
 - **0.1 (draft), 15 November 2026:** first draft.
+- **0.1 (draft), 15 November 2026, revision:** repairs (section 5.3): a file whose bytes do not match its inventory, such as a Git LFS pointer committed by mistake, is replaced by the right bytes in a new commit, the only change allowed to an existing version folder; the append-only check accepts it.

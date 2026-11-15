@@ -107,7 +107,7 @@
 
   <subsection*|4.2 Git LFS><label|42-git-lfs>
 
-  Archive files MUST NOT be stored with Git LFS, or any other mechanism that keeps a pointer in the repository in place of the file, unless every deployment and every copy of the repository used as a copy of the archive replaces the pointers by the files. A deployment that serves the pointer serves a file whose digest does not match its inventory. GitHub Pages, deploying from a branch, serves the pointers.
+  Archive files MUST NOT be stored with Git LFS, or any other mechanism that keeps a pointer in the repository in place of the file, unless every deployment and every copy of the repository used as a copy of the archive replaces the pointers by the files. A deployment that serves the pointer serves a file whose digest does not match its inventory. GitHub Pages, deploying from a branch, serves the pointers. Pointers committed by mistake are repaired (section 5.3).
 
   <subsection*|4.3 File names><label|43-file-names>
 
@@ -125,15 +125,23 @@
 
   Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
 
-  1. a new object folder <verbatim|ocfl/\<less\>id\<gtr\>/>, with the files of a complete OCFL object (a new object, or the copy of an object of another archive); 2. a new version folder <verbatim|ocfl/\<less\>id\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version; 3. files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder, or under <verbatim|witnesses/>; 4. the replacement of <verbatim|opensheaf.json>; 5. at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification); 6. the removal of an object folder, by a takedown (section 9).
+  1. a new object folder <verbatim|ocfl/\<less\>id\<gtr\>/>, with the files of a complete OCFL object (a new object, or the copy of an object of another archive); 2. a new version folder <verbatim|ocfl/\<less\>id\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version; 3. files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder, or under <verbatim|witnesses/>; 4. the replacement of <verbatim|opensheaf.json>; 5. at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification); 6. the removal of an object folder, by a takedown (section 9); 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
 
-  No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed. Several changes MAY be made in one commit.
+  No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
   The published branch MUST NOT be rewritten, except for a takedown (section 9). Repositories SHOULD use the protection of their host to refuse force-pushes to the published branch and its deletion (on GitHub: a branch protection rule or a ruleset).
 
   <subsection*|5.2 Every published commit is an archive><label|52-every-published-commit-is-an-archive>
 
   Every published commit MUST hold a conforming archive: the archive files of the commit, alone, pass the verification of section 14 of the specification. In particular a new object version, the replaced root inventory and the updated discovery document are committed together. Since a deployment serves the files of one commit, readers never see half a deposit.
+
+  <subsection*|5.3 Repairs><label|53-repairs>
+
+  A published commit may hold a file whose bytes differ from those its inventory records: a Git LFS pointer committed in place of the file (section 4.2), line endings converted by a clone with other attributes, a file damaged on disk. The inventory, and every pin to it, still name the right bytes; only this copy of the file is wrong. The depositor's own clone may hold the right bytes and verify, while every other copy fails.
+
+  Such a file MUST be repaired by a new commit on the published branch that replaces its bytes by bytes whose digest is the one its inventory records, taken from any copy that matches (the depositor's files, the LFS storage, a mirror, an external deposit). A repair changes no inventory, no checksum file and no discovery document; its commit message SHOULD name the files it repairs and say why. A repair is not a rewrite: the commits holding the wrong bytes stay in the history, as a record of what was served.
+
+  If no copy with the right bytes can be found, the file is lost. It MUST NOT be replaced by other bytes, and verifiers keep reporting it as missing or corrupt. (Lost and corrupted files are in scope for OCFL version 2; see section 11.3 of the specification.)
 
   <section*|6. Commits, branches and drafts><label|6-commits-branches-and-drafts>
 
@@ -222,7 +230,7 @@
 
     <item><strong|no pointers, links or submodules> among the archive files: no Git LFS pointer, symbolic link or submodule (sections 3 and 4.2);
 
-    <item><strong|append-only>: between each published commit and the next, only the changes of section 5.1 (for a pull request: between its base and its head);
+    <item><strong|append-only>: between each published commit and the next, only the changes of section 5.1 (for a pull request: between its base and its head); a change to a file of an existing version folder is accepted only as a repair, when the new bytes have the digest its inventory records and the old bytes did not;
 
     <item><strong|portable names>: the content paths of section 4.3 (a warning, not an error);
 
@@ -259,6 +267,8 @@
 
   <\itemize>
     <item><strong|0.1 (draft), 15 November 2026:> first draft.
+
+    <item><strong|0.1 (draft), 15 November 2026, revision:> repairs (section 5.3): a file whose bytes do not match its inventory, such as a Git LFS pointer committed by mistake, is replaced by the right bytes in a new commit, the only change allowed to an existing version folder; the append-only check accepts it.
   </itemize>
 
 </body>
