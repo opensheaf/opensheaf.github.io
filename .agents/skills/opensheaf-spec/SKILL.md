@@ -115,19 +115,24 @@ only what its two standards leave open:
   base32: 52 characters, `^[a-z2-7]{52}$`; the last character's 4 spare
   bits hold k, from 0 to 15 (0, the default, gives `a` or `q`).
 - **Clashes** (6.5): an archive keeps at most one object per line (owner,
-  name). Sealing draws a new nonce if the line is taken, so an
-  originator's line is named by algorithm 0. A branch takes `parent.name`,
-  unless its line is taken and its branch point cannot be moved there; it
-  then takes the smallest free algorithm number above the parent's (an
-  unjustified rename is only a warning). A mirror whose line is taken
-  cannot be kept. Every line records `sealed` (the originator's sealing
-  version: `archiveId`, `objectId`, `objectVersion`), copied by branches;
-  an archive refuses a genesis record reused for another work (a
-  different `sealed`) and an owner identifier equal to another owner's at
-  its heads. A work is searched for under all 16 names of its genesis
-  record, keeping entries whose record is byte-identical (`names/` entries
-  carry `genesis` and `sealed`) and grouping them by `sealed`. Aliases are
-  open (#44).
+  name), and a line stays taken after a takedown. Sealing draws a new
+  nonce if the line is taken, so an originator's line is named by
+  algorithm 0; the originator never branches its own work (open). A
+  branch takes `parent.name`, unless that line is taken in its archive or
+  among its owner's confirmed lines elsewhere (unconfirmed ones never
+  cause a rename); if the taken line is the owner's own branch (made by
+  the owner) of the same parent line, the branch point is moved there;
+  otherwise the branch takes the smallest free algorithm number above the
+  parent's (a number not above it fails verification; other unjustified
+  renames are warnings), and is refused if none up to 15 is free. A mirror
+  whose line is taken cannot be kept. Every line records `sealed` (the
+  originator's sealing version: `archiveId`, `objectId`, `objectVersion`),
+  copied by branches; an archive refuses a genesis record reused for
+  another work (a different `sealed`) and an owner identifier equal to
+  another owner's at its heads. A work is searched for under all 16 names
+  of its genesis record, keeping entries whose record is byte-identical
+  (`names/` entries carry `genesis` and `sealed`) and grouping them by
+  `sealed`. Aliases are open (#44).
 - **Draft and sealing** (6.5): a draft is an object without a genesis
   record; no pin may name its versions. Sealing adds the genesis record,
   at the owner's request, before a version first leaves the owner's hands.

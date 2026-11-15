@@ -29,7 +29,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.1 (draft), 15 November 2026. OpenSheaf is a
+      Specification, version 0.1 (draft), 16 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). This version is experimental and
@@ -803,7 +803,9 @@
       vetted (whether sealing may instead rewrite them is open, below). This
       proposal does not hand lines over (an open question, below): when
       another owner continues the work (an author leaving an institution's
-      repository, a journal handing a report to its referee), the new owner
+      repository, when the line is the institution's; a journal handing a
+      report to its referee; a line the author owns as originator is not
+      branched by the author but moved, an open question below), the new owner
       makes a deep branch (section 10.5), and the previous owner MAY add a
       notice to its own line pointing to the branch.
     </p>
@@ -812,7 +814,8 @@
       format does not assume that two works never share one: in an archive, an
       object is identified by its line, and no two objects of an archive have
       the same owner and name (section 14). A clash can arise only when an
-      object is created or deposited in an archive, and is resolved there:
+      object is created or deposited in an archive, and is resolved there,
+      against the archive and the confirmed lines of the same owner elsewhere:
     </p>
     <ul>
       <li>
@@ -837,24 +840,38 @@
         <p>
           a branch is named by <tt class="verbatim">parent.name</tt>, unless its line
           (its owner, that name) is taken by another object, in its archive or
-          among the other lines of its owner that the tool knows (in the
-          owner's other archives, or in indexes, <tt class="verbatim">owners/</tt>); if
-          that object is the owner's own branch of the same parent line and
-          the new branch point is later in the parent line's history than that
-          branch's point, the owner moves its branch point instead (section
-          10.5); otherwise (another genesis record, a mirror, another parent
-          line, an earlier or equal branch point) the branch is named by the
-          smallest algorithm number greater than that of <tt class="verbatim">parent.name</tt>
-          whose name, over the same genesis record, gives a line free in the
-          archive and among the owner's known lines; <tt class="verbatim">parent</tt>
-          keeps the parent's name; if no number up to 15 is free, the branch
-          is refused. A second accepted copy of a selection is not renamed:
-          owners differ between selections (section 10.5);
+          among the other lines of its owner that the tool knows elsewhere and
+          that are confirmed (section 6.6: reached through the archive named
+          by their <tt class="verbatim">archiveId</tt>, known independently, or signed
+          by a keyed owner); a line known only from indexes kept by others, or
+          otherwise unconfirmed, is reported and never causes a rename; if
+          that object is the owner's own branch (one the owner made: for a
+          keyed owner, its signatures hold; for a named owner, the owner
+          confirms it; any other object counts as another object) of the same
+          parent line and the new branch point is later in the parent line's
+          history than that branch's point, the owner moves its branch point
+          instead (section 10.5), in the archive that keeps that branch, and
+          this archive MAY then keep a mirror of it; a tool that cannot do so
+          renames the new branch as below; otherwise (another genesis record,
+          a mirror, another parent line, an earlier or equal branch point) the
+          branch is named by the smallest algorithm number greater than that
+          of <tt class="verbatim">parent.name</tt> whose name, over the same genesis
+          record, gives a line free in the archive and among the owner's known
+          lines; <tt class="verbatim">parent</tt> keeps the parent's name; if no number
+          up to 15 is free, the branch is refused. An accepted copy of another
+          selection is not renamed: owners differ between selections (section
+          10.5);
         </p>
       </li>
       <li>
         <p>
-          a mirror whose line is taken cannot be kept there.
+          a mirror whose line is taken cannot be kept there;
+        </p>
+      </li>
+      <li>
+        <p>
+          a line stays taken after a takedown (section 11.3), like the object
+          identifier, so that a removed line and a new one never share a URI.
         </p>
       </li>
     </ul>
@@ -862,9 +879,11 @@
       Other owners' lines are different lines and never clash. A renamed
       branch is always written with its owner part (section 6.6), since a URI
       without an owner part names the originator's line, which is named by
-      algorithm 0. Lines of one owner in archives the tool does not know may
-      still duplicate each other; they are forks of the line, found by
-      resolvers (section 6.6).
+      algorithm 0; a resolver given a renamed name without an owner part finds
+      no originator's line, and reports it, pointing to the search for the
+      work. Lines of one owner in archives the tool does not know may still
+      duplicate each other; they are forks of the line, found by resolvers
+      (section 6.6).
     </p>
     <p>
       <strong>Refusals.</strong> One genesis record names one work, and one
@@ -1073,18 +1092,19 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           line of the originator, the owner named by <tt class="verbatim">originator</tt>
           in the genesis record, which every copy of the object and of its
           branches carries. If a resolver finds several genesis records under
-          one name, with different originators, the URI is ambiguous: it lists
-          them with their originators and does not choose. It does not mean
-          the latest line or the most authoritative one: the versions of any
-          other line, such as a journal's or a co-author's, are written with
-          their owner, and if the originator stops and another owner continues
-          the work in a deep branch, the URI still names the originator's
-          line. <tt class="verbatim">sheaf:&lt;name&gt;:*</tt> names the object as a
-          whole, with all its lines: a resolver shows the lines it knows that
-          pass the checks below, each marked confirmed or unconfirmed. A
-          resolver rejects <tt class="verbatim">:*</tt> with a document version or <tt
-          class="verbatim">sha512</tt>, since every line has its own document versions
-          (section 10.5); <tt class="verbatim">at</tt> is allowed with it.
+          one name (with the same originator or not), the URI is ambiguous: it
+          lists them with their originators and does not choose. It does not
+          mean the latest line or the most authoritative one: the versions of
+          any other line, such as a journal's or a co-author's, are written
+          with their owner, and if the originator stops and another owner
+          continues the work in a deep branch, the URI still names the
+          originator's line. <tt class="verbatim">sheaf:&lt;name&gt;:*</tt> names the
+          object as a whole, with all its lines: a resolver shows the lines it
+          knows that pass the checks below, each marked confirmed or
+          unconfirmed. A resolver rejects <tt class="verbatim">:*</tt> with a document
+          version or <tt class="verbatim">sha512</tt>, since every line has its own
+          document versions (section 10.5); <tt class="verbatim">at</tt> is allowed with
+          it.
         </p>
       </li>
       <li>
@@ -1500,7 +1520,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       without gaps, independently of any external numbering: a work whose
       versions 1, 3 and 4 are available on arXiv has document versions 1, 2
       and 3. A branch (section 10.5) starts from the document version of its
-      first branch point, and continues without gaps from it (provisionally:
+      first branch point (for a deep branch, its first own version keeps that
+      number when it adds no files of the document's own, and takes the next
+      one otherwise), and continues without gaps from it (provisionally:
       option (a) of the open question of section 10.5); an object version that
       moves the branch point is the branch's next document version, and <tt
       class="verbatim">parent</tt> keeps the parent's own number.
@@ -2183,23 +2205,22 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       versions, the branch point: a co-author carrying the work on, a journal
       keeping the version it vetted and correcting it afterwards. Its genesis
       record is the object's, so it has the parent's name (section 6.5), or,
-      after a clash in its archive, another name of the same genesis record;
-      it copies <tt class="verbatim">sealed</tt> from its parent. From its first version
-      after the branch point, its <tt class="verbatim">object.json</tt> records its own
-      <tt class="verbatim">owner</tt> and <tt class="verbatim">parent</tt>: the <tt class="verbatim">owner</tt>,
-      <tt class="verbatim">name</tt>, <tt class="verbatim">archiveId</tt>, <tt class="verbatim">objectId</tt>,
-      <tt class="verbatim">objectVersion</tt> (the branch point), <tt class="verbatim">documentVersion</tt>
-      and <tt class="verbatim">inventorySha512</tt> of the parent version, and SHOULD
-      record the <tt class="verbatim">url</tt> of that object version, an absolute URL
-      (<tt class="verbatim">&lt;storage root URL&gt;&lt;object
-      id&gt;/&lt;version&gt;/</tt>), so that it can be resolved (section 6.4).
-      Its <tt class="verbatim">datacite.json</tt> describes it with the branch owner
-      (for a selection, its archive) as <tt class="verbatim">publisher</tt> and keeps
-      the relations of the parent version; the first version of a shallow
-      branch, and every version that moves its branch point, SHOULD link the
-      parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if it has
-      one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt> of <tt
-      class="verbatim">parent</tt>). A branch is deep or shallow.
+      after a clash, another name of the same genesis record; it copies <tt
+      class="verbatim">sealed</tt> from its parent. From its first version after the
+      branch point, its <tt class="verbatim">object.json</tt> records its own <tt class="verbatim">owner</tt>
+      and <tt class="verbatim">parent</tt>: the <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>,
+      <tt class="verbatim">archiveId</tt>, <tt class="verbatim">objectId</tt>, <tt class="verbatim">objectVersion</tt>
+      (the branch point), <tt class="verbatim">documentVersion</tt> and <tt class="verbatim">inventorySha512</tt>
+      of the parent version, and SHOULD record the <tt class="verbatim">url</tt> of that
+      object version, an absolute URL (<tt class="verbatim">&lt;storage root
+      URL&gt;&lt;object id&gt;/&lt;version&gt;/</tt>), so that it can be
+      resolved (section 6.4). Its <tt class="verbatim">datacite.json</tt> describes it
+      with the branch owner (for a selection, its archive) as <tt class="verbatim">publisher</tt>
+      and keeps the relations of the parent version; the first version of a
+      shallow branch, and every version that moves its branch point, SHOULD
+      link the parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if
+      it has one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt> of
+      <tt class="verbatim">parent</tt>). A branch is deep or shallow.
     </p>
     <ul>
       <li>
@@ -2333,15 +2354,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       kept by a selection from a revision it vetted. Its owner is a URI, named
       or keyed, for the selection or the body behind it (a journal, a review
       journal), and MUST differ between selections that keep copies of the
-      same document, also in one archive: two selections are two owners, hence
-      two lines. Its later document versions are acts of the selection's
-      curator (a corrected version accepted, a notice, a withdrawal); the
-      authors' later versions change nothing in it. The selection lists the
-      accepted copy as its member, a member of its own archive; it MAY list
-      the original revision set as well. A branch is not a mirror: it is
-      another line, with its own inventories, and cannot stand for the parent
-      in the resolution of a pin (section 6.4), so it is never listed in <tt
-      class="verbatim">mirrors</tt>.
+      same document, also in one archive, and MUST NOT be the originator
+      (section 6.5): two selections are two owners, hence two lines. Its later
+      document versions are acts of the selection's curator (a corrected
+      version accepted, a notice, a withdrawal); the authors' later versions
+      change nothing in it. The selection lists the accepted copy as its
+      member, a member of its own archive; it MAY list the original revision
+      set as well. A branch is not a mirror: it is another line, with its own
+      inventories, and cannot stand for the parent in the resolution of a pin
+      (section 6.4), so it is never listed in <tt class="verbatim">mirrors</tt>.
     </p>
     <p>
       A version that the selection makes itself, such as a journal's typeset
@@ -2697,18 +2718,18 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           of <tt class="verbatim">object.json</tt>, that <tt class="verbatim">owner</tt>, <tt
           class="verbatim">name</tt>, <tt class="verbatim">sealed</tt>, <tt class="verbatim">archiveId</tt>
           and <tt class="verbatim">objectId</tt> do not change from the first version of
-          the line, that no two objects of the archive (mirrors included) have
-          the same <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> at their
-          heads, that objects with the same genesis record have the same <tt
-          class="verbatim">sealed</tt>, that a line without <tt class="verbatim">parent</tt> is
-          named by algorithm 0 and its <tt class="verbatim">sealed</tt> names its own
-          sealing version, that no two owners at the heads of the archive have
-          the same owner identifier, that owners are written in the forms of
-          section 6.5, that the discovery document lists the head's <tt class="verbatim">name</tt>
-          and <tt class="verbatim">owner</tt>, that a line whose owner is not the
-          originator declares a parent and that the originator's line declares
-          none, and, for a keyed owner, the signature of every object version
-          of the line;
+          the line, that no two objects of the archive (mirrors included), nor
+          an object and a tombstone, have the same <tt class="verbatim">name</tt> and
+          <tt class="verbatim">owner</tt> at their heads, that objects with the same
+          genesis record have the same <tt class="verbatim">sealed</tt>, that a line
+          without <tt class="verbatim">parent</tt> is named by algorithm 0 and its <tt
+          class="verbatim">sealed</tt> names its own sealing version, that no two owners
+          at the heads of the archive have the same owner identifier, that
+          owners are written in the forms of section 6.5, that the discovery
+          document lists the head's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>,
+          that a line whose owner is not the originator declares a parent and
+          that the originator's line declares none, and, for a keyed owner,
+          the signature of every object version of the line;
         </p>
       </li>
       <li>
@@ -2853,13 +2874,18 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           <strong>First deposit wins (proposal).</strong> An archive refuses a
-          mirror or a branch whose line is taken, or whose genesis record is
-          held with another <tt class="verbatim">sealed</tt> (section 6.5), so a forged
-          copy deposited first gets the genuine one refused. Archives that
-          accept objects of others (custodians, repositories with many
-          depositors) SHOULD check that a copy is confirmed (section 6.6)
-          before depositing it, and resolve a refusal by checking which copy
-          is (#39).
+          mirror whose line is taken, and an object whose genesis record it
+          holds with another <tt class="verbatim">sealed</tt> (section 6.5), so a forged
+          copy deposited first gets the genuine one refused; a branch whose
+          line is taken is renamed instead, and is moved onto an existing
+          object only if the owner made that object (signed, or confirmed by
+          the owner), so that a forged branch is never continued as the
+          owner's line. A tool renames only for lines that are confirmed, so
+          forged index entries cannot force renames. Archives that accept
+          objects of others (custodians, repositories with many depositors)
+          SHOULD check that a copy is confirmed (section 6.6) before
+          depositing it, and resolve a refusal by checking which copy is
+          (#39).
         </p>
       </li>
       <li>
@@ -3254,6 +3280,19 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           copies; a renamed number not above the parent's is a failure, other
           unjustified renames warnings; no free number refuses the branch;
           first deposit wins, in section 15; wording.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 16 November 2026, proposal revised after an eleventh
+          review (branch <tt class="verbatim">proposal/identity</tt>):** a branch
+          renames only for confirmed lines of its owner elsewhere, and moves
+          onto an existing branch only if the owner made it, in the archive
+          that keeps it; lines stay taken after a takedown; an accepted copy's
+          owner is not the originator; a deep branch's first own version keeps
+          the branch point's number only if it adds no files of its own; the
+          handover example limited to lines the institution owns; section 15
+          rewritten; wording.
         </p>
       </li>
     </ul>
