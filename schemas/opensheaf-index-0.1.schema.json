@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json",
+  "title": "OpenSheaf index file (names/, owners/, sha512/), version 0.1",
+  "$comment": "Proposal (section 6.6 of the specification, branch proposal/identity). Dedicated to the public domain under CC0 1.0.",
+  "type": "object",
+  "required": [
+    "format",
+    "index",
+    "entries"
+  ],
+  "properties": {
+    "format": {
+      "const": "opensheaf-index/0.1"
+    },
+    "index": {
+      "enum": [
+        "names",
+        "owners",
+        "sha512"
+      ]
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/base32"
+          },
+          "owner": {
+            "type": "string",
+            "format": "uri"
+          },
+          "ownerId": {
+            "$ref": "#/$defs/base32"
+          },
+          "objectId": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 64
+          },
+          "inventorySha512": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{128}$"
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^v[1-9][0-9]*$"
+          },
+          "archiveId": {
+            "type": "string",
+            "format": "uri"
+          },
+          "archiveUrl": {
+            "type": "string",
+            "format": "uri-reference"
+          }
+        },
+        "dependentRequired": {
+          "archiveId": [
+            "archiveUrl"
+          ],
+          "archiveUrl": [
+            "archiveId"
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "index": {
+            "const": "names"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {
+              "required": [
+                "name",
+                "owner",
+                "ownerId",
+                "objectId"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "index": {
+            "const": "owners"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {
+              "required": [
+                "ownerId",
+                "owner"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "index": {
+            "const": "sha512"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {
+              "required": [
+                "inventorySha512",
+                "objectId",
+                "version"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "base32": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$"
+    }
+  }
+}

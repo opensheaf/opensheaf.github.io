@@ -385,9 +385,9 @@
     </ul>
     <p>
       The JSON files defined here (<tt class="verbatim">opensheaf.json</tt>, <tt class="verbatim">object.json</tt>,
-      <tt class="verbatim">members.json</tt>, <tt class="verbatim">genesis.json</tt>) MUST
-      validate against the JSON Schemas of appendix D for their declared
-      format version.
+      <tt class="verbatim">members.json</tt>, <tt class="verbatim">genesis.json</tt>, the index
+      files of section 6.6) MUST validate against the JSON Schemas of appendix
+      D for their declared format version.
     </p>
     <h2 id="auto-6"><a id="5-layout"></a>5. Layout<span style="margin-left: 1em"></span></h2>
     <p>
@@ -421,8 +421,16 @@
       </li>
       <li>
         <p>
+          <strong>Indexes</strong>, OPTIONAL: <tt class="verbatim">names/</tt>, <tt
+          class="verbatim">owners/</tt> and <tt class="verbatim">sha512/</tt> next to the
+          discovery document (section 6.6, proposal).
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>Presentation files</strong>, OPTIONAL, anywhere outside the
-          storage root and <tt class="verbatim">witnesses/</tt> (appendix C).
+          storage root, <tt class="verbatim">witnesses/</tt> and the indexes (appendix
+          C).
         </p>
       </li>
     </ul>
@@ -599,12 +607,13 @@
     <h3 id="auto-12"><a id="65-names-owners-and-lines"></a>6.5 Names, owners and lines<span style="margin-left: 1em"></span></h3>
     <div class="os-alert os-note">
       <font class="os-alert-label">Note.</font> <strong>Proposal.</strong> This section, and
-      the sections it changes (3, 4, 6.1, 6.3, 6.4, 7, 9, 10.2 to 10.6, 11.3,
-      13.2, 14 to 16 and appendices D to F, with the FAQ and the use cases),
-      are a proposal on the branch <tt class="verbatim">proposal/identity</tt>, not yet
-      agreed. It builds on the discussions of self-certifying names (#20),
-      decentralised holding and keys (#13), global names (#14), private and
-      draft objects (#29) and the evidence of accepted copies (#22).
+      the sections it changes (3 to 5, 6.1, 6.3, 6.4, 7, 9, 10.2 to 10.6,
+      11.3, 13.2, 14 to 16 and appendices D to F, with the FAQ and the use
+      cases), together with section 6.6, are a proposal on the branch <tt
+      class="verbatim">proposal/identity</tt>, not yet agreed. It builds on the
+      discussions of self-certifying names (#20), decentralised holding and
+      keys (#13), global names (#14), private and draft objects (#29) and the
+      evidence of accepted copies (#22).
     </div>
     <p>
       An object identifier names an object within its archive (section 6.3).
@@ -743,16 +752,19 @@
     <ul>
       <li>
         <p>
-          Writing a line, a version and a pin as one URI (a scheme such as <tt
-          class="verbatim">sheaf:</tt>), and the form of archive identifiers (<tt class="verbatim">tag:</tt>
-          or ARK) (#14, #20).
+          Registering the scheme <tt class="verbatim">sheaf</tt> with IANA, as a
+          provisional scheme (RFC 7595); whether the pair (archive identifier,
+          object identifier) keeps a URI form of its own beside <tt class="verbatim">sheaf:</tt>
+          URIs; the form of archive identifiers (<tt class="verbatim">tag:</tt> or ARK)
+          (#14).
         </p>
       </li>
       <li>
         <p>
-          Finding an object by its name once its archive has gone: indexes by
-          inventory digest and by name, kept by archives or custodians (#20,
-          #13).
+          Who keeps indexes of many archives, so that an object can be found
+          once its archive has gone, how resolvers find them, and whether the
+          project runs a shared resolver of <tt class="verbatim">sheaf:</tt> URIs (#13,
+          #20).
         </p>
       </li>
       <li>
@@ -766,7 +778,8 @@
       <li>
         <p>
           The numbering of document versions on branches after the branch
-          point (section 10.5).
+          point (section 10.5), which <tt class="verbatim">/v&lt;n&gt;</tt> in a <tt
+          class="verbatim">sheaf:</tt> URI follows (section 6.6).
         </p>
       </li>
       <li>
@@ -823,8 +836,183 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-13"><a id="7-objects"></a>7. Objects<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-14"><a id="71-common-rules"></a>7.1 Common rules<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-13"><a id="66-names-as-uris-and-finding-objects"></a>6.6 Names as URIs and finding objects<span style="margin-left: 1em"></span></h3>
+    <div class="os-alert os-note">
+      <font class="os-alert-label">Note.</font> <strong>Proposal.</strong> This section is
+      part of the proposal of section 6.5 (branch <tt class="verbatim">proposal/identity</tt>):
+      writing lines, versions and pins as URIs, and finding objects by name
+      (#14, #20).
+    </div>
+    <p>
+      <strong>Owner identifier.</strong> The owner identifier of an owner is
+      the SHA-512 digest of its URI, in the canonical form of section 6.5,
+      encoded in UTF-8 without a line end, truncated to its first 256 bits and
+      written in lowercase base32, as names are (section 6.5): 52 characters.
+      It names an owner inside a URI, where the owner's own URI, which holds
+      <tt class="verbatim">:</tt> and <tt class="verbatim">/</tt>, cannot be written. It is
+      computed, never recorded: <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">object.json</tt>
+      and pins record the owner's URI.
+    </p>
+    <p>
+      **The <tt class="verbatim">sheaf</tt> URI.** A line, a document version of a line,
+      or one object version, is written as a URI of the scheme <tt class="verbatim">sheaf</tt>:
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+sheaf:&lt;name&gt;                            the object, all its lines
+sheaf:&lt;name&gt;:&lt;owner id&gt;                 the line of that owner
+sheaf:&lt;name&gt;/v&lt;n&gt;                       document version n of the originator's line
+sheaf:&lt;name&gt;:&lt;owner id&gt;/v&lt;n&gt;            document version n of that owner's line
+sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one object version holding it</pre>
+    </div>
+    <p>
+      The parts are, in this order: the name; optionally <tt class="verbatim">:</tt> and
+      an owner identifier; optionally <tt class="verbatim">/v</tt> and a document
+      version, a positive integer without leading zeros; optionally <tt class="verbatim">?sha512=</tt>
+      and the SHA-512 digest of an inventory file, 128 lowercase hexadecimal
+      digits, as in a pin (section 10.2). The letters are lowercase; a
+      resolver MAY accept uppercase and fold it.
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>The owner.</strong> Without an owner part, a URI with a
+          document version names the line of the originator, the owner named
+          by <tt class="verbatim">originator</tt> in the genesis record, which every
+          copy of the object and of its branches carries. It does not mean the
+          latest line or the most authoritative one: the versions of any other
+          line, such as a journal's or a co-author's, are written with their
+          owner. Without a document version, <tt class="verbatim">sheaf:&lt;name&gt;</tt>
+          names the object as a whole, with all its lines, and <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner
+          id&gt;</tt> the line.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>The version.</strong> <tt class="verbatim">/v&lt;n&gt;</tt> is a
+          document version of the line (section 7.3; on a branch, numbered as
+          section 10.5 says), not an OCFL object version. Several object
+          versions may hold it: without a digest, the URI names the one listed
+          for it in the history of the line's head (section 7.3), and what it
+          names can change as the line grows, by a description or a notice.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>The pin.</strong> With a digest, the URI names exactly the
+          object version whose inventory file has that digest, which MUST hold
+          the document version given; a resolver MUST check the digest, and
+          reports a mismatch as section 14 does. Citations of a fixed version
+          SHOULD carry the digest.
+        </p>
+      </li>
+    </ul>
+    <p>
+      <strong>Short forms.</strong> For people reading and typing them, the
+      name and the owner identifier MAY be shortened to a prefix of at least 8
+      characters: <tt class="verbatim">sheaf:warwmdym/v3</tt>, <tt class="verbatim">sheaf:warwmdym:sfhd2dwt/v3</tt>.
+      A part of 52 characters is complete; a shorter one is a prefix. A
+      resolver expands a short form among the lines it knows of (from the
+      indexes below, the archives and collections it reads, and its user's
+      configuration):
+    </p>
+    <ul>
+      <li>
+        <p>
+          the candidates are the lines whose name starts with the name part
+          and whose owner identifier starts with the owner part; without an
+          owner part, the lines of the originators;
+        </p>
+      </li>
+      <li>
+        <p>
+          if all the candidates have the same owner, the short form names the
+          first of them in that owner's order: the line whose first object
+          version written by that owner (for an originator, the version that
+          sealed it; for a branch, its first version after the branch point)
+          has the earliest <tt class="verbatim">created</tt> in its inventory;
+        </p>
+      </li>
+      <li>
+        <p>
+          if candidates have different owners, or two have the same <tt class="verbatim">created</tt>,
+          the short form is ambiguous: the resolver MUST NOT choose one, and
+          lists the candidates with their full forms.
+        </p>
+      </li>
+    </ul>
+    <p>
+      Only an owner orders its own lines, and only that owner can add to them,
+      so no one else can take a short form over: another owner can at most
+      make it ambiguous, by publishing a name or an owner identifier with the
+      same prefix (8 characters are 40 bits, which can be searched for). A
+      resolver knows only the lines it has seen, so a short form that is
+      unique today may become ambiguous later, while a full form never does.
+      Short forms are therefore for people (text, citations, a lookup typed by
+      hand): pins, <tt class="verbatim">parent</tt>, <tt class="verbatim">members.json</tt> and
+      every other file defined by this specification MUST use complete names
+      and owners, a resolver SHOULD show the full form of what it resolved,
+      and landing pages and citation metadata SHOULD give the full form, and
+      MAY add a short one.
+    </p>
+    <p>
+      <strong>Indexes.</strong> To find objects by name, by owner or by
+      inventory digest without knowing their archive, an archive SHOULD keep
+      three indexes of its own objects next to its discovery document, and a
+      custodian or a resolver MAY keep the same files for the objects of many
+      archives:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">names/&lt;b&gt;.json</tt>, where <tt class="verbatim">&lt;b&gt;</tt>
+          is the first two characters of a name: the objects whose names start
+          with them, each entry with <tt class="verbatim">name</tt>, <tt class="verbatim">owner</tt>,
+          <tt class="verbatim">ownerId</tt> and <tt class="verbatim">objectId</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">owners/&lt;b&gt;.json</tt>, where <tt class="verbatim">&lt;b&gt;</tt>
+          is the first two characters of an owner identifier: the owners of
+          those objects, each entry with <tt class="verbatim">ownerId</tt> and <tt
+          class="verbatim">owner</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">sha512/&lt;b&gt;.json</tt>, where <tt class="verbatim">&lt;b&gt;</tt>
+          is the first two hexadecimal digits of an inventory digest: the
+          object versions whose inventories have digests starting with them,
+          each entry with <tt class="verbatim">inventorySha512</tt>, <tt class="verbatim">objectId</tt>
+          and <tt class="verbatim">version</tt> (the object version).
+        </p>
+      </li>
+    </ul>
+    <p>
+      Each index file is a JSON object with <tt class="verbatim">format</tt> (<tt class="verbatim">&quot;opensheaf-index/0.1&quot;</tt>),
+      <tt class="verbatim">index</tt> (<tt class="verbatim">names</tt>, <tt class="verbatim">owners</tt> or
+      <tt class="verbatim">sha512</tt>) and <tt class="verbatim">entries</tt>, the list of its
+      entries; an index kept for several archives adds to each entry <tt
+      class="verbatim">archiveId</tt> and <tt class="verbatim">archiveUrl</tt> (the archive's base
+      URL). An archive's indexes list every object of its storage root with a
+      genesis record (withdrawn objects included, tombstoned ones removed),
+      and every version of them; a file with no entries is omitted. The
+      entries are grouped by their first two characters because a static
+      server does not list folders: a resolver expands a short form from one
+      file, and there are at most 1024 files for names and for owners, and 256
+      for digests. A resolver looks up <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner
+      id&gt;/v&lt;n&gt;</tt> in <tt class="verbatim">names/</tt> (and <tt class="verbatim">owners/</tt>,
+      to read the owner's URI) at the archives and indexes it knows, then
+      reads the history of the object it finds; it looks up a pin in <tt
+      class="verbatim">sha512/</tt>. Like the discovery document, indexes are maps, not
+      witnesses: they are rewritten when objects change, and a resolver checks
+      what it finds against the objects (the name is the digest of <tt class="verbatim">genesis.json</tt>,
+      the owner is in <tt class="verbatim">object.json</tt>, the digest is that of the
+      inventory file).
+    </p>
+    <h2 id="auto-14"><a id="7-objects"></a>7. Objects<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-15"><a id="71-common-rules"></a>7.1 Common rules<span style="margin-left: 1em"></span></h3>
     <p>
       Every object MUST be a valid OCFL 1.1 object. Its inventories MUST use
       <tt class="verbatim">sha512</tt> as digest algorithm. Every object version MUST
@@ -864,7 +1052,7 @@
       MUST NOT begin with <tt class="verbatim">/</tt>, and MUST NOT contain <tt class="verbatim">.</tt>
       or <tt class="verbatim">..</tt> segments.
     </p>
-    <h3 id="auto-15"><a id="72-documents"></a>7.2 Documents<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-16"><a id="72-documents"></a>7.2 Documents<span style="margin-left: 1em"></span></h3>
     <p>
       A document version contains, at the top level of its content unless a
       profile says otherwise:
@@ -908,7 +1096,7 @@
       since they depend on the presentation and are regenerated when it
       improves.
     </p>
-    <h3 id="auto-16"><a id="73-document-versions"></a>7.3 Document versions<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-17"><a id="73-document-versions"></a>7.3 Document versions<span style="margin-left: 1em"></span></h3>
     <p>
       <strong>Numbering.</strong> Document versions are numbered by the
       archive, from 1, without gaps, independently of any external numbering:
@@ -1006,7 +1194,7 @@
       Dates never order document versions and never decide the current version
       (section 8).
     </p>
-    <h3 id="auto-17"><a id="74-collections"></a>7.4 Collections<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-18"><a id="74-collections"></a>7.4 Collections<span style="margin-left: 1em"></span></h3>
     <p>
       A collection version contains <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>,
       <tt class="verbatim">members.json</tt> (section 10), which states whether the
@@ -1018,7 +1206,7 @@
       <tt class="verbatim">renditions</tt>, <tt class="verbatim">toolchain</tt>, <tt class="verbatim">changes</tt>,
       <tt class="verbatim">stage</tt>, <tt class="verbatim">history</tt>, <tt class="verbatim">notices</tt>).
     </p>
-    <h2 id="auto-18"><a id="8-description-datacitejson"></a>8. Description: datacite.json<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-19"><a id="8-description-datacitejson"></a>8. Description: datacite.json<span style="margin-left: 1em"></span></h2>
     <p>
       Every object version MUST contain <tt class="verbatim">datacite.json</tt>, a JSON
       object with the DataCite 4.7 properties in the form of the <tt class="verbatim">attributes</tt>
@@ -1174,7 +1362,7 @@
       explaining them (for instance &quot;from file timestamps&quot;); unknown
       dates are omitted.
     </p>
-    <h3 id="auto-19"><a id="81-relations"></a>8.1 Relations<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-20"><a id="81-relations"></a>8.1 Relations<span style="margin-left: 1em"></span></h3>
     <ul>
       <li>
         <p>
@@ -1224,7 +1412,7 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-20"><a id="9-the-object-objectjson"></a>9. The object: object.json<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-21"><a id="9-the-object-objectjson"></a>9. The object: object.json<span style="margin-left: 1em"></span></h2>
     <p>
       Every object version MUST contain <tt class="verbatim">object.json</tt>,
       OpenSheaf's record of the object as of that version: its identity, the
@@ -1389,8 +1577,8 @@
       <tt class="verbatim">object.json</tt> is metadata and is placed under CC0 (section
       16).
     </p>
-    <h2 id="auto-21"><a id="10-collections-membersjson"></a>10. Collections: members.json<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-22"><a id="101-catalogues-and-selections"></a>10.1 Catalogues and selections<span style="margin-left: 1em"></span></h3>
+    <h2 id="auto-22"><a id="10-collections-membersjson"></a>10. Collections: members.json<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-23"><a id="101-catalogues-and-selections"></a>10.1 Catalogues and selections<span style="margin-left: 1em"></span></h3>
     <p>
       Collections are of two kinds, which differ in how they treat the
       versions of their members.
@@ -1423,7 +1611,7 @@
       Both kinds may contain collections as members (an archive of archives, a
       selection of issues). <tt class="verbatim">members.json</tt> states the kind.
     </p>
-    <h3 id="auto-23"><a id="102-the-member-list"></a>10.2 The member list<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-24"><a id="102-the-member-list"></a>10.2 The member list<span style="margin-left: 1em"></span></h3>
     <p>
       A collection version MUST contain <tt class="verbatim">members.json</tt> with:
     </p>
@@ -1547,7 +1735,7 @@
       inventory, which fixes all its files, collections are hash trees. Pins
       cannot form cycles.
     </p>
-    <h3 id="auto-24"><a id="103-members-of-other-archives"></a>10.3 Members of other archives<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-25"><a id="103-members-of-other-archives"></a>10.3 Members of other archives<span style="margin-left: 1em"></span></h3>
     <p>
       A member may belong to another archive. Nothing is copied: the member is
       resolved as in section 6.4. A reference (a pin without a copy) needs no
@@ -1555,7 +1743,7 @@
       the same line, and branches (section 10.5), which are lines of other
       owners; accepted copies are shallow branches.
     </p>
-    <h3 id="auto-25"><a id="104-mirrors"></a>10.4 Mirrors<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-26"><a id="104-mirrors"></a>10.4 Mirrors<span style="margin-left: 1em"></span></h3>
     <p>
       An archive MAY mirror an object of another archive: copy the whole
       object, every version with its inventories and files, byte for byte,
@@ -1578,7 +1766,7 @@
       its members' archives, an independent storage site): they are impartial,
       like catalogues, and carry every version.
     </p>
-    <h3 id="auto-26"><a id="105-branches-and-accepted-copies"></a>10.5 Branches and accepted copies<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-27"><a id="105-branches-and-accepted-copies"></a>10.5 Branches and accepted copies<span style="margin-left: 1em"></span></h3>
     <p>
       A branch is a line of another owner continuing an object from one of its
       versions, the branch point: a co-author carrying the work on, a journal
@@ -1741,14 +1929,14 @@
       3.2), which reads more clearly but makes <tt class="verbatim">documentVersion</tt>
       more than an integer.
     </p>
-    <h3 id="auto-27"><a id="106-rights"></a>10.6 Rights<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-28"><a id="106-rights"></a>10.6 Rights<span style="margin-left: 1em"></span></h3>
     <p>
       The member list of a collection is placed under CC0. The licence of a
       collection never extends to its members. Mirrors and branches keep the
       licences of what they copy.
     </p>
-    <h2 id="auto-28"><a id="11-withdrawal-and-takedown"></a>11. Withdrawal and takedown<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-29"><a id="111-withdrawal"></a>11.1 Withdrawal<span style="margin-left: 1em"></span></h3>
+    <h2 id="auto-29"><a id="11-withdrawal-and-takedown"></a>11. Withdrawal and takedown<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-30"><a id="111-withdrawal"></a>11.1 Withdrawal<span style="margin-left: 1em"></span></h3>
     <p>
       A document or collection is withdrawn (for instance retracted by its
       authors) by a description-only version whose <tt class="verbatim">object.json</tt>
@@ -1761,13 +1949,13 @@
       <tt class="verbatim">withdrawn</tt>. Presentations MUST show the withdrawal notice
       with the document.
     </p>
-    <h3 id="auto-30"><a id="112-takedown"></a>11.2 Takedown<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-31"><a id="112-takedown"></a>11.2 Takedown<span style="margin-left: 1em"></span></h3>
     <p>
       When content must be removed (by law, or for a breach of rights), the
       object is deleted from the storage root and a tombstone MUST be added to
       the discovery document.
     </p>
-    <h3 id="auto-31"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-32"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
     <p>
       A tombstone records <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt>, <tt class="verbatim">lastVersion</tt>,
       <tt class="verbatim">inventorySha512</tt> of that version, <tt class="verbatim">date</tt>
@@ -1786,7 +1974,7 @@
       mechanism is published, a later version of this specification will adopt
       it for takedowns of single files.
     </p>
-    <h2 id="auto-32"><a id="12-versioning-of-this-specification"></a>12. Versioning of this specification<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-33"><a id="12-versioning-of-this-specification"></a>12. Versioning of this specification<span style="margin-left: 1em"></span></h2>
     <p>
       This specification is versioned MAJOR.MINOR.PATCH, a form of semantic
       versioning adapted to a format:
@@ -1841,8 +2029,8 @@
       and is not changed after the version is final, except by patch versions,
       which are listed in its changelog.
     </p>
-    <h2 id="auto-33"><a id="13-integrity-and-authenticity"></a>13. Integrity and authenticity<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-34"><a id="131-integrity"></a>13.1 Integrity<span style="margin-left: 1em"></span></h3>
+    <h2 id="auto-34"><a id="13-integrity-and-authenticity"></a>13. Integrity and authenticity<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-35"><a id="131-integrity"></a>13.1 Integrity<span style="margin-left: 1em"></span></h3>
     <p>
       Integrity rests on OCFL digests: every file is fixed by its SHA-512
       digest in the inventory, every inventory by its checksum file, and every
@@ -1851,7 +2039,7 @@
       block; archives following the Zenodo binding MUST record MD5 (appendix
       A).
     </p>
-    <h3 id="auto-35"><a id="132-authenticity-and-dates"></a>13.2 Authenticity and dates<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-36"><a id="132-authenticity-and-dates"></a>13.2 Authenticity and dates<span style="margin-left: 1em"></span></h3>
     <p>
       Digests show that files were not changed; they do not show who made them
       or when. An archive MAY provide, for each object version:
@@ -1974,7 +2162,7 @@
       tags, but git hashes are not part of the integrity chain of this
       specification.
     </p>
-    <h2 id="auto-36"><a id="14-verification"></a>14. Verification<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-37"><a id="14-verification"></a>14. Verification<span style="margin-left: 1em"></span></h2>
     <p>
       A verifier checking an archive MUST:
     </p>
@@ -1983,9 +2171,9 @@
         <p>
           validate the discovery document, and every <tt class="verbatim">object.json</tt>,
           <tt class="verbatim">members.json</tt> and <tt class="verbatim">genesis.json</tt>,
-          against the schemas of their declared versions, checking formats
-          (dates, URIs) as assertions, which JSON Schema 2020-12 leaves
-          optional;
+          against the schemas of their declared versions (and the index files
+          of section 6.6, if present), checking formats (dates, URIs) as
+          assertions, which JSON Schema 2020-12 leaves optional;
         </p>
       </li>
       <li>
@@ -2119,14 +2307,16 @@
       </li>
     </ul>
     <p>
-      A verifier SHOULD check the witnesses it finds, the requirements of the
+      A verifier SHOULD check the witnesses it finds, the indexes of the
+      archive (section 6.6: every entry agrees with the objects, and every
+      object with a genesis record is listed), the requirements of the
       profiles the archive declares, and those of the extensions it knows; it
       SHOULD report the extensions it does not know, which do not make an
       archive fail verification. It MUST NOT treat the presentation as
       authoritative. It SHOULD limit the depth and size of the collections it
       follows, and report when it stops.
     </p>
-    <h2 id="auto-37"><a id="15-security-considerations"></a>15. Security considerations<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-38"><a id="15-security-considerations"></a>15. Security considerations<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -2182,14 +2372,23 @@
       </li>
       <li>
         <p>
-          <strong>Mutable maps.</strong> The discovery document and
-          presentation files can be changed by whoever controls the server;
-          their statements are only trusted after checking them against the
-          storage root and the pins.
+          <strong>Short names (proposal).</strong> A short form of a <tt
+          class="verbatim">sheaf:</tt> URI (section 6.6) can be made ambiguous by anyone
+          who publishes a name or an owner identifier with the same prefix,
+          but not taken over; resolvers list ambiguous candidates instead of
+          choosing, and files record only complete names.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Mutable maps.</strong> The discovery document, the indexes
+          and presentation files can be changed by whoever controls the
+          server; their statements are only trusted after checking them
+          against the storage root and the pins.
         </p>
       </li>
     </ul>
-    <h2 id="auto-38"><a id="16-privacy-and-rights"></a>16. Privacy and rights<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-39"><a id="16-privacy-and-rights"></a>16. Privacy and rights<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -2230,7 +2429,7 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-39"><a id="17-changelog"></a>17. Changelog<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-40"><a id="17-changelog"></a>17. Changelog<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -2360,8 +2559,20 @@
           privacy of depositors of anonymous owners.
         </p>
       </li>
+      <li>
+        <p>
+          **0.1 (draft), 15 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>):**
+          <tt class="verbatim">sheaf:</tt> URIs for objects, lines, document versions
+          and pins (section 6.6), the owner defaulting to the originator;
+          owner identifiers (the digest of the owner's URI); short forms of at
+          least 8 characters, resolved within one owner by the order of its
+          lines and otherwise listed as ambiguous; indexes by name, owner and
+          inventory digest, grouped by two characters, with their schema (#14,
+          #20).
+        </p>
+      </li>
     </ul>
-    <h2 id="auto-40"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
+    <h2 id="auto-41"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
     <p>
       Zenodo issues DataCite DOIs (prefix <tt class="verbatim">10.5281</tt>) and keeps
@@ -2450,7 +2661,7 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-41"><a id="appendix-b-texmacs-profile-normative-for-archives-declaring-the-profile-texmacs"></a>Appendix B. TeXmacs profile (normative for archives
+    <h2 id="auto-42"><a id="appendix-b-texmacs-profile-normative-for-archives-declaring-the-profile-texmacs"></a>Appendix B. TeXmacs profile (normative for archives
     declaring the profile <tt class="verbatim">texmacs</tt>)<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
@@ -2499,7 +2710,7 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-42"><a id="appendix-c-website-profile-normative-for-archives-declaring-the-profile-website"></a>Appendix C. Website profile (normative for archives
+    <h2 id="auto-43"><a id="appendix-c-website-profile-normative-for-archives-declaring-the-profile-website"></a>Appendix C. Website profile (normative for archives
     declaring the profile <tt class="verbatim">website</tt>)<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
@@ -2559,7 +2770,7 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-43"><a id="appendix-d-json-schemas-normative"></a>Appendix D. JSON Schemas (normative)<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-44"><a id="appendix-d-json-schemas-normative"></a>Appendix D. JSON Schemas (normative)<span style="margin-left: 1em"></span></h2>
     <p>
       The schemas (JSON Schema draft 2020-12) are published with this
       specification and dedicated to the public domain under CC0 1.0, so that
@@ -2584,7 +2795,13 @@
       <li>
         <p>
           <a href="https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json">opensheaf-genesis-0.1.schema.json</a> for <tt class="verbatim">genesis.json</tt>
-          (proposal, section 6.5).
+          (proposal, section 6.5);
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json">opensheaf-index-0.1.schema.json</a> for the index files
+          (proposal, section 6.6).
         </p>
       </li>
     </ul>
@@ -2595,7 +2812,7 @@
       against the DataCite 4.7 XML Schema, together with the requirements of
       section 8.
     </p>
-    <h2 id="auto-44"><a id="appendix-e-examples-non-normative"></a>Appendix E. Examples (non-normative)<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-45"><a id="appendix-e-examples-non-normative"></a>Appendix E. Examples (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
       The values below come from the first archive. Digests are shortened, and
       the DOIs and ORCID iDs are placeholders.
@@ -2833,7 +3050,43 @@
 }</pre>
       </div>
     </div>
-    <h2 id="auto-45"><a id="appendix-f-rationale-non-normative"></a>Appendix F. Rationale (non-normative)<span style="margin-left: 1em"></span></h2>
+    <p>
+      URIs of this paper (proposal, section 6.6). The authors' ORCID iD is the
+      originator, and the journal's owner identifier, the digest of its <tt
+      class="verbatim">did:key</tt> URI, is <tt class="verbatim">sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a</tt>:
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+sheaf:warwmdymmbkgyxqthxndnjy7q734kem5etenxial3bzzuyryqvma/v3
+    document version 3 of the authors' line
+sheaf:warwmdymmbkgyxqthxndnjy7q734kem5etenxial3bzzuyryqvma/v3?sha512=c07a&hellip;
+    the authors' object version v4, which the journal vetted
+sheaf:warwmdymmbkgyxqthxndnjy7q734kem5etenxial3bzzuyryqvma:sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a/v3
+    document version 3 of the journal's line, its accepted copy
+sheaf:warwmdym/v3
+sheaf:warwmdym:sfhd2dwt/v3
+    the same two, in short form</pre>
+    </div>
+    <p>
+      The entry of the journal's archive for this object, in its index <tt
+      class="verbatim">names/wa.json</tt>:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-index/0.1&quot;,
+  &quot;index&quot;: &quot;names&quot;,
+  &quot;entries&quot;: [
+    { &quot;name&quot;: &quot;warwmdymmbkgyxqthxndnjy7q734kem5etenxial3bzzuyryqvma&quot;,
+      &quot;owner&quot;: &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
+      &quot;ownerId&quot;: &quot;sfhd2dwtwfacdj6c6ffjka4uqljqz3e5otubs4kp6zby2xvwni6a&quot;,
+      &quot;objectId&quot;: &quot;network-discrimination&quot; }
+  ]
+}</pre>
+      </div>
+    </div>
+    <h2 id="auto-46"><a id="appendix-f-rationale-non-normative"></a>Appendix F. Rationale (non-normative)<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -3008,7 +3261,7 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-46"><a id="appendix-g-references"></a>Appendix G. References<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-47"><a id="appendix-g-references"></a>Appendix G. References<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
