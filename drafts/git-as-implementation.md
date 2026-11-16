@@ -78,8 +78,9 @@ and the digest of a blob or a tree, or of a commit, a *gitlink*), a **commit**
 message) and an annotated **tag** (a name for another object, with a message).
 Digests are SHA-1 in almost every repository; repositories in the SHA-256
 object format exist, but tools and forges support them only partly, and work
-on letting the two formats interoperate is still under way (Git 3.0 plans
-SHA-256 as the default for new repositories).
+on letting the two formats interoperate is still under way (Git 3.0, not yet
+released and without a date, will make SHA-256 the default for new
+repositories).
 
 **References** (`refs/heads/main`, `refs/tags/v1`) are mutable names for
 commits (or for tags): the only mutable part of a repository. **Notes** attach
@@ -143,10 +144,12 @@ Its limits:
   git view, checking a pinned version needs only SHA-512; finding a version by
   its identifier, comparing identifiers, and the bytes of earlier inventories
   rest on git's hash (section 5.2, "What each check rests on").
-- **Large files.** It appears to keep the pointer files of Git LFS, not the
-  files they point to, and to skip very large files; both are to be checked
-  (section 9). Either is a further reason to keep archive files out of LFS
-  (section 4.2 of [OpenSheaf archives in git](../opensheaf-git-0.1.md)).
+- **Large files.** Its git loader has no support for Git LFS, so it keeps the
+  pointer files, not the files they point to; and it records a file above a
+  size limit (100 MiB by default in the loader; the limit in production is not
+  published) by its hashes and length only, without its bytes. Either is a
+  further reason to keep archive files out of LFS (section 4.2 of [OpenSheaf
+  archives in git](../opensheaf-git-0.1.md)).
 - **Takedowns.** It has its own takedown process: a copy there outlives a
   takedown in the archive unless Software Heritage is asked as well (issue
   [#33](https://github.com/opensheaf/opensheaf.github.io/issues/33)).
@@ -215,8 +218,9 @@ knows.
   (Gitea and Forgejo do, GitLab experimentally, GitHub not). SHA-1 has known
   collision attacks; git detects the known attack technique, but a format
   meant for decades should not rest on it, and git's change of algorithm is
-  not complete. OCFL lets an object choose its digest algorithm, and OpenSheaf
-  chose SHA-512.
+  not complete. OCFL lets the digest algorithm be chosen per inventory, and
+  changed at a new version, earlier version inventories keeping theirs (OCFL
+  1.1 implementation notes, section 3.4); OpenSheaf chose SHA-512.
 - **Reading with HTTP.** A browser cannot read a repository from the main
   forges: their git endpoints do not allow cross-origin requests, and objects
   come in compressed packs, which need a git implementation in the reader
@@ -484,10 +488,11 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   numeric offset. The rules (truncation, `+0000`, for instance) must be fixed,
   or two tools compute different commits.
 - **Paths.** Logical paths git cannot store must be reported: `.git` in any
-  case, and the names that git's checks (which GitHub runs on every push)
-  treat as `.git` on other file systems, such as `git~1` and names with
-  ignorable Unicode characters. A logical path `.gitmodules` is parsed by
-  those checks at any depth, and one they cannot accept (a bad URL, for
+  case, and the names that git's checks treat as `.git` on other file systems,
+  such as `git~1` and names with ignorable Unicode characters; GitHub rejects
+  pushes of such trees, and of bad `.gitmodules` files, though it does not
+  document running all of git's checks. A logical path `.gitmodules` is parsed
+  by those checks at any depth, and one they cannot accept (a bad URL, for
   instance) is an error, so a push of the views to a forge that checks objects
   fails. A `.gitattributes` inside `content/` changes how a checkout writes
   the files of `content/` (line ends, filters), so the checked-out files may
@@ -547,11 +552,16 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   fixed path under the base URL). A superproject depends on its members'
   objects, so a takedown of a member, or the loss of its archive, leaves it
   unverifiable for that member, while the collection's own view is unaffected.
-  A commit reachable only from references outside `refs/heads/` and
-  `refs/tags/` is fetched by a submodule only if the server allows fetching a
-  commit by its hash. The companion forbids submodules among archive files
-  ([OpenSheaf archives in git](../opensheaf-git-0.1.md), section 3); a
-  repository of views is a separate repository, so the two do not conflict.
+  A gitlink is usually not the tip of a reference, since the pinned version
+  need not be the head. Tested with git 2.50, a submodule fetches such a
+  commit from a static host with the dumb protocol and from a server speaking
+  protocol v2, but over protocol v0 only if the server allows it
+  (`uploadpack.allowReachableSHA1InWant`); the forges are untested (section
+  9). A default clone fetches only branches, so a mirror of
+  `refs/opensheaf/...` needs explicit refspecs. The companion forbids
+  submodules among archive files ([OpenSheaf archives in
+  git](../opensheaf-git-0.1.md), section 3); a repository of views is a
+  separate repository, so the two do not conflict.
 - **SHA-1 or SHA-256.** The view can be computed in both object formats. SHA-1
   views match Software Heritage and the forges; SHA-256 views are stronger,
   and could be computed now and published later. Neither replaces the SHA-512
@@ -652,16 +662,16 @@ committing to it.
    the SWHIDs from the OCFL objects and finds them in Software Heritage, and
    one that fetches a version from Software Heritage and checks it against its
    pin, compared with finding the inventory of an archive kept in git (section
-   5.3) by its `swh:1:cnt:` identifier. The same test settles what Software
-   Heritage keeps of large files and of files in Git LFS, and whether its
-   snapshots keep references outside `refs/heads/` and `refs/tags/` (such as
-   `refs/opensheaf/...`), or the views must be published as ordinary branches.
+   5.3) by its `swh:1:cnt:` identifier. Its snapshots keep every reference a
+   server advertises, `refs/notes/*` and `refs/pull/*/head` included (dropping
+   only GitHub's auto-merge, GitLab's pipeline and Gerrit's change
+   references), so views under `refs/opensheaf/...` should be kept; the test
+   confirms it on a real repository of views.
 3. **A collection as a superproject.** A superproject for a selection with
    members in two archives, cloned with its submodules: a convention for the
-   URLs of `.gitmodules`, and whether the forges and a static host with the
-   dumb protocol let a submodule fetch a commit reachable only from
-   `refs/opensheaf/...` (a default clone fetches only branches and tags, so
-   mirrors also need explicit refspecs).
+   URLs of `.gitmodules`, and whether the forges let a submodule fetch a
+   commit below the tip of `refs/opensheaf/...`, as a static host with the
+   dumb protocol and git's own server with protocol v2 do (section 6).
 4. **A mirror by fetch.** A copy of an archive kept up to date by `git fetch`
    of the views and the references of witnesses, rebuilt into an OCFL storage
    root, and verified byte for byte against the original.
@@ -680,7 +690,7 @@ committing to it.
 - The exact mapping of depositors, addresses and dates to git's author,
   committer and dates (section 6), on which the determinism of the view rests.
 - The names of the references in a repository of views, and whether the views
-  go on ordinary branches (experiment 2).
+  go on ordinary branches.
 - Where witnesses and the discovery document go in a repository of views.
 - Whether collections should have superprojects at all, whose gitlinks tools
   would fetch automatically from places the collection does not vouch for.
