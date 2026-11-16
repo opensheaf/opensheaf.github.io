@@ -855,21 +855,25 @@
           own branch (one the owner made: for a keyed owner, its signatures
           hold; for a named owner, the archive that keeps it accepts the move
           under the same authority it requires for any new version of that
-          line; any other object counts as another object; a mirror of the
-          owner's own branch counts as that branch) of the same parent line
-          and the new branch point is later in the parent line's history than
-          that branch's current branch point, the owner moves its branch point
-          instead (section 10.5), in the archive that keeps that branch, and a
-          mirror of it is then brought up to date; a tool that cannot do so
-          renames the new branch as below; otherwise (another genesis record,
-          a mirror, another parent line, an earlier or equal branch point) the
-          branch is named by the smallest algorithm number greater than that
-          of <tt class="verbatim">parent.name</tt> whose name, over the same genesis
-          record, gives a line free in the archive and among the owner's known
-          confirmed lines; <tt class="verbatim">parent</tt> keeps the parent's name; if
-          no number up to 15 is free, the branch is refused. An accepted copy
-          of another selection is not renamed: owners differ between
-          selections (section 10.5);
+          line, and an archive that accepts deposits from more than one
+          depositor MUST bind each line, and each named owner URI, to the
+          depositors allowed to use it, so that no depositor continues
+          another's line or opens a line under another's owner URI; any other
+          object counts as another object; a mirror of the owner's own branch
+          counts as that branch) of the same parent line and the new branch
+          point is later in the parent line's history than that branch's
+          current branch point, the owner moves its branch point instead
+          (section 10.5), in the archive that keeps that branch, and a mirror
+          of it is then brought up to date; a tool that cannot do so renames
+          the new branch as below; otherwise (another genesis record, a mirror
+          of anything else, another parent line, an earlier or equal branch
+          point) the branch is named by the smallest algorithm number greater
+          than that of <tt class="verbatim">parent.name</tt> whose name, over the same
+          genesis record, gives a line free in the archive and among the
+          owner's known confirmed lines; <tt class="verbatim">parent</tt> keeps the
+          parent's name; if no number up to 15 is free, the branch is refused.
+          An accepted copy of another selection is not renamed: owners differ
+          between selections (section 10.5);
         </p>
       </li>
       <li>
@@ -1121,26 +1125,26 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           <strong>The version.</strong> <tt class="verbatim">/v&lt;n&gt;</tt> is a
-          document version of the line (section 7.3; on a branch, numbered as
-          section 10.5 says), not an OCFL object version. It names only object
-          versions of the line: sealed versions (with a genesis record) whose
-          <tt class="verbatim">object.json</tt> has the line's owner. The versions of a
-          deep branch up to its branch point belong to its parent's line, and
-          are named with the parent's owner; a document version held only by
-          versions made before sealing (section 6.5) belongs to no line and
-          has no <tt class="verbatim">sheaf:</tt> URI. Several object versions of the
-          line may hold document version n: without a digest, the URI names
-          the one listed for n in the <tt class="verbatim">history</tt> of the line's
-          head, or, without <tt class="verbatim">history</tt>, the last object version
-          of the line holding n (section 7.3). What it names can then change
-          as the line grows, by a description or a notice, and copies with
-          different heads may answer differently: a resolver uses the latest
-          head among the confirmed copies that agree (section 6.5, and below),
-          and reports a later head found only in unconfirmed copies as an
-          unconfirmed extension, without using it; with no confirmed copy, it
-          uses the latest head among the unconfirmed copies that agree, and
-          reports the result as unconfirmed; if some unconfirmed copies
-          disagree with the others, it lists them all and does not choose.
+          document version of the line (section 7.3, also on a branch), not an
+          OCFL object version. It names only object versions of the line:
+          sealed versions (with a genesis record) whose <tt class="verbatim">object.json</tt>
+          has the line's owner. The versions of a deep branch up to its branch
+          point belong to its parent's line, and are named with the parent's
+          owner; a document version held only by versions made before sealing
+          (section 6.5) belongs to no line and has no <tt class="verbatim">sheaf:</tt>
+          URI. Several object versions of the line may hold document version
+          n: without a digest, the URI names the one listed for n in the <tt
+          class="verbatim">history</tt> of the line's head, or, without <tt class="verbatim">history</tt>,
+          the last object version of the line holding n (section 7.3). What it
+          names can then change as the line grows, by a description or a
+          notice, and copies with different heads may answer differently: a
+          resolver uses the latest head among the confirmed copies that agree
+          (section 6.5, and below), and reports a later head found only in
+          unconfirmed copies as an unconfirmed extension, without using it;
+          with no confirmed copy, it uses the latest head among the
+          unconfirmed copies that agree, and reports the result as
+          unconfirmed; if some unconfirmed copies disagree with the others, it
+          lists them all and does not choose.
         </p>
       </li>
       <li>
@@ -1170,16 +1174,17 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           <strong>Equality.</strong> The canonical form of a <tt class="verbatim">sheaf:</tt>
-          URI has complete parts, lowercase where the case is folded, for <tt
-          class="verbatim">:*</tt>, the name made by algorithm 0, since all the names of
-          a genesis record name the same work; no owner part when the owner is
-          the originator (read from the genesis record, which any copy carries
-          and the name certifies, section 6.5, so that deciding equality may
-          need one copy of <tt class="verbatim">genesis.json</tt>), and no <tt class="verbatim">at</tt>
-          and no unknown parameters. Two URIs name the same thing when their
-          canonical forms are equal, byte for byte, and files that record a
-          <tt class="verbatim">sheaf:</tt> URI (for instance among the relations of <tt
-          class="verbatim">datacite.json</tt>) record its canonical form.
+          URI has complete parts, lowercase where the case is folded, and, for
+          <tt class="verbatim">:*</tt>, the name made by algorithm 0, since all the
+          names of a genesis record name the same work; it has no owner part
+          when the owner is the originator (read from the genesis record,
+          which any copy carries and the name certifies, section 6.5, so that
+          deciding equality may need one copy of <tt class="verbatim">genesis.json</tt>),
+          and no <tt class="verbatim">at</tt> and no unknown parameters. Two URIs name
+          the same thing when their canonical forms are equal, byte for byte,
+          and files that record a <tt class="verbatim">sheaf:</tt> URI (for instance
+          among the relations of <tt class="verbatim">datacite.json</tt>) record its
+          canonical form.
         </p>
       </li>
     </ul>
@@ -1221,15 +1226,16 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       the name, checked against it); computes its 16 names, by every
       algorithm; looks each of them up in the indexes it knows; and keeps only
       the entries whose genesis record is, byte for byte, the one it obtained,
-      discarding the others as collisions; it groups the lines it keeps by
-      their <tt class="verbatim">sealed</tt>, read from the copies (<tt class="verbatim">object.json</tt>),
-      not from indexes kept by others, and lists different groups as different
-      works (a genesis record reused in two archives), each marked confirmed
-      or unconfirmed like lines, without choosing. The comparison is of bytes,
-      so it does not rely on any hash being free of collisions. Resolving a
-      line needs no search: <tt class="verbatim">sheaf:&lt;name&gt;</tt> names the
-      originator's line, always named by algorithm 0 (a clash when sealing
-      draws a new nonce), and <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner
+      discarding the others as collisions (removed entries without a genesis
+      record are listed apart, as removed lines of those names); it groups the
+      lines it keeps by their <tt class="verbatim">sealed</tt>, read from the copies
+      (<tt class="verbatim">object.json</tt>), not from indexes kept by others, and
+      lists different groups as different works (a genesis record reused in
+      two archives), each marked confirmed or unconfirmed like lines, without
+      choosing. The comparison is of bytes, so it does not rely on any hash
+      being free of collisions. Resolving a line needs no search: <tt class="verbatim">sheaf:&lt;name&gt;</tt>
+      names the originator's line, always named by algorithm 0 (a clash when
+      sealing draws a new nonce), and <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner
       id&gt;</tt> names exactly that line.
     </p>
     <p>
@@ -1336,10 +1342,12 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           <tt class="verbatim">owners/&lt;p&gt;.json</tt>, where <tt class="verbatim">&lt;p&gt;</tt>
           is the first characters of an owner identifier: the owners whose
           identifiers start with them, each entry with <tt class="verbatim">ownerId</tt>,
-          <tt class="verbatim">owner</tt> and <tt class="verbatim">names</tt> (in an index kept
-          for several archives, one entry for each owner and archive), the
-          names of that owner's objects, so that the lines of an owner can be
-          listed;
+          <tt class="verbatim">owner</tt> and <tt class="verbatim">names</tt> (the names of
+          objects of the storage root only: a takedown that erases the owner
+          removes the name, and the entry once it lists none) (in an index
+          kept for several archives, one entry for each owner and archive),
+          the names of that owner's objects, so that the lines of an owner can
+          be listed;
         </p>
       </li>
       <li>
@@ -1374,25 +1382,28 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       so that a resolver can report it as section 11.3 asks; a removed entry
       of <tt class="verbatim">names/</tt> keeps <tt class="verbatim">name</tt>, <tt class="verbatim">ownerId</tt>
       and <tt class="verbatim">objectId</tt>, and MAY drop <tt class="verbatim">owner</tt>, <tt
-      class="verbatim">originator</tt>, <tt class="verbatim">genesis</tt> and <tt class="verbatim">sealed</tt>,
-      so that a takedown can erase them (section 16). A file with no entries
-      is omitted, so that, where the indexes are declared, a missing file
-      means no entry. A resolver looks up a URI in <tt class="verbatim">names/</tt> at
-      the archives and indexes it knows, starting from <tt class="verbatim">at</tt>,
-      keeping the entries whose <tt class="verbatim">ownerId</tt> matches the owner
-      part, or, without an owner part, those whose <tt class="verbatim">owner</tt> is
-      their <tt class="verbatim">originator</tt>, or, for <tt class="verbatim">:*</tt>, every
-      entry found by the search for the work (above), each line checked and
-      confirmed separately, then reads the history of the object it finds; it
-      looks up a pin in <tt class="verbatim">sha512/</tt>, and an owner in <tt class="verbatim">owners/</tt>
-      (two different owner URIs under one owner identifier are a collision:
-      the resolver lists them and does not choose); at an archive that keeps
-      no indexes, it MAY read <tt class="verbatim">objects</tt> of the discovery
-      document instead, which gives each object's <tt class="verbatim">name</tt> and <tt
-      class="verbatim">owner</tt>, and fetches <tt class="verbatim">genesis.json</tt> and <tt
-      class="verbatim">object.json</tt> from the objects for the search. Like the
-      discovery document, indexes are maps, not witnesses: they are rewritten
-      when objects change, and a resolver checks what it finds as above.
+      class="verbatim">originator</tt> and <tt class="verbatim">genesis</tt>, so that a takedown
+      can erase them (section 16). A file with no entries is omitted, so that,
+      where the indexes are declared, a missing file means no entry. A
+      resolver looks up a URI in <tt class="verbatim">names/</tt> at the archives and
+      indexes it knows, starting from <tt class="verbatim">at</tt>, keeping the entries
+      whose <tt class="verbatim">ownerId</tt> matches the owner part, or, without an
+      owner part, those whose <tt class="verbatim">owner</tt> is their <tt class="verbatim">originator</tt>
+      (for a removed entry without them, whose <tt class="verbatim">ownerId</tt> is the
+      owner identifier of the originator read from any copy of the genesis
+      record; otherwise it is reported as a removed line of that name, owner
+      unknown), or, for <tt class="verbatim">:*</tt>, every entry found by the search
+      for the work (above), each line checked and confirmed separately, then
+      reads the history of the object it finds; it looks up a pin in <tt
+      class="verbatim">sha512/</tt>, and an owner in <tt class="verbatim">owners/</tt> (two
+      different owner URIs under one owner identifier are a collision: the
+      resolver lists them and does not choose); at an archive that keeps no
+      indexes, it MAY read <tt class="verbatim">objects</tt> of the discovery document
+      instead, which gives each object's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>,
+      and fetches <tt class="verbatim">genesis.json</tt> and <tt class="verbatim">object.json</tt>
+      from the objects for the search. Like the discovery document, indexes
+      are maps, not witnesses: they are rewritten when objects change, and a
+      resolver checks what it finds as above.
     </p>
     <p>
       <strong>Gateways.</strong> Browsers do not resolve <tt class="verbatim">sheaf:</tt>
@@ -1536,14 +1547,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       without gaps, independently of any external numbering: a work whose
       versions 1, 3 and 4 are available on arXiv has document versions 1, 2
       and 3. A branch (section 10.5) starts from the document version of its
-      first branch point (for a deep branch, its first own version keeps that
-      number when it adds no files of the document's own, and otherwise takes
-      the number after the highest document version held by the versions it
-      copies, placed after the branch point in <tt class="verbatim">history</tt>), and
-      continues without gaps from it (provisionally: option (a) of the open
-      question of section 10.5); an object version that moves the branch point
-      is the branch's next document version, and <tt class="verbatim">parent</tt> keeps
-      the parent's own number.
+      first branch point (for a deep branch, an own version that adds no files
+      of the document's own keeps the number it holds, and every own version
+      that adds files takes the number after the highest document version in
+      the object, the copied versions included, and goes last in <tt class="verbatim">history</tt>,
+      so that the branch's own work is its current version), and continues
+      without gaps from it (provisionally: option (a) of the open question of
+      section 10.5); an object version that moves the branch point is the
+      branch's next document version, and <tt class="verbatim">parent</tt> keeps the
+      parent's own number.
     </p>
     <p>
       <strong>Identity versions.</strong> An object version that seals an
@@ -2434,8 +2446,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <tt class="verbatim">inventorySha512</tt> of that version, <tt class="verbatim">date</tt>
       and <tt class="verbatim">reason</tt> (plain text, since the discovery document has
       no content files), and, for an object with a genesis record, its <tt
-      class="verbatim">name</tt> and <tt class="verbatim">ownerId</tt> (section 6.6), which it
-      MUST record, so that its line stays taken (section 6.5); it MAY also
+      class="verbatim">name</tt>, <tt class="verbatim">ownerId</tt> (section 6.6) and <tt class="verbatim">sealed</tt>,
+      which it MUST record, so that its line stays taken and its genesis
+      record cannot be reused for another work (section 6.5); it MAY also
       record <tt class="verbatim">owner</tt>, unless the takedown erases it (section
       16). Identifiers of tombstoned objects MUST NOT be reused. Verifiers
       report a pin to a tombstoned object as &quot;removed&quot;, not as a
@@ -2687,14 +2700,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           renditions and change note, except that a version with <tt class="verbatim">sourcesMissing</tt>
           may be completed by adding files (section 7.3); new numbers follow
           the rule of new versions, without gaps (for a branch, from the
-          document version of its first branch point, or for a deep branch's
-          first own version that adds files, from the highest copied document
-          version; a version that moves the branch point taking the next
-          number); <tt class="verbatim">history</tt>, when present, lists distinct
-          document versions, covers all of them, each entry being the last
-          object version holding its document version; no object version after
-          the first one with <tt class="verbatim">history</tt> lacks it; every notice is
-          kept unchanged in every later object version;
+          document version of its first branch point; for a deep branch, every
+          own version that adds files taking the number after the highest
+          document version in the object, last in <tt class="verbatim">history</tt>; a
+          version that moves the branch point taking the next number); <tt
+          class="verbatim">history</tt>, when present, lists distinct document versions,
+          covers all of them, each entry being the last object version holding
+          its document version; no object version after the first one with <tt
+          class="verbatim">history</tt> lacks it; every notice is kept unchanged in
+          every later object version;
         </p>
       </li>
       <li>
@@ -2909,13 +2923,14 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           branch only under the conditions of section 6.5 (the owner's own
           branch of the same parent line, a later branch point, in the archive
           that keeps it), so that a forged branch is never continued as the
-          owner's line; for a named owner, an archive with many depositors
-          MUST bind each line to whoever may add versions to it, so that no
-          depositor continues another's genuine line. Archives that accept
-          objects of others (custodians, repositories with many depositors)
-          SHOULD check that a copy is confirmed (section 6.6) before
-          depositing it, and resolve a refusal by checking which copy is
-          (#39).
+          owner's line; for a named owner, an archive that accepts deposits
+          from more than one depositor binds each line and each named owner
+          URI to its depositors (section 6.5), so that no depositor continues
+          another's genuine line or opens one under another's URI. Archives
+          that accept objects of others (custodians, repositories with many
+          depositors) SHOULD check that a copy is confirmed (section 6.6)
+          before depositing it, and resolve a refusal by checking which copy
+          is (#39).
         </p>
       </li>
       <li>
@@ -2985,7 +3000,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           minimal (section 9). A request to erase personal data from an
           immutable history is handled by a takedown (section 11.2); with the
           proposal of section 6.5, the tombstone and the indexes then keep
-          only the name and the owner identifier, not the owner's URI.
+          only the name, the owner identifier and <tt class="verbatim">sealed</tt>, not
+          the owner's URI. An owner identifier is a digest of a URI that can
+          often be guessed (an ORCID iD), so it is a pseudonym, not an
+          erasure.
         </p>
       </li>
       <li>
@@ -3342,6 +3360,21 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           takedowns can erase it; the canonical form of <tt class="verbatim">:*</tt>
           uses the algorithm-0 name; originator defined; section 15 aligned
           with section 6.5.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 16 November 2026, proposal revised after a thirteenth
+          review (branch <tt class="verbatim">proposal/identity</tt>):** every own
+          version of a deep branch that adds files takes the number after the
+          highest in the object and goes last in <tt class="verbatim">history</tt>;
+          removed index entries still match by owner identifier and are listed
+          apart in a search; archives accepting more than one depositor MUST
+          bind lines and named owner URIs to their depositors (section 6.5); a
+          mirror of anything but the owner's branch is renamed; tombstones
+          keep <tt class="verbatim">sealed</tt>; <tt class="verbatim">owners/</tt> lists only
+          objects of the storage root, and owner identifiers are pseudonyms;
+          wording.
         </p>
       </li>
     </ul>

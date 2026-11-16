@@ -180,6 +180,30 @@
             "pattern": "^[a-z2-7]{52}$",
             "$comment": "proposal (section 6.6): the owner identifier, which keeps the line taken"
           },
+          "sealed": {
+            "type": "object",
+            "$comment": "proposal (section 6.5): the originator's sealing version, copied unchanged by every branch",
+            "required": [
+              "archiveId",
+              "objectId",
+              "objectVersion"
+            ],
+            "properties": {
+              "archiveId": {
+                "type": "string",
+                "format": "uri"
+              },
+              "objectId": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 64
+              },
+              "objectVersion": {
+                "type": "string",
+                "pattern": "^v[1-9][0-9]*$"
+              }
+            }
+          },
           "owner": {
             "type": "string",
             "format": "uri",
@@ -188,9 +212,13 @@
         },
         "dependentRequired": {
           "name": [
-            "ownerId"
+            "ownerId",
+            "sealed"
           ],
           "ownerId": [
+            "name"
+          ],
+          "sealed": [
             "name"
           ],
           "owner": [
