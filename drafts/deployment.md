@@ -1,15 +1,15 @@
 # Deploying an OpenSheaf archive: hosting options
 
-*Working note, draft of 15 November 2026. Non-normative: practical advice
-on where and how to serve an archive, outside the specification (which
-refers to "a deployment guide, outside this specification"). It sets out
-what a host must do, which kinds of host do it (static hosting, object
-storage, institutional web space, and with conditions WebDAV servers and
-Nextcloud shares), which do not (consumer cloud drives, reference
-managers), how to upload, how to check a deployment, and middle layers
-for those who use neither git nor the command line. Facts about
-services are as of November 2026, and change: check them before relying
-on them.*
+*Working note, draft of 16 November 2026. Non-normative: practical advice on
+where and how to serve an archive, outside the specification (which refers to
+"a deployment guide, outside this specification"). It sets out what a host
+must do, which kinds of host do it (static hosting, object storage,
+institutional web space, servers backed by a database, and with conditions
+WebDAV servers and Nextcloud shares), which do not (consumer cloud drives,
+reference managers), how to upload, how to check a deployment, and middle
+layers for those who use neither git nor the command line. Facts about
+services are as of November 2026, and change: check them before relying on
+them.*
 
 ## 1. What a host must do
 
@@ -38,10 +38,12 @@ For the **website profile** (landing pages read by readers and search
 engines) the host must also serve HTML as `text/html` and PDFs as
 `application/pdf`, so that browsers display them.
 
-Nothing else is needed: no server software, no database, no folder
-listings. The storage root may even be on another host than the
-discovery document, which gives its URL (`storageRoot`, section 6.1 of
-the specification).
+Nothing else is needed: no server software, no database, no folder listings.
+Nor is anything else excluded: a server running software, with a database
+behind it, is a host like any other if it meets these conditions (section 2,
+"Servers backed by a database"). The storage root may even be on another host
+than the discovery document, which gives its URL (`storageRoot`, section 6.1
+of the specification).
 
 ## 2. Hosts that work
 
@@ -151,9 +153,9 @@ endpoint that "does not require authentication":
     https://<host>/public.php/dav/files/<share token>/
 
 A folder shared by link, without a password, so has a base URL, and the
-archive's files can be read under it with a plain `GET` (from the
-developer manual; files in subfolders are reached by path, as in any
-WebDAV tree, though the manual gives no example). Conditions:
+archive's files can be read under it with a plain `GET` (from the developer
+manual; files in subfolders are reached by path, as in any WebDAV tree, though
+the manual gives no example). Conditions:
 
 - **Nextcloud 29 or later**, and link shares allowed by the administrator.
 - **No password.** A share with a password needs HTTP Basic credentials,
@@ -181,6 +183,30 @@ A Nextcloud share is thus usable as a mirror for command-line tools, and
 for browser tools where the administrator adds the cross-origin header;
 not as the home of an archive's website. This is from the documentation,
 not yet tested on a server.
+
+### Servers backed by a database
+
+A server that keeps the archive's files in a database, or in a store keyed by
+digest, and delivers them at the paths of the storage root, serves an archive
+like a static host. It suits institutions, portals, very large archives and
+archives with private versions, at the price of software to run. Conditions,
+beyond those of section 1:
+
+- **Bytes as written.** Every file, the JSON files included, is kept as the
+  bytes written at deposit and served as such; never parsed into rows and
+  written out again, which changes spacing, order of keys or escapes, and
+  breaks every pin from that version on.
+- **Whole versions.** A version appears, discovery document included, only
+  once all its files are served; a transaction gives this directly.
+- **A way out.** The archive can be exported as a folder, a plain OCFL storage
+  root, identical byte for byte to what the server delivers. A copy of that
+  export on a static host, listed in `mirrors`, keeps the archive readable
+  when the server is down.
+
+The test is the export: download the archive from its base URL into a folder,
+validate it, and compare every file with the server. The [working paper on
+databases](database.md) discusses this design, an index derived from the
+files, and an index published as a static SQLite file for large archives.
 
 ## 3. Uploading
 
