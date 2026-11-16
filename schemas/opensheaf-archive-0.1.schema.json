@@ -177,7 +177,7 @@
           },
           "ownerId": {
             "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
+            "pattern": "^[a-z2-7]{51}[aq]$",
             "$comment": "proposal (section 6.6): the owner identifier, which keeps the line taken"
           },
           "sealed": {

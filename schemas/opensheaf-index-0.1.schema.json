@@ -48,7 +48,8 @@
                 "format": "uri"
               },
               "ownerId": {
-                "$ref": "#/$defs/base32"
+                "type": "string",
+                "pattern": "^[a-z2-7]{51}[aq]$"
               },
               "names": {
                 "type": "array",

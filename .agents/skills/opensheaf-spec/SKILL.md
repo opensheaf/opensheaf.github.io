@@ -138,7 +138,9 @@ only what its two standards leave open:
   carry `genesis` and `sealed`) and grouping them by `sealed`. Aliases are
   open (#44). A deep branch's first own version that adds files of the
   document's own takes the number after the highest in the object and goes
-  last in `history`.
+  last in `history`. A move on a deep branch also takes the number after the
+  highest. `mirrorOf` is never the archive itself, and an archive's lines
+  name its own `archiveId`, except mirrors and copied versions.
 - **Draft and sealing** (6.5): a draft is an object without a genesis
   record; no pin may name its versions. Sealing adds the genesis record,
   at the owner's request, before a version first leaves the owner's hands.
