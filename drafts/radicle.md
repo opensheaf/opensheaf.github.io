@@ -168,7 +168,7 @@ PR #30 where marked; the proposal is not agreed.
 | repository, named by its RID | object, with a self-certifying name (PR #30) | RID: SHA-1 of the first identity document; name: SHA-256 of a seed and `genesis.json` |
 | first identity document | genesis record `genesis.json` (PR #30) | both fix the name; Radicle's document then changes, signed by the delegates |
 | `payload` of the identity document | `datacite.json`, `object.json` | Radicle's description is minimal (name, description, default branch) |
-| delegates and threshold | owner of a line, single writer | several owners with a quorum are an open question in PR #30 (co-authors and controllers) |
+| delegates and threshold | owner of a line, single writer | several owners with a quorum: open, issue #53 |
 | peer namespace, "sole owner and writer" | line (owner, name), single writer (PR #30) | the closest match of all |
 | fork of a peer, then a patch | deep branch (PR #30) | in Radicle, merging into the canonical branch is the delegates' act |
 | canonical default branch, by threshold | the origin line, the originator's (PR #30) | OpenSheaf has one origin, no vote |
@@ -276,37 +276,139 @@ features that PR #30 already specifies in plain files.
 ### 4.3 Radicle as a source of designs
 
 OpenSheaf keeps its files and its digests, and borrows designs that Radicle
-has tested:
+has tested. Each is described in Radicle's terms, then in OpenSheaf's.
 
-- **Namespaces per owner.** A peer namespace is a line, with one writer. It
-  suggests a storage arrangement for an archive that keeps several lines of
-  one object (a deep branch kept beside its parent): one folder per owner
-  under the object, the files shared, rather than separate objects. This
-  bears on custodians holding many lines (issue
-  [#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)).
-- **Delegates and a threshold.** PR #30 leaves open how several people
-  answer for one line (co-authors, controllers). Radicle's answer, a list of
-  keys and a quorum, written in a signed document whose first version fixes
-  the name, is a candidate. Its cost is that the identity of the object then
-  depends on a changing document, signed by changing keys, and every reader
-  must replay the chain of changes.
-- **Signing the whole state.** Signed references sign everything a peer has
-  published at once. An archive could sign its discovery document in the same
-  way, with each change, so that a copy of the map of the archive can be
-  checked; today the discovery document is "never a witness" (section 6.1),
-  and checked only against the storage root.
-- **Announcements.** The inventory and refs announcements are what an index
-  of many archives needs to hear: which archive holds which objects, and
-  which heads changed. A feed of an archive, read by aggregators, plays that
-  part; gossip is one way to carry it (section 5 of the [positioning
-  paper](positioning.md#5-federated-and-distributed-systems)).
-- **Seeding policies.** A custodian's policy (keep everything of this owner,
-  of this collection, or what I choose) is a seeding policy. Stating it would
-  let readers know what a custodian promises to keep (issue #13).
-- **Collaborative objects.** Comments and reviews merged as a CRDT, each
-  change signed, are a model for discussion objects that several people
-  write, such as the comments on a document; in OpenSheaf they would be
-  objects of their own, not part of the document they discuss.
+#### A namespace per owner
+
+**In Radicle.** A project is one git repository. Inside it, each peer has a
+namespace named by its key, and only that peer writes there: Alice's branches
+are under `refs/namespaces/<alice>/`, Bob's under `refs/namespaces/<bob>/`.
+The files are stored once and shared by all namespaces.
+
+**In OpenSheaf.** PR #30 gives each line (owner, name) one writer. Take a
+paper by A: co-author B continues it (a deep branch), and journal J keeps the
+version it vetted (a shallow branch). Today these are three OCFL objects, and
+an archive or a custodian keeping all three stores the same files three
+times. Radicle suggests grouping the lines of one work, one folder per owner:
+
+```
+ocfl/<name>/<owner A>/v1, v2 ...
+ocfl/<name>/<owner B>/v1, v2, v3 ...
+ocfl/<name>/<owner J>/v1 ...
+```
+
+A reader then finds every line of a work in one place, and the forks are
+visible. This bears on custodians holding many lines (issue
+[#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)).
+
+The saving of space needs no new layout where the archive is kept in git:
+git stores each file once, by its digest, across the whole repository, so
+the three objects share their files already
+([OpenSheaf archives in git](../opensheaf-git-0.1.md), and the [git
+paper](git-as-implementation.md)). Only on plain file systems and static
+hosts would the files be stored several times; there, OCFL objects are
+self-contained and do not share files, so sharing would need an OCFL
+extension. What remains of the idea is the grouping: a layout, or an index,
+that places the lines of one name together.
+
+#### Delegates and a threshold
+
+**In Radicle.** The identity document lists keys, the delegates, and a
+threshold, for instance 2 of 3. The canonical state of the default branch is
+the commit that at least 2 delegates have. A change of the document, adding
+or removing a delegate, also needs the signatures of 2 current delegates. The
+name of the repository is the digest of the first document, so it does not
+change.
+
+**In OpenSheaf.** PR #30 gives each line a single owner, and leaves open how
+several people answer for one line. With one owner, the other authors of a
+paper keep branches of their own. With delegates, the line is owned by a
+group: `genesis.json` lists the keys of A, B and C with a threshold of 2; a
+version belongs to the line only if 2 of them signed it; adding D, or
+replacing a lost key, is a signed change by 2 of the current owners.
+
+The cost is that a verifier must replay every change of the owners since the
+genesis record to know who may sign a given version, and that only keyed
+owners can take part: an ORCID iD asserted as owner signs nothing. The
+question is left for later, in issue
+[#53](https://github.com/opensheaf/opensheaf.github.io/issues/53).
+
+#### Signing the discovery document
+
+**In Radicle.** Each time a peer's branches change, its node signs the whole
+list, each branch with its commit, as one statement. Whoever delivers a
+copy, a reader can check that it is exactly what the peer published.
+
+**In OpenSheaf.** The discovery document `opensheaf.json` lists each object
+with its head and the digest of its inventory. The specification calls it "a
+map, not a witness" (section 6.1): it is checked against the storage root,
+but nobody answers for it. Each version is protected by its pin; what is not
+protected is which version is the latest. A copy of an archive kept
+elsewhere, or an attacker on the way, could serve an older map, hiding a newer
+version or a withdrawal.
+
+The archive's key could sign each new `opensheaf.json`, with a sequence
+number and a timestamp. A copy kept anywhere (a seed, a mirror, Software
+Heritage) would then prove that on a given date the archive declared these
+heads. An old map remains validly signed, so freshness needs the sequence
+number and the timestamp; and the signature needs archive keys, which issue
+#13 discusses.
+
+#### Announcements
+
+The inventory and refs announcements are what an index of many archives
+needs to hear: which archive holds which objects, and which heads changed. A
+feed of an archive, read by aggregators, plays that part; gossip is one way
+to carry it (section 5 of the [positioning
+paper](positioning.md#5-federated-and-distributed-systems)).
+
+#### Seeding policies for custodians
+
+**In Radicle.** Each node has a seeding policy: a default, keep everything
+(`allow`) or nothing (`block`), and exceptions per repository. A public seed
+node keeps everything it hears of; a selective one keeps what its operator
+lists.
+
+**In OpenSheaf.** Today a mirror is decided object by object (`mirrorOf`).
+Custodians (issues #13 and #39) would be institutions that keep copies of
+others' work. A custodian could publish its policy in its discovery document,
+as standing rules:
+
+- keep every object of an owner;
+- keep every member of a collection, including those added later;
+- keep every revision a selection vets;
+- always within what the licences allow (section 10.4).
+
+Readers and authors would then know what is promised: an author could see
+which institutions will keep their work. And custody could be automatic:
+when a journal's selection adds a paper, every custodian that follows the
+selection mirrors it. This would be a new field; nothing like it is in the
+specification.
+
+#### Comments merged by many authors
+
+**In Radicle.** An issue is a graph of small signed changes by different
+people: open, comment, reply, edit, close. Each change names the changes it
+follows, by their digests. Every node unites the graphs it receives and
+computes the same state in a fixed order, so no server decides what the
+discussion is, and any copy can be merged with any other.
+
+**In OpenSheaf.** An object has one writer, but the discussion of a paper (an
+objection, the author's reply, a correction, a referee's remark) has many.
+Making each comment an object of its own is heavy. A discussion modelled on
+Radicle's issues would be one object, separate from the paper, as the format
+requires (a document never holds the statements about it), made of small
+entries: each signed by its author, naming the document version it discusses
+and the entries it answers, and fixed by its digest. Anyone may keep a copy;
+copies merge by union. This keeps an objection, its correction and the reply
+connected, as the [essay that motivated
+OpenSheaf](https://mgubi.org/docs/zettels/a-living-scientific-record.html)
+asks.
+
+The costs: anyone can add entries, so each keeper chooses which to accept,
+as a seed chooses what to keep; authors need keys to sign; and nothing is
+deleted, only answered or retracted by a later entry. Such discussions are
+companion documents in the sense of issue #28, or an extension.
 
 And one warning. Radicle's privacy rested on replicating only to allowed
 nodes, and failed with its transport. Private archives (issue #29) should not
@@ -326,8 +428,8 @@ years.
 OpenSheaf should not be built on Radicle (section 4.2). An archive kept in git
 may be published on Radicle as one more copy (section 4.1). The designs of
 section 4.3 deserve to be weighed in the discussions they touch: delegates
-and thresholds in PR #30, signed discovery documents and custodians in issue
-#13, announcements for indexes in issue #20, encryption for private archives
+and thresholds in issue #53, signed discovery documents and custodians in
+issue #13, announcements for indexes in issue #20, encryption for private archives
 in issue #29.
 
 ## 6. Experiments
@@ -359,7 +461,7 @@ in issue #29.
 - Should the deployment note recommend Radicle, or only mention it, as one
   way to keep copies of an archive in git?
 - Is a quorum of keys the right model for co-authors in PR #30, or should a
-  line keep one writer and co-authors keep lines of their own?
+  line keep one writer and co-authors keep lines of their own? (Issue #53.)
 - Should an archive sign its discovery document, making it a witness of the
   map of the archive?
 
