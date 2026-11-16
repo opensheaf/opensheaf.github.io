@@ -146,7 +146,9 @@ only what its two standards leave open:
   canonical forms. The **originator** (in the genesis record) owns the first
   line, the only one with no parent.
 - **Line** (6.5): (owner, name), one writer, one archive identifier and one
-  object identifier in all its copies. Copies agree when their version
+  object identifier in all its copies. An archive with several depositors
+  binds each named owner URI of its lines to depositors it has checked
+  (not keyed lines, not mirrors). Copies agree when their version
   inventories are byte-identical; otherwise it is a **fork**.
 - **Branches** (10.5): lines of other owners with the same genesis record,
   declaring `parent`. **Deep**: copies the earlier versions and continues
