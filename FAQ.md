@@ -120,8 +120,7 @@ erratum, as text or as a file): notices are later statements about a version,
 kept with the object and shown with that version, and they never change the
 version itself.
 
-## How do collections work across archives? What if another archive
-disappears?
+## How do collections work across archives? What if another archive disappears?
 
 A collection lists its members by archive identifier, address, object
 identifier, version and the SHA-512 digest of that version's inventory (the
@@ -183,8 +182,7 @@ selection vetted into the selection's own archive, where later changes are
 the curator's acts (for a journal). The licence of a collection (CC0 for the
 list) never extends to its members.
 
-## Can documents be linked in richer ways (a short account and its full
-proof)?
+## Can documents be linked in richer ways (a short account and its full proof)?
 
 Yes, on top of the format rather than in it. The core keeps only what every
 archive needs to keep, cite, compose and verify documents. Other relations

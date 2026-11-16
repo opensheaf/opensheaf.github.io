@@ -57,9 +57,7 @@
 
   Deposit a corrected version, with a change note saying what changed. To warn readers of the earlier version, add a notice about it (for instance an erratum, as text or as a file): notices are later statements about a version, kept with the object and shown with that version, and they never change the version itself.
 
-  <section*|How do collections work across archives? What if another archive><label|how-do-collections-work-across-archives-what-if-another-archive>
-
-  disappears?
+  <section*|How do collections work across archives? What if another archive disappears?><label|how-do-collections-work-across-archives-what-if-another-archive-disappears>
 
   A collection lists its members by archive identifier, address, object identifier, version and the SHA-512 digest of that version's inventory (the "pin"). Since an inventory fixes all its files, the pin fixes the member completely, and a collection becomes a hash tree over everything it contains. If the member's archive moves or disappears, the member can be fetched from a mirror, from its DOI deposit or from a Software Heritage snapshot: any copy that matches the pin is the right one. A collection also keeps a cached citation of each member, so that it stays readable even if no copy is found.
 
@@ -79,9 +77,7 @@
 
   Yes. A reference (a pin) copies nothing and needs no permission. There are two ways to keep a copy, both allowed only if the licence of what is copied permits redistribution (or the authors agree): a <strong|mirror> copies the whole object, every version, and stays the original archive's object (for an institution or a storage site); an <strong|accepted copy> takes the one revision a selection vetted into the selection's own archive, where later changes are the curator's acts (for a journal). The licence of a collection (CC0 for the list) never extends to its members.
 
-  <section*|Can documents be linked in richer ways (a short account and its full><label|can-documents-be-linked-in-richer-ways-a-short-account-and-its-full>
-
-  proof)?
+  <section*|Can documents be linked in richer ways (a short account and its full proof)?><label|can-documents-be-linked-in-richer-ways-a-short-account-and-its-full-proof>
 
   Yes, on top of the format rather than in it. The core keeps only what every archive needs to keep, cite, compose and verify documents. Other relations are built from it: by links inside the documents and DataCite relations, which need nothing more, or by <strong|extensions> (section 4 of the specification), published separately, whose data an object version records in its <verbatim|object.json>, so that tools that know them can follow the relation when they copy, verify or present documents. Extensions never change the core: an archive is read and verified without them. The <hlink|use cases|use-cases.tm> show a journal publishing a short account of a proof whose detailed argument, possibly written with AI, stays online in the version reviewed.
 
