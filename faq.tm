@@ -59,9 +59,7 @@
 
   Deposit a corrected version, with a change note saying what changed. To warn readers of the earlier version, add a notice about it (for instance an erratum, as text or as a file): notices are later statements about a version, kept with the object and shown with that version, and they never change the version itself.
 
-  <section*|How do collections work across archives? What if another archive><label|how-do-collections-work-across-archives-what-if-another-archive>
-
-  disappears?
+  <section*|How do collections work across archives? What if another archive disappears?><label|how-do-collections-work-across-archives-what-if-another-archive-disappears>
 
   A collection lists its members by archive identifier, address, object identifier, version and the SHA-512 digest of that version's inventory (the "pin"). Since an inventory fixes all its files, the pin fixes the member completely, and a collection becomes a hash tree over everything it contains. If the member's archive moves or disappears, the member can be fetched from a mirror, from its DOI deposit or from a Software Heritage snapshot: any copy that matches the pin is the right one. A collection also keeps a cached citation of each member, so that it stays readable even if no copy is found.
 

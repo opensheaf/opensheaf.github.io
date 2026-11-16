@@ -125,8 +125,7 @@ erratum, as text or as a file): notices are later statements about a version,
 kept with the object and shown with that version, and they never change the
 version itself.
 
-## How do collections work across archives? What if another archive
-disappears?
+## How do collections work across archives? What if another archive disappears?
 
 A collection lists its members by archive identifier, address, object
 identifier, version and the SHA-512 digest of that version's inventory (the
