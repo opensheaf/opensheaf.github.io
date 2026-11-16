@@ -53,6 +53,27 @@ the key. A node may announce an alias, which is neither unique nor checked. A
 lost or compromised key means a new identity; there is no rotation, and
 several devices for one person are listed as future work.
 
+The key is made by `rad auth`, which asks for a passphrase and stores the
+pair in the OpenSSH format under `~/.radicle/keys/` (`radicle`, the secret
+key encrypted with the passphrase, and `radicle.pub`); the alias goes in the
+configuration file. For daily use the key is loaded into `ssh-agent`, through
+which Radicle signs everything (signed references, changes of collaborative
+objects, announcements), or the passphrase is given in the environment
+variable `RAD_PASSPHRASE` (source: `commands/auth.rs`, `ssh/keystore.rs`,
+`profile.rs` of Heartwood, section 2.9).
+
+Other nodes learn of a node from its signed node announcements, and keep its
+addresses and alias. A connection was meant to be authenticated by the key
+(section 2.6), which the disclosure of September 2026 found broken (section
+2.7). Nothing ties a key to a person: no name, ORCID iD or e-mail address is
+attached, and readers trust a key they got from a source they trust. A person
+with several machines either copies the secret key between them, or appears
+as several identities. These are the open questions of keyed owners in PR
+#30: rotation and several keys (issues #13 and #20), and tying a key to a
+person (issue [#41](https://github.com/opensheaf/opensheaf.github.io/issues/41)).
+Radicle shows that an identity made of a key alone works in daily use, with
+`ssh-agent` doing the signing; it does not yet answer those questions.
+
 ### 2.2 Repositories and their identity
 
 A repository is named by a **Repository ID** (RID), `rad:z3gqcJ...`: the git
