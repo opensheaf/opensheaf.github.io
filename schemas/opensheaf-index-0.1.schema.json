@@ -141,14 +141,28 @@
                 "items": {
                   "required": [
                     "name",
-                    "originator",
-                    "owner",
                     "ownerId",
                     "objectId",
-                    "status",
-                    "genesis",
-                    "sealed"
-                  ]
+                    "status"
+                  ],
+                  "if": {
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "active",
+                          "withdrawn"
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "originator",
+                      "owner",
+                      "genesis",
+                      "sealed"
+                    ]
+                  }
                 }
               }
             }

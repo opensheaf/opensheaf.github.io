@@ -115,13 +115,16 @@ only what its two standards leave open:
   base32: 52 characters, `^[a-z2-7]{52}$`; the last character's 4 spare
   bits hold k, from 0 to 15 (0, the default, gives `a` or `q`).
 - **Clashes** (6.5): an archive keeps at most one object per line (owner,
-  name), and a line stays taken after a takedown. Sealing draws a new
+  name), and a line stays taken after a takedown (tombstones keep the name
+  and owner identifier). Sealing draws a new
   nonce if the line is taken, so an originator's line is named by
   algorithm 0; the originator never branches its own work (open). A
   branch takes `parent.name`, unless that line is taken in its archive or
   among its owner's confirmed lines elsewhere (unconfirmed ones never
-  cause a rename); if the taken line is the owner's own branch (made by
-  the owner) of the same parent line, the branch point is moved there;
+  cause a rename); if the taken line is the owner's own branch (signed,
+  or accepted by its keeping archive under that line's authority) of the
+  same parent line and the new branch point is later, the branch point is
+  moved there, in the archive that keeps it;
   otherwise the branch takes the smallest free algorithm number above the
   parent's (a number not above it fails verification; other unjustified
   renames are warnings), and is refused if none up to 15 is free. A mirror

@@ -254,6 +254,12 @@
       </li>
       <li>
         <p>
+          <dfn>Originator</dfn>: the owner named in the genesis record, whose
+          line is the origin of the name and has no parent (section 6.5).
+        </p>
+      </li>
+      <li>
+        <p>
           <dfn>Line</dfn>: the history of an object as decided by one owner,
           identified by the pair (owner, name); its object versions form a
           single sequence (section 6.5).
@@ -839,28 +845,31 @@
       <li>
         <p>
           a branch is named by <tt class="verbatim">parent.name</tt>, unless its line
-          (its owner, that name) is taken by another object, in its archive or
-          among the other lines of its owner that the tool knows elsewhere and
-          that are confirmed (section 6.6: reached through the archive named
-          by their <tt class="verbatim">archiveId</tt>, known independently, or signed
-          by a keyed owner); a line known only from indexes kept by others, or
-          otherwise unconfirmed, is reported and never causes a rename; if
-          that object is the owner's own branch (one the owner made: for a
-          keyed owner, its signatures hold; for a named owner, the owner
-          confirms it; any other object counts as another object) of the same
-          parent line and the new branch point is later in the parent line's
-          history than that branch's point, the owner moves its branch point
-          instead (section 10.5), in the archive that keeps that branch, and
-          this archive MAY then keep a mirror of it; a tool that cannot do so
+          (its owner, that name) is taken by another object, in its archive
+          (any object there, or a tombstone) or among the other lines of its
+          owner that the tool knows elsewhere and that are confirmed (section
+          6.6: reached through the archive named by their <tt class="verbatim">archiveId</tt>,
+          known independently, or signed by a keyed owner); a line known
+          elsewhere only from index entries, without a confirmed copy, is
+          reported and never causes a rename; if that object is the owner's
+          own branch (one the owner made: for a keyed owner, its signatures
+          hold; for a named owner, the archive that keeps it accepts the move
+          under the same authority it requires for any new version of that
+          line; any other object counts as another object; a mirror of the
+          owner's own branch counts as that branch) of the same parent line
+          and the new branch point is later in the parent line's history than
+          that branch's current branch point, the owner moves its branch point
+          instead (section 10.5), in the archive that keeps that branch, and a
+          mirror of it is then brought up to date; a tool that cannot do so
           renames the new branch as below; otherwise (another genesis record,
           a mirror, another parent line, an earlier or equal branch point) the
           branch is named by the smallest algorithm number greater than that
           of <tt class="verbatim">parent.name</tt> whose name, over the same genesis
           record, gives a line free in the archive and among the owner's known
-          lines; <tt class="verbatim">parent</tt> keeps the parent's name; if no number
-          up to 15 is free, the branch is refused. An accepted copy of another
-          selection is not renamed: owners differ between selections (section
-          10.5);
+          confirmed lines; <tt class="verbatim">parent</tt> keeps the parent's name; if
+          no number up to 15 is free, the branch is refused. An accepted copy
+          of another selection is not renamed: owners differ between
+          selections (section 10.5);
         </p>
       </li>
       <li>
@@ -870,8 +879,10 @@
       </li>
       <li>
         <p>
-          a line stays taken after a takedown (section 11.3), like the object
-          identifier, so that a removed line and a new one never share a URI.
+          a line stays taken after a takedown (section 11.3: the tombstone
+          keeps the name and the owner identifier), like the object
+          identifier, so that a removed line and a new one never share a URI
+          in that archive.
         </p>
       </li>
     </ul>
@@ -1159,15 +1170,16 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           <strong>Equality.</strong> The canonical form of a <tt class="verbatim">sheaf:</tt>
-          URI has complete parts, lowercase where the case is folded, no owner
-          part when the owner is the originator (read from the genesis record,
-          which any copy carries and the name certifies, section 6.5, so that
-          deciding equality may need one copy of <tt class="verbatim">genesis.json</tt>),
-          and no <tt class="verbatim">at</tt> and no unknown parameters. Two URIs name
-          the same thing when their canonical forms are equal, byte for byte,
-          and files that record a <tt class="verbatim">sheaf:</tt> URI (for instance
-          among the relations of <tt class="verbatim">datacite.json</tt>) record its
-          canonical form.
+          URI has complete parts, lowercase where the case is folded, for <tt
+          class="verbatim">:*</tt>, the name made by algorithm 0, since all the names of
+          a genesis record name the same work; no owner part when the owner is
+          the originator (read from the genesis record, which any copy carries
+          and the name certifies, section 6.5, so that deciding equality may
+          need one copy of <tt class="verbatim">genesis.json</tt>), and no <tt class="verbatim">at</tt>
+          and no unknown parameters. Two URIs name the same thing when their
+          canonical forms are equal, byte for byte, and files that record a
+          <tt class="verbatim">sheaf:</tt> URI (for instance among the relations of <tt
+          class="verbatim">datacite.json</tt>) record its canonical form.
         </p>
       </li>
     </ul>
@@ -1359,10 +1371,14 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       class="verbatim">names/</tt> and <tt class="verbatim">sha512/</tt> with <tt class="verbatim">status</tt>
       (<tt class="verbatim">active</tt> or <tt class="verbatim">withdrawn</tt>); a tombstoned
       object keeps its entries with <tt class="verbatim">status</tt> <tt class="verbatim">removed</tt>,
-      so that a resolver can report it as section 11.3 asks. A file with no
-      entries is omitted, so that, where the indexes are declared, a missing
-      file means no entry. A resolver looks up a URI in <tt class="verbatim">names/</tt>
-      at the archives and indexes it knows, starting from <tt class="verbatim">at</tt>,
+      so that a resolver can report it as section 11.3 asks; a removed entry
+      of <tt class="verbatim">names/</tt> keeps <tt class="verbatim">name</tt>, <tt class="verbatim">ownerId</tt>
+      and <tt class="verbatim">objectId</tt>, and MAY drop <tt class="verbatim">owner</tt>, <tt
+      class="verbatim">originator</tt>, <tt class="verbatim">genesis</tt> and <tt class="verbatim">sealed</tt>,
+      so that a takedown can erase them (section 16). A file with no entries
+      is omitted, so that, where the indexes are declared, a missing file
+      means no entry. A resolver looks up a URI in <tt class="verbatim">names/</tt> at
+      the archives and indexes it knows, starting from <tt class="verbatim">at</tt>,
       keeping the entries whose <tt class="verbatim">ownerId</tt> matches the owner
       part, or, without an owner part, those whose <tt class="verbatim">owner</tt> is
       their <tt class="verbatim">originator</tt>, or, for <tt class="verbatim">:*</tt>, every
@@ -1521,11 +1537,13 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       versions 1, 3 and 4 are available on arXiv has document versions 1, 2
       and 3. A branch (section 10.5) starts from the document version of its
       first branch point (for a deep branch, its first own version keeps that
-      number when it adds no files of the document's own, and takes the next
-      one otherwise), and continues without gaps from it (provisionally:
-      option (a) of the open question of section 10.5); an object version that
-      moves the branch point is the branch's next document version, and <tt
-      class="verbatim">parent</tt> keeps the parent's own number.
+      number when it adds no files of the document's own, and otherwise takes
+      the number after the highest document version held by the versions it
+      copies, placed after the branch point in <tt class="verbatim">history</tt>), and
+      continues without gaps from it (provisionally: option (a) of the open
+      question of section 10.5); an object version that moves the branch point
+      is the branch's next document version, and <tt class="verbatim">parent</tt> keeps
+      the parent's own number.
     </p>
     <p>
       <strong>Identity versions.</strong> An object version that seals an
@@ -2416,10 +2434,13 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <tt class="verbatim">inventorySha512</tt> of that version, <tt class="verbatim">date</tt>
       and <tt class="verbatim">reason</tt> (plain text, since the discovery document has
       no content files), and, for an object with a genesis record, its <tt
-      class="verbatim">name</tt> and <tt class="verbatim">owner</tt> (section 6.5). Identifiers of
-      tombstoned objects MUST NOT be reused. Verifiers report a pin to a
-      tombstoned object as &quot;removed&quot;, not as a corruption. External
-      copies (DOI records, snapshots) follow the rules of their services.
+      class="verbatim">name</tt> and <tt class="verbatim">ownerId</tt> (section 6.6), which it
+      MUST record, so that its line stays taken (section 6.5); it MAY also
+      record <tt class="verbatim">owner</tt>, unless the takedown erases it (section
+      16). Identifiers of tombstoned objects MUST NOT be reused. Verifiers
+      report a pin to a tombstoned object as &quot;removed&quot;, not as a
+      corruption. External copies (DOI records, snapshots) follow the rules of
+      their services.
     </p>
     <p>
       Note: OCFL 1.1 has no way to remove files from an object short of
@@ -2666,13 +2687,14 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           renditions and change note, except that a version with <tt class="verbatim">sourcesMissing</tt>
           may be completed by adding files (section 7.3); new numbers follow
           the rule of new versions, without gaps (for a branch, from the
-          document version of its first branch point, a version that moves the
-          branch point taking the next number); <tt class="verbatim">history</tt>, when
-          present, lists distinct document versions, covers all of them, each
-          entry being the last object version holding its document version; no
-          object version after the first one with <tt class="verbatim">history</tt>
-          lacks it; every notice is kept unchanged in every later object
-          version;
+          document version of its first branch point, or for a deep branch's
+          first own version that adds files, from the highest copied document
+          version; a version that moves the branch point taking the next
+          number); <tt class="verbatim">history</tt>, when present, lists distinct
+          document versions, covers all of them, each entry being the last
+          object version holding its document version; no object version after
+          the first one with <tt class="verbatim">history</tt> lacks it; every notice is
+          kept unchanged in every later object version;
         </p>
       </li>
       <li>
@@ -2720,16 +2742,17 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           and <tt class="verbatim">objectId</tt> do not change from the first version of
           the line, that no two objects of the archive (mirrors included), nor
           an object and a tombstone, have the same <tt class="verbatim">name</tt> and
-          <tt class="verbatim">owner</tt> at their heads, that objects with the same
-          genesis record have the same <tt class="verbatim">sealed</tt>, that a line
-          without <tt class="verbatim">parent</tt> is named by algorithm 0 and its <tt
-          class="verbatim">sealed</tt> names its own sealing version, that no two owners
-          at the heads of the archive have the same owner identifier, that
-          owners are written in the forms of section 6.5, that the discovery
-          document lists the head's <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>,
-          that a line whose owner is not the originator declares a parent and
-          that the originator's line declares none, and, for a keyed owner,
-          the signature of every object version of the line;
+          owner (owner identifier, for a tombstone) at their heads, that
+          objects with the same genesis record have the same <tt class="verbatim">sealed</tt>,
+          that a line without <tt class="verbatim">parent</tt> is named by algorithm 0
+          and its <tt class="verbatim">sealed</tt> names its own sealing version, that
+          no two owners at the heads of the archive have the same owner
+          identifier, that owners are written in the forms of section 6.5,
+          that the discovery document lists the head's <tt class="verbatim">name</tt>
+          and <tt class="verbatim">owner</tt>, that a line whose owner is not the
+          originator declares a parent and that the originator's line declares
+          none, and, for a keyed owner, the signature of every object version
+          of the line;
         </p>
       </li>
       <li>
@@ -2754,9 +2777,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           it was renamed after a clash, that a renamed branch has an algorithm
           number greater than that of <tt class="verbatim">parent.name</tt> (a failure
           otherwise), and that its owner is not the originator; reporting as a
-          warning, not a failure, a rename that the objects now in the archive
-          do not justify, or a number that is not the smallest free one, since
-          the object that caused it may have been taken down or kept
+          warning, not a failure, a rename that neither the objects nor the
+          tombstones of the archive justify, or a number that is not the
+          smallest free one, since the line that caused it may be kept
           elsewhere; that <tt class="verbatim">sealed</tt> equals the parent's, and that
           the parent's owner is the <tt class="verbatim">originator</tt> of the genesis
           record or the parent version's <tt class="verbatim">object.json</tt> (<tt
@@ -2874,14 +2897,21 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       <li>
         <p>
           <strong>First deposit wins (proposal).</strong> An archive refuses a
-          mirror whose line is taken, and an object whose genesis record it
-          holds with another <tt class="verbatim">sealed</tt> (section 6.5), so a forged
-          copy deposited first gets the genuine one refused; a branch whose
-          line is taken is renamed instead, and is moved onto an existing
-          object only if the owner made that object (signed, or confirmed by
-          the owner), so that a forged branch is never continued as the
-          owner's line. A tool renames only for lines that are confirmed, so
-          forged index entries cannot force renames. Archives that accept
+          mirror whose line is taken, an object sealed outside it whose line
+          is taken when it is deposited, an object whose genesis record it
+          holds with another <tt class="verbatim">sealed</tt>, and an owner whose
+          identifier is another owner's (section 6.5), so a forged copy
+          deposited first gets the genuine one refused. A branch whose line is
+          taken is renamed instead: for any object or tombstone in its
+          archive, confirmed or not, and for the owner's confirmed lines
+          elsewhere, never for index entries alone, so forged index entries
+          cannot force renames. A branch point is moved onto an existing
+          branch only under the conditions of section 6.5 (the owner's own
+          branch of the same parent line, a later branch point, in the archive
+          that keeps it), so that a forged branch is never continued as the
+          owner's line; for a named owner, an archive with many depositors
+          MUST bind each line to whoever may add versions to it, so that no
+          depositor continues another's genuine line. Archives that accept
           objects of others (custodians, repositories with many depositors)
           SHOULD check that a copy is confirmed (section 6.6) before
           depositing it, and resolve a refusal by checking which copy is
@@ -2953,7 +2983,9 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           affiliations) and the depositor of each version. The depositor is
           recorded in the inventory (section 7.1). Agreement records are
           minimal (section 9). A request to erase personal data from an
-          immutable history is handled by a takedown (section 11.2).
+          immutable history is handled by a takedown (section 11.2); with the
+          proposal of section 6.5, the tombstone and the indexes then keep
+          only the name and the owner identifier, not the owner's URI.
         </p>
       </li>
       <li>
@@ -3293,6 +3325,23 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           the branch point's number only if it adds no files of its own; the
           handover example limited to lines the institution owns; section 15
           rewritten; wording.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 16 November 2026, proposal revised after a twelfth
+          review (branch <tt class="verbatim">proposal/identity</tt>):** a deep branch's
+          first own version that adds files takes the number after the highest
+          copied document version; a named owner's branch point is moved only
+          under the authority the keeping archive requires for new versions of
+          that line, and archives with many depositors bind each line to who
+          may add to it; renames for any object or tombstone in the archive
+          and for confirmed lines elsewhere; a mirror of the owner's branch
+          counts as that branch; tombstones and removed index entries keep the
+          name and the owner identifier, and may drop the owner's URI, so that
+          takedowns can erase it; the canonical form of <tt class="verbatim">:*</tt>
+          uses the algorithm-0 name; originator defined; section 15 aligned
+          with section 6.5.
         </p>
       </li>
     </ul>
