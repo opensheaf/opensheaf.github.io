@@ -283,6 +283,64 @@ The match breaks where OpenSheaf is about documents rather than code:
   without the software that made them (requirements 9 and 10 of the [git
   paper](git-as-implementation.md#2-what-opensheaf-needs)).
 
+### The identity of an archive
+
+A Radicle repository is the unit that is named, written by its delegates and
+replicated; in OpenSheaf that unit is the archive. Its identity is named in
+two ways, neither of which is Radicle's.
+
+**Today** (section 6.2 of the specification), an archive is named by an
+archive identifier, a URI that does not change when the archive moves. It
+SHOULD be a `tag:` URI (RFC 4151), built from a domain or e-mail address the
+owner controlled at the time, a date and a name, such as
+`tag:opensheaf.org,2026:mgubi`; a DOI or another persistent URI MAY be used
+instead. It is separate from the base URL, which may change, and is carried
+by the discovery document. Uniqueness is a rule ("Two different archives MUST
+NOT use the same archive identifier") that nothing checks: anyone can claim
+any `tag:`.
+
+**The proposal** of issue
+[#52](https://github.com/opensheaf/opensheaf.github.io/issues/52), which
+builds on PR #30 and is not agreed, names an archive as PR #30 names objects:
+
+- a **genesis record** written when the archive is created (originator,
+  date, a random nonce, kind `archive`), kept in the archive's root so that it
+  travels with every copy;
+- a **name** made by the same function as object names, the SHA-256 digest of
+  the seed `opensheaf-name-<k>` and the record, 52 characters of base32;
+- an **owner**, named (an archive identifier, an ORCID iD, a web address) or
+  keyed (`did:key:`): the archive is a line one level up, (owner, archive
+  name), with a single writer;
+- the **right to write** belongs to the owner, not to a site: moving an
+  archive is handing that right to another site holding the same files, and
+  for a keyed owner the right is checkable by signatures;
+- **holdings**: a site keeps one storage root per archive it holds, keyed by
+  the archive's name, at most one of them writable, so that copies of other
+  archives are kept apart and their identifiers never clash with its own.
+
+The name would replace `tag:` URIs and ARKs as archive identifiers, and
+settle in one direction the question of issue
+[#14](https://github.com/opensheaf/opensheaf.github.io/issues/14), how to
+write an archive, an object and a pinned version as one URI; in PR #30 the
+form is `sheaf:<name>[:<owner id>]...`.
+
+| | Radicle repository | OpenSheaf archive, today | OpenSheaf archive, issue #52 |
+|---|---|---|---|
+| name | SHA-1 of the first identity document | a `tag:` URI, chosen | SHA-256 of the genesis record |
+| uniqueness | no nonce: one owner describing two repositories alike gets one RID (section 2.9) | a rule, not checked | a random nonce; clashes handled (issue #44) |
+| who writes | delegates, with a threshold | the archive's keeper | one owner per line; several owners are issue #53 |
+| authority | keys only | asserted by whoever controls the domain | a named owner (asserted) or a keyed owner (signed) |
+| moving | any node holding the data serves it | a new base URL, the same identifier | any site holding the root; the write right moves with the owner |
+
+The step from `tag:` to the proposal is the step Radicle took: the name
+stops being a claim and becomes self-certifying, since anyone can check that
+a genesis record gives that name. In both, the digest fixes only *which*
+archive or repository is meant; *who answers for it* comes from the owner, or
+the delegates, and can be checked only when they have keys. Radicle has only
+keyed owners; the proposal keeps named owners as well, whose authority is
+asserted, so that an archive can start without keys and an institution can
+answer for it by its name.
+
 ## 4. Three ways to use Radicle
 
 ### 4.1 Radicle as a transport for archives in git
