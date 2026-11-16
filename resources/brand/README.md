@@ -54,4 +54,7 @@ This is a visual interpretation, rather than a literal mathematical diagram.
 
 The wordmark and its placement are preserved. SVG roots have explicit numeric
 width and height attributes for native image import. PNG and PDF copies of
-the complete logo are provided for TeXmacs and other document tools.
+the complete logo, and a PNG copy of the symbol (`opensheaf-symbol.png`,
+864 x 944, four times the SVG's size with a margin of 12 units, on the
+site's light grey `#eee`), are
+provided for TeXmacs and other document tools.
