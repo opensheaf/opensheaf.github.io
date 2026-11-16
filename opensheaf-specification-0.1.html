@@ -29,7 +29,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.1 (draft), 15 November 2026. OpenSheaf is a
+      Specification, version 0.1 (draft), 16 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). This version is experimental and
@@ -364,12 +364,27 @@
       <li>
         <p>
           <strong>A storage root</strong>, REQUIRED, conforming to OCFL 1.1,
-          at a URL given by the discovery document. It MUST use the storage
-          layout extension <tt class="verbatim">0002-flat-direct-storage-layout</tt>, so
-          that an object with identifier <tt class="verbatim">&lt;id&gt;</tt> is at <tt
-          class="verbatim">&lt;storage root URL&gt;&lt;id&gt;/</tt>. It MAY contain, as
-          loose files allowed by OCFL, a copy of the OCFL specification and of
-          this specification.
+          at a URL given by the discovery document. It MUST use one of two
+          storage layout extensions of OCFL, named in the storage root's <tt
+          class="verbatim">ocfl_layout.json</tt> and in the discovery document (section
+          6.1): <tt class="verbatim">0002-flat-direct-storage-layout</tt>, so that an
+          object with identifier <tt class="verbatim">&lt;id&gt;</tt> is at <tt class="verbatim">&lt;storage
+          root URL&gt;&lt;id&gt;/</tt>; or, for large archives, <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>
+          with its default parameters (<tt class="verbatim">digestAlgorithm</tt> <tt
+          class="verbatim">sha256</tt>, <tt class="verbatim">tupleSize</tt> 3, <tt class="verbatim">numberOfTuples</tt>
+          3; a configuration file, if present, MUST give these values), so
+          that the object is at <tt class="verbatim">&lt;storage root
+          URL&gt;&lt;t1&gt;/&lt;t2&gt;/&lt;t3&gt;/&lt;id&gt;/</tt>, where <tt
+          class="verbatim">&lt;t1&gt;</tt>, <tt class="verbatim">&lt;t2&gt;</tt> and <tt class="verbatim">&lt;t3&gt;</tt>
+          are the first three groups of three characters of the lowercase
+          hexadecimal SHA-256 digest of the identifier (as UTF-8). Since
+          object identifiers are short and use only safe characters (section
+          6.3), the folder of an object is named by its identifier in both.
+          Archives SHOULD use the flat-direct layout unless the number of
+          objects makes one folder impractical for their hosts (tens of
+          thousands of objects or more). It MAY contain, as loose files
+          allowed by OCFL, a copy of the OCFL specification and of this
+          specification.
         </p>
       </li>
       <li>
@@ -447,7 +462,10 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">storageLayout</tt>: <tt class="verbatim">&quot;0002-flat-direct-storage-layout&quot;</tt>;
+          <tt class="verbatim">storageLayout</tt>: the storage layout extension of the
+          storage root, <tt class="verbatim">&quot;0002-flat-direct-storage-layout&quot;</tt>
+          or <tt class="verbatim">&quot;0003-hash-and-id-n-tuple-storage-layout&quot;</tt>
+          (section 5);
         </p>
       </li>
       <li>
@@ -496,11 +514,12 @@
     <p>
       An object identifier MUST match <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>
       and MUST be at most 64 characters long. It is the OCFL <tt class="verbatim">id</tt>
-      of the object and the name of its folder in the storage root. It MUST be
-      unique in the archive and MUST NOT be reused, also after a takedown.
-      Since it is permanent and appears in every URL of the object, it SHOULD
-      be short (at most 32 characters), readable and chosen by the depositor,
-      and SHOULD NOT be derived mechanically from the title, which may change
+      of the object and the name of its folder in the storage root (under the
+      folders of the hash, in the hashed layout, section 5). It MUST be unique
+      in the archive and MUST NOT be reused, also after a takedown. Since it
+      is permanent and appears in every URL of the object, it SHOULD be short
+      (at most 32 characters), readable and chosen by the depositor, and
+      SHOULD NOT be derived mechanically from the title, which may change
       between versions while the identifier cannot; tools importing documents
       propose identifiers and the depositor decides. The kind of an object is
       given by its <tt class="verbatim">object.json</tt>, never by its identifier.
@@ -515,7 +534,11 @@
       <li>
         <p>
           reads the discovery document at the member's archive URL (section
-          10.2) and fetches <tt class="verbatim">&lt;storageRoot&gt;&lt;id&gt;/&lt;version&gt;/inventory.json</tt>;
+          10.2) and fetches <tt class="verbatim">&lt;storageRoot&gt;&lt;path&gt;/&lt;version&gt;/inventory.json</tt>,
+          where <tt class="verbatim">&lt;path&gt;</tt> is the path of the object given
+          by the <tt class="verbatim">storageLayout</tt> of the discovery document
+          (section 5): <tt class="verbatim">&lt;id&gt;</tt>, or <tt class="verbatim">&lt;t1&gt;/&lt;t2&gt;/&lt;t3&gt;/&lt;id&gt;</tt>
+          in the hashed layout;
         </p>
       </li>
       <li>
@@ -1457,7 +1480,10 @@
       <li>
         <p>
           validate the storage root and every object against OCFL 1.1 (with a
-          standard OCFL validator or equivalent checks);
+          standard OCFL validator or equivalent checks), and check that the
+          storage root uses the layout named by <tt class="verbatim">storageLayout</tt>,
+          with the parameters of section 5, and that every object is at the
+          path that layout gives;
         </p>
       </li>
       <li>
@@ -1664,6 +1690,16 @@
           <strong>0.1 (draft), 15 November 2026, revision:</strong> section 5
           points to the companion document OpenSheaf archives in git, in place
           of a deployment guide.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 16 November 2026, revision:</strong> a storage
+          root MAY use the hashed layout <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>,
+          with its default parameters, in place of the flat-direct layout, for
+          large archives (issue #19); <tt class="verbatim">storageLayout</tt> in the
+          discovery document names the layout; resolution (section 6.4) and
+          verification (section 14) follow it.
         </p>
       </li>
     </ul>
@@ -2110,9 +2146,19 @@
       </li>
       <li>
         <p>
-          <strong>Why the flat-direct layout.</strong> Paths stay readable and
-          resolvable by rule over plain HTTP; the cost is short identifiers
-          without <tt class="verbatim">/</tt>.
+          <strong>Why the flat-direct layout, and a hashed layout for large
+          archives.</strong> Paths stay readable and resolvable by rule over
+          plain HTTP; the cost is short identifiers without <tt class="verbatim">/</tt>.
+          One folder holding every object becomes impractical for some file
+          systems and hosts at very large sizes, so a large archive may spread
+          its objects over folders named by the hash of their identifiers (<tt
+          class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>), which keeps
+          the identifier as the name of the object's folder and the path
+          computable by rule (a browser computes SHA-256 natively); its
+          parameters are fixed so that every client computes the same paths.
+          The layout of Fedora (<tt class="verbatim">0004-hashed-n-tuple-storage-layout</tt>)
+          was not chosen, since it names the object's folder by the hash
+          alone.
         </p>
       </li>
       <li>

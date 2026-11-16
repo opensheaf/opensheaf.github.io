@@ -1,6 +1,6 @@
 # OpenSheaf: an open format for document archives and collections
 
-*Specification, version 0.1 (draft), 15 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.*
+*Specification, version 0.1 (draft), 16 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.*
 
 > [!WARNING]
 > **Draft.** This version is a draft. Until version 1.0, any revision may change the format in incompatible ways, and archives and collections made now may have to be rebuilt or migrated. Do not rely on it yet for anything you cannot redo. Changes are listed in the changelog (section 17) and discussed in the [issues](https://github.com/opensheaf/opensheaf.github.io/issues).
@@ -70,7 +70,7 @@ The JSON files defined here (`opensheaf.json`, `object.json`, `members.json`) MU
 An archive consists of:
 
 - **A discovery document**, `opensheaf.json`, at its base URL (section 6). It is REQUIRED.
-- **A storage root**, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST use the storage layout extension `0002-flat-direct-storage-layout`, so that an object with identifier `<id>` is at `<storage root URL><id>/`. It MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
+- **A storage root**, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST use one of two storage layout extensions of OCFL, named in the storage root's `ocfl_layout.json` and in the discovery document (section 6.1): `0002-flat-direct-storage-layout`, so that an object with identifier `<id>` is at `<storage root URL><id>/`; or, for large archives, `0003-hash-and-id-n-tuple-storage-layout` with its default parameters (`digestAlgorithm` `sha256`, `tupleSize` 3, `numberOfTuples` 3; a configuration file, if present, MUST give these values), so that the object is at `<storage root URL><t1>/<t2>/<t3>/<id>/`, where `<t1>`, `<t2>` and `<t3>` are the first three groups of three characters of the lowercase hexadecimal SHA-256 digest of the identifier (as UTF-8). Since object identifiers are short and use only safe characters (section 6.3), the folder of an object is named by its identifier in both. Archives SHOULD use the flat-direct layout unless the number of objects makes one folder impractical for their hosts (tens of thousands of objects or more). It MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
 - **Witnesses**, OPTIONAL: signatures and timestamp proofs of object versions, in each object's extension folder `extensions/opensheaf-witnesses/`, or under `witnesses/` next to the discovery document (section 13.2).
 - **Presentation files**, OPTIONAL, anywhere outside the storage root and `witnesses/` (appendix C).
 
@@ -91,7 +91,7 @@ The discovery document is the JSON file `opensheaf.json` at the base URL of the 
 - `archiveId`: the archive identifier (section 6.2);
 - `name`: a human-readable name;
 - `storageRoot`: the URL of the storage root, ending with `/` (relative URLs are allowed);
-- `storageLayout`: `"0002-flat-direct-storage-layout"`;
+- `storageLayout`: the storage layout extension of the storage root, `"0002-flat-direct-storage-layout"` or `"0003-hash-and-id-n-tuple-storage-layout"` (section 5);
 - `objects`: the list of all objects in the storage root, each with `id`, `kind`, `head` (the head object version), `inventorySha512` (the SHA-512 digest of the head inventory, as written in its checksum file) and `status` (`active` or `withdrawn`, section 11); a mirror (section 10.4) also has `mirrorOf`, the archive identifier of the archive whose object it copies.
 
 It MUST also contain `profiles`, the list of profiles followed, from `zenodo`, `texmacs`, `website` (an empty list if none). It SHOULD contain `mainCollection` (the identifier of the collection that lists the archive's own documents), `contact` (a URI) and, if its objects use extensions, `extensions` (their names, section 4). It MAY contain `mirrors` (base URLs of complete copies of the archive), `tombstones` (section 11.3), `keys` (section 13.2) and `feed` (the URL of an Atom feed of new object versions).
@@ -104,13 +104,13 @@ An archive identifier is a URI that does not change when the archive moves. It S
 
 ### 6.3 Object identifiers
 
-An object identifier MUST match `^[a-z0-9]+(-[a-z0-9]+)*$` and MUST be at most 64 characters long. It is the OCFL `id` of the object and the name of its folder in the storage root. It MUST be unique in the archive and MUST NOT be reused, also after a takedown. Since it is permanent and appears in every URL of the object, it SHOULD be short (at most 32 characters), readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title, which may change between versions while the identifier cannot; tools importing documents propose identifiers and the depositor decides. The kind of an object is given by its `object.json`, never by its identifier. Outside the archive, an object is named by the pair (archive identifier, object identifier).
+An object identifier MUST match `^[a-z0-9]+(-[a-z0-9]+)*$` and MUST be at most 64 characters long. It is the OCFL `id` of the object and the name of its folder in the storage root (under the folders of the hash, in the hashed layout, section 5). It MUST be unique in the archive and MUST NOT be reused, also after a takedown. Since it is permanent and appears in every URL of the object, it SHOULD be short (at most 32 characters), readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title, which may change between versions while the identifier cannot; tools importing documents propose identifiers and the depositor decides. The kind of an object is given by its `object.json`, never by its identifier. Outside the archive, an object is named by the pair (archive identifier, object identifier).
 
 ### 6.4 Resolution
 
 To fetch an object version of a member, a client:
 
-- reads the discovery document at the member's archive URL (section 10.2) and fetches `<storageRoot><id>/<version>/inventory.json`;
+- reads the discovery document at the member's archive URL (section 10.2) and fetches `<storageRoot><path>/<version>/inventory.json`, where `<path>` is the path of the object given by the `storageLayout` of the discovery document (section 5): `<id>`, or `<t1>/<t2>/<t3>/<id>` in the hashed layout;
 - if this fails, tries the mirrors listed in the member, then those listed in the archive's discovery document;
 - if this fails, MAY use external copies: the files of an external record named in the version's `object.json` (a DOI record), or a software archive snapshot (a SWHID).
 
@@ -346,7 +346,7 @@ External deposits (appendix A) and software archive snapshots are further witnes
 A verifier checking an archive MUST:
 
 - validate the discovery document, and every `object.json` and `members.json`, against the schemas of their declared versions, checking formats (dates, URIs) as assertions, which JSON Schema 2020-12 leaves optional;
-- validate the storage root and every object against OCFL 1.1 (with a standard OCFL validator or equivalent checks);
+- validate the storage root and every object against OCFL 1.1 (with a standard OCFL validator or equivalent checks), and check that the storage root uses the layout named by `storageLayout`, with the parameters of section 5, and that every object is at the path that layout gives;
 - check that the discovery document lists the objects of the storage root with their kinds, head versions, inventory digests and status as their head versions state them, and that no listed object has the identifier of a tombstone; a verifier reading the archive over HTTP cannot list folders, so it checks the listed objects and reports that completeness was not checked, while a verifier with access to the files also checks that no object is missing;
 - check the requirements of sections 7 to 11 on every object version, including that `datacite.json` and `object.json` agree on the document version and on the date of a withdrawal, and that `Available`, for a version first made public by the archive, is the date of its deposit (section 7.1);
 - check the document versions of each document (section 7.3): object versions with the same document version have the same sources, renditions and change note, except that a version with `sourcesMissing` may be completed by adding files (section 7.3); new numbers follow the rule of new versions, without gaps; `history`, when present, lists distinct document versions, covers all of them, each entry being the last object version holding its document version; no object version after the first one with `history` lacks it; every notice is kept unchanged in every later object version;
@@ -379,6 +379,7 @@ A verifier SHOULD check the witnesses it finds, the requirements of the profiles
 - **0.1 (draft), 14 November 2026, revision:** the impartial kind of collection is named catalogue (`type` `catalogue` in `members.json`), formerly archive collection, so that it is not confused with an archive.
 - **0.1 (draft), 14 November 2026, revision:** `Presentation` (slides) named among the values of `resourceTypeGeneral` (section 8).
 - **0.1 (draft), 15 November 2026, revision:** section 5 points to the companion document OpenSheaf archives in git, in place of a deployment guide.
+- **0.1 (draft), 16 November 2026, revision:** a storage root MAY use the hashed layout `0003-hash-and-id-n-tuple-storage-layout`, with its default parameters, in place of the flat-direct layout, for large archives (issue #19); `storageLayout` in the discovery document names the layout; resolution (section 6.4) and verification (section 14) follow it.
 
 ## Appendix A. Zenodo binding (normative for archives declaring the profile `zenodo`)
 
@@ -588,7 +589,7 @@ The `object.json` of the journal's accepted copy of the first member's version 2
 ## Appendix F. Rationale (non-normative)
 
 - **Why OCFL.** It is a published, versioned specification for exactly this problem (versioned objects as plain files with digests), with independent validators, used by research libraries. OpenSheaf adds only discovery and collections.
-- **Why the flat-direct layout.** Paths stay readable and resolvable by rule over plain HTTP; the cost is short identifiers without `/`.
+- **Why the flat-direct layout, and a hashed layout for large archives.** Paths stay readable and resolvable by rule over plain HTTP; the cost is short identifiers without `/`. One folder holding every object becomes impractical for some file systems and hosts at very large sizes, so a large archive may spread its objects over folders named by the hash of their identifiers (`0003-hash-and-id-n-tuple-storage-layout`), which keeps the identifier as the name of the object's folder and the path computable by rule (a browser computes SHA-256 natively); its parameters are fixed so that every client computes the same paths. The layout of Fedora (`0004-hashed-n-tuple-storage-layout`) was not chosen, since it names the object's folder by the hash alone.
 - **Why a discovery document.** Static web servers cannot list folders; one small file makes an archive discoverable, and its statements are checked against the storage root.
 - **Why pins by inventory digest.** One digest fixes a whole object version, so collections become hash trees across archives, and any matching copy will do.
 - **Why catalogues and selections.** Keeping and vetting are different acts. An archive (an author's, an institution's, a storage site) keeps what its members deposit, every version, without judging them: following an object as it grows is its job. A selection (a journal, a digest, a review journal) vouches for particular revisions: a later version by the authors has not been vetted, so it cannot enter the selection by itself, and a change of what is vetted is an editorial act that the selection's own history records. Pinning whole objects in one case and revision sets in the other makes the difference explicit and checkable.

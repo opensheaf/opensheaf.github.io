@@ -30,7 +30,8 @@ only what its two standards leave open:
   it is custody and naming, and the single writer of its objects.
 - **Discovery document** `opensheaf.json` (6.1): a mutable map, never a
   witness: format, archive identifier, name, storage root, layout
-  (`0002-flat-direct-storage-layout`), `objects` (each with `id`, `kind`,
+  (`0002-flat-direct-storage-layout`, or `0003-hash-and-id-n-tuple-storage-layout`
+  for large archives, section 5), `objects` (each with `id`, `kind`,
   `head`, `inventorySha512`, `status`, and `mirrorOf` for mirrors),
   `profiles`; SHOULD `mainCollection`, `contact`, `extensions`; MAY
   `mirrors`, `tombstones`, `keys`, `feed`. Everything it says is checked

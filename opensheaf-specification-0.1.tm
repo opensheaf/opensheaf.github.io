@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf: an open format for document archives and collections>
 
-  <notes-abstract|Specification, version 0.1 (draft), 15 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.>
+  <notes-abstract|Specification, version 0.1 (draft), 16 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.>
 
   <os-alert|warning|Warning.|<strong|Draft.> This version is a draft. Until version 1.0, any revision may change the format in incompatible ways, and archives and collections made now may have to be rebuilt or migrated. Do not rely on it yet for anything you cannot redo. Changes are listed in the changelog (section 17) and discussed in the <hlink|issues|https://github.com/opensheaf/opensheaf.github.io/issues>.>
 
@@ -116,7 +116,7 @@
   <\itemize>
     <item><strong|A discovery document>, <verbatim|opensheaf.json>, at its base URL (section 6). It is REQUIRED.
 
-    <item><strong|A storage root>, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST use the storage layout extension <verbatim|0002-flat-direct-storage-layout>, so that an object with identifier <verbatim|\<less\>id\<gtr\>> is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>id\<gtr\>/>. It MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
+    <item><strong|A storage root>, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST use one of two storage layout extensions of OCFL, named in the storage root's <verbatim|ocfl_layout.json> and in the discovery document (section 6.1): <verbatim|0002-flat-direct-storage-layout>, so that an object with identifier <verbatim|\<less\>id\<gtr\>> is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>id\<gtr\>/>; or, for large archives, <verbatim|0003-hash-and-id-n-tuple-storage-layout> with its default parameters (<verbatim|digestAlgorithm> <verbatim|sha256>, <verbatim|tupleSize> 3, <verbatim|numberOfTuples> 3; a configuration file, if present, MUST give these values), so that the object is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>/>, where <verbatim|\<less\>t1\<gtr\>>, <verbatim|\<less\>t2\<gtr\>> and <verbatim|\<less\>t3\<gtr\>> are the first three groups of three characters of the lowercase hexadecimal SHA-256 digest of the identifier (as UTF-8). Since object identifiers are short and use only safe characters (section 6.3), the folder of an object is named by its identifier in both. Archives SHOULD use the flat-direct layout unless the number of objects makes one folder impractical for their hosts (tens of thousands of objects or more). It MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
 
     <item><strong|Witnesses>, OPTIONAL: signatures and timestamp proofs of object versions, in each object's extension folder <verbatim|extensions/opensheaf-witnesses/>, or under <verbatim|witnesses/> next to the discovery document (section 13.2).
 
@@ -146,7 +146,7 @@
 
     <item><verbatim|storageRoot>: the URL of the storage root, ending with <verbatim|/> (relative URLs are allowed);
 
-    <item><verbatim|storageLayout>: <verbatim|"0002-flat-direct-storage-layout">;
+    <item><verbatim|storageLayout>: the storage layout extension of the storage root, <verbatim|"0002-flat-direct-storage-layout"> or <verbatim|"0003-hash-and-id-n-tuple-storage-layout"> (section 5);
 
     <item><verbatim|objects>: the list of all objects in the storage root, each with <verbatim|id>, <verbatim|kind>, <verbatim|head> (the head object version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as written in its checksum file) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, section 11); a mirror (section 10.4) also has <verbatim|mirrorOf>, the archive identifier of the archive whose object it copies.
   </itemize>
@@ -161,14 +161,14 @@
 
   <subsection*|6.3 Object identifiers><label|63-object-identifiers>
 
-  An object identifier MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$> and MUST be at most 64 characters long. It is the OCFL <verbatim|id> of the object and the name of its folder in the storage root. It MUST be unique in the archive and MUST NOT be reused, also after a takedown. Since it is permanent and appears in every URL of the object, it SHOULD be short (at most 32 characters), readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title, which may change between versions while the identifier cannot; tools importing documents propose identifiers and the depositor decides. The kind of an object is given by its <verbatim|object.json>, never by its identifier. Outside the archive, an object is named by the pair (archive identifier, object identifier).
+  An object identifier MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$> and MUST be at most 64 characters long. It is the OCFL <verbatim|id> of the object and the name of its folder in the storage root (under the folders of the hash, in the hashed layout, section 5). It MUST be unique in the archive and MUST NOT be reused, also after a takedown. Since it is permanent and appears in every URL of the object, it SHOULD be short (at most 32 characters), readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title, which may change between versions while the identifier cannot; tools importing documents propose identifiers and the depositor decides. The kind of an object is given by its <verbatim|object.json>, never by its identifier. Outside the archive, an object is named by the pair (archive identifier, object identifier).
 
   <subsection*|6.4 Resolution><label|64-resolution>
 
   To fetch an object version of a member, a client:
 
   <\itemize>
-    <item>reads the discovery document at the member's archive URL (section 10.2) and fetches <verbatim|\<less\>storageRoot\<gtr\>\<less\>id\<gtr\>/\<less\>version\<gtr\>/inventory.json>;
+    <item>reads the discovery document at the member's archive URL (section 10.2) and fetches <verbatim|\<less\>storageRoot\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/inventory.json>, where <verbatim|\<less\>path\<gtr\>> is the path of the object given by the <verbatim|storageLayout> of the discovery document (section 5): <verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout;
 
     <item>if this fails, tries the mirrors listed in the member, then those listed in the archive's discovery document;
 
@@ -474,7 +474,7 @@
   <\itemize>
     <item>validate the discovery document, and every <verbatim|object.json> and <verbatim|members.json>, against the schemas of their declared versions, checking formats (dates, URIs) as assertions, which JSON Schema 2020-12 leaves optional;
 
-    <item>validate the storage root and every object against OCFL 1.1 (with a standard OCFL validator or equivalent checks);
+    <item>validate the storage root and every object against OCFL 1.1 (with a standard OCFL validator or equivalent checks), and check that the storage root uses the layout named by <verbatim|storageLayout>, with the parameters of section 5, and that every object is at the path that layout gives;
 
     <item>check that the discovery document lists the objects of the storage root with their kinds, head versions, inventory digests and status as their head versions state them, and that no listed object has the identifier of a tombstone; a verifier reading the archive over HTTP cannot list folders, so it checks the listed objects and reports that completeness was not checked, while a verifier with access to the files also checks that no object is missing;
 
@@ -531,6 +531,8 @@
     <item><strong|0.1 (draft), 14 November 2026, revision:> <verbatim|Presentation> (slides) named among the values of <verbatim|resourceTypeGeneral> (section 8).
 
     <item><strong|0.1 (draft), 15 November 2026, revision:> section 5 points to the companion document OpenSheaf archives in git, in place of a deployment guide.
+
+    <item><strong|0.1 (draft), 16 November 2026, revision:> a storage root MAY use the hashed layout <verbatim|0003-hash-and-id-n-tuple-storage-layout>, with its default parameters, in place of the flat-direct layout, for large archives (issue #19); <verbatim|storageLayout> in the discovery document names the layout; resolution (section 6.4) and verification (section 14) follow it.
   </itemize>
 
   <section*|Appendix A. Zenodo binding (normative for archives declaring the profile <verbatim|zenodo>)><label|appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo>
@@ -900,7 +902,7 @@
   <\itemize>
     <item><strong|Why OCFL.> It is a published, versioned specification for exactly this problem (versioned objects as plain files with digests), with independent validators, used by research libraries. OpenSheaf adds only discovery and collections.
 
-    <item><strong|Why the flat-direct layout.> Paths stay readable and resolvable by rule over plain HTTP; the cost is short identifiers without <verbatim|/>.
+    <item><strong|Why the flat-direct layout, and a hashed layout for large archives.> Paths stay readable and resolvable by rule over plain HTTP; the cost is short identifiers without <verbatim|/>. One folder holding every object becomes impractical for some file systems and hosts at very large sizes, so a large archive may spread its objects over folders named by the hash of their identifiers (<verbatim|0003-hash-and-id-n-tuple-storage-layout>), which keeps the identifier as the name of the object's folder and the path computable by rule (a browser computes SHA-256 natively); its parameters are fixed so that every client computes the same paths. The layout of Fedora (<verbatim|0004-hashed-n-tuple-storage-layout>) was not chosen, since it names the object's folder by the hash alone.
 
     <item><strong|Why a discovery document.> Static web servers cannot list folders; one small file makes an archive discoverable, and its statements are checked against the storage root.
 

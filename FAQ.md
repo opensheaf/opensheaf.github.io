@@ -82,9 +82,14 @@ root.
 
 The flat-direct storage layout puts each object in a folder named by its
 identifier, so paths stay readable and can be computed over plain HTTP; a
-folder name cannot contain `/`. The archive itself has a URI-like identifier
-(a `tag:` URI, for instance `tag:opensheaf.org,2026:mgubi`), and an object is
-named globally by the pair (archive identifier, object identifier).
+folder name cannot contain `/`. A very large archive may instead spread its
+objects over folders named by the hash of their identifiers (the layout
+`0003-hash-and-id-n-tuple-storage-layout`, for instance
+`ocfl/3c0/ff4/240/object-01/`); the last folder is still named by the
+identifier, and the path is still computed by rule. The archive itself has a
+URI-like identifier (a `tag:` URI, for instance
+`tag:opensheaf.org,2026:mgubi`), and an object is named globally by the pair
+(archive identifier, object identifier).
 
 ## What is the difference between a document version and an object version?
 

@@ -43,7 +43,7 @@
 
   <section*|Why are identifiers short names and not URIs?><label|why-are-identifiers-short-names-and-not-uris>
 
-  The flat-direct storage layout puts each object in a folder named by its identifier, so paths stay readable and can be computed over plain HTTP; a folder name cannot contain <verbatim|/>. The archive itself has a URI-like identifier (a <verbatim|tag:> URI, for instance <verbatim|tag:opensheaf.org,2026:mgubi>), and an object is named globally by the pair (archive identifier, object identifier).
+  The flat-direct storage layout puts each object in a folder named by its identifier, so paths stay readable and can be computed over plain HTTP; a folder name cannot contain <verbatim|/>. A very large archive may instead spread its objects over folders named by the hash of their identifiers (the layout <verbatim|0003-hash-and-id-n-tuple-storage-layout>, for instance <verbatim|ocfl/3c0/ff4/240/object-01/>); the last folder is still named by the identifier, and the path is still computed by rule. The archive itself has a URI-like identifier (a <verbatim|tag:> URI, for instance <verbatim|tag:opensheaf.org,2026:mgubi>), and an object is named globally by the pair (archive identifier, object identifier).
 
   <section*|What is the difference between a document version and an object version?><label|what-is-the-difference-between-a-document-version-and-an-object-version>
 

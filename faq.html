@@ -115,9 +115,14 @@
     <p>
       The flat-direct storage layout puts each object in a folder named by its
       identifier, so paths stay readable and can be computed over plain HTTP;
-      a folder name cannot contain <tt class="verbatim">/</tt>. The archive itself has a
-      URI-like identifier (a <tt class="verbatim">tag:</tt> URI, for instance <tt class="verbatim">tag:opensheaf.org,2026:mgubi</tt>),
-      and an object is named globally by the pair (archive identifier, object
+      a folder name cannot contain <tt class="verbatim">/</tt>. A very large archive may
+      instead spread its objects over folders named by the hash of their
+      identifiers (the layout <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>,
+      for instance <tt class="verbatim">ocfl/3c0/ff4/240/object-01/</tt>); the last
+      folder is still named by the identifier, and the path is still computed
+      by rule. The archive itself has a URI-like identifier (a <tt class="verbatim">tag:</tt>
+      URI, for instance <tt class="verbatim">tag:opensheaf.org,2026:mgubi</tt>), and an
+      object is named globally by the pair (archive identifier, object
       identifier).
     </p>
     <h2 id="auto-11"><a id="what-is-the-difference-between-a-document-version-and-an-object-version"></a>What is the difference between a document version and

@@ -228,8 +228,9 @@ Fedora writes its OCFL objects itself, and they are not OpenSheaf objects:
   n-tuple layout (extension 0004). An archival group, a set of resources, is
   one OCFL object; every other resource is an object of its own. OpenSheaf
   requires the flat-direct layout (extension 0002, section 5 of the
-  specification) and object identifiers matching `^[a-z0-9]+(-[a-z0-9]+)*$`
-  (section 6.3).
+  specification), or for large archives the hashed layout 0003, which keeps
+  the identifier as the name of the object's folder and object identifiers
+  matching `^[a-z0-9]+(-[a-z0-9]+)*$` (section 6.3).
 - **No adoption.** An OCFL object without Fedora's header files stops a
   rebuild of the indexes (or is skipped, if Fedora is so configured), and
   Fedora's import tools read Fedora exports, Fedora 3 repositories or
