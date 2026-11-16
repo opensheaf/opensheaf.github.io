@@ -260,7 +260,7 @@
   <strong|Open questions.>
 
   <\itemize>
-    <item>Registering the scheme <verbatim|sheaf> with IANA, as a provisional scheme (RFC 7595), since section 6.6 uses it in place of the <verbatim|tag:> or ARK form chosen in #14 (#36); whether the pair (archive identifier, object identifier) keeps a URI form of its own beside <verbatim|sheaf:> URIs; the form of archive identifiers (<verbatim|tag:> or ARK) (#14).
+    <item>Registering the scheme <verbatim|sheaf> with IANA, as a provisional scheme (RFC 7595), since section 6.6 uses it in place of the <verbatim|tag:> or ARK form chosen in #14 (#36); whether the pair (archive identifier, object identifier) keeps a URI form of its own beside <verbatim|sheaf:> URIs; the form of archive identifiers (<verbatim|tag:> or ARK) (#14), or names made as object names are, from a genesis record of the archive, with an owner (#52).
 
     <item>Who keeps indexes of many archives, so that an object can be found once its archive has gone, how resolvers find them, and whether the project runs a shared resolver of <verbatim|sheaf:> URIs, a gateway (section 6.6): at <verbatim|https://opensheaf.org/sheaf:...>, as written provisionally, or on a domain used only for resolution, such as <verbatim|https://sheaf.pub/>, without <verbatim|sheaf:> in the path (#13, #20, #35).
 
@@ -278,7 +278,7 @@
 
     <item>Whether a draft may be rewritten before it is sealed, against the rule that versions are fixed, and whether tools MUST seal only at the owner's request (#29).
 
-    <item>Holding and copying among custodians, which this proposal leaves to #39: copies kept apart from the storage root, <verbatim|mirrors> as locations, mirrors made by agreement, and statements of custodians.
+    <item>Holding and copying among custodians, which this proposal leaves to #39: copies kept apart from the storage root, <verbatim|mirrors> as locations, mirrors made by agreement, and statements of custodians; #52 proposes that a site keep one storage root per archive it holds, writing only to the one whose owner authorises it, which would remove the refusals of mirrors in section 10.4 and under Clashes above.
 
     <item>Takedowns: a branch keeps the parent version after the parent is taken down, and mirrors, indexes kept by others and gateways may go on serving a taken-down object (#33).
 
@@ -843,6 +843,8 @@
     <item><strong|0.1 (draft), 16 November 2026, revision:> a storage root MAY use the hashed layout <verbatim|0003-hash-and-id-n-tuple-storage-layout>, with its default parameters, in place of the flat-direct layout, for large archives (issue #19); <verbatim|ocfl_layout.json> is required and names the same layout as <verbatim|storageLayout> in the discovery document; archives should keep the flat-direct layout unless their size requires otherwise, and should not change their layout; resolution (section 6.4), mirrors (section 10.4), takedown (section 11.2, removing empty folders of the hash) and verification (section 14) follow it; sections 6.3 and appendix F updated.
 
     <item>**0.1 (draft), 16 November 2026, proposal aligned with the hashed layout (branch <verbatim|proposal/identity>):** the <verbatim|url> of a branch's <verbatim|parent> and the copies of a deep branch use the object's path in the layout; index entries are resolved through the layout of the archive they name; appendix F notes that a name used as identifier sits under the hash of that identifier; section 5 names <verbatim|parent.url> in place of the <verbatim|record> of an accepted copy; the git companion keeps the indexes (its sections 2, 4.1, 5.1 and 9) and calls its git branches working branches.
+
+    <item>**0.1 (draft), 16 November 2026, proposal (branch <verbatim|proposal/identity>):** open questions of section 6.5 point to #52 (one storage root per archive held, archives named from genesis records).
   </itemize>
 
   <section*|Appendix A. Zenodo binding (normative for archives declaring the profile <verbatim|zenodo>)><label|appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo>

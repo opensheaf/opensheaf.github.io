@@ -985,7 +985,9 @@
           the <tt class="verbatim">tag:</tt> or ARK form chosen in #14 (#36); whether
           the pair (archive identifier, object identifier) keeps a URI form of
           its own beside <tt class="verbatim">sheaf:</tt> URIs; the form of archive
-          identifiers (<tt class="verbatim">tag:</tt> or ARK) (#14).
+          identifiers (<tt class="verbatim">tag:</tt> or ARK) (#14), or names made as
+          object names are, from a genesis record of the archive, with an
+          owner (#52).
         </p>
       </li>
       <li>
@@ -1059,7 +1061,10 @@
           Holding and copying among custodians, which this proposal leaves to
           #39: copies kept apart from the storage root, <tt class="verbatim">mirrors</tt>
           as locations, mirrors made by agreement, and statements of
-          custodians.
+          custodians; #52 proposes that a site keep one storage root per
+          archive it holds, writing only to the one whose owner authorises it,
+          which would remove the refusals of mirrors in section 10.4 and under
+          Clashes above.
         </p>
       </li>
       <li>
@@ -3538,6 +3543,13 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           class="verbatim">record</tt> of an accepted copy; the git companion keeps the
           indexes (its sections 2, 4.1, 5.1 and 9) and calls its git branches
           working branches.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 16 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>):**
+          open questions of section 6.5 point to #52 (one storage root per
+          archive held, archives named from genesis records).
         </p>
       </li>
     </ul>
