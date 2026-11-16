@@ -364,27 +364,35 @@
       <li>
         <p>
           <strong>A storage root</strong>, REQUIRED, conforming to OCFL 1.1,
-          at a URL given by the discovery document. It MUST use one of two
-          storage layout extensions of OCFL, named in the storage root's <tt
-          class="verbatim">ocfl_layout.json</tt> and in the discovery document (section
-          6.1): <tt class="verbatim">0002-flat-direct-storage-layout</tt>, so that an
-          object with identifier <tt class="verbatim">&lt;id&gt;</tt> is at <tt class="verbatim">&lt;storage
-          root URL&gt;&lt;id&gt;/</tt>; or, for large archives, <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>
+          at a URL given by the discovery document. It MUST contain <tt class="verbatim">ocfl_layout.json</tt>,
+          whose <tt class="verbatim">extension</tt> MUST be the storage layout named by
+          <tt class="verbatim">storageLayout</tt> in the discovery document (section
+          6.1), one of two storage layout extensions of OCFL: <tt class="verbatim">0002-flat-direct-storage-layout</tt>,
+          so that an object with identifier <tt class="verbatim">&lt;id&gt;</tt> is at
+          <tt class="verbatim">&lt;storage root URL&gt;&lt;id&gt;/</tt>; or, for large
+          archives, <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>
           with its default parameters (<tt class="verbatim">digestAlgorithm</tt> <tt
           class="verbatim">sha256</tt>, <tt class="verbatim">tupleSize</tt> 3, <tt class="verbatim">numberOfTuples</tt>
-          3; a configuration file, if present, MUST give these values), so
-          that the object is at <tt class="verbatim">&lt;storage root
-          URL&gt;&lt;t1&gt;/&lt;t2&gt;/&lt;t3&gt;/&lt;id&gt;/</tt>, where <tt
-          class="verbatim">&lt;t1&gt;</tt>, <tt class="verbatim">&lt;t2&gt;</tt> and <tt class="verbatim">&lt;t3&gt;</tt>
-          are the first three groups of three characters of the lowercase
-          hexadecimal SHA-256 digest of the identifier (as UTF-8). Since
-          object identifiers are short and use only safe characters (section
-          6.3), the folder of an object is named by its identifier in both.
-          Archives SHOULD use the flat-direct layout unless the number of
-          objects makes one folder impractical for their hosts (tens of
-          thousands of objects or more). It MAY contain, as loose files
-          allowed by OCFL, a copy of the OCFL specification and of this
-          specification.
+          3; its configuration file <tt class="verbatim">extensions/0003-hash-and-id-n-tuple-storage-layout/config.json</tt>,
+          if present, MUST NOT set other values, and a parameter it omits
+          takes its default), so that the object is at <tt class="verbatim">&lt;storage
+          root URL&gt;&lt;t1&gt;/&lt;t2&gt;/&lt;t3&gt;/&lt;id&gt;/</tt>, where
+          <tt class="verbatim">&lt;t1&gt;</tt>, <tt class="verbatim">&lt;t2&gt;</tt> and <tt
+          class="verbatim">&lt;t3&gt;</tt> are the first three groups of three
+          characters of the lowercase hexadecimal SHA-256 digest of the
+          identifier (as UTF-8). Since object identifiers are short and use
+          only safe characters (section 6.3), the folder of an object is named
+          by its identifier in both. Archives SHOULD use the flat-direct
+          layout unless their size makes one folder holding every object
+          impractical (for instance from tens of thousands of objects, or
+          fewer in a git repository; appendix F). The layout is chosen when
+          the archive is created: changing it keeps every pin valid, since
+          clients compute paths from <tt class="verbatim">storageLayout</tt>, but moves
+          every object and so changes every URL into the storage root (the <tt
+          class="verbatim">record</tt> of an accepted copy, section 10.5, or a link in a
+          document), so archives SHOULD NOT change it. The storage root MAY
+          contain, as loose files allowed by OCFL, a copy of the OCFL
+          specification and of this specification.
         </p>
       </li>
       <li>
@@ -403,10 +411,11 @@
       </li>
     </ul>
     <p>
-      Because OCFL does not allow directories other than objects and
-      extensions inside a storage root, the storage root SHOULD be a dedicated
-      folder (by convention <tt class="verbatim">ocfl/</tt>), and presentation files
-      MUST NOT be placed inside it.
+      Because OCFL allows inside a storage root only the folders that hold
+      objects (the objects themselves and, in the hashed layout, the folders
+      of the hash above them) and extensions, the storage root SHOULD be a
+      dedicated folder (by convention <tt class="verbatim">ocfl/</tt>), and presentation
+      files MUST NOT be placed inside it.
     </p>
     <p>
       All files of the discovery document, the storage root and <tt class="verbatim">witnesses/</tt>
@@ -544,7 +553,8 @@
       <li>
         <p>
           if this fails, tries the mirrors listed in the member, then those
-          listed in the archive's discovery document;
+          listed in the archive's discovery document, each resolved through
+          its own discovery document and layout;
         </p>
       </li>
       <li>
@@ -1258,17 +1268,18 @@
       An archive MAY mirror an object of another archive: copy the whole
       object, every version with its inventories and files, byte for byte,
       into its own storage root, under the same identifier (only if no object
-      of its own has it). A mirror is the same object, not a new one: its <tt
-      class="verbatim">object.json</tt> files keep naming the original archive, and the
-      discovery document lists it with <tt class="verbatim">mirrorOf</tt>, the
-      identifier of the original archive (section 6.1). A mirror is brought up
-      to date only by copying the new versions of the original, which is
-      possible because OCFL objects only grow; it MUST NOT be changed
-      otherwise. Mirroring is allowed only if the licences of all the versions
-      copied allow redistribution. A catalogue MAY list a mirror of a member
-      in the member's <tt class="verbatim">mirrors</tt>. An archive that mirrors another
-      archive entirely SHOULD be listed in the <tt class="verbatim">mirrors</tt> of that
-      archive's discovery document, with the agreement of its owner.
+      of its own has it), at the path given by its own layout. A mirror is the
+      same object, not a new one: its <tt class="verbatim">object.json</tt> files keep
+      naming the original archive, and the discovery document lists it with
+      <tt class="verbatim">mirrorOf</tt>, the identifier of the original archive
+      (section 6.1). A mirror is brought up to date only by copying the new
+      versions of the original, which is possible because OCFL objects only
+      grow; it MUST NOT be changed otherwise. Mirroring is allowed only if the
+      licences of all the versions copied allow redistribution. A catalogue
+      MAY list a mirror of a member in the member's <tt class="verbatim">mirrors</tt>.
+      An archive that mirrors another archive entirely SHOULD be listed in the
+      <tt class="verbatim">mirrors</tt> of that archive's discovery document, with the
+      agreement of its owner.
     </p>
     <p>
       Mirrors serve preservation and access (an institution keeping copies of
@@ -1334,8 +1345,10 @@
     <h3 id="auto-29"><a id="112-takedown"></a>11.2 Takedown<span style="margin-left: 1em"></span></h3>
     <p>
       When content must be removed (by law, or for a breach of rights), the
-      object is deleted from the storage root and a tombstone MUST be added to
-      the discovery document.
+      object is deleted from the storage root, together with the folders of
+      the hash that the deletion leaves empty (in the hashed layout, section
+      5, since OCFL forbids empty folders in a storage root), and a tombstone
+      MUST be added to the discovery document.
     </p>
     <h3 id="auto-30"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
     <p>
@@ -1481,9 +1494,10 @@
         <p>
           validate the storage root and every object against OCFL 1.1 (with a
           standard OCFL validator or equivalent checks), and check that the
-          storage root uses the layout named by <tt class="verbatim">storageLayout</tt>,
-          with the parameters of section 5, and that every object is at the
-          path that layout gives;
+          storage root's <tt class="verbatim">ocfl_layout.json</tt> names the layout
+          given by <tt class="verbatim">storageLayout</tt>, that its configuration does
+          not change the parameters of section 5, and that every object is at
+          the path that layout gives;
         </p>
       </li>
       <li>
@@ -1697,9 +1711,14 @@
           <strong>0.1 (draft), 16 November 2026, revision:</strong> a storage
           root MAY use the hashed layout <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>,
           with its default parameters, in place of the flat-direct layout, for
-          large archives (issue #19); <tt class="verbatim">storageLayout</tt> in the
-          discovery document names the layout; resolution (section 6.4) and
-          verification (section 14) follow it.
+          large archives (issue #19); <tt class="verbatim">ocfl_layout.json</tt> is
+          required and names the same layout as <tt class="verbatim">storageLayout</tt>
+          in the discovery document; archives should keep the flat-direct
+          layout unless their size requires otherwise, and should not change
+          their layout; resolution (section 6.4), mirrors (section 10.4),
+          takedown (section 11.2, removing empty folders of the hash) and
+          verification (section 14) follow it; sections 6.3 and appendix F
+          updated.
         </p>
       </li>
     </ul>
@@ -2149,16 +2168,19 @@
           <strong>Why the flat-direct layout, and a hashed layout for large
           archives.</strong> Paths stay readable and resolvable by rule over
           plain HTTP; the cost is short identifiers without <tt class="verbatim">/</tt>.
-          One folder holding every object becomes impractical for some file
-          systems and hosts at very large sizes, so a large archive may spread
-          its objects over folders named by the hash of their identifiers (<tt
-          class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>), which keeps
-          the identifier as the name of the object's folder and the path
-          computable by rule (a browser computes SHA-256 natively); its
-          parameters are fixed so that every client computes the same paths.
-          The layout of Fedora (<tt class="verbatim">0004-hashed-n-tuple-storage-layout</tt>)
-          was not chosen, since it names the object's folder by the hash
-          alone.
+          One folder holding every object becomes impractical at large sizes,
+          mostly in git, where every deposit rewrites a tree listing every
+          object, and in the web views of forges, which show at most about a
+          thousand entries of a folder; object storage, which has no real
+          folders, gains nothing. So a large archive may spread its objects
+          over folders named by the hash of their identifiers (<tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>),
+          which keeps the identifier as the name of the object's folder and
+          the path computable by rule (a browser computes SHA-256 natively);
+          its parameters are fixed so that every client computes the same
+          paths, and the layout is chosen once, since changing it changes
+          every URL into the storage root (though no pin). The layout of
+          Fedora (<tt class="verbatim">0004-hashed-n-tuple-storage-layout</tt>) was not
+          chosen, since it names the object's folder by the hash alone.
         </p>
       </li>
       <li>

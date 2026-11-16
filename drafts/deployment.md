@@ -19,10 +19,12 @@ An archive is a folder of plain files: the discovery document
 website profile). Section 5 of the specification asks of whatever serves
 it:
 
-- **Fixed paths under one base URL.** Every file is reached by an
-  anonymous `GET` of `<base URL>/<path>`: `opensheaf.json`,
-  `ocfl/<object>/v1/inventory.json`, and so on. Links made of tokens or
-  identifiers, one per file, do not do.
+- **Fixed paths under one base URL.** Every file is reached by an anonymous
+  `GET` of `<base URL>/<path>`: `opensheaf.json`,
+  `ocfl/<object>/v1/inventory.json` (or
+  `ocfl/<t1>/<t2>/<t3>/<object>/v1/inventory.json` in the hashed layout of
+  large archives, section 5 of the specification), and so on. Links made of
+  tokens or identifiers, one per file, do not do.
 - **Bytes as stored.** The archive files MUST be served byte for byte: no
   conversion of line endings or character sets, no compression that
   changes the bytes after decoding (compression in transport, such as
@@ -214,7 +216,9 @@ Whatever the host, the files of a new object version are uploaded in an
 order that never shows a reader an archive that refers to files not yet
 there:
 
-1. the content files of the new version;
+1. the content files of the new version (for a new object in the hashed
+   layout, after the folders of the hash, where a host needs folders created,
+   such as WebDAV's `MKCOL`);
 2. its inventory and inventory checksum, inside the version folder;
 3. the object's root inventory and checksum (the copies of the latest
    inventory, at the root of the object);

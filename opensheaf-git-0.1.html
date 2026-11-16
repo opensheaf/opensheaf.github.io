@@ -28,7 +28,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 15
+      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 16
       November 2026. How to keep an OpenSheaf archive in a git repository,
       publish it from there and copy it, without git changing a byte of what
       the archive holds. It adds nothing to the format: readers of an archive
@@ -305,20 +305,24 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       Between C and C', the archive files MAY change only as follows:
     </p>
     <p>
-      1. a new object folder <tt class="verbatim">ocfl/&lt;id&gt;/</tt>, with the files
-      of a complete OCFL object (a new object, or the copy of an object of
-      another archive); 2. a new version folder <tt class="verbatim">ocfl/&lt;id&gt;/v&lt;N&gt;/</tt>,
-      where <tt class="verbatim">v&lt;N-1&gt;</tt> is the head of the object in C, with
-      the replacement of the object's root <tt class="verbatim">inventory.json</tt> and
-      its checksum file by those of the new version; 3. files added, replaced
-      or removed in an object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
-      folder, or under <tt class="verbatim">witnesses/</tt>; 4. the replacement of <tt
-      class="verbatim">opensheaf.json</tt>; 5. at the creation of the storage root, its
-      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
-      the configuration of the layout extension, and the loose files allowed
-      by section 5 of the specification); 6. the removal of an object folder,
-      by a takedown (section 9); 7. the repair of a file whose bytes do not
-      match the digest its inventory records (section 5.3).
+      1. a new object folder <tt class="verbatim">ocfl/&lt;path&gt;/</tt>, where <tt
+      class="verbatim">&lt;path&gt;</tt> is the object's path in the layout of the
+      storage root (<tt class="verbatim">&lt;id&gt;</tt>, or <tt class="verbatim">&lt;t1&gt;/&lt;t2&gt;/&lt;t3&gt;/&lt;id&gt;</tt>
+      in the hashed layout, section 5 of the specification), with the folders
+      of the hash it needs, and the files of a complete OCFL object (a new
+      object, or the copy of an object of another archive); 2. a new version
+      folder <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt>, where <tt class="verbatim">v&lt;N-1&gt;</tt>
+      is the head of the object in C, with the replacement of the object's
+      root <tt class="verbatim">inventory.json</tt> and its checksum file by those of
+      the new version; 3. files added, replaced or removed in an object's <tt
+      class="verbatim">extensions/opensheaf-witnesses/</tt> folder, or under <tt class="verbatim">witnesses/</tt>;
+      4. the replacement of <tt class="verbatim">opensheaf.json</tt>; 5. at the creation
+      of the storage root, its own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt
+      class="verbatim">ocfl_layout.json</tt>, the configuration of the layout extension,
+      and the loose files allowed by section 5 of the specification); 6. the
+      removal of an object folder, with the folders of the hash it leaves
+      empty, by a takedown (section 9); 7. the repair of a file whose bytes do
+      not match the digest its inventory records (section 5.3).
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -575,9 +579,14 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       Tools working on a large archive MAY use a partial clone (<tt class="verbatim">git
       clone &ndash;filter=blob:none</tt>) or a sparse checkout, since adding a
       version to an object needs only that object's folder and the discovery
-      document. (Archives of millions of objects, their storage layouts and
-      their indexes are discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a> and <a href="https://github.com/opensheaf/opensheaf.github.io/issues/32">issue
-      #32</a>.)
+      document. In git, the flat-direct layout reaches its limits first: every
+      deposit rewrites the tree of <tt class="verbatim">ocfl/</tt>, which lists every
+      object, and the web views of forges show at most about a thousand
+      entries of a folder. An archive expected to hold tens of thousands of
+      objects or more SHOULD therefore be created with the hashed layout
+      (section 5 of the specification), which spreads the objects over folders
+      of a few entries each. (Indexes for archives of millions of objects are
+      discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a>.)
     </p>
     <h2 id="auto-24"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
     <p>
@@ -596,11 +605,12 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       section 5.1, item 6; 2. rewrite the history of every branch of the
       repository to remove the object's files from every commit (for instance
       with <tt class="verbatim">git filter-repo &ndash;invert-paths &ndash;path
-      ocfl/&lt;id&gt;/</tt>); 3. force-push the rewritten branches, and delete
-      tags that point to commits holding the files; 4. ask the host to remove
-      what it keeps of the old history (on GitHub, cached views and the
-      references of pull requests are removed on request to its support; forks
-      are separate repositories, which it does not change).
+      ocfl/&lt;path&gt;/</tt>, with the object's path in the layout); 3.
+      force-push the rewritten branches, and delete tags that point to commits
+      holding the files; 4. ask the host to remove what it keeps of the old
+      history (on GitHub, cached views and the references of pull requests are
+      removed on request to its support; forks are separate repositories,
+      which it does not change).
     </p>
     <p>
       This is the only rewrite of the published branch allowed. The commit of
@@ -735,9 +745,9 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       itself, since it matters for any copy made on another system? 4.
       <strong>Drafts and publication dates</strong> (sections 6.2 and 6.3):
       the draft state and the date a version becomes public, in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue
-      #29</a>. 5. <strong>Scale</strong> (section 8): storage layouts and the
-      size of git trees for very large archives, in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a> and
-      <a href="https://github.com/opensheaf/opensheaf.github.io/issues/32">issue #32</a>. 6. <strong>Objects held by others</strong> (<a
+      #29</a>. 5. <strong>Scale</strong> (section 8): indexes and the size of
+      git trees for very large archives, in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a> and <a
+      href="https://github.com/opensheaf/opensheaf.github.io/issues/32">issue #32</a>. 6. <strong>Objects held by others</strong> (<a
       href="https://github.com/opensheaf/opensheaf.github.io/issues/13">issue #13</a>): whether objects controlled by their authors and
       kept by custodians call for one repository per object, and how such
       repositories make up an archive without submodules.
@@ -765,6 +775,15 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
           as a Git LFS pointer committed by mistake, is replaced by the right
           bytes in a new commit, the only change allowed to an existing
           version folder; the append-only check accepts it.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 16 November 2026, revision:</strong> the hashed
+          storage layout of the specification: the append-only rules (section
+          5.1) and the takedown (section 9) use the object's path in the
+          layout, with the folders of the hash; large archives in git should
+          use the hashed layout (section 8).
         </p>
       </li>
     </ul>

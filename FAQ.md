@@ -35,13 +35,13 @@ serve an archive, but any static web server will do.
 For tools, yes; for readers, no. The raw file server of a public GitHub
 repository (`https://raw.githubusercontent.com/<owner>/<repository>/main/`)
 serves every file byte for byte and allows cross-origin requests, so the
-Explorer, and other tools that read archives over HTTP, can read and verify
-an archive from it. It does not serve a website: it sends pages as plain text and PDFs
-as downloads, so landing pages are neither shown nor read by search engines,
-and it serves the pointers of Git LFS, not the files. It is best listed as a
-second location in `mirrors` of the discovery document, next to a GitHub
-Pages site or another web server. See section 7.4 of [OpenSheaf archives in
-git](opensheaf-git-0.1.md).
+Explorer, and other tools that read archives over HTTP, can read and verify an
+archive from it. It does not serve a website: it sends pages as plain text and
+PDFs as downloads, so landing pages are neither shown nor read by search
+engines, and it serves the pointers of Git LFS, not the files. It is best
+listed as a second location in `mirrors` of the discovery document, next to a
+GitHub Pages site or another web server. See section 7.4 of [OpenSheaf
+archives in git](opensheaf-git-0.1.md).
 
 ## Why OCFL? Isn't git enough?
 
@@ -82,10 +82,10 @@ root.
 
 The flat-direct storage layout puts each object in a folder named by its
 identifier, so paths stay readable and can be computed over plain HTTP; a
-folder name cannot contain `/`. A very large archive may instead spread its
-objects over folders named by the hash of their identifiers (the layout
+folder name cannot contain `/`. A large archive may instead spread its objects
+over folders named by parts of the hash of their identifiers (the layout
 `0003-hash-and-id-n-tuple-storage-layout`, for instance
-`ocfl/3c0/ff4/240/object-01/`); the last folder is still named by the
+`ocfl/f2a/eee/55d/kpz-details/`); the last folder is still named by the
 identifier, and the path is still computed by rule. The archive itself has a
 URI-like identifier (a `tag:` URI, for instance
 `tag:opensheaf.org,2026:mgubi`), and an object is named globally by the pair
@@ -120,7 +120,8 @@ erratum, as text or as a file): notices are later statements about a version,
 kept with the object and shown with that version, and they never change the
 version itself.
 
-## How do collections work across archives? What if another archive disappears?
+## How do collections work across archives? What if another archive
+disappears?
 
 A collection lists its members by archive identifier, address, object
 identifier, version and the SHA-512 digest of that version's inventory (the
@@ -159,17 +160,17 @@ number of views over any homes.
 
 ## What is the difference between a catalogue and a selection?
 
-Keeping and vetting are different acts, and OpenSheaf has a kind of
-collection for each. A **catalogue** keeps objects whole and is
-impartial about their versions: each member pins an object with all its
-versions, and the collection may follow it as its owner adds versions. An
-author's archive, an institution's repository and a storage site list what
-they keep in catalogues. A **selection** vets particular revisions: a journal its
-accepted version, a digest or a review journal the version it read. Each
-member pins the revision set that was vetted; later versions by the authors
-are not part of it, and any change of what is vetted (a correction accepted
-by the editors) is an explicit act of the curator, recorded as a new version
-of the selection. The [use cases](USE-CASES.md) show both at work.
+Keeping and vetting are different acts, and OpenSheaf has a kind of collection
+for each. A **catalogue** keeps objects whole and is impartial about their
+versions: each member pins an object with all its versions, and the collection
+may follow it as its owner adds versions. An author's archive, an
+institution's repository and a storage site list what they keep in catalogues.
+A **selection** vets particular revisions: a journal its accepted version, a
+digest or a review journal the version it read. Each member pins the revision
+set that was vetted; later versions by the authors are not part of it, and any
+change of what is vetted (a correction accepted by the editors) is an explicit
+act of the curator, recorded as a new version of the selection. The [use
+cases](USE-CASES.md) show both at work.
 
 ## Can I put someone else's paper in my collection?
 
@@ -182,7 +183,8 @@ selection vetted into the selection's own archive, where later changes are
 the curator's acts (for a journal). The licence of a collection (CC0 for the
 list) never extends to its members.
 
-## Can documents be linked in richer ways (a short account and its full proof)?
+## Can documents be linked in richer ways (a short account and its full
+proof)?
 
 Yes, on top of the format rather than in it. The core keeps only what every
 archive needs to keep, cite, compose and verify documents. Other relations
@@ -234,9 +236,9 @@ OpenSheaf will adopt it when it is published.
 ## Can I use "All rights reserved"?
 
 Yes. Each document carries the licence its authors choose; "All rights
-reserved" means readers may access the document but not reuse it. The
-metadata (descriptions, object records, member lists, inventories) is CC0, so that
-it can be harvested and mirrored freely. On Zenodo, "All rights reserved" is
+reserved" means readers may access the document but not reuse it. The metadata
+(descriptions, object records, member lists, inventories) is CC0, so that it
+can be harvested and mirrored freely. On Zenodo, "All rights reserved" is
 entered as a custom licence.
 
 ## Will Google Scholar find the papers?

@@ -115,10 +115,10 @@
     <p>
       The flat-direct storage layout puts each object in a folder named by its
       identifier, so paths stay readable and can be computed over plain HTTP;
-      a folder name cannot contain <tt class="verbatim">/</tt>. A very large archive may
-      instead spread its objects over folders named by the hash of their
-      identifiers (the layout <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>,
-      for instance <tt class="verbatim">ocfl/3c0/ff4/240/object-01/</tt>); the last
+      a folder name cannot contain <tt class="verbatim">/</tt>. A large archive may
+      instead spread its objects over folders named by parts of the hash of
+      their identifiers (the layout <tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>,
+      for instance <tt class="verbatim">ocfl/f2a/eee/55d/kpz-details/</tt>); the last
       folder is still named by the identifier, and the path is still computed
       by rule. The archive itself has a URI-like identifier (a <tt class="verbatim">tag:</tt>
       URI, for instance <tt class="verbatim">tag:opensheaf.org,2026:mgubi</tt>), and an
@@ -157,8 +157,11 @@
       version, kept with the object and shown with that version, and they
       never change the version itself.
     </p>
-    <h2 id="auto-14"><a id="how-do-collections-work-across-archives-what-if-another-archive-disappears"></a>How do collections work across archives? What if
-    another archive disappears?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-14"><a id="how-do-collections-work-across-archives-what-if-another-archive"></a>How do collections work across archives? What if
+    another archive<span style="margin-left: 1em"></span></h2>
+    <p>
+      disappears?
+    </p>
     <p>
       A collection lists its members by archive identifier, address, object
       identifier, version and the SHA-512 digest of that version's inventory
@@ -229,8 +232,11 @@
       are the curator's acts (for a journal). The licence of a collection (CC0
       for the list) never extends to its members.
     </p>
-    <h2 id="auto-18"><a id="can-documents-be-linked-in-richer-ways-a-short-account-and-its-full-proof"></a>Can documents be linked in richer ways (a short account
-    and its full proof)?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-18"><a id="can-documents-be-linked-in-richer-ways-a-short-account-and-its-full"></a>Can documents be linked in richer ways (a short account
+    and its full<span style="margin-left: 1em"></span></h2>
+    <p>
+      proof)?
+    </p>
     <p>
       Yes, on top of the format rather than in it. The core keeps only what
       every archive needs to keep, cite, compose and verify documents. Other

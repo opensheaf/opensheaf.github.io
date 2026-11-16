@@ -1,6 +1,6 @@
 # OpenSheaf archives in git
 
-*Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 15 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.*
+*Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 16 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.*
 
 > [!WARNING]
 > **Draft for discussion.** This document is a first draft. Its open questions are listed in section 13; none of them is settled.
@@ -90,12 +90,12 @@ Git keeps neither empty folders nor modification times, and records of file mode
 
 Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
 
-1. a new object folder `ocfl/<id>/`, with the files of a complete OCFL object (a new object, or the copy of an object of another archive);
-2. a new version folder `ocfl/<id>/v<N>/`, where `v<N-1>` is the head of the object in C, with the replacement of the object's root `inventory.json` and its checksum file by those of the new version;
+1. a new object folder `ocfl/<path>/`, where `<path>` is the object's path in the layout of the storage root (`<id>`, or `<t1>/<t2>/<t3>/<id>` in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive);
+2. a new version folder `ocfl/<path>/v<N>/`, where `v<N-1>` is the head of the object in C, with the replacement of the object's root `inventory.json` and its checksum file by those of the new version;
 3. files added, replaced or removed in an object's `extensions/opensheaf-witnesses/` folder, or under `witnesses/`;
 4. the replacement of `opensheaf.json`;
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
-6. the removal of an object folder, by a takedown (section 9);
+6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
 
 No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
@@ -188,7 +188,7 @@ An archive near these limits can:
 - store large files with Git LFS, deployed by a workflow (section 4.2);
 - move to a host with other limits, or to its own server.
 
-Tools working on a large archive MAY use a partial clone (`git clone --filter=blob:none`) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. (Archives of millions of objects, their storage layouts and their indexes are discussed in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19) and [issue #32](https://github.com/opensheaf/opensheaf.github.io/issues/32).)
+Tools working on a large archive MAY use a partial clone (`git clone --filter=blob:none`) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the flat-direct layout reaches its limits first: every deposit rewrites the tree of `ocfl/`, which lists every object, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 5 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19).)
 
 ## 9. Takedown
 
@@ -197,7 +197,7 @@ A takedown deletes an object from the storage root and adds a tombstone to the d
 When content must be removed (by law, or for a breach of rights), the keeper MUST:
 
 1. commit the removal of the object folder and the tombstone, as in section 5.1, item 6;
-2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with `git filter-repo --invert-paths --path ocfl/<id>/`);
+2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with `git filter-repo --invert-paths --path ocfl/<path>/`, with the object's path in the layout);
 3. force-push the rewritten branches, and delete tags that point to commits holding the files;
 4. ask the host to remove what it keeps of the old history (on GitHub, cached views and the references of pull requests are removed on request to its support; forks are separate repositories, which it does not change).
 
@@ -236,7 +236,7 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 2. **Takedown without rewriting history.** Section 9 makes takedown a rewrite of history. Alternatives: content files outside git, one repository per object, or the deletion mechanism expected in OCFL 2 (section 11.3 of the specification). Archives that hold documents of others (a journal, an institution) need it most.
 3. **Portable content paths** (section 4.3): a recommendation here, or a rule of the specification itself, since it matters for any copy made on another system?
 4. **Drafts and publication dates** (sections 6.2 and 6.3): the draft state and the date a version becomes public, in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).
-5. **Scale** (section 8): storage layouts and the size of git trees for very large archives, in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19) and [issue #32](https://github.com/opensheaf/opensheaf.github.io/issues/32).
+5. **Scale** (section 8): indexes and the size of git trees for very large archives, in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19) and [issue #32](https://github.com/opensheaf/opensheaf.github.io/issues/32).
 6. **Objects held by others** ([issue #13](https://github.com/opensheaf/opensheaf.github.io/issues/13)): whether objects controlled by their authors and kept by custodians call for one repository per object, and how such repositories make up an archive without submodules.
 
 ## 14. Changelog
@@ -244,3 +244,4 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 - **0.1 (draft), 15 November 2026:** first draft.
 - **0.1 (draft), 15 November 2026, revision:** raw file servers (section 7.4): they serve the archive files byte for byte with cross-origin requests allowed, so tools can read an archive from them, but not a website (content types), nor Git LFS files; their base URL may be listed in `mirrors`.
 - **0.1 (draft), 15 November 2026, revision:** repairs (section 5.3): a file whose bytes do not match its inventory, such as a Git LFS pointer committed by mistake, is replaced by the right bytes in a new commit, the only change allowed to an existing version folder; the append-only check accepts it.
+- **0.1 (draft), 16 November 2026, revision:** the hashed storage layout of the specification: the append-only rules (section 5.1) and the takedown (section 9) use the object's path in the layout, with the folders of the hash; large archives in git should use the hashed layout (section 8).
