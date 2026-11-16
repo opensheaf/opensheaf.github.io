@@ -14,11 +14,14 @@ costs, and proposes experiments.*
 
 Git and OCFL solve related problems. Both keep versioned trees of files; both
 name content by its digest; in both, a reference to a version fixes that
-version and every version before it. Git adds what OCFL leaves out: a
-transport that copies only what is missing, a protocol for pushing and
-fetching, signatures, forks and merges, hosting by forges, and long-term
-archiving by Software Heritage, whose identifiers are git's own. Many
-OpenSheaf archives will be kept in git anyway.
+version and the content of every version before it (git's also fixes the
+earlier commits byte for byte; an OpenSheaf pin leaves the bytes of earlier
+inventories open, issue
+[#46](https://github.com/opensheaf/opensheaf.github.io/issues/46)). Git adds
+what OCFL leaves out: a transport that copies only what is missing, a protocol
+for pushing and fetching, signatures, forks and merges, hosting by forges, and
+long-term archiving by Software Heritage, whose identifiers are git's own.
+Many OpenSheaf archives will be kept in git anyway.
 
 So one can ask whether the archive could *be* git: an object a chain of
 commits, a pin a commit hash, a mirror a fetch, a collection a tree of
@@ -40,15 +43,16 @@ The format rests on a few properties; any implementation must provide them.
    corrections are new versions.
 2. **Ordered history.** The versions of an object form a sequence, and each
    version knows the ones before it.
-3. **Pins.** A pin is a reference that fixes one object version and every
-   earlier one, so that any copy can be checked against it, wherever it comes
-   from (sections 6.4 and 10.2 of the specification). Collections are made of
-   pins, so they are hash trees across archives.
+3. **Pins.** A pin is a reference that fixes one object version, with the
+   files and records of every earlier one, so that any copy can be checked
+   against it, wherever it comes from (sections 6.4 and 10.2 of the
+   specification). Collections are made of pins, so they are hash trees across
+   archives.
 4. **Names.** An archive has an identifier that survives a move (section 6.2);
    an object has a short identifier in its archive (section 6.3), and, in the
    proposal of [PR
    #30](https://github.com/opensheaf/opensheaf.github.io/pull/30), a
-   self-certifying name, the digest of a genesis record, and an owner.
+   self-certifying name, a digest of a genesis record, and an owner.
 5. **A mutable map.** The discovery document lists the objects and their
    heads; it is not evidence, and is checked against the objects.
 6. **Description.** Every version carries `datacite.json` and `object.json`,
@@ -121,15 +125,17 @@ available source code, with its history.
 For OpenSheaf it can be three things. First, a dated witness kept by a third
 party, checkable against the pins (issue
 [#22](https://github.com/opensheaf/opensheaf.github.io/issues/22)): an archive
-kept in git as [OpenSheaf archives in git](../opensheaf-git-0.1.md) says
-already has its inventories, byte for byte, in the snapshots of Software
-Heritage, and recording beside a pin the `swh:1:cnt:` identifier (or the
-SHA-256) of the inventory would let anyone find it there; the git view of
-section 5.2 adds one recomputable identifier per object version. Second, one
-more location from which a version can be fetched once its archive has gone
-(issue [#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)).
-Third, with SWHIDs recorded beside pins, a way for a collection to point at
-copies that outlive its members' archives.
+kept in git as [OpenSheaf archives in git](../opensheaf-git-0.1.md) says has
+its inventories, byte for byte, in the snapshots of Software Heritage once
+Software Heritage has archived it (and if they are not in Git LFS), and
+recording beside a pin the `swh:1:cnt:` identifier (or the SHA-256) of the
+inventory would let anyone find it there; the git view of section 5.2 adds two
+recomputable identifiers per object version, one for the version with its
+history (`swh:1:rev:`) and one for its files (`swh:1:dir:`). Second, one more
+location from which a version can be fetched once its archive has gone (issue
+[#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)). Third,
+with SWHIDs recorded beside pins, a way for a collection to point at copies
+that outlive its members' archives.
 
 Its limits:
 
@@ -166,21 +172,23 @@ Its limits:
 | mirror | a byte copy of an object folder | a fetch of the object's reference |
 | deep branch (#30) | the earlier versions copied, continued | a fork |
 | shallow branch (#30) | another OCFL object, a line of the same name, holding the parent's files, inventory and `object.json` at the branch point | loosely, a shallow clone: a parent named but not held |
-| self-certifying name (#20, #30) | the digest of `genesis.json` | the blob hash of `genesis.json` |
+| self-certifying name (#20, #30) | a digest of a seed and `genesis.json` | the blob hash of `genesis.json` |
 | witness | files in `extensions/opensheaf-witnesses/` | signed tags, notes |
 | withdrawal | a description-only version | a commit leaving the document's files unchanged |
 | takedown | the object folder deleted, a tombstone | the reference deleted and the commits pruned; a rewrite if forks reach them |
 
 The match is close. A commit hash fixes its whole history, as an OpenSheaf pin
-does through the inventory. A fork is a deep branch; a shallow branch
-resembles a shallow clone, whose boundary commit names a parent it does not
-hold, though in PR #30 it is another OCFL object, a line of the same name,
-rather than a cut history (section 7). A gitlink, the tree entry that
-submodules use, is a pin inside a tree. The references of a repository are a
-mutable map, checked against the objects, as the discovery document is. And
-the owner and line of PR #30 resemble git's own practice: one writer per
-branch, copies that agree when one is a prefix of the other, and a fork when
-they diverge.
+fixes, through the inventory, the files and records of every earlier version;
+git is stronger here, since it also fixes every earlier commit byte for byte,
+where a pin leaves the bytes of earlier inventories open (section 5.2, rule
+2). A fork is a deep branch; a shallow branch resembles a shallow clone, whose
+boundary commit names a parent it does not hold, though in PR #30 it is
+another OCFL object, a line of the same name, rather than a cut history
+(section 7). A gitlink, the tree entry that submodules use, is a pin inside a
+tree. The references of a repository are a mutable map, checked against the
+objects, as the discovery document is. And the owner and line of PR #30
+resemble git's own practice: one writer per branch, copies that agree when one
+is a prefix of the other, and a fork when they diverge.
 
 ## 5. Three designs
 
@@ -207,8 +215,8 @@ knows.
   (Gitea and Forgejo do, GitLab experimentally, GitHub not). SHA-1 has known
   collision attacks; git detects the known attack technique, but a format
   meant for decades should not rest on it, and git's change of algorithm is
-  not complete. OCFL lets the digest algorithm be chosen per inventory, and
-  OpenSheaf chose SHA-512.
+  not complete. OCFL lets an object choose its digest algorithm, and OpenSheaf
+  chose SHA-512.
 - **Reading with HTTP.** A browser cannot read a repository from the main
   forges: their git endpoints do not allow cross-origin requests, and objects
   come in compressed packs, which need a git implementation in the reader
@@ -273,10 +281,13 @@ that anyone can recompute it from the OCFL object alone.
 
 Since the tree hash depends only on the files, and the commit hash only on the
 tree, the parent and these fields, the git view of an object version is a
-function of the OCFL object. It adds a second digest to every version without
-changing a byte of the archive (unless the archive chooses to chain the
-commits, below). A mirror (section 10.4 of the specification) is the same
-object, so it has the same views.
+function of the OCFL object, once the mapping of depositors, addresses and
+dates, still open (section 6), is fixed. It adds a second digest to every
+version without changing a byte of the archive (unless the archive chooses to
+chain the commits, below). A mirror (section 10.4 of the specification) that
+is a byte copy has the same views; a copy that passes verification against the
+pins may not, since its earlier inventories may differ in bytes (rule 2,
+below).
 
 The inventory can be in the tree because it never describes itself: it lists
 the files under `content/`, as in OCFL it lists the files of the version
@@ -294,8 +305,8 @@ all under SHA-512:
 - the bytes of each digest of the manifest are in `content/` of the commit of
   any version whose state lists it, since every digest of the manifest is in
   at least one state (OCFL 1.1, section 3.5.2), and the manifest gives every
-  content path to write them to (OCFL allows several for one digest, and a
-  copy in a version folder that no state lists);
+  content path to write them to (OCFL allows several content paths for one
+  digest);
 - the inventory of each version and its checksum file are in its commit,
   written to `vN/inventory.json` and `vN/inventory.json.sha512`, and the
   head's also at the root;
@@ -311,7 +322,12 @@ all under SHA-512:
    every file of that version and of every earlier one, every earlier version
    block (state, date, depositor, message) and the manifest. The commit that
    carries it is only an address: a collision of git hashes could at worst
-   point to the wrong commit, which the check against the pin rejects.
+   point to the wrong commit, which the check against the pin rejects. The
+   rest of the commit (author, committer, dates, message, any other header or
+   tree entry) is fixed only if the verifier also checks that the commit is
+   exactly the view of its inventory, most simply by rebuilding it from the
+   inventory, the tree and the parent's hash and comparing; git tools that
+   show who deposited what read those fields.
 2. **A pin does not fix** the bytes of the earlier inventories and their
    checksum files, which no inventory lists, nor the earlier commits, whose
    hashes depend on them. With only the head pin, the head commit's parents
@@ -322,12 +338,17 @@ all under SHA-512:
    the head pin alone confirms that agreement and nothing more. The same holds
    for the archive itself, whatever git does (issue
    [#46](https://github.com/opensheaf/opensheaf.github.io/issues/46)).
-3. **The bytes of an earlier inventory are fixed** only by evidence from
-   outside the archive and the repository that serve it: a pin of that version
-   itself (in a collection, for instance); or a commit hash of that version or
-   a later one, taken from a witness (a signature or timestamp of the commit,
-   section 13.2 of the specification) or from a snapshot of Software Heritage,
-   and then trusted as far as git's hash is (SHA-1 or SHA-256).
+3. **The bytes of an earlier inventory are fixed** only by evidence that
+   whoever serves the copy cannot make: a pin of that version itself (in a
+   collection, for instance); a witness of that version (section 13.2 of the
+   specification), a signature or timestamp of its checksum file, which fixes
+   the inventory by SHA-512 as a pin does; or a commit hash of that version or
+   a later one, taken from a signature or timestamp of the commit (a kind of
+   witness the specification does not define) or from a snapshot of Software
+   Heritage, and then trusted as far as git's hash is (SHA-1 or SHA-256).
+   Dated evidence (a timestamp, a snapshot) fixes the bytes as they were at
+   its date: it is evidence of the original only if that date precedes any
+   change.
 4. **The archive's own maps prove nothing more.** A commit hash recorded in
    the discovery document, and the `sha512/` indexes of section 6.6 of PR #30
    (which list sealed versions only), are maps, not witnesses: they help to
@@ -364,8 +385,9 @@ are in `content/members.json`, and its view is a function of the collection
 object alone. Fetching its members with git needs more: gitlinks, one for each
 pin, each the view commit of the pinned member version, and a `.gitmodules`
 file at the top of the tree, which git reads only there, with the URL of each
-member's repository of views. These cannot be part of the view. A gitlink
-depends on the member's whole object up to the pinned version, earlier
+member's <dfn>repository of views</dfn>, a git repository in which an archive
+publishes the views of its objects. These cannot be part of the view. A
+gitlink depends on the member's whole object up to the pinned version, earlier
 inventories included, which the pin does not fix (rule 2); and through the
 parents, the view of collection version N would depend on every member pinned
 in versions 1 to N, in other archives. It could not be recomputed once any of
@@ -388,11 +410,11 @@ snapshot of Software Heritage (rule 3).
   its snapshot and git's hash for the identity; or, without recomputing
   anything, fetch a version from Software Heritage and check its inventory
   against the pin, which rests on SHA-512 alone. A snapshot also fixes the
-  commit hashes it holds, and so the earlier inventories, as far as git's hash
-  goes (rule 3). An archive kept in git (section 5.3) already gives the
-  second; what the view adds is one identifier per object version,
-  `swh:1:rev:` for the version with its history and `swh:1:dir:` for its
-  files.
+  commit hashes it holds, and so the earlier inventories as they were at its
+  date, as far as git's hash goes (rule 3). An archive kept in git (section
+  5.3) already gives the second; what the view adds is two identifiers per
+  object version, `swh:1:rev:` for the version with its history and
+  `swh:1:dir:` for its files.
 - **Transport.** Mirrors and custodians can follow an archive with `git
   fetch`, receiving only new versions, and rebuild the OCFL objects from the
   commits, with the witnesses from their own references (section 6).
@@ -403,10 +425,10 @@ snapshot of Software Heritage (rule 3).
   git protocol: it gives a repository through the Vault, on request). The URLs
   in `.gitmodules` are not given by `members.json` (section 6).
 - **Tools.** Every git tool can browse the history of a document, compare two
-  versions, and show who deposited what. Git takes the newest commit as the
-  latest, but the current document version is not always the head (section 7.3
-  of the specification): a tool reading the views must still read
-  `object.json`.
+  versions, and show who deposited what (once the commits are checked, rule
+  1). Git tools take the tip of a reference as the latest, but the current
+  document version is not always the head (section 7.3 of the specification):
+  a tool reading the views must still read `object.json`.
 - **The format stays.** Readers who know nothing of git read the archive as
   today; the view is optional, and can be added to existing archives.
 
@@ -465,39 +487,45 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   case, and the names that git's checks (which GitHub runs on every push)
   treat as `.git` on other file systems, such as `git~1` and names with
   ignorable Unicode characters. A logical path `.gitmodules` is parsed by
-  those checks. A `.gitattributes` inside `content/` changes how a checkout
-  writes the files of `content/` (line ends, filters), so the checked-out
-  files may no longer match their digests: a verifier checks the files as git
-  stores them (the blobs), not a checkout. With `export-ignore` or
-  `export-subst`, it also changes the ZIP and tarball downloads that forges
-  build with `git archive`.
+  those checks at any depth, and one they cannot accept (a bad URL, for
+  instance) is an error, so a push of the views to a forge that checks objects
+  fails. A `.gitattributes` inside `content/` changes how a checkout writes
+  the files of `content/` (line ends, filters), so the checked-out files may
+  no longer match their digests: a verifier checks the files as git stores
+  them (the blobs), not a checkout. With `export-ignore` or `export-subst`, it
+  also changes the ZIP and tarball downloads that forges build with `git
+  archive`.
 - **Parents of branches.** The rule of section 5.2 gives the first version of
   an object no parent. A deep branch of PR #30 copies the parent's versions,
-  so its views are the parent's commits, continued. A shallow branch is
-  another OCFL object, a line of the same name, whose first version holds the
-  parent's files, the same `genesis.json` included, and the parent's inventory
-  and `object.json` at the branch point (`parent.inventory.json`,
-  `parent.object.json`, kept in every later version): its first view is a root
-  commit, unless the rule gives it the parent's view as a git parent, which
-  ties the views of two objects together. Moving the branch point to a later
-  parent version could likewise be a commit with two parents, as PR #30's open
-  question suggests (the moving version "should probably be a merge keeping
-  both"). Either needs a rule.
+  so its views are the parent's commits, continued, if its copies of the
+  earlier versions are byte copies (rule 2). A shallow branch is another OCFL
+  object, a line of the same name, whose first version holds the parent's
+  files, the same `genesis.json` included, and the parent's inventory and
+  `object.json` at the branch point (`parent.inventory.json`,
+  `parent.object.json`, in every later version, renewed when the branch point
+  moves): its first view is a root commit, unless the rule gives it the
+  parent's view as a git parent, which ties the views of two objects together.
+  Moving the branch point to a later parent version could likewise be a commit
+  with two parents, as PR #30's open question suggests (the moving version
+  "should probably be a merge keeping both"). Either needs a rule.
 - **Where the commit hash is recorded.** A version cannot hold its own commit
   hash (the hash depends on the content). Outside it, the places differ in
   what they prove (section 5.2, rules 3 to 5): in the discovery document
   (`gitCommit` next to `inventorySha512`), it helps readers who do not compute
-  it, but is a map; in a witness, or a snapshot of Software Heritage, it is
-  evidence; in the next version's `object.json`, it chains the commits, at the
-  price of an extension and of changing the archive; not recorded at all, it
-  can be recomputed, but proves nothing about earlier inventories.
+  it, but is a map; in a signature or timestamp of the commit, or a snapshot
+  of Software Heritage, it is evidence, as of its date; in the next version's
+  `object.json`, it chains the commits, at the price of an extension and of
+  changing the archive; not recorded at all, it can be recomputed, but proves
+  nothing about earlier inventories.
 - **Inventories and description.** `datacite.json` and `object.json` are in
   `content/`, as files of the version; the inventory and its checksum file are
   beside it, at the root of the tree (section 5.2). They must agree: the files
   of `content/` are exactly the state of the version in the inventory, with
-  the digests it gives, and the parent commits follow its versions. A verifier
-  reports a view where they do not, and a superproject whose gitlinks are not
-  the views of the versions its collection pins.
+  the digests it gives, the parent commits follow its versions, and the
+  author, committer, dates and message are those the mapping gives, with no
+  other header (rule 1). A verifier reports a view where they do not, and a
+  superproject whose gitlinks are not the views of the versions its collection
+  pins.
 - **What is outside the versions.** Witnesses are outside the versions, in
   each object's `extensions/opensheaf-witnesses/` or under `witnesses/` next
   to the discovery document, and are added and upgraded later; the discovery
@@ -539,15 +567,18 @@ archive, which is not a pin, and a fetch copies whole archives, not objects.
   The sealing commit names at best the object, within the originator's line
   and its deep branches. The git analogue of the name is the blob hash of
   `genesis.json`. The self-certifying name of PR #30 (section 6.5, from #20)
-  is the digest of the genesis record alone (its format, kind, date,
-  originator and nonce), which does not depend on git's commit metadata or on
-  later versions, and should stay so.
-- **Takedown.** In a repository of views each object has its own reference, so
-  a takedown deletes the reference and prunes the commits; a rewrite of
-  history, as in section 9 of [OpenSheaf archives in
-  git](../opensheaf-git-0.1.md), is needed only where other references reach
-  them (forks, deep branches). The views computed elsewhere, and Software
-  Heritage, keep them. Takedowns across copies are discussed in issue
+  is the SHA-256 digest of a fixed seed followed by the genesis record (its
+  format, kind, date, originator and nonce), much as a blob hash is the digest
+  of a header followed by the bytes; it does not depend on git's commit
+  metadata or on later versions, and should stay so.
+- **Takedown.** If each object has its own reference in a repository of views
+  (as under `refs/opensheaf/objects/<id>` in section 5.1; section 10), a
+  takedown deletes the reference and prunes the commits, and asks a forge to
+  remove the copies it keeps; a rewrite of history, as in section 9 of
+  [OpenSheaf archives in git](../opensheaf-git-0.1.md), is needed only where
+  other references reach them (forks, deep branches). The views computed
+  elsewhere, and Software Heritage, keep them. Takedowns across copies are
+  discussed in issue
   [#33](https://github.com/opensheaf/opensheaf.github.io/issues/33).
 - **Privacy.** The view publishes the depositor's address from the inventory
   as a commit author, where a reader of git expects it. Inventories already
@@ -599,11 +630,11 @@ the gains can be had otherwise.
 
 Git as a view (section 5.2) keeps the format and adds what git does best:
 incremental copies, a familiar interface to histories, collections fetched in
-one command, and an identifier in Software Heritage for each object version,
-checkable against the pins (where an archive kept in git already has its
-inventories there). It costs a mapping to specify carefully, and a second
-representation to keep. It would be an extension of the format, or a tool
-convention, not a change of the core.
+one command, and identifiers in Software Heritage for each object version,
+checkable against the pins (where an archive kept in git, once archived,
+already has its inventories). It costs a mapping to specify carefully, and a
+second representation to keep. It would be an extension of the format, or a
+tool convention, not a change of the core.
 
 Git as the transport (section 5.3) is what archives already do, and what
 [OpenSheaf archives in git](../opensheaf-git-0.1.md) makes safe.
@@ -646,6 +677,10 @@ committing to it.
 - SHA-1, SHA-256 or both, and for how long SHA-1 views are worth computing.
 - Which tree: the document with its inventory (section 5.2), or the OCFL
   object folder itself.
+- The exact mapping of depositors, addresses and dates to git's author,
+  committer and dates (section 6), on which the determinism of the view rests.
+- The names of the references in a repository of views, and whether the views
+  go on ordinary branches (experiment 2).
 - Where witnesses and the discovery document go in a repository of views.
 - Whether collections should have superprojects at all, whose gitlinks tools
   would fetch automatically from places the collection does not vouch for.
