@@ -157,6 +157,49 @@ announced.
 Radicle uses git as it is: SHA-1 object identifiers, and a RID that is a
 SHA-1 digest. SHA-256 repositories are not mentioned.
 
+### 2.9 Names and collisions
+
+The documentation does not say what happens when two repositories share a
+name or a RID; the following is read from the source of Heartwood (the GitHub
+mirror `radicle-dev/heartwood`, commit `8b053320dc3d` of 6 November 2026,
+files `crates/radicle/src/rad.rs`, `identity/doc.rs`, `storage/git.rs`).
+
+**Names.** The name in the payload is description only: nothing checks it,
+and there is no registry. Any number of repositories may be called
+`heartwood`; they are told apart by their RIDs and their delegates. A
+repository with the name and description of a well-known project is easy to
+make, and only the RID protects readers: they must get it from a source they
+trust.
+
+**How the RID is made.** `rad init` builds the first identity document from
+exactly five things: the format version, the payload (`name`, `description`,
+`defaultBranch`), the creator's key as sole delegate, a threshold of 1, and
+the visibility. It encodes the document as canonical JSON and takes its git
+blob digest, SHA-1, as the RID. There is no nonce and no date. Hence:
+
+- two people creating repositories with the same name get different RIDs,
+  since their keys differ;
+- one person creating two repositories with the same name, description,
+  default branch and visibility gets the same RID twice. On one node the
+  second `rad init` fails, because the storage folder of that RID already
+  exists (the code carries a note to give a better error). On two machines
+  sharing the same key, both succeed, and once the nodes meet, the two
+  projects are one repository with one namespace for their owner: their
+  default branches overwrite each other.
+
+**Two repositories with one RID.** For Radicle a RID is one repository:
+nodes store one git repository per RID and announce RIDs, so the copies of two
+repositories with one RID would be fetched into the same storage, and nodes
+could hold different first identity documents for it, and disagree about its
+delegates. Nothing in the protocol detects or resolves this; Radicle relies
+on the digest never repeating. A stranger cannot make a document with an
+existing RID, which would need a second preimage of SHA-1. But SHA-1
+collisions can be made (SHAttered, 2017; a chosen-prefix collision,
+"Shambles", 2020): someone could craft two different first documents, both
+their own, with one RID, and show different repositories to different
+people. The digest is computed with libgit2, whose SHA-1 detects the known
+collision attacks by default; that is the only defence.
+
 ## 3. How the concepts meet
 
 The middle column uses the terms of the specification, and of the proposal of
@@ -431,6 +474,15 @@ also evidence of the costs: a protocol whose nodes must run, a storage that
 users must not touch, SHA-1, and a transport that had to be replaced after two
 years.
 
+On names, Radicle supports the choices of PR #30 by what it lacks (section
+2.9). A RID made from a first document without a nonce repeats when the same
+owner describes two repositories alike; a collision, accidental or crafted,
+merges two repositories with nothing to detect it. PR #30 draws a random
+nonce for every genesis record, uses SHA-256, has archives refuse a genesis
+record reused for another work, compares the bytes of genesis records when
+two share a name, and keeps further names, by algorithm number, for a clash
+(issue [#44](https://github.com/opensheaf/opensheaf.github.io/issues/44)).
+
 OpenSheaf should not be built on Radicle (section 4.2). An archive kept in git
 may be published on Radicle as one more copy (section 4.1). The designs of
 section 4.3 deserve to be weighed in the discussions they touch: delegates
@@ -478,5 +530,7 @@ history of an OpenSheaf object is linear and checkable without them.
   <https://radicle.dev/2026/09/23/disclosure-of-vulnerability-in-network-protocol.html>.
 - Radicle at FOSDEM 2026:
   <https://fosdem.org/2026/schedule/event/TMQZTP-radicle>.
+- Heartwood, the reference implementation (GitHub mirror):
+  <https://github.com/radicle-dev/heartwood>.
 - The Update Framework: <https://theupdateframework.io>.
 - iroh: <https://www.iroh.computer>.
