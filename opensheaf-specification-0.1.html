@@ -556,8 +556,9 @@
           file) and <tt class="verbatim">status</tt> (<tt class="verbatim">active</tt> or <tt
           class="verbatim">withdrawn</tt>, section 11); a mirror (section 10.4) also has
           <tt class="verbatim">mirrorOf</tt>, the archive identifier of the archive
-          whose object it copies; an object with a genesis record (section
-          6.5) also has its <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>.
+          whose object it copies, which is not the archive's own; an object
+          with a genesis record (section 6.5) also has its <tt class="verbatim">name</tt>
+          and <tt class="verbatim">owner</tt>.
         </p>
       </li>
     </ul>
@@ -841,9 +842,10 @@
           archive and, if it is taken, draws a new nonce, so that the
           originator's line is always named by algorithm 0; an object sealed
           outside the archive's storage root and shared before its deposit can
-          still meet a taken line when it is deposited (only after a reused
-          genesis record or a collision), and is then refused, its owner
-          sealing it anew;
+          still meet a taken line when it is deposited (after a reused genesis
+          record or a collision, or when the archive already holds a copy or a
+          tombstone of the same line), and is then refused, its owner sealing
+          it anew;
         </p>
       </li>
       <li>
@@ -1369,7 +1371,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           is the first hexadecimal digits of an inventory digest: the sealed
           object versions whose inventories have digests starting with them,
           each entry with <tt class="verbatim">inventorySha512</tt>, <tt class="verbatim">objectId</tt>
-          and <tt class="verbatim">version</tt> (the object version).
+          and <tt class="verbatim">version</tt> (the object version), and <tt class="verbatim">status</tt>,
+          the object's.
         </p>
       </li>
     </ul>
@@ -1436,10 +1439,11 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           MUST NOT redirect permanently (301 or 308), since copies move and
           are taken down, and it MAY cache its own result for a URI with a
           digest, but not for one without; it MUST redirect only to a copy at
-          a base URL of a confirmed archive, never to a location given only by
-          <tt class="verbatim">at</tt> or by an index kept by others, and otherwise
-          answers with a page that links to the copy and marks it unconfirmed;
-          <tt class="verbatim">sheaf:&lt;name&gt;:*</tt> shows the lines it knows;
+          a base URL of the archive that keeps the line, reached as section
+          6.6 confirms,, never to a location given only by <tt class="verbatim">at</tt>
+          or by an index kept by others, and otherwise answers with a page
+          that links to the copy and marks it unconfirmed; <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>
+          shows the lines it knows;
         </p>
       </li>
       <li>
@@ -1570,7 +1574,8 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       section; a branch does not complete the versions it copies from its
       parent), and continues without gaps from it (provisionally: option (a)
       of the open question of section 10.5); an object version that moves the
-      branch point is the branch's next document version, and <tt class="verbatim">parent</tt>
+      branch point is the branch's next document version (on a deep branch,
+      the number after the highest in the object), and <tt class="verbatim">parent</tt>
       keeps the parent's own number.
     </p>
     <p>
@@ -2380,20 +2385,20 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       the files of the new parent version, as the first version of a shallow
       branch does, with new copies of <tt class="verbatim">parent.inventory.json</tt>
       and <tt class="verbatim">parent.object.json</tt>, and is checked like that first
-      version (this drops the branch's own files, such as the files of its
-      notices, which section 7.3 keeps in every later version: how a move
-      keeps them is open, section 6.5), and also for continuity: the new
-      parent inventory continues the previous one when both have the same <tt
-      class="verbatim">id</tt>, every entry of <tt class="verbatim">versions</tt> in the previous
-      one is equal, as a JSON value, to the entry of the same version in the
-      new one, and every digest of those entries is in the manifest of the new
-      one. This shows, from the branch alone, that the corrected version
-      continues the version first vetted. A deep branch moves its branch point
-      in the same way; the checks of a deep branch apply to its first branch
-      point only, and for its first move the previous parent inventory is that
-      of its first branch point, <tt class="verbatim">vk/inventory.json</tt>. The branch
-      stays one sequence of versions under one owner, numbered as section 7.3
-      says.
+      version (this drops the files of the branch's own notes, such as the
+      files of its notices, which section 7.3 keeps in every later version:
+      how a move keeps them is open, section 6.5), and also for continuity:
+      the new parent inventory continues the previous one when both have the
+      same <tt class="verbatim">id</tt>, every entry of <tt class="verbatim">versions</tt> in the
+      previous one is equal, as a JSON value, to the entry of the same version
+      in the new one, and every digest of those entries is in the manifest of
+      the new one. This shows, from the branch alone, that the corrected
+      version continues the version first vetted. A deep branch moves its
+      branch point in the same way; the checks of a deep branch apply to its
+      first branch point only, and for its first move the previous parent
+      inventory is that of its first branch point, <tt class="verbatim">vk/inventory.json</tt>.
+      The branch stays one sequence of versions under one owner, numbered as
+      section 7.3 says.
     </p>
     <p>
       <strong>Accepted copies.</strong> An accepted copy is a shallow branch
@@ -2678,11 +2683,12 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
     <ul>
       <li>
         <p>
-          validate the discovery document, and every <tt class="verbatim">object.json</tt>,
-          <tt class="verbatim">members.json</tt> and <tt class="verbatim">genesis.json</tt>,
-          against the schemas of their declared versions (and the index files
-          of section 6.6, if present), checking formats (dates, URIs) as
-          assertions, which JSON Schema 2020-12 leaves optional;
+          validate the discovery document, and every <tt class="verbatim">object.json</tt>
+          (<tt class="verbatim">parent.object.json</tt> included), <tt class="verbatim">members.json</tt>
+          and <tt class="verbatim">genesis.json</tt>, against the schemas of their
+          declared versions (and the index files of section 6.6, if present),
+          checking formats (dates, URIs) as assertions, which JSON Schema
+          2020-12 leaves optional;
         </p>
       </li>
       <li>
@@ -2757,10 +2763,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       </li>
       <li>
         <p>
-          for each mirror (<tt class="verbatim">mirrorOf</tt>), check that the <tt
-          class="verbatim">object.json</tt> files of the versions of the mirrored line
-          name that archive (for a mirror of a deep branch, the versions after
-          its branch point; those before name the parent's archive);
+          for each mirror (<tt class="verbatim">mirrorOf</tt>), check that <tt class="verbatim">mirrorOf</tt>
+          differs from the archive's own <tt class="verbatim">archiveId</tt> and that
+          the <tt class="verbatim">object.json</tt> files of the versions of the
+          mirrored line name that archive (for a mirror of a deep branch, the
+          versions after its branch point; those before name the parent's
+          archive); for every other object, that the versions of its line name
+          the archive's own <tt class="verbatim">archiveId</tt> (for a deep branch, its
+          versions after the branch point; those before name the parent's
+          archive);
         </p>
       </li>
       <li>
@@ -2866,12 +2877,12 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       declares (section 6.6: every entry agrees with the objects and starts
       with its file's prefix, every object with a genesis record and every
       sealed version is listed, and tombstoned objects are listed as <tt
-      class="verbatim">removed</tt>), the requirements of the profiles the archive
-      declares, and those of the extensions it knows; it SHOULD report the
-      extensions it does not know, which do not make an archive fail
-      verification. It MUST NOT treat the presentation as authoritative. It
-      SHOULD limit the depth and size of the collections it follows, and
-      report when it stops.
+      class="verbatim">removed</tt> in <tt class="verbatim">names/</tt> and <tt class="verbatim">sha512/</tt>),
+      the requirements of the profiles the archive declares, and those of the
+      extensions it knows; it SHOULD report the extensions it does not know,
+      which do not make an archive fail verification. It MUST NOT treat the
+      presentation as authoritative. It SHOULD limit the depth and size of the
+      collections it follows, and report when it stops.
     </p>
     <h2 id="auto-38"><a id="15-security-considerations"></a>15. Security considerations<span style="margin-left: 1em"></span></h2>
     <ul>
@@ -3018,10 +3029,10 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           recorded in the inventory (section 7.1). Agreement records are
           minimal (section 9). A request to erase personal data from an
           immutable history is handled by a takedown (section 11.2); with the
-          proposal of section 6.5, the tombstone and the indexes then keep
-          only the name, the owner identifier and <tt class="verbatim">sealed</tt>, not
-          the owner's URI. An owner identifier is a digest of a URI that can
-          often be guessed (an ORCID iD), so it is a pseudonym, not an
+          proposal of section 6.5, the tombstone and the indexes then keep, of
+          the owner, only the owner identifier (with the name and <tt class="verbatim">sealed</tt>),
+          not the owner's URI. An owner identifier is a digest of a URI that
+          can often be guessed (an ORCID iD), so it is a pseudonym, not an
           erasure.
         </p>
       </li>
@@ -3411,6 +3422,17 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           every takedown; a deep branch's copied versions serve pins; <tt
           class="verbatim">/v&lt;n&gt;</tt> of a copied version points to the parent;
           wording.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 16 November 2026, proposal revised after a fifteenth
+          review (branch <tt class="verbatim">proposal/identity</tt>):** <tt class="verbatim">mirrorOf</tt>
+          is never the archive itself, and the lines an archive keeps name its
+          own <tt class="verbatim">archiveId</tt> (section 14); on a deep branch a move
+          takes the number after the highest in the object; a deposit meets a
+          taken line also with a copy or tombstone of it; <tt class="verbatim">parent.object.json</tt>
+          validated; wording.
         </p>
       </li>
     </ul>

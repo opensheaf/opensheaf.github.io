@@ -131,10 +131,14 @@ only what its two standards leave open:
   kept. Every line records `sealed` (the originator's sealing version:
   `archiveId`, `objectId`, `objectVersion`), copied by branches; an archive
   refuses a genesis record reused for another work (a different `sealed`)
-  and an owner identifier equal to another owner's at its heads. A work is
-  searched for under all 16 names of its genesis record, keeping entries
-  whose record is byte-identical (`names/` entries carry `genesis` and
-  `sealed`) and grouping them by `sealed`. Aliases are open (#44).
+  and an owner identifier equal to another owner's at its heads; reuse is
+  also refused against tombstones (one of the 16 names equals a
+  tombstone's). A work is searched for under all 16 names of its genesis
+  record, keeping entries whose record is byte-identical (`names/` entries
+  carry `genesis` and `sealed`) and grouping them by `sealed`. Aliases are
+  open (#44). A deep branch's first own version that adds files of the
+  document's own takes the number after the highest in the object and goes
+  last in `history`.
 - **Draft and sealing** (6.5): a draft is an object without a genesis
   record; no pin may name its versions. Sealing adds the genesis record,
   at the owner's request, before a version first leaves the owner's hands.
