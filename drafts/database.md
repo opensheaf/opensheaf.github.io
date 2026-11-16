@@ -6,7 +6,8 @@ HTTP. This paper asks what a database can do for it: as an index derived from
 the files, as the storage behind a server that delivers them, or instead of
 them. It sets out what the format requires of any of these, the trap of
 re-serialising metadata, an index published as a static SQLite file for large
-archives, and experiments.*
+archives, what Fedora, the repository software of libraries, can and cannot
+do for an archive, and experiments.*
 
 ## 1. The question
 
@@ -52,8 +53,9 @@ compare it, byte for byte, with what the server delivers.
 The storage root stays the truth; a database holds what is read from it, and
 can be rebuilt from it at any time. This is the common pattern for OCFL:
 Fedora 6 keeps its repository as OCFL objects with an index in a relational
-database, which it can rebuild from the objects, and the Java library
-ocfl-java can keep object locks and a cache of object details in a database.
+database, which it can rebuild from the objects (section 6), and the Java
+library ocfl-java can keep object locks and a cache of object details in a
+database.
 
 Uses:
 
@@ -187,7 +189,115 @@ lookups without SQLite, but not the search; both are answers to #19, which is
 open. Either would need a field in the discovery document naming the index;
 this paper proposes none.
 
-## 6. What the specification and the notes might say
+## 6. Fedora
+
+[Fedora](https://fedorarepository.org/) is repository software for libraries,
+maintained by LYRASIS with its community, and the storage layer of many
+Islandora and Samvera (Hyrax) installations. Since version 6 (the current
+release is 7.0) it keeps its content as OCFL objects, through ocfl-java, and
+its indexes in a relational database (H2 by default, PostgreSQL, MySQL or
+MariaDB). It rebuilds the indexes from the OCFL storage root at start-up when
+told to (`fcrepo.rebuild`; Fedora 6 also does so when the index is empty),
+or object by object at run time (`fcr:reindex`). It is the clearest working
+example of section 3.1, and institutions that run it may ask whether an
+OpenSheaf archive can run on top of it. What follows is read from Fedora's
+source code (`fcrepo/fcrepo` and `fcrepo/fcrepo-storage-ocfl` on GitHub, as
+of November 2026), not yet tested on an instance.
+
+### 6.1 Why an OpenSheaf object cannot be a Fedora object
+
+Fedora writes its OCFL objects itself, and they are not OpenSheaf objects:
+
+- **Extra files.** Fedora keeps its own metadata in each object's content: a
+  JSON header file for each resource under `.fcrepo/` (`.fcrepo/fcr-root.json`
+  for the root of the object), and RDF in N-Triples beside the files
+  (`fcr-container.nt` for a container, `<file>~fcr-desc.nt` for the
+  description of a binary). An OpenSheaf version holds the document's files
+  with `datacite.json` and `object.json`, and nothing else.
+- **Its own inventories.** Fedora writes every version with the user
+  `fedoraAdmin` (address `info:fedora/fedoraAdmin`) and the message
+  `Authored by Fedora <release>`, whoever deposited, at the time of the
+  commit. It also decides when versions are made: at each change (automatic
+  versioning, the default), or, when that is off, by staging changes in a
+  mutable head (OCFL extension 0005) committed on request. Section 7.1 of the
+  specification requires the user to be the depositor and the message to
+  describe the change; and an OpenSheaf pin is the digest of an inventory
+  whose versions are the object's versions.
+- **Its own layout and identifiers.** Fedora names each OCFL object by its
+  Fedora identifier (`info:fedora/<path>`) and places it with the hashed
+  n-tuple layout (extension 0004). An archival group, a set of resources, is
+  one OCFL object; every other resource is an object of its own. OpenSheaf
+  requires the flat-direct layout (extension 0002, section 5 of the
+  specification) and object identifiers matching `^[a-z0-9]+(-[a-z0-9]+)*$`
+  (section 6.3).
+- **No adoption.** An OCFL object without Fedora's header files stops a
+  rebuild of the indexes (or is skipped, if Fedora is so configured), and
+  Fedora's import tools read Fedora exports, Fedora 3 repositories or
+  repositories of earlier Fedora versions, not foreign OCFL objects. Fedora
+  cannot take over an existing OpenSheaf storage root.
+
+Mapping OpenSheaf objects onto Fedora's would need the specification to
+accept Fedora's files and inventories, and so to give up what makes a pin a
+pin. This paper does not propose it.
+
+### 6.2 What works
+
+1. **Fedora as a store and server of the files** (section 3.2). The archive's
+   files, `opensheaf.json`, `ocfl/...` and the rest, are deposited in Fedora
+   as binaries at the same paths, and Fedora serves each one with a plain
+   `GET` under its REST endpoint, which becomes the archive's base URL. A
+   binary deposited as such comes back as stored, without redirect (Fedora
+   redirects only for content kept outside it), with range requests. Fedora
+   wraps the files in OCFL objects of its own (OCFL inside OCFL): one per file
+   and per folder, or one per OpenSheaf object if each is deposited as an
+   archival group, a version in one transaction (`fcr:tx`) so that it becomes
+   one Fedora version. OpenSheaf's bytes are stored once, unchanged, as
+   content of Fedora's objects. Conditions:
+   - **Deposit each file as a binary with its media type**, with
+     `Link: <http://www.w3.org/ns/ldp#NonRDFSource>; rel="type"`: a file in
+     a format Fedora takes for RDF would otherwise be parsed and rewritten.
+     A request whose `Accept` header does not match the stored type gets
+     `406`, so the types must be right.
+   - **Folders before their files.** A file put under a folder that does not
+     exist yet leaves the folder as a placeholder that can never be created
+     afterwards; harmless to readers, who fetch only files, but best avoided.
+     Paths are otherwise free: OpenSheaf's file names (`inventory.json`,
+     `0=ocfl_object_1.1`) use none of Fedora's reserved names (`.fcrepo`,
+     `fcr-root`, `fcr-container.nt`, the suffixes `~fcr-desc` and `~fcr-acl`,
+     segments beginning with `fcr:`).
+   - **Anonymous reads.** Fedora's access control grants read to everyone by
+     default, but its web application, as shipped, asks for HTTP
+     authentication on every request, `GET` and `OPTIONS` included. The
+     deployment lifts that for `GET`, `HEAD` and `OPTIONS` (in the
+     application's `web.xml`, or with a proxy in front) and keeps it for
+     writes.
+   - **The cross-origin header**, which Fedora does not send: added in the
+     servlet container (Tomcat's `CorsFilter`, for instance) or by a proxy,
+     which also answers the browser's preflight `OPTIONS` without
+     authentication.
+   - **No website.** Fedora sends binaries as attachments (unless
+     `?inline=true` is added), so the pages of the website profile are
+     better served elsewhere.
+   - **Fixity on the way in.** A deposit can send `Digest: sha-512=...`, so
+     that Fedora rejects a corrupted upload, and Fedora reports a digest on
+     request (`Want-Digest`), in base64 where inventories use hexadecimal.
+     The export test of section 2 remains the proof.
+2. **Fedora as the internal store, the OpenSheaf archive exported from it.**
+   An institution keeps its documents in Fedora, and a tool writes OpenSheaf
+   objects from them and publishes them. The pins are digests of the exported
+   inventories, not of Fedora's; an export once published is kept as written,
+   never regenerated (section 4). The export is in effect an archive of its
+   own, fed from Fedora.
+3. **Fedora beside the archive.** The archive stays plain files on a static
+   host or a bucket, and Fedora keeps a copy for preservation, as a set of
+   binaries.
+
+For an institution that already runs Fedora, the first or the third keeps
+the archive's bytes OpenSheaf's and uses Fedora for what it does well:
+storage, access control, history of changes (`fcr:versions`), fixity. The
+second suits documents that already live in Fedora for other reasons.
+
+## 7. What the specification and the notes might say
 
 - **Nothing new in the format** for sections 3.1 and 3.2: the specification
   already constrains only the bytes served. A sentence in section 5 could say
@@ -199,7 +309,7 @@ this paper proposes none.
   a folder with a base URL byte for byte), which is useful for any host.
 - **An index for large archives** (section 5) belongs to #19.
 
-## 7. Experiments
+## 8. Experiments
 
 1. **The export test.** A command that downloads an archive from its base URL
    into a folder, validates the folder, and compares every file with the
@@ -215,8 +325,15 @@ this paper proposes none.
 4. **Round trip.** Deposit through a server keeping files in a database,
    export, and compare digests; then parse and rewrite the JSON files on
    purpose, to show what the rules of section 4 prevent.
+5. **Fedora.** The files of the first archive deposited in a Fedora instance
+   (the Docker image `fcrepo/fcrepo`, 6.5 or 7.0) at the same paths, each as
+   a binary with its media type, folders first, a version of each object in
+   one transaction; anonymous `GET`, `HEAD` and `OPTIONS` allowed and the
+   cross-origin header added in front; read by the Explorer from Fedora's
+   REST endpoint and verified; then the export test, and Fedora's
+   `Want-Digest` answers compared with the inventories.
 
-## 8. Open questions
+## 9. Open questions
 
 - Should section 5 of the specification say explicitly that any server may
   serve an archive, or is "MAY be kept in git and served by any static web
@@ -230,5 +347,5 @@ this paper proposes none.
 Related issues:
 [#19](https://github.com/opensheaf/opensheaf.github.io/issues/19) (scale),
 [#29](https://github.com/opensheaf/opensheaf.github.io/issues/29) (private
-archives and reviews); and the [working paper on git](git-as-implementation.md)
-and the [deployment note](deployment.md).
+archives and reviews); and the [working paper on
+git](git-as-implementation.md) and the [deployment note](deployment.md).
