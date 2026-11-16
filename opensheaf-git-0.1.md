@@ -31,7 +31,7 @@ The principle: git is a store and a transport for the files of the archive. The 
 The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL are to be interpreted as described in BCP 14 (RFC 2119, RFC 8174) when, and only when, they appear in all capitals. Terms of the specification (archive, storage root, discovery document, object, object version, pin, mirror, witness, takedown, tombstone) keep their meaning.
 
 - <dfn>Repository</dfn>: a git repository holding one archive.
-- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, `witnesses/`.
+- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, `witnesses/` and the indexes (`indexes.json` and the folders `names/`, `owners/` and `sha512/`, section 6.6 of the specification, proposal).
 - <dfn>Presentation files</dfn>: the website of the archive (appendix C of the specification), generated from the archive files.
 - <dfn>Working files</dfn>: every other file of the repository: settings of tools, descriptions of deposits, sources being prepared, scripts, workflows.
 - <dfn>Published branch</dfn>: the branch from which the archive is served (usually `main`). A <dfn>published commit</dfn> is a commit of its first-parent history.
@@ -43,7 +43,7 @@ A repository conforms to this document if every published commit satisfies secti
 
 A repository SHOULD hold one archive, with the discovery document at the top of the repository and the storage root in `ocfl/`. An archive kept in a sub-folder of a larger repository is allowed; what follows then applies to that folder.
 
-Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or `witnesses/`, and they are not published unless the keeper means them to be (section 7).
+Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root, `witnesses/` or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
 
 The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of objects of other archives are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
 
@@ -51,7 +51,7 @@ The archive files MUST NOT contain symbolic links or git submodules. Members of 
 
 ### 4.1 Attributes
 
-The repository MUST contain a `.gitattributes` file at its top with these lines (with `witnesses/**` only if the archive uses that folder, and the paths adjusted if the archive is in a sub-folder):
+The repository MUST contain a `.gitattributes` file at its top with these lines (with `witnesses/**` only if the archive uses that folder, the lines of the indexes only if it keeps them, and the paths adjusted if the archive is in a sub-folder):
 
 ```
 # OpenSheaf archive files: stored and checked out byte for byte,
@@ -59,6 +59,10 @@ The repository MUST contain a `.gitattributes` file at its top with these lines 
 opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
 ocfl/**        -text -filter -ident -working-tree-encoding -export-subst -merge
 witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge
+indexes.json   -text -filter -ident -working-tree-encoding -export-subst -merge
+names/**       -text -filter -ident -working-tree-encoding -export-subst -merge
+owners/**      -text -filter -ident -working-tree-encoding -export-subst -merge
+sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge
 ```
 
 - `-text`: no conversion of line endings, whatever the settings of the clone (`core.autocrlf`, `core.eol`).
@@ -93,7 +97,7 @@ Let C be a published commit and C' the next one on the published branch. Between
 1. a new object folder `ocfl/<path>/`, where `<path>` is the object's path in the layout of the storage root (`<id>`, or `<t1>/<t2>/<t3>/<id>` in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive);
 2. a new version folder `ocfl/<path>/v<N>/`, where `v<N-1>` is the head of the object in C, with the replacement of the object's root `inventory.json` and its checksum file by those of the new version;
 3. files added, replaced or removed in an object's `extensions/opensheaf-witnesses/` folder, or under `witnesses/`;
-4. the replacement of `opensheaf.json`;
+4. the replacement of `opensheaf.json`, and files added, replaced or removed among the indexes (`indexes.json`, `names/`, `owners/`, `sha512/`), which are rewritten at every deposit and takedown (section 6.6 of the specification, proposal);
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
@@ -114,7 +118,7 @@ Such a file MUST be repaired by a new commit on the published branch that replac
 
 If no copy with the right bytes can be found, the file is lost. It MUST NOT be replaced by other bytes, and verifiers keep reporting it as missing or corrupt. (Lost and corrupted files are in scope for OCFL version 2; see section 11.3 of the specification.)
 
-## 6. Commits, branches and drafts
+## 6. Commits, working branches and merging
 
 ### 6.1 Commits
 
@@ -124,9 +128,9 @@ The author and committer of a commit record who made the commit; the inventory r
 
 Commits and tags MAY be signed. They are witnesses of who published a state of the archive, not part of its integrity (section 13.2 of the specification).
 
-### 6.2 Drafts
+### 6.2 Working branches
 
-Branches other than the published branch are working space. They MAY be rewritten, and the object versions they hold are not yet published: a tool MAY rebuild them, changing their pins, until they are merged into the published branch. Once a version is on the published branch it is fixed. (Draft and private states of archives and objects are discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
+Git branches other than the published branch are <dfn>working branches</dfn>: working space, not branches of an object (section 10.5 of the specification, proposal). They MAY be rewritten, and the object versions they hold are not yet published: a tool MAY rebuild them, changing their pins, until they are merged into the published branch, unless a version has already been shared, since a sealed version MUST NOT change once it has left its owner's hands (section 6.5 of the specification, proposal). Once a version is on the published branch it is fixed. (Drafts, objects without a genesis record, and private states of archives and objects are discussed in section 6.5 of the specification, proposal, and in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
 
 ### 6.3 Merging
 
@@ -196,7 +200,7 @@ A takedown deletes an object from the storage root and adds a tombstone to the d
 
 When content must be removed (by law, or for a breach of rights), the keeper MUST:
 
-1. commit the removal of the object folder and the tombstone, as in section 5.1, item 6;
+1. commit the removal of the object folder and the tombstone, and the update of the indexes if the archive keeps them (the object's entries kept with `status` `removed`, its name removed from `owners/`, section 6.6 of the specification, proposal), as in section 5.1, items 4 and 6;
 2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with `git filter-repo --invert-paths --path ocfl/<path>/`, with the object's path in the layout);
 3. force-push the rewritten branches, and delete tags that point to commits holding the files;
 4. ask the host to remove what it keeps of the old history (on GitHub, cached views and the references of pull requests are removed on request to its support; forks are separate repositories, which it does not change).
@@ -245,3 +249,4 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 - **0.1 (draft), 15 November 2026, revision:** raw file servers (section 7.4): they serve the archive files byte for byte with cross-origin requests allowed, so tools can read an archive from them, but not a website (content types), nor Git LFS files; their base URL may be listed in `mirrors`.
 - **0.1 (draft), 15 November 2026, revision:** repairs (section 5.3): a file whose bytes do not match its inventory, such as a Git LFS pointer committed by mistake, is replaced by the right bytes in a new commit, the only change allowed to an existing version folder; the append-only check accepts it.
 - **0.1 (draft), 16 November 2026, revision:** the hashed storage layout of the specification: the append-only rules (section 5.1) and the takedown (section 9) use the object's path in the layout, with the folders of the hash; large archives in git should use the hashed layout (section 8).
+- **0.1 (draft), 16 November 2026, proposal (branch `proposal/identity` of the specification):** the indexes of the identity proposal (`indexes.json`, `names/`, `owners/`, `sha512/`) are archive files: stored byte for byte (section 4.1), rewritten at every deposit and takedown (sections 5.1 and 9); git branches other than the published branch are called working branches (section 6.2), not drafts, which the proposal defines as objects without a genesis record, and a sealed version is not rebuilt once shared.

@@ -141,7 +141,10 @@
           <dfn>Archive files</dfn>: the files the specification requires to be
           served byte for byte: the discovery document <tt class="verbatim">opensheaf.json</tt>,
           the storage root (by convention <tt class="verbatim">ocfl/</tt>) and, if used,
-          <tt class="verbatim">witnesses/</tt>.
+          <tt class="verbatim">witnesses/</tt> and the indexes (<tt class="verbatim">indexes.json</tt>
+          and the folders <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt> and
+          <tt class="verbatim">sha512/</tt>, section 6.6 of the specification,
+          proposal).
         </p>
       </li>
       <li>
@@ -188,9 +191,9 @@
     </p>
     <p>
       Working files MAY be kept in the repository. They are not part of the
-      archive: they MUST NOT be placed inside the storage root or <tt class="verbatim">witnesses/</tt>,
-      and they are not published unless the keeper means them to be (section
-      7).
+      archive: they MUST NOT be placed inside the storage root, <tt class="verbatim">witnesses/</tt>
+      or the folders of the indexes, and they are not published unless the
+      keeper means them to be (section 7).
     </p>
     <p>
       The archive files MUST NOT contain symbolic links or git submodules.
@@ -205,8 +208,8 @@
     <p>
       The repository MUST contain a <tt class="verbatim">.gitattributes</tt> file at its
       top with these lines (with <tt class="verbatim">witnesses/**</tt> only if the
-      archive uses that folder, and the paths adjusted if the archive is in a
-      sub-folder):
+      archive uses that folder, the lines of the indexes only if it keeps
+      them, and the paths adjusted if the archive is in a sub-folder):
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
@@ -214,7 +217,11 @@
 # never merged as text.
 opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
 ocfl/**        -text -filter -ident -working-tree-encoding -export-subst -merge
-witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge</pre>
+witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge
+indexes.json   -text -filter -ident -working-tree-encoding -export-subst -merge
+names/**       -text -filter -ident -working-tree-encoding -export-subst -merge
+owners/**      -text -filter -ident -working-tree-encoding -export-subst -merge
+sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge</pre>
     </div>
     <ul>
       <li>
@@ -316,13 +323,17 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       root <tt class="verbatim">inventory.json</tt> and its checksum file by those of
       the new version; 3. files added, replaced or removed in an object's <tt
       class="verbatim">extensions/opensheaf-witnesses/</tt> folder, or under <tt class="verbatim">witnesses/</tt>;
-      4. the replacement of <tt class="verbatim">opensheaf.json</tt>; 5. at the creation
-      of the storage root, its own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt
-      class="verbatim">ocfl_layout.json</tt>, the configuration of the layout extension,
-      and the loose files allowed by section 5 of the specification); 6. the
-      removal of an object folder, with the folders of the hash it leaves
-      empty, by a takedown (section 9); 7. the repair of a file whose bytes do
-      not match the digest its inventory records (section 5.3).
+      4. the replacement of <tt class="verbatim">opensheaf.json</tt>, and files added,
+      replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt
+      class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
+      which are rewritten at every deposit and takedown (section 6.6 of the
+      specification, proposal); 5. at the creation of the storage root, its
+      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
+      the configuration of the layout extension, and the loose files allowed
+      by section 5 of the specification); 6. the removal of an object folder,
+      with the folders of the hash it leaves empty, by a takedown (section 9);
+      7. the repair of a file whose bytes do not match the digest its
+      inventory records (section 5.3).
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -370,7 +381,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       missing or corrupt. (Lost and corrupted files are in scope for OCFL
       version 2; see section 11.3 of the specification.)
     </p>
-    <h2 id="auto-14"><a id="6-commits-branches-and-drafts"></a>6. Commits, branches and drafts<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-14"><a id="6-commits-working-branches-and-merging"></a>6. Commits, working branches and merging<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-15"><a id="61-commits"></a>6.1 Commits<span style="margin-left: 1em"></span></h3>
     <p>
       A commit MAY add any number of object versions. A commit SHOULD hold one
@@ -391,14 +402,19 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       state of the archive, not part of its integrity (section 13.2 of the
       specification).
     </p>
-    <h3 id="auto-16"><a id="62-drafts"></a>6.2 Drafts<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-16"><a id="62-working-branches"></a>6.2 Working branches<span style="margin-left: 1em"></span></h3>
     <p>
-      Branches other than the published branch are working space. They MAY be
-      rewritten, and the object versions they hold are not yet published: a
-      tool MAY rebuild them, changing their pins, until they are merged into
-      the published branch. Once a version is on the published branch it is
-      fixed. (Draft and private states of archives and objects are discussed
-      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
+      Git branches other than the published branch are <dfn>working
+      branches</dfn>: working space, not branches of an object (section 10.5
+      of the specification, proposal). They MAY be rewritten, and the object
+      versions they hold are not yet published: a tool MAY rebuild them,
+      changing their pins, until they are merged into the published branch,
+      unless a version has already been shared, since a sealed version MUST
+      NOT change once it has left its owner's hands (section 6.5 of the
+      specification, proposal). Once a version is on the published branch it
+      is fixed. (Drafts, objects without a genesis record, and private states
+      of archives and objects are discussed in section 6.5 of the
+      specification, proposal, and in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
     </p>
     <h3 id="auto-17"><a id="63-merging"></a>6.3 Merging<span style="margin-left: 1em"></span></h3>
     <p>
@@ -601,16 +617,19 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
       keeper MUST:
     </p>
     <p>
-      1. commit the removal of the object folder and the tombstone, as in
-      section 5.1, item 6; 2. rewrite the history of every branch of the
-      repository to remove the object's files from every commit (for instance
-      with <tt class="verbatim">git filter-repo &ndash;invert-paths &ndash;path
-      ocfl/&lt;path&gt;/</tt>, with the object's path in the layout); 3.
-      force-push the rewritten branches, and delete tags that point to commits
-      holding the files; 4. ask the host to remove what it keeps of the old
-      history (on GitHub, cached views and the references of pull requests are
-      removed on request to its support; forks are separate repositories,
-      which it does not change).
+      1. commit the removal of the object folder and the tombstone, and the
+      update of the indexes if the archive keeps them (the object's entries
+      kept with <tt class="verbatim">status</tt> <tt class="verbatim">removed</tt>, its name
+      removed from <tt class="verbatim">owners/</tt>, section 6.6 of the specification,
+      proposal), as in section 5.1, items 4 and 6; 2. rewrite the history of
+      every branch of the repository to remove the object's files from every
+      commit (for instance with <tt class="verbatim">git filter-repo &ndash;invert-paths
+      &ndash;path ocfl/&lt;path&gt;/</tt>, with the object's path in the
+      layout); 3. force-push the rewritten branches, and delete tags that
+      point to commits holding the files; 4. ask the host to remove what it
+      keeps of the old history (on GitHub, cached views and the references of
+      pull requests are removed on request to its support; forks are separate
+      repositories, which it does not change).
     </p>
     <p>
       This is the only rewrite of the published branch allowed. The commit of
@@ -784,6 +803,19 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
           5.1) and the takedown (section 9) use the object's path in the
           layout, with the folders of the hash; large archives in git should
           use the hashed layout (section 8).
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 16 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
+          of the specification):** the indexes of the identity proposal (<tt
+          class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>,
+          <tt class="verbatim">sha512/</tt>) are archive files: stored byte for byte
+          (section 4.1), rewritten at every deposit and takedown (sections 5.1
+          and 9); git branches other than the published branch are called
+          working branches (section 6.2), not drafts, which the proposal
+          defines as objects without a genesis record, and a sealed version is
+          not rebuilt once shared.
         </p>
       </li>
     </ul>

@@ -50,7 +50,7 @@
   <\itemize>
     <item><dfn|Repository>: a git repository holding one archive.
 
-    <item><dfn|Archive files>: the files the specification requires to be served byte for byte: the discovery document <verbatim|opensheaf.json>, the storage root (by convention <verbatim|ocfl/>) and, if used, <verbatim|witnesses/>.
+    <item><dfn|Archive files>: the files the specification requires to be served byte for byte: the discovery document <verbatim|opensheaf.json>, the storage root (by convention <verbatim|ocfl/>) and, if used, <verbatim|witnesses/> and the indexes (<verbatim|indexes.json> and the folders <verbatim|names/>, <verbatim|owners/> and <verbatim|sha512/>, section 6.6 of the specification, proposal).
 
     <item><dfn|Presentation files>: the website of the archive (appendix C of the specification), generated from the archive files.
 
@@ -67,7 +67,7 @@
 
   A repository SHOULD hold one archive, with the discovery document at the top of the repository and the storage root in <verbatim|ocfl/>. An archive kept in a sub-folder of a larger repository is allowed; what follows then applies to that folder.
 
-  Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or <verbatim|witnesses/>, and they are not published unless the keeper means them to be (section 7).
+  Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root, <verbatim|witnesses/> or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
 
   The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of objects of other archives are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
 
@@ -75,7 +75,7 @@
 
   <subsection*|4.1 Attributes><label|41-attributes>
 
-  The repository MUST contain a <verbatim|.gitattributes> file at its top with these lines (with <verbatim|witnesses/**> only if the archive uses that folder, and the paths adjusted if the archive is in a sub-folder):
+  The repository MUST contain a <verbatim|.gitattributes> file at its top with these lines (with <verbatim|witnesses/**> only if the archive uses that folder, the lines of the indexes only if it keeps them, and the paths adjusted if the archive is in a sub-folder):
 
   <\verbatim-code>
     # OpenSheaf archive files: stored and checked out byte for byte,
@@ -87,6 +87,14 @@
     ocfl/** \ \ \ \ \ \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
 
     witnesses/** \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
+
+    indexes.json \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
+
+    names/** \ \ \ \ \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
+
+    owners/** \ \ \ \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
+
+    sha512/** \ \ \ \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
   </verbatim-code>
 
   <\itemize>
@@ -125,7 +133,7 @@
 
   Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
 
-  1. a new object folder <verbatim|ocfl/\<less\>path\<gtr\>/>, where <verbatim|\<less\>path\<gtr\>> is the object's path in the layout of the storage root (<verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive); 2. a new version folder <verbatim|ocfl/\<less\>path\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version; 3. files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder, or under <verbatim|witnesses/>; 4. the replacement of <verbatim|opensheaf.json>; 5. at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification); 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9); 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
+  1. a new object folder <verbatim|ocfl/\<less\>path\<gtr\>/>, where <verbatim|\<less\>path\<gtr\>> is the object's path in the layout of the storage root (<verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive); 2. a new version folder <verbatim|ocfl/\<less\>path\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version; 3. files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder, or under <verbatim|witnesses/>; 4. the replacement of <verbatim|opensheaf.json>, and files added, replaced or removed among the indexes (<verbatim|indexes.json>, <verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>), which are rewritten at every deposit and takedown (section 6.6 of the specification, proposal); 5. at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification); 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9); 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
 
   No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -143,7 +151,7 @@
 
   If no copy with the right bytes can be found, the file is lost. It MUST NOT be replaced by other bytes, and verifiers keep reporting it as missing or corrupt. (Lost and corrupted files are in scope for OCFL version 2; see section 11.3 of the specification.)
 
-  <section*|6. Commits, branches and drafts><label|6-commits-branches-and-drafts>
+  <section*|6. Commits, working branches and merging><label|6-commits-working-branches-and-merging>
 
   <subsection*|6.1 Commits><label|61-commits>
 
@@ -153,9 +161,9 @@
 
   Commits and tags MAY be signed. They are witnesses of who published a state of the archive, not part of its integrity (section 13.2 of the specification).
 
-  <subsection*|6.2 Drafts><label|62-drafts>
+  <subsection*|6.2 Working branches><label|62-working-branches>
 
-  Branches other than the published branch are working space. They MAY be rewritten, and the object versions they hold are not yet published: a tool MAY rebuild them, changing their pins, until they are merged into the published branch. Once a version is on the published branch it is fixed. (Draft and private states of archives and objects are discussed in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>.)
+  Git branches other than the published branch are <dfn|working branches>: working space, not branches of an object (section 10.5 of the specification, proposal). They MAY be rewritten, and the object versions they hold are not yet published: a tool MAY rebuild them, changing their pins, until they are merged into the published branch, unless a version has already been shared, since a sealed version MUST NOT change once it has left its owner's hands (section 6.5 of the specification, proposal). Once a version is on the published branch it is fixed. (Drafts, objects without a genesis record, and private states of archives and objects are discussed in section 6.5 of the specification, proposal, and in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>.)
 
   <subsection*|6.3 Merging><label|63-merging>
 
@@ -227,7 +235,7 @@
 
   When content must be removed (by law, or for a breach of rights), the keeper MUST:
 
-  1. commit the removal of the object folder and the tombstone, as in section 5.1, item 6; 2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with <verbatim|git filter-repo --invert-paths --path ocfl/\<less\>path\<gtr\>/>, with the object's path in the layout); 3. force-push the rewritten branches, and delete tags that point to commits holding the files; 4. ask the host to remove what it keeps of the old history (on GitHub, cached views and the references of pull requests are removed on request to its support; forks are separate repositories, which it does not change).
+  1. commit the removal of the object folder and the tombstone, and the update of the indexes if the archive keeps them (the object's entries kept with <verbatim|status> <verbatim|removed>, its name removed from <verbatim|owners/>, section 6.6 of the specification, proposal), as in section 5.1, items 4 and 6; 2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with <verbatim|git filter-repo --invert-paths --path ocfl/\<less\>path\<gtr\>/>, with the object's path in the layout); 3. force-push the rewritten branches, and delete tags that point to commits holding the files; 4. ask the host to remove what it keeps of the old history (on GitHub, cached views and the references of pull requests are removed on request to its support; forks are separate repositories, which it does not change).
 
   This is the only rewrite of the published branch allowed. The commit of step 1 SHOULD say that it is a takedown, and name the object, so that a check comparing the history before and after (section 10) can recognise it. The rewrite changes the hash of every commit after the first that held the object: signatures of those commits and tags no longer verify, and clones must be made again. Copies of the repository elsewhere (forks, other clones, Software Heritage) follow their own rules, as external copies do (section 11.3 of the specification).
 
@@ -283,6 +291,8 @@
     <item><strong|0.1 (draft), 15 November 2026, revision:> repairs (section 5.3): a file whose bytes do not match its inventory, such as a Git LFS pointer committed by mistake, is replaced by the right bytes in a new commit, the only change allowed to an existing version folder; the append-only check accepts it.
 
     <item><strong|0.1 (draft), 16 November 2026, revision:> the hashed storage layout of the specification: the append-only rules (section 5.1) and the takedown (section 9) use the object's path in the layout, with the folders of the hash; large archives in git should use the hashed layout (section 8).
+
+    <item>**0.1 (draft), 16 November 2026, proposal (branch <verbatim|proposal/identity> of the specification):** the indexes of the identity proposal (<verbatim|indexes.json>, <verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>) are archive files: stored byte for byte (section 4.1), rewritten at every deposit and takedown (sections 5.1 and 9); git branches other than the published branch are called working branches (section 6.2), not drafts, which the proposal defines as objects without a genesis record, and a sealed version is not rebuilt once shared.
   </itemize>
 
 </body>

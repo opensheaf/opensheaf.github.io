@@ -478,10 +478,10 @@
           the archive is created: changing it keeps every pin valid, since
           clients compute paths from <tt class="verbatim">storageLayout</tt>, but moves
           every object and so changes every URL into the storage root (the <tt
-          class="verbatim">record</tt> of an accepted copy, section 10.5, or a link in a
-          document), so archives SHOULD NOT change it. The storage root MAY
-          contain, as loose files allowed by OCFL, a copy of the OCFL
-          specification and of this specification.
+          class="verbatim">url</tt> of a branch's <tt class="verbatim">parent</tt>, section 10.5,
+          or a link in a document), so archives SHOULD NOT change it. The
+          storage root MAY contain, as loose files allowed by OCFL, a copy of
+          the OCFL specification and of this specification.
         </p>
       </li>
       <li>
@@ -698,12 +698,12 @@
     <div class="os-alert os-note">
       <font class="os-alert-label">Note.</font> <strong>Proposal.</strong> This section, and
       the sections it changes (3 to 5, 6.1 to 6.4, 7, 8.1, 9, 10.2 to 10.6,
-      11.3, 13.2, 14 to 16 and appendices D to F, with the FAQ and the use
-      cases), together with section 6.6, are a proposal on the branch <tt
-      class="verbatim">proposal/identity</tt>, not yet agreed. It builds on the
-      discussions of self-certifying names (#20), decentralised holding and
-      keys (#13), global names (#14), private and draft objects (#29) and the
-      evidence of accepted copies (#22).
+      11.3, 13.2, 14 to 16 and appendices D to F, with the FAQ, the use cases
+      and the companion OpenSheaf archives in git), together with section 6.6,
+      are a proposal on the branch <tt class="verbatim">proposal/identity</tt>, not yet
+      agreed. It builds on the discussions of self-certifying names (#20),
+      decentralised holding and keys (#13), global names (#14), private and
+      draft objects (#29) and the evidence of accepted copies (#22).
     </div>
     <p>
       An object identifier names an object within its archive (section 6.3).
@@ -1449,14 +1449,15 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       when no copy of the genesis record is found, it is reported as a removed
       line of that name, owner unknown), or, for <tt class="verbatim">:*</tt>, every
       entry found by the search for the work (above), each line checked and
-      confirmed separately, then reads the history of the object it finds; it
-      looks up a pin in <tt class="verbatim">sha512/</tt>, and an owner in <tt class="verbatim">owners/</tt>
-      (two different owner URIs under one owner identifier are a collision:
-      the resolver lists them and does not choose); at an archive that keeps
-      no indexes, it MAY read <tt class="verbatim">objects</tt> of the discovery
-      document instead, which gives each object's <tt class="verbatim">name</tt> and <tt
-      class="verbatim">owner</tt>, and fetches <tt class="verbatim">genesis.json</tt> and <tt
-      class="verbatim">object.json</tt> from the objects for the search. Like the
+      confirmed separately, then reads the history of the object it finds, at
+      the path given by the layout of that archive's discovery document
+      (section 6.4); it looks up a pin in <tt class="verbatim">sha512/</tt>, and an
+      owner in <tt class="verbatim">owners/</tt> (two different owner URIs under one
+      owner identifier are a collision: the resolver lists them and does not
+      choose); at an archive that keeps no indexes, it MAY read <tt class="verbatim">objects</tt>
+      of the discovery document instead, which gives each object's <tt class="verbatim">name</tt>
+      and <tt class="verbatim">owner</tt>, and fetches <tt class="verbatim">genesis.json</tt> and
+      <tt class="verbatim">object.json</tt> from the objects for the search. Like the
       discovery document, indexes are maps, not witnesses: they are rewritten
       when objects change, and a resolver checks what it finds as above.
     </p>
@@ -2279,16 +2280,16 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       into its own storage root, under the same identifier (only if no object
       of its own has it), at the path given by its own layout. A mirror is the
       same object, not a new one: it also copies the object's witnesses
-      (section 13.2), and its <tt class="verbatim">object.json</tt> files keep naming
-      the original archive, and the discovery document lists it with <tt
-      class="verbatim">mirrorOf</tt>, the identifier of the original archive (section
-      6.1). A mirror is brought up to date only by copying the new versions of
-      the original, which is possible because OCFL objects only grow; it MUST
-      NOT be changed otherwise. Mirroring is allowed only if the licences of
-      all the versions copied allow redistribution. A catalogue MAY list a
-      mirror of a member in the member's <tt class="verbatim">mirrors</tt>. An archive
-      that mirrors another archive entirely SHOULD be listed in the <tt class="verbatim">mirrors</tt>
-      of that archive's discovery document, with the agreement of its owner.
+      (section 13.2); its <tt class="verbatim">object.json</tt> files keep naming the
+      original archive, and the discovery document lists it with <tt class="verbatim">mirrorOf</tt>,
+      the identifier of the original archive (section 6.1). A mirror is
+      brought up to date only by copying the new versions of the original,
+      which is possible because OCFL objects only grow; it MUST NOT be changed
+      otherwise. Mirroring is allowed only if the licences of all the versions
+      copied allow redistribution. A catalogue MAY list a mirror of a member
+      in the member's <tt class="verbatim">mirrors</tt>. An archive that mirrors another
+      archive entirely SHOULD be listed in the <tt class="verbatim">mirrors</tt> of that
+      archive's discovery document, with the agreement of its owner.
     </p>
     <p>
       Mirrors serve preservation and access (an institution keeping copies of
@@ -2309,28 +2310,29 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
       (the branch point), <tt class="verbatim">documentVersion</tt> and <tt class="verbatim">inventorySha512</tt>
       of the parent version, and SHOULD record the <tt class="verbatim">url</tt> of that
       object version, an absolute URL (<tt class="verbatim">&lt;storage root
-      URL&gt;&lt;object id&gt;/&lt;version&gt;/</tt>), so that it can be
-      resolved (section 6.4). Its <tt class="verbatim">datacite.json</tt> describes it
-      with the branch owner (for a selection, its archive) as <tt class="verbatim">publisher</tt>
-      and keeps the relations of the parent version; the first version of a
-      shallow branch, and every version that moves its branch point, SHOULD
-      link the parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if
-      it has one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt> of
-      <tt class="verbatim">parent</tt>). A branch is deep or shallow.
+      URL&gt;&lt;path&gt;/&lt;version&gt;/</tt>, with <tt class="verbatim">&lt;path&gt;</tt>
+      the object's path in the layout of the parent's storage root, section
+      5), so that it can be resolved (section 6.4). Its <tt class="verbatim">datacite.json</tt>
+      describes it with the branch owner (for a selection, its archive) as <tt
+      class="verbatim">publisher</tt> and keeps the relations of the parent version; the
+      first version of a shallow branch, and every version that moves its
+      branch point, SHOULD link the parent version with <tt class="verbatim">IsIdenticalTo</tt>:
+      its DOI if it has one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt>
+      of <tt class="verbatim">parent</tt>). A branch is deep or shallow.
     </p>
     <ul>
       <li>
         <p>
           A <strong>deep branch</strong> holds the parent's object versions up
           to the branch point, byte for byte, under the parent's object
-          identifier (only if no object of its own archive has it), and
-          continues them with versions of its own owner. Its common past with
-          the parent is checked by the records of those versions in its
-          inventories, which equal the parent's. It copies every earlier
-          version, so it is allowed only if their licences allow
-          redistribution, or with the agreement of their owners, recorded as
-          <tt class="verbatim">agreement</tt> in the <tt class="verbatim">object.json</tt> of its
-          first own version (section 9).
+          identifier (only if no object of its own archive has it), at the
+          path given by its own layout, and continues them with versions of
+          its own owner. Its common past with the parent is checked by the
+          records of those versions in its inventories, which equal the
+          parent's. It copies every earlier version, so it is allowed only if
+          their licences allow redistribution, or with the agreement of their
+          owners, recorded as <tt class="verbatim">agreement</tt> in the <tt class="verbatim">object.json</tt>
+          of its first own version (section 9).
         </p>
       </li>
       <li>
@@ -3524,6 +3526,20 @@ sheaf:&lt;name&gt;[:&lt;owner id&gt;]/v&lt;n&gt;?sha512=&lt;digest&gt;   one obj
           updated.
         </p>
       </li>
+      <li>
+        <p>
+          **0.1 (draft), 16 November 2026, proposal aligned with the hashed
+          layout (branch <tt class="verbatim">proposal/identity</tt>):** the <tt class="verbatim">url</tt>
+          of a branch's <tt class="verbatim">parent</tt> and the copies of a deep branch
+          use the object's path in the layout; index entries are resolved
+          through the layout of the archive they name; appendix F notes that a
+          name used as identifier sits under the hash of that identifier;
+          section 5 names <tt class="verbatim">parent.url</tt> in place of the <tt
+          class="verbatim">record</tt> of an accepted copy; the git companion keeps the
+          indexes (its sections 2, 4.1, 5.1 and 9) and calls its git branches
+          working branches.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-41"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4080,11 +4096,14 @@ https://opensheaf.org/sheaf:2kukpn74/v3
           over folders named by the hash of their identifiers (<tt class="verbatim">0003-hash-and-id-n-tuple-storage-layout</tt>),
           which keeps the identifier as the name of the object's folder and
           the path computable by rule (a browser computes SHA-256 natively);
-          its parameters are fixed so that every client computes the same
-          paths, and the layout is chosen once, since changing it changes
-          every URL into the storage root (though no pin). The layout of
-          Fedora (<tt class="verbatim">0004-hashed-n-tuple-storage-layout</tt>) was not
-          chosen, since it names the object's folder by the hash alone.
+          an object whose identifier is its name (section 6.5, proposal) is
+          placed in the same way, under the hash of that identifier, which has
+          nothing to do with the digest that made the name; its parameters are
+          fixed so that every client computes the same paths, and the layout
+          is chosen once, since changing it changes every URL into the storage
+          root (though no pin). The layout of Fedora (<tt class="verbatim">0004-hashed-n-tuple-storage-layout</tt>)
+          was not chosen, since it names the object's folder by the hash
+          alone.
         </p>
       </li>
       <li>
