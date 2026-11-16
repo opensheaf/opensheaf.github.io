@@ -333,26 +333,31 @@ owners can take part: an ORCID iD asserted as owner signs nothing. The
 question is left for later, in issue
 [#53](https://github.com/opensheaf/opensheaf.github.io/issues/53).
 
-#### Signing the discovery document
+#### Signed references: not needed
 
 **In Radicle.** Each time a peer's branches change, its node signs the whole
 list, each branch with its commit, as one statement. Whoever delivers a
 copy, a reader can check that it is exactly what the peer published.
 
-**In OpenSheaf.** The discovery document `opensheaf.json` lists each object
-with its head and the digest of its inventory. The specification calls it "a
-map, not a witness" (section 6.1): it is checked against the storage root,
-but nobody answers for it. Each version is protected by its pin; what is not
-protected is which version is the latest. A copy of an archive kept
-elsewhere, or an attacker on the way, could serve an older map, hiding a newer
-version or a withdrawal.
+**In OpenSheaf.** The nearest counterpart would be a signed discovery
+document, and it is not needed, because the history of an object is linear.
+Radicle signs its references because git references are mutable: a branch
+can be moved to any commit, rewritten or deleted, and a peer has many of
+them, so only the peer's signature says which state is its own. An OpenSheaf
+object only grows: each version's inventory fixes every version before it,
+and a line has one writer (PR #30). Of two copies of an object, either one
+is a prefix of the other, and the longer is simply more recent, or they
+diverge, which is a fork and is detected without any signature. The
+discovery document says nothing that cannot be checked: it is "a map, not a
+witness" (section 6.1), and every head and digest it states is verified
+against the storage root. Who made a version is answered for each version,
+by the owner's signature in PR #30 or by witnesses (section 13.2), not by
+signing the map.
 
-The archive's key could sign each new `opensheaf.json`, with a sequence
-number and a timestamp. A copy kept anywhere (a seed, a mirror, Software
-Heritage) would then prove that on a given date the archive declared these
-heads. An old map remains validly signed, so freshness needs the sequence
-number and the timestamp; and the signature needs archive keys, which issue
-#13 discusses.
+What linearity does not give is freshness: a copy that stops at an older
+version looks, by itself, like a complete one. A signed map does not give it
+either, since an old map stays validly signed; a reader who needs the latest
+version asks the archive itself, or compares copies and keeps the longest.
 
 #### Announcements
 
@@ -428,9 +433,10 @@ years.
 OpenSheaf should not be built on Radicle (section 4.2). An archive kept in git
 may be published on Radicle as one more copy (section 4.1). The designs of
 section 4.3 deserve to be weighed in the discussions they touch: delegates
-and thresholds in issue #53, signed discovery documents and custodians in
-issue #13, announcements for indexes in issue #20, encryption for private archives
-in issue #29.
+and thresholds in issue #53, custodians in issue #13, announcements for
+indexes in issue #20, encryption for private archives in issue #29. One is not
+needed: Radicle signs its references because they are mutable, while the
+history of an OpenSheaf object is linear and checkable without them.
 
 ## 6. Experiments
 
@@ -449,9 +455,6 @@ in issue #29.
 4. **Delegates for a line.** Write the rules of PR #30 for a line with two
    owners and a threshold, as Radicle's identity document does, and see what
    a verifier must replay.
-5. **Signed discovery documents.** Sign each version of `opensheaf.json`
-   with the archive's key, as signed references sign a peer's branches, and
-   see what a reader of a copy gains.
 
 ## 7. Open questions
 
@@ -462,8 +465,6 @@ in issue #29.
   way to keep copies of an archive in git?
 - Is a quorum of keys the right model for co-authors in PR #30, or should a
   line keep one writer and co-authors keep lines of their own? (Issue #53.)
-- Should an archive sign its discovery document, making it a witness of the
-  map of the archive?
 
 ## References
 
