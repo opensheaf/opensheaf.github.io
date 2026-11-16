@@ -39,7 +39,10 @@
       "pattern": "/$"
     },
     "storageLayout": {
-      "const": "0002-flat-direct-storage-layout"
+      "enum": [
+        "0002-flat-direct-storage-layout",
+        "0003-hash-and-id-n-tuple-storage-layout"
+      ]
     },
     "mainCollection": {
       "type": "string",

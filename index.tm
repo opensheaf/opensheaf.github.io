@@ -8,7 +8,7 @@
   <specific|html*|<html-class|visually-hidden|<html-tag|h:h1|OpenSheaf>>>
 
   <\center>
-    <vspace*|4fn><html-attr|alt|OpenSheaf|<image|resources/brand/opensheaf-logo.svg|0.65par|||>><vspace|5fn>
+    <vspace*|1fn><html-attr|alt|OpenSheaf|<image|resources/brand/opensheaf-logo.svg|0.65par|||>><vspace|2.5fn>
   </center>
 
   <notes-abstract|OpenSheaf is an open format for archives of scholarly documents and for collections of them. Read the <hlink|specification|opensheaf-specification-0.1.tm> (version 0.1) and the <hlink|FAQ|faq.tm>, which explains its main choices. The site is <hlink|opensheaf.org|https://opensheaf.org> (also <verbatim|sheaf.pub>).>
@@ -70,7 +70,7 @@
 
     <item><strong|Explorer:> the <hlink|OpenSheaf Explorer|https://opensheaf.org/explorer/> (<hlink|opensheaf/explorer|https://github.com/opensheaf/explorer>, also a <hlink|literate program|https://opensheaf.org/explorer/source/>) shows an archive or a collection in the browser, its objects, versions, files and members across archives, and verifies it as section 14 asks, from a static page: open it with the address of an archive (<hlink|example|https://opensheaf.org/explorer/?url=https://mgubi.org/papers/>), link it from an archive's pages, or keep a copy in an archive.
 
-    <item><strong|Templates:> <hlink|archive-template|https://github.com/opensheaf/archive-template>, a ready repository for your own archive of papers, and <hlink|collection-template|https://github.com/opensheaf/collection-template>, for a curated collection of papers from any archive (a reading list, written as a selection, or a catalogue); both are published with GitHub Pages ("Use this template", then <verbatim|osheaf init>), and both are testing grounds that run every workflow of the tools on every push.
+    <item><strong|Template:> <hlink|archive-template|https://github.com/opensheaf/archive-template>, a ready repository for an archive of papers and for collections of papers from any archive (a reading list or a journal issue, written as a selection, or a catalogue), kept from the browser with GitHub's forms or with <verbatim|osheaf>, and published with GitHub Pages; it is also a testing ground that runs every workflow of the tools on every push.
 
     <item><strong|Test data:> <hlink|example-papers|https://github.com/opensheaf/example-papers>, papers to deposit (invented ones, TeXmacs papers and slides, real openly licensed preprints from arXiv and slides from Zenodo) with their metadata.
   </itemize>
@@ -84,11 +84,13 @@
 
     <item><hlink|<verbatim|USE-CASES.md>|use-cases.tm>: how the specification adapts to authors, archives and selections (non-normative).
 
+    <item><hlink|<verbatim|opensheaf-git-0.1.md>|opensheaf-git-0.1.tm>: OpenSheaf archives in git, a companion to the specification: how to keep, publish and copy an archive in a git repository without changing its bytes.
+
     <item><hlink|<verbatim|README.md>|https://github.com/opensheaf/opensheaf.github.io/blob/main/README.md>: this text, also the home page of the site.
 
     <item><hlink|<verbatim|schemas/>|https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas>: the JSON Schemas of the files defined by the specification, also published at <verbatim|https://opensheaf.org/schemas/>: <hlink|<verbatim|opensheaf-archive-0.1.schema.json>|https://opensheaf.org/schemas/opensheaf-archive-0.1.schema.json> for <verbatim|opensheaf.json>, <hlink|<verbatim|opensheaf-object-0.1.schema.json>|https://opensheaf.org/schemas/opensheaf-object-0.1.schema.json> for <verbatim|object.json> and <hlink|<verbatim|opensheaf-collection-0.1.schema.json>|https://opensheaf.org/schemas/opensheaf-collection-0.1.schema.json> for <verbatim|members.json>.
 
-    <item><hlink|<verbatim|index.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm>/<hlink|<verbatim|index.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html>, <hlink|<verbatim|opensheaf-specification-0.1.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm>/<hlink|<verbatim|.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html>, <hlink|<verbatim|faq.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm>/<hlink|<verbatim|faq.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html>, <hlink|<verbatim|use-cases.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm>/<hlink|<verbatim|use-cases.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html>: the pages of the site, generated from the Markdown files (for TeXmacs and for the web); do not edit them.
+    <item><hlink|<verbatim|index.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm>/<hlink|<verbatim|index.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html>, <hlink|<verbatim|opensheaf-specification-0.1.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm>/<hlink|<verbatim|.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html>, <hlink|<verbatim|faq.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm>/<hlink|<verbatim|faq.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html>, <hlink|<verbatim|use-cases.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm>/<hlink|<verbatim|use-cases.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html>, <hlink|<verbatim|opensheaf-git-0.1.tm>|https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.tm>/<hlink|<verbatim|.html>|https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.html>: the pages of the site, generated from the Markdown files (for TeXmacs and for the web); do not edit them.
 
     <item><hlink|<verbatim|notes-meta.ts>|https://github.com/opensheaf/opensheaf.github.io/blob/main/notes-meta.ts>: the TeXmacs style package of the page; <hlink|<verbatim|resources/>|https://github.com/opensheaf/opensheaf.github.io/tree/main/resources>: its stylesheets, scripts and fonts.
 

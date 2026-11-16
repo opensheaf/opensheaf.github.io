@@ -36,7 +36,9 @@ only what its two standards leave open:
   proposal, the writer of a line is its owner, and the archive keeps it).
 - **Discovery document** `opensheaf.json` (6.1): a mutable map, never a
   witness: format, archive identifier, name, storage root, layout
-  (`0002-flat-direct-storage-layout`), `objects` (each with `id`, `kind`,
+  (`0002-flat-direct-storage-layout`, or
+  `0003-hash-and-id-n-tuple-storage-layout` for large archives, section 5,
+  also in `ocfl_layout.json`), `objects` (each with `id`, `kind`,
   `head`, `inventorySha512`, `status`, and `mirrorOf` for mirrors),
   `profiles`; SHOULD `mainCollection`, `contact`, `extensions`; MAY
   `mirrors`, `tombstones`, `keys`, `feed`; (proposal) `name` and `owner`

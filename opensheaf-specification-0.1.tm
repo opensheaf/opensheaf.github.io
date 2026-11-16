@@ -140,7 +140,7 @@
   <\itemize>
     <item><strong|A discovery document>, <verbatim|opensheaf.json>, at its base URL (section 6). It is REQUIRED.
 
-    <item><strong|A storage root>, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST use the storage layout extension <verbatim|0002-flat-direct-storage-layout>, so that an object with identifier <verbatim|\<less\>id\<gtr\>> is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>id\<gtr\>/>. It MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
+    <item><strong|A storage root>, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST contain <verbatim|ocfl_layout.json>, whose <verbatim|extension> MUST be the storage layout named by <verbatim|storageLayout> in the discovery document (section 6.1), one of two storage layout extensions of OCFL: <verbatim|0002-flat-direct-storage-layout>, so that an object with identifier <verbatim|\<less\>id\<gtr\>> is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>id\<gtr\>/>; or, for large archives, <verbatim|0003-hash-and-id-n-tuple-storage-layout> with its default parameters (<verbatim|digestAlgorithm> <verbatim|sha256>, <verbatim|tupleSize> 3, <verbatim|numberOfTuples> 3; its configuration file <verbatim|extensions/0003-hash-and-id-n-tuple-storage-layout/config.json>, if present, MUST NOT set other values, and a parameter it omits takes its default), so that the object is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>/>, where <verbatim|\<less\>t1\<gtr\>>, <verbatim|\<less\>t2\<gtr\>> and <verbatim|\<less\>t3\<gtr\>> are the first three groups of three characters of the lowercase hexadecimal SHA-256 digest of the identifier (as UTF-8). Since object identifiers are short and use only safe characters (section 6.3), the folder of an object is named by its identifier in both. Archives SHOULD use the flat-direct layout unless their size makes one folder holding every object impractical (for instance from tens of thousands of objects, or fewer in a git repository; appendix F). The layout is chosen when the archive is created: changing it keeps every pin valid, since clients compute paths from <verbatim|storageLayout>, but moves every object and so changes every URL into the storage root (the <verbatim|record> of an accepted copy, section 10.5, or a link in a document), so archives SHOULD NOT change it. The storage root MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
 
     <item><strong|Witnesses>, OPTIONAL: signatures and timestamp proofs of object versions, in each object's extension folder <verbatim|extensions/opensheaf-witnesses/>, or under <verbatim|witnesses/> next to the discovery document (section 13.2).
 
@@ -149,11 +149,11 @@
     <item><strong|Presentation files>, OPTIONAL, anywhere outside the storage root, <verbatim|witnesses/> and the indexes (appendix C).
   </itemize>
 
-  Because OCFL does not allow directories other than objects and extensions inside a storage root, the storage root SHOULD be a dedicated folder (by convention <verbatim|ocfl/>), and presentation files MUST NOT be placed inside it.
+  Because OCFL allows inside a storage root only the folders that hold objects (the objects themselves and, in the hashed layout, the folders of the hash above them) and extensions, the storage root SHOULD be a dedicated folder (by convention <verbatim|ocfl/>), and presentation files MUST NOT be placed inside it.
 
   All files of the discovery document, the storage root, <verbatim|witnesses/> and the indexes (if used) MUST be served byte for byte, as stored: no conversion of line endings or character sets, no compression that changes the bytes delivered after decoding. Archives kept in git SHOULD mark these files as binary (for instance with <verbatim|.gitattributes> lines <verbatim|ocfl/** -text>, <verbatim|opensheaf.json -text> and, where used, <verbatim|witnesses/** -text>, <verbatim|names/** -text>, <verbatim|owners/** -text> and <verbatim|sha512/** -text>). Archives SHOULD be served over HTTPS and SHOULD allow cross-origin requests to these files (<verbatim|Access-Control-Allow-Origin: *>), so that tools running in a browser can resolve members.
 
-  An archive MAY be kept in git and served by any static web server (GitHub Pages, object storage, a university server). A deployment guide, outside this specification, discusses hosting limits and practices.
+  An archive MAY be kept in git and served by any static web server (GitHub Pages, object storage, a university server). The companion document <hlink|OpenSheaf archives in git|opensheaf-git-0.1.tm>, outside this specification, says how to keep, publish and copy an archive in git without changing its bytes.
 
   <section*|6. Discovery and identity><label|6-discovery-and-identity>
 
@@ -172,7 +172,7 @@
 
     <item><verbatim|storageRoot>: the URL of the storage root, ending with <verbatim|/> (relative URLs are allowed);
 
-    <item><verbatim|storageLayout>: <verbatim|"0002-flat-direct-storage-layout">;
+    <item><verbatim|storageLayout>: the storage layout extension of the storage root, <verbatim|"0002-flat-direct-storage-layout"> or <verbatim|"0003-hash-and-id-n-tuple-storage-layout"> (section 5);
 
     <item><verbatim|objects>: the list of all objects in the storage root, each with <verbatim|id>, <verbatim|kind>, <verbatim|head> (the head object version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as written in its checksum file) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, section 11); a mirror (section 10.4) also has <verbatim|mirrorOf>, the archive identifier of the archive whose object it copies, which is not the archive's own; an object with a genesis record (section 6.5) also has its <verbatim|name> and <verbatim|owner>.
   </itemize>
@@ -187,16 +187,16 @@
 
   <subsection*|6.3 Object identifiers><label|63-object-identifiers>
 
-  An object identifier MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$> and MUST be at most 64 characters long. It is the OCFL <verbatim|id> of the object and the name of its folder in the storage root. It MUST be unique in the archive and MUST NOT be reused, also after a takedown. Since it is permanent and appears in every URL of the object, it SHOULD be short (at most 32 characters), readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title, which may change between versions while the identifier cannot; tools importing documents propose identifiers and the depositor decides. Notwithstanding these recommendations, an archive MAY use the object's name (section 6.5), 52 characters, as its identifier, unless it keeps two objects of that name (lines of several owners). The kind of an object is given by its <verbatim|object.json>, never by its identifier. Outside the archive, an object is named by the pair (archive identifier, object identifier) of its <verbatim|object.json>, which a mirror keeps unchanged; with the proposal of section 6.5, its line is also named by the pair (owner, name), independently of any archive.
+  An object identifier MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$> and MUST be at most 64 characters long. It is the OCFL <verbatim|id> of the object and the name of its folder in the storage root (under the folders of the hash, in the hashed layout, section 5). It MUST be unique in the archive and MUST NOT be reused, also after a takedown. Since it is permanent and appears in every URL of the object, it SHOULD be short (at most 32 characters), readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title, which may change between versions while the identifier cannot; tools importing documents propose identifiers and the depositor decides. Notwithstanding these recommendations, an archive MAY use the object's name (section 6.5), 52 characters, as its identifier, unless it keeps two objects of that name (lines of several owners). The kind of an object is given by its <verbatim|object.json>, never by its identifier. Outside the archive, an object is named by the pair (archive identifier, object identifier) of its <verbatim|object.json>, which a mirror keeps unchanged; with the proposal of section 6.5, its line is also named by the pair (owner, name), independently of any archive.
 
   <subsection*|6.4 Resolution><label|64-resolution>
 
   To fetch an object version of a member, a client:
 
   <\itemize>
-    <item>reads the discovery document at the member's archive URL (section 10.2) and fetches <verbatim|\<less\>storageRoot\<gtr\>\<less\>id\<gtr\>/\<less\>version\<gtr\>/inventory.json>;
+    <item>reads the discovery document at the member's archive URL (section 10.2) and fetches <verbatim|\<less\>storageRoot\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/inventory.json>, where <verbatim|\<less\>path\<gtr\>> is the path of the object given by the <verbatim|storageLayout> of the discovery document (section 5): <verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout;
 
-    <item>if this fails, tries the mirrors listed in the member, then those listed in the archive's discovery document;
+    <item>if this fails, tries the mirrors listed in the member, then those listed in the archive's discovery document, each resolved through its own discovery document and layout;
 
     <item>if this fails, MAY use external copies: the files of an external record named in the version's <verbatim|object.json> (a DOI record), or a software archive snapshot (a SWHID).
   </itemize>
@@ -593,7 +593,7 @@
 
   <subsection*|10.4 Mirrors><label|104-mirrors>
 
-  An archive MAY mirror an object of another archive: copy the whole object, every version with its inventories and files, byte for byte, into its own storage root, under the same identifier (only if no object of its own has it). A mirror is the same object, not a new one: it also copies the object's witnesses (section 13.2), and its <verbatim|object.json> files keep naming the original archive, and the discovery document lists it with <verbatim|mirrorOf>, the identifier of the original archive (section 6.1). A mirror is brought up to date only by copying the new versions of the original, which is possible because OCFL objects only grow; it MUST NOT be changed otherwise. Mirroring is allowed only if the licences of all the versions copied allow redistribution. A catalogue MAY list a mirror of a member in the member's <verbatim|mirrors>. An archive that mirrors another archive entirely SHOULD be listed in the <verbatim|mirrors> of that archive's discovery document, with the agreement of its owner.
+  An archive MAY mirror an object of another archive: copy the whole object, every version with its inventories and files, byte for byte, into its own storage root, under the same identifier (only if no object of its own has it), at the path given by its own layout. A mirror is the same object, not a new one: it also copies the object's witnesses (section 13.2), and its <verbatim|object.json> files keep naming the original archive, and the discovery document lists it with <verbatim|mirrorOf>, the identifier of the original archive (section 6.1). A mirror is brought up to date only by copying the new versions of the original, which is possible because OCFL objects only grow; it MUST NOT be changed otherwise. Mirroring is allowed only if the licences of all the versions copied allow redistribution. A catalogue MAY list a mirror of a member in the member's <verbatim|mirrors>. An archive that mirrors another archive entirely SHOULD be listed in the <verbatim|mirrors> of that archive's discovery document, with the agreement of its owner.
 
   Mirrors serve preservation and access (an institution keeping copies of its members' archives, an independent storage site): they are impartial, like catalogues, and carry every version.
 
@@ -643,7 +643,7 @@
 
   <subsection*|11.2 Takedown><label|112-takedown>
 
-  When content must be removed (by law, or for a breach of rights), the object is deleted from the storage root and a tombstone MUST be added to the discovery document.
+  When content must be removed (by law, or for a breach of rights), the object is deleted from the storage root, together with the folders of the hash that the deletion leaves empty (in the hashed layout, section 5, since OCFL forbids empty folders in a storage root), and a tombstone MUST be added to the discovery document.
 
   <subsection*|11.3 Tombstones><label|113-tombstones>
 
@@ -720,7 +720,7 @@
   <\itemize>
     <item>validate the discovery document, and every <verbatim|object.json> (<verbatim|parent.object.json> included), <verbatim|members.json> and <verbatim|genesis.json>, against the schemas of their declared versions (and the index files of section 6.6, if present), checking formats (dates, URIs) as assertions, which JSON Schema 2020-12 leaves optional;
 
-    <item>validate the storage root and every object against OCFL 1.1 (with a standard OCFL validator or equivalent checks);
+    <item>validate the storage root and every object against OCFL 1.1 (with a standard OCFL validator or equivalent checks), and check that the storage root's <verbatim|ocfl_layout.json> names the layout given by <verbatim|storageLayout>, that its configuration does not change the parameters of section 5, and that every object is at the path that layout gives;
 
     <item>check that the discovery document lists the objects of the storage root with their kinds, head versions, inventory digests and status as their head versions state them, and that no listed object has the identifier of a tombstone; a verifier reading the archive over HTTP cannot list folders, so it checks the listed objects and reports that completeness was not checked, while a verifier with access to the files also checks that no object is missing;
 
@@ -802,6 +802,8 @@
 
     <item>**0.1 (draft), 14 November 2026, proposal revised after a fourth review (branch <verbatim|proposal/identity>):** a branch moves its branch point only to a later version of its parent's line, never back; the moving version takes the branch's next document version; continuity of two parent inventories defined; witnesses of each branch point in <verbatim|parent/\<less\>w\<gtr\>/>; a verdict per branch point, the weakest for the branch; the originator's line has no parent; owners of accepted copies differ between selections; the sealing version keeps its document version; no pin names a version without a genesis record; a resolved parent confirms only from a base URL known independently; the examples carry names and owners; privacy of depositors of anonymous owners.
 
+    <item><strong|0.1 (draft), 15 November 2026, revision:> section 5 points to the companion document OpenSheaf archives in git, in place of a deployment guide.
+
     <item>**0.1 (draft), 15 November 2026, proposal (branch <verbatim|proposal/identity>):** <verbatim|sheaf:> URIs for objects, lines, document versions and pins (section 6.6), the owner defaulting to the originator; owner identifiers (the digest of the owner's URI); short forms of at least 8 characters, resolved within one owner by the order of its lines and otherwise listed as ambiguous; indexes by name (with the originator), owner and inventory digest, grouped by two characters, with their schema; an <verbatim|at> hint, outside the identity; gateways serving a URI after their base URL, the gateway's domain and form still to be decided (#14, #20).
 
     <item>**0.1 (draft), 15 November 2026, proposal revised after a fifth review (branch <verbatim|proposal/identity>):** <verbatim|sheaf:> URIs: query grammar, case, percent-encoding of <verbatim|at>, canonical form and equality; <verbatim|/v\<less\>n\<gtr\>> names only sealed versions of the line; a pin checks name, owner and document version; copies found without a digest are confirmed only through the owner's archive or keys, others reported as unconfirmed, forks reported; gateways answer with real statuses, do not serve archives' files, and fetch safely; short forms ordered only among confirmed lines, unconfirmed ones shown as warnings; indexes declared (<verbatim|indexes>, <verbatim|indexes.json>) with prefixes of 2 to 4 characters, sealed versions only, tombstones kept as <verbatim|removed>, <verbatim|owners/> listing each owner's names; resolvers as a conformance class; printed short forms of 16 characters; the replacement of #14's <verbatim|tag:> decision stated; the example ORCID iD given a valid check digit, and the example name recomputed.
@@ -837,6 +839,8 @@
     <item>**0.1 (draft), 16 November 2026, proposal revised after a fifteenth review (branch <verbatim|proposal/identity>):** <verbatim|mirrorOf> is never the archive itself, and the lines an archive keeps name its own <verbatim|archiveId> (section 14); on a deep branch a move takes the number after the highest in the object; a deposit meets a taken line also with a copy or tombstone of it; <verbatim|parent.object.json> validated; wording.
 
     <item>**0.1 (draft), 16 November 2026, proposal revised after a sixteenth review (branch <verbatim|proposal/identity>):** <verbatim|archiveId> defined in section 9 as the identifier of the archive that keeps the line, the archive's own except in mirrors and copied versions; copied versions of a deep branch of a deep branch name their own lines; a deposit meeting a copy of its line leaves the line with the archive that keeps it; the deep-branch move number in section 14; a deep branch holds the earlier versions too; the gateway rule counts the keeping archive's mirrors; owner identifiers end in <verbatim|a> or <verbatim|q> in the schemas.
+
+    <item><strong|0.1 (draft), 16 November 2026, revision:> a storage root MAY use the hashed layout <verbatim|0003-hash-and-id-n-tuple-storage-layout>, with its default parameters, in place of the flat-direct layout, for large archives (issue #19); <verbatim|ocfl_layout.json> is required and names the same layout as <verbatim|storageLayout> in the discovery document; archives should keep the flat-direct layout unless their size requires otherwise, and should not change their layout; resolution (section 6.4), mirrors (section 10.4), takedown (section 11.2, removing empty folders of the hash) and verification (section 14) follow it; sections 6.3 and appendix F updated.
   </itemize>
 
   <section*|Appendix A. Zenodo binding (normative for archives declaring the profile <verbatim|zenodo>)><label|appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo>
@@ -1320,7 +1324,7 @@
   <\itemize>
     <item><strong|Why OCFL.> It is a published, versioned specification for exactly this problem (versioned objects as plain files with digests), with independent validators, used by research libraries. OpenSheaf adds only discovery and collections.
 
-    <item><strong|Why the flat-direct layout.> Paths stay readable and resolvable by rule over plain HTTP; the cost is short identifiers without <verbatim|/>.
+    <item><strong|Why the flat-direct layout, and a hashed layout for large archives.> Paths stay readable and resolvable by rule over plain HTTP; the cost is short identifiers without <verbatim|/>. One folder holding every object becomes impractical at large sizes, mostly in git, where every deposit rewrites a tree listing every object, and in the web views of forges, which show at most about a thousand entries of a folder; object storage, which has no real folders, gains nothing. So a large archive may spread its objects over folders named by the hash of their identifiers (<verbatim|0003-hash-and-id-n-tuple-storage-layout>), which keeps the identifier as the name of the object's folder and the path computable by rule (a browser computes SHA-256 natively); its parameters are fixed so that every client computes the same paths, and the layout is chosen once, since changing it changes every URL into the storage root (though no pin). The layout of Fedora (<verbatim|0004-hashed-n-tuple-storage-layout>) was not chosen, since it names the object's folder by the hash alone.
 
     <item><strong|Why a discovery document.> Static web servers cannot list folders; one small file makes an archive discoverable, and its statements are checked against the storage root.
 

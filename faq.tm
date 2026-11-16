@@ -21,6 +21,10 @@
 
   No. The core of the format is an OCFL storage root and a discovery document served over HTTPS. Zenodo, TeXmacs and the website are optional profiles (appendices A, B and C). Git and GitHub Pages are convenient ways to keep and serve an archive, but any static web server will do.
 
+  <section*|Can an archive be served straight from GitHub, without GitHub Pages?><label|can-an-archive-be-served-straight-from-github-without-github-pages>
+
+  For tools, yes; for readers, no. The raw file server of a public GitHub repository (<verbatim|https://raw.githubusercontent.com/\<less\>owner\<gtr\>/\<less\>repository\<gtr\>/main/>) serves every file byte for byte and allows cross-origin requests, so the Explorer, and other tools that read archives over HTTP, can read and verify an archive from it. It does not serve a website: it sends pages as plain text and PDFs as downloads, so landing pages are neither shown nor read by search engines, and it serves the pointers of Git LFS, not the files. It is best listed as a second location in <verbatim|mirrors> of the discovery document, next to a GitHub Pages site or another web server. See section 7.4 of <hlink|OpenSheaf archives in git|opensheaf-git-0.1.tm>.
+
   <section*|Why OCFL? Isn't git enough?><label|why-ocfl-isnt-git-enough>
 
   Git records history, but its layout is internal to git and its hashes (SHA-1 in most repositories) are not meant for long-term preservation. OCFL (the Oxford Common File Layout) is a published specification for exactly this problem: versioned objects stored as plain files, every file fixed by a SHA-512 digest, readable without any special software, with independent validators, used by research libraries. An OpenSheaf archive can still be kept in git; git just is not part of its integrity.
@@ -39,7 +43,7 @@
 
   <section*|Why are identifiers short names and not URIs?><label|why-are-identifiers-short-names-and-not-uris>
 
-  The flat-direct storage layout puts each object in a folder named by its identifier, so paths stay readable and can be computed over plain HTTP; a folder name cannot contain <verbatim|/>. The archive itself has a URI-like identifier (a <verbatim|tag:> URI, for instance <verbatim|tag:opensheaf.org,2026:mgubi>), and an object is named globally by the pair (archive identifier, object identifier).
+  The flat-direct storage layout puts each object in a folder named by its identifier, so paths stay readable and can be computed over plain HTTP; a folder name cannot contain <verbatim|/>. A large archive may instead spread its objects over folders named by parts of the hash of their identifiers (the layout <verbatim|0003-hash-and-id-n-tuple-storage-layout>, for instance <verbatim|ocfl/f2a/eee/55d/kpz-details/>); the last folder is still named by the identifier, and the path is still computed by rule. The archive itself has a URI-like identifier (a <verbatim|tag:> URI, for instance <verbatim|tag:opensheaf.org,2026:mgubi>), and an object is named globally by the pair (archive identifier, object identifier).
 
   The identity proposal (sections 6.5 and 6.6, not yet agreed) adds a name independent of any archive, the digest of the object's genesis record, and writes lines, versions and pins as <verbatim|sheaf:> URIs, for instance <verbatim|sheaf:\<less\>name\<gtr\>/v3>; the pair stays the address of a copy in an archive.
 
@@ -55,7 +59,9 @@
 
   Deposit a corrected version, with a change note saying what changed. To warn readers of the earlier version, add a notice about it (for instance an erratum, as text or as a file): notices are later statements about a version, kept with the object and shown with that version, and they never change the version itself.
 
-  <section*|How do collections work across archives? What if another archive disappears?><label|how-do-collections-work-across-archives-what-if-another-archive-disappears>
+  <section*|How do collections work across archives? What if another archive><label|how-do-collections-work-across-archives-what-if-another-archive>
+
+  disappears?
 
   A collection lists its members by archive identifier, address, object identifier, version and the SHA-512 digest of that version's inventory (the "pin"). Since an inventory fixes all its files, the pin fixes the member completely, and a collection becomes a hash tree over everything it contains. If the member's archive moves or disappears, the member can be fetched from a mirror, from its DOI deposit or from a Software Heritage snapshot: any copy that matches the pin is the right one. A collection also keeps a cached citation of each member, so that it stays readable even if no copy is found.
 
