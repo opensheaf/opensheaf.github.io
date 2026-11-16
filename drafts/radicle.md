@@ -388,7 +388,8 @@ Readers and authors would then know what is promised: an author could see
 which institutions will keep their work. And custody could be automatic:
 when a journal's selection adds a paper, every custodian that follows the
 selection mirrors it. This would be a new field; nothing like it is in the
-specification.
+specification. The question is open in issue
+[#54](https://github.com/opensheaf/opensheaf.github.io/issues/54).
 
 #### Comments merged by many authors
 
@@ -433,7 +434,7 @@ years.
 OpenSheaf should not be built on Radicle (section 4.2). An archive kept in git
 may be published on Radicle as one more copy (section 4.1). The designs of
 section 4.3 deserve to be weighed in the discussions they touch: delegates
-and thresholds in issue #53, custodians in issue #13, announcements for
+and thresholds in issue #53, custody policies in issue #54, announcements for
 indexes in issue #20, encryption for private archives in issue #29. One is not
 needed: Radicle signs its references because they are mutable, while the
 history of an OpenSheaf object is linear and checkable without them.
