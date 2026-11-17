@@ -92,9 +92,9 @@
         <p>
           She is an owner: her key log, kept in her archive at <tt class="verbatim">&lt;owner&gt;/&lt;owner&gt;/</tt>,
           lists her keys (one for daily use, a spare kept apart), and every
-          version she deposits is signed with them. Each paper is one of her
-          lines, at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>, with a label
-          (<tt class="verbatim">kpz-uniqueness</tt>) for the website.
+          version she deposits is signed with her daily key (threshold 1).
+          Each paper is one of her lines, at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>,
+          with a label (<tt class="verbatim">kpz-uniqueness</tt>) for the website.
         </p>
       </li>
       <li>
@@ -383,25 +383,25 @@ members:
           is itself a branch (<tt class="verbatim">parent.*</tt>), byte for byte, with
           the evidence of the authors' version (their inventory, <tt class="verbatim">object.json</tt>
           and signatures, and, if the authors' version is itself a branch, the
-          evidence of its own parents; section 10.5), and the authors' key log
-          beside it, as their owner object. It keeps the document version of
-          the revision it copies (the authors' version 3, say). Only the
-          copied revision needs a licence allowing redistribution; a paper
-          whose first preprint was under a restrictive licence can be accepted
-          in a later, openly licensed version. Later versions of the accepted
-          copy (corrections, notices, a withdrawal) are the editors' acts,
-          signed by the journal; the authors cannot change them. A journal
-          will usually adopt the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> in its key
-          log, from its first version, with <tt class="verbatim">all</tt>, so that every
-          version it signs is dated, by an RFC 3161 authority it trusts or by
-          OpenTimestamps, and forks of its key log are resolved by time. A
-          correction the journal makes itself is its own version 4
-          (provisionally: the numbering on branches is an open question of
-          section 10.5); when the editors later vet the authors' corrected
-          version, the copy moves its branch point to it, with the same
-          evidence, as the journal's next version (the journal's own files are
-          then dropped; how a move keeps them is an open question of section
-          6.5).
+          evidence of its own parents; section 10.5), and the key logs of the
+          authors and of those parents' owners beside it, as owner objects. It
+          keeps the document version of the revision it copies (the authors'
+          version 3, say). Only the copied revision needs a licence allowing
+          redistribution; a paper whose first preprint was under a restrictive
+          licence can be accepted in a later, openly licensed version. Later
+          versions of the accepted copy (corrections, notices, a withdrawal)
+          are the editors' acts, signed by the journal; the authors cannot
+          change them. A journal will usually adopt the <a href="opensheaf-timestamps-0.1.html">timestamps
+          extension</a> in its key log, from its first version, with <tt
+          class="verbatim">all</tt>, so that every version it signs is dated, by an RFC
+          3161 authority it trusts or by OpenTimestamps, and forks of its key
+          log are resolved by time. A correction the journal makes itself is
+          its own version 4 (provisionally: the numbering on branches is an
+          open question of section 10.5, #57); when the editors later vet the
+          authors' corrected version, the copy moves its branch point to it,
+          with the same evidence, as the journal's next version (the journal's
+          own files are then dropped; how a move keeps them is an open
+          question of section 6.5, #57).
         </p>
       </li>
     </ul>

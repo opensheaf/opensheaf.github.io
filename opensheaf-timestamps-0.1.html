@@ -60,7 +60,8 @@
           owner revokes a key that may have been exposed. Since nothing dates
           a signature, the core cannot tell the signatures the owner made with
           that key before the revocation from those that whoever holds it
-          makes afterwards, and leaves them all unconfirmed.
+          makes afterwards, and leaves them unconfirmed, except where a later
+          signed version of the same line confirms them.
         </p>
       </li>
       <li>
@@ -68,7 +69,8 @@
           <strong>Forks of a key log are reported, not resolved.</strong> Keys
           of a version, retired or revoked since, can still sign a different
           next version, and so fork the key log; nothing in the core says
-          which side is the owner's.
+          which side is the owner's, and a revocation made on one side does
+          not apply until the fork is resolved.
         </p>
       </li>
     </ul>
@@ -189,9 +191,12 @@
       <tt class="verbatim">timestamps</tt> says what the owner stamps, and what
       verifiers report as undated when a timestamp is missing (section 9).
       Only with <tt class="verbatim">all</tt> can the signatures of a revoked key on the
-      owner's lines be confirmed, since only then are they stamped; with <tt
-      class="verbatim">keylog</tt>, the declaration resolves forks, and confirms only
-      the signatures of the key log itself.
+      owner's lines be confirmed by this extension, since only then are they
+      stamped; with <tt class="verbatim">keylog</tt>, it resolves forks of the key log,
+      and so lets the revocations of the owner's side take effect, and
+      confirms nothing on the lines (the versions of the key log up to a
+      revocation are never unconfirmed by it, section 6.5 of the
+      specification).
     </p>
     <p>
       <strong>The declaration in force</strong>, for every check of this
@@ -200,14 +205,18 @@
       does so for everything checked afterwards. While the key log is forked,
       the declaration in force is that of the last version all sides share,
       for every check on any side, since the latest version known is not
-      defined across a fork (section 7). Changing the declaration never leaves
-      unconfirmed a signature that the specification lets count (section 7).
+      defined across a fork (section 7); once the fork is resolved, it is that
+      of the latest version known on the owner's side. Changing the
+      declaration never leaves unconfirmed a signature that the specification
+      lets count (section 7).
     </p>
     <p>
       An owner MAY drop the declaration, by a later key-log version without
-      it: afterwards only the rules of the specification apply, so later forks
-      are reported, not resolved, and signatures of keys revoked later are not
-      confirmed.
+      it: since the declaration in force is that of the latest version, only
+      the rules of the specification then apply, to everything: forks are
+      reported, not resolved, and no signature of a revoked key is confirmed
+      by this extension, whenever the key was revoked. An owner that has
+      revoked a key SHOULD NOT drop the declaration.
     </p>
     <h2 id="auto-6"><a id="5-checking-a-timestamp"></a>5. Checking a timestamp<span style="margin-left: 1em"></span></h2>
     <p>
@@ -281,13 +290,18 @@
     <p>
       <strong>Signatures of a revoked key.</strong> A signature by a key that
       a version of the key log revokes, which the core leaves unconfirmed
-      (section 6.5 of the specification), counts if it is otherwise valid and
-      its date is earlier than the time of the first key-log version that
-      lists the key in <tt class="verbatim">revoked</tt>. Where that version has no
-      time, no such signature is confirmed. Revocation dates the end of the
-      owner's trust in a key, not its theft: signatures that a thief made, and
+      (section 6.5 of the specification), counts if it is unconfirmed for no
+      other reason (it does not name, for instance, a key-log version after
+      the fork point of a fork that is not resolved) and its date is earlier
+      than the time of the first key-log version that lists the key in <tt
+      class="verbatim">revoked</tt> and, when that entry gives one, than its <tt class="verbatim">since</tt>,
+      the owner's estimate of when the key may have been exposed. Where that
+      version has no time, no such signature is confirmed. The time of the
+      revoking version dates the end of the owner's trust in a key, not its
+      theft: without <tt class="verbatim">since</tt>, signatures that a thief made, and
       stamped, between the theft and the revocation are confirmed too, so
-      owners revoke a key as soon as they fear it exposed.
+      owners revoke a key as soon as they fear it exposed, and give <tt class="verbatim">since</tt>
+      when they can tell when the exposure began.
     </p>
     <p>
       <strong>Forks of a key log.</strong> When valid versions of a key log
@@ -303,7 +317,9 @@
       in the core: a side never wins because another's timestamps are missing,
       since a host can strip them from a copy. A fork within a side, after a
       fork that is resolved, is resolved in the same way, from the earliest
-      fork point on.
+      fork point on. Once a fork is resolved, the revocations listed on the
+      owner's side apply, as the specification lets them (its section 6.5),
+      and those listed only on other sides are ignored.
     </p>
     <p>
       <strong>Missing timestamps.</strong> A version without a time in a given
@@ -343,6 +359,14 @@
       <li>
         <p>
           validates each declaration against the schema of appendix A;
+        </p>
+      </li>
+      <li>
+        <p>
+          merges the timestamp files of every copy it sees of a signature
+          file, of the object and of its owner objects, which the names of
+          section 3 allow, before computing dates, so that a timestamp
+          stripped from one copy is restored from another;
         </p>
       </li>
       <li>
@@ -430,7 +454,14 @@
           <strong>Stripping.</strong> A host can remove timestamp files from a
           copy; the signatures they confirmed are then unconfirmed again, and
           a fork unresolved, until a copy with the files restores them.
-          Nothing that the core lets count is lost.
+          Nothing that the core lets count is lost. Since a signature file may
+          be stamped again later (section 3), a host can also remove the
+          earliest timestamps of a revoking key-log version and keep its later
+          ones: the version's time then moves later, and more of a thief's
+          signatures are confirmed. <tt class="verbatim">since</tt>, signed by the owner
+          in the revoking version, bounds this: no signature dated after it is
+          confirmed, whatever the version's time; and readers merge the
+          timestamp files of every copy they see (section 9).
         </p>
       </li>
       <li>
@@ -450,8 +481,12 @@
           keys, forks the key log at once and stamps the fork, before the
           owner revokes the keys in a version of its own, wins the fork, even
           if it publishes the fork later. Owners who want to resist the theft
-          of one key use a threshold of 2 or more, with keys kept apart, so
-          that one stolen key cannot fork the key log at all.
+          of one key use a threshold of 2 or more, with keys kept apart, from
+          the first version of their key log, so that one stolen key cannot
+          fork the key log at all: a threshold binds only the signatures
+          naming its version (section 6.5 of the specification), so a key
+          listed earlier under a threshold of 1 can still fork the key log at
+          that version, whatever the threshold later.
         </p>
       </li>
       <li>
@@ -508,9 +543,12 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
     </div>
     <p>
       If the owner later revokes the first key, in version 3 of its key log,
-      the signatures of that key whose date is earlier than the time of
-      version 3 count again for readers that know this extension; the others
-      stay unconfirmed.
+      with <tt class="verbatim">since</tt> the time it believes the key was exposed, the
+      signatures of that key whose date is earlier than both the time of
+      version 3 and <tt class="verbatim">since</tt> count again for readers that know
+      this extension; the others stay unconfirmed, unless a later signed
+      version of the same line confirms them (section 6.5 of the
+      specification).
     </p>
     <h2 id="auto-15"><a id="appendix-c-references"></a>Appendix C. References<span style="margin-left: 1em"></span></h2>
     <ul>
@@ -594,6 +632,22 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           independently merge; forks of more than two sides; <tt class="verbatim">all</tt>
           recommended from the first version; the first-stamp advantage of a
           thief, and the exposure between a theft and its revocation, stated.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, revised after a sixth
+          audit:</strong> a revoked key's signature is confirmed only if dated
+          before both the time of the revoking version and its <tt class="verbatim">since</tt>,
+          the owner's estimate of the exposure, which bounds what stripping
+          the earliest timestamps of the revoking version can confirm;
+          verifiers merge the timestamp files of every copy they see; once a
+          fork is resolved, the declaration in force is the latest of the
+          owner's side, and only that side's revocations apply; dropping the
+          declaration ends every confirmation it gave; with <tt class="verbatim">keylog</tt>,
+          the extension confirms nothing on the lines; a threshold binds only
+          the signatures naming its version, so a threshold of 2 or more is
+          recommended from the first version.
         </p>
       </li>
     </ul>

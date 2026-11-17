@@ -135,7 +135,8 @@ on GitHub, and archives made with them.
 - [`opensheaf-timestamps-0.1.md`](opensheaf-timestamps-0.1.md): OpenSheaf
   timestamps, an extension to the identity proposal: how an owner dates its
   signatures (RFC 3161, OpenTimestamps), declares it in its key log, and so
-  resolves forks of its key log by time.
+  confirms the signatures a key made before its revocation and resolves forks
+  of its key log by time.
 - [`README.md`](https://github.com/opensheaf/opensheaf.github.io/blob/main/README.md): this text, also the home page of the site.
 - [`schemas/`](https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas): the JSON Schemas of the files defined by the
   specification, also published at `https://opensheaf.org/schemas/`:

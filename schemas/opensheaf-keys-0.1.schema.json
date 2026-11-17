@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json",
   "title": "OpenSheaf key log version (keys.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys, that no revoked key is listed in keys, and that every later version keeps the revoked keys, are checked by verifiers.",
+  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys, that no revoked key is listed in keys or listed twice in revoked, and that every later version keeps the revoked keys with the same since or an earlier one, are checked by verifiers.",
   "type": "object",
   "required": [
     "format",
@@ -28,11 +28,25 @@
     "revoked": {
       "type": "array",
       "minItems": 1,
-      "uniqueItems": true,
       "items": {
-        "$ref": "#/$defs/didKey"
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "$ref": "#/$defs/didKey"
+          },
+          "since": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$",
+            "$comment": "optional: the owner's estimate of when the key may have been exposed, in UTC; used by extensions that date signatures"
+          }
+        }
       },
-      "$comment": "optional (section 6.5): keys the owner has revoked because they may have been exposed; their signatures are unconfirmed unless an extension dates them before the revocation"
+      "$comment": "optional (section 6.5): keys the owner has revoked because they may have been exposed; their signatures are unconfirmed unless a later signed version of the same line confirms them or an extension dates them before the revocation (and its since); each key appears once, checked by verifiers"
     },
     "keeper": {
       "type": "array",

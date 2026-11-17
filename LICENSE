@@ -4,8 +4,9 @@ The contents of this repository are licensed as follows.
   timestamps extension (opensheaf-timestamps-0.1.md), the git companion
   (opensheaf-git-0.1.md), the FAQ (FAQ.md), the use cases (USE-CASES.md),
   the policy on the name and the logo (TRADEMARKS.md), the README and the
-  pages of the site generated from them: Creative Commons Attribution-ShareAlike 4.0
-  International (CC BY-SA 4.0), LICENSES/CC-BY-SA-4.0.txt.
+  pages of the site generated from them: Creative Commons
+  Attribution-ShareAlike 4.0 International (CC BY-SA 4.0),
+  LICENSES/CC-BY-SA-4.0.txt.
 - The JSON Schemas (schemas/): CC0 1.0 Universal, dedicated to the public
   domain, LICENSES/CC0-1.0.txt.
 - The tools and style files (tools/, notes-meta.ts, resources/ except
