@@ -80,21 +80,26 @@ root.
 
 ## Why are identifiers short names and not URIs?
 
-The flat-direct storage layout puts each object in a folder named by its
-identifier, so paths stay readable and can be computed over plain HTTP; a
-folder name cannot contain `/`. A large archive may instead spread its objects
-over folders named by parts of the hash of their identifiers (the layout
-`0003-hash-and-id-n-tuple-storage-layout`, for instance
-`ocfl/f2a/eee/55d/kpz-details/`); the last folder is still named by the
-identifier, and the path is still computed by rule. The archive itself has a
-URI-like identifier (a `tag:` URI, for instance
-`tag:opensheaf.org,2026:mgubi`), and an object is named globally by the pair
-(archive identifier, object identifier).
+On `main` they are: the flat-direct storage layout puts each object in a
+folder named by its identifier, so paths stay readable and can be computed
+over plain HTTP; a folder name cannot contain `/`. The archive itself has a
+URI-like identifier (a `tag:` URI), and an object is named globally by the
+pair (archive identifier, object identifier).
 
-The identity proposal (sections 6.5 and 6.6, not yet agreed) adds a name
-independent of any archive, the digest of the object's genesis record, and
-writes lines, versions and pins as `sheaf:` URIs, for instance
-`sheaf:<name>/v3`; the pair stays the address of a copy in an archive.
+The identity proposal (sections 6.3, 6.5 and 6.6, not yet agreed) changes
+this. A work gets a name independent of any archive, the digest of its
+genesis record, and each history of it an owner; the identifier of an object
+is its line, written as a `sheaf:` URI, `sheaf:<name>:<owner>`. Identifiers
+chosen by each archive clash as soon as one archive keeps copies of another's
+objects; identifiers made from lines never do, so one storage root can hold
+the lines its owners write and copies of others' side by side. The default
+layout puts a line at `<owner>/<name>/`, one folder per owner; a large
+archive may instead spread its objects over folders named by parts of the
+hash of their identifiers. Archives have no identifiers of their own: they
+are found at their addresses. Readable names (`kpz-details`) become
+**labels** in the discovery document, used for the website's URLs; they are
+not permanent, and permanent links use `sheaf:` URIs, for instance
+`sheaf:<name>/v3`.
 
 ## What is the difference between a document version and an object version?
 
@@ -127,43 +132,43 @@ version itself.
 
 ## How do collections work across archives? What if another archive disappears?
 
-A collection lists its members by archive identifier, address, object
-identifier, version and the SHA-512 digest of that version's inventory (the
-"pin"). Since an inventory fixes all its files, the pin fixes the member
-completely, and a collection becomes a hash tree over everything it contains.
-If the member's archive moves or disappears, the member can be fetched from a
-mirror, from its DOI deposit or from a Software Heritage snapshot: any copy
-that matches the pin is the right one. A collection also keeps a cached
-citation of each member, so that it stays readable even if no copy is found.
+A collection lists its members by line (name and owner, under the identity
+proposal), an address where a copy was found, version and the SHA-512 digest
+of that version's inventory (the "pin"). Since an inventory fixes all its
+files, the pin fixes the member completely, and a collection becomes a hash
+tree over everything it contains. If the member's archive moves or
+disappears, the member can be fetched from a mirror, from its DOI deposit or
+from a Software Heritage snapshot: any copy that matches the pin is the right
+one. A collection also keeps a cached citation of each member, so that it
+stays readable even if no copy is found.
 
 ## Why both archives and collections?
 
-They answer different questions. An **archive** is custody and naming: one
-owner's storage root and discovery document, under an archive identifier. It
-says who keeps an object, what it is called, and where its files are. An
-object is named by the pair (archive identifier, object identifier), and its
-versions are added only by its archive, which is its single writer: a copy
-kept elsewhere (a mirror) stays the object of its archive and can only
-receive its versions. Archives do not overlap and do not nest. (Under a
-proposal, below, the single writer is the owner of a line, and the archive
-is only where the line is kept: see "Who owns an object, and what is a
-branch?")
+They answer different questions. An **archive** is custody: a storage root
+and a discovery document, served at an address. It says what is kept there
+and where its files are. Under the identity proposal, an archive hosts the
+lines of any number of owners and owns none of them by hosting them: every
+version of a line is signed by its owner, wherever it is stored, and an
+archive cannot add to another owner's line. A copy kept elsewhere (a mirror)
+stays its owner's line and can only receive the owner's versions. (On
+`main`, the archive is the single writer of its objects, named by an archive
+identifier; see "Who owns an object, and what is a branch?")
 
 A **collection** is a statement: a versioned list of pins, made by a curator,
-over objects of any archives. It says which objects, in which versions, go
+over objects kept anywhere. It says which objects, in which versions, go
 together: an author's papers, an issue of a journal, a reading list.
 Collections are objects themselves, so they can be pinned, nested and
 included in other collections, across archives.
 
 The two are kept apart because an archive changes at every deposit and holds
 facts that are nobody's claim (which objects it holds, their heads, mirrors,
-tombstones, keys), while a collection changes by the rules its curator set
-(adding members, following them as they grow, vetting their versions), and
-each of its versions can be cited and verified as it stood. When an archive
-itself should be cited as it stood, that is what its main collection is for:
-a catalogue of its own documents, pinned like any other. Archives partition
-the objects, each object having one home; collections overlay them, any
-number of views over any homes.
+tombstones), while a collection changes by the rules its curator set (adding
+members, following them as they grow, vetting their versions), and each of
+its versions can be cited and verified as it stood. When an archive's
+documents should be cited as they stood, that is what its main collection is
+for: a catalogue of them, pinned like any other. Archives hold copies, each
+line possibly in several; collections overlay them, any number of views over
+any holdings.
 
 ## What is the difference between a catalogue and a selection?
 
@@ -184,48 +189,56 @@ cases](USE-CASES.md) show both at work.
 Yes. A reference (a pin) copies nothing and needs no permission. There are
 two ways to keep a copy, both allowed only if the licence of what is copied
 permits redistribution (or the authors agree): a **mirror** copies the whole
-object, every version, and stays the original archive's object (for an
-institution or a storage site); an **accepted copy** takes the one revision a
-selection vetted into the selection's own archive, where later changes are
-the curator's acts (for a journal). The licence of a collection (CC0 for the
-list) never extends to its members.
+line, every version, and stays its owner's line (for an institution or a
+storage site); an **accepted copy** takes the one revision a selection vetted
+into a line of the selection's owner, where later changes are the curator's
+acts (for a journal). The licence of a collection (CC0 for the list) never
+extends to its members.
 
 ## Who owns an object, and what is a branch?
 
 > [!NOTE]
 > This answer describes a proposal (sections 6.5 and 10.5 of the
-> specification, on the branch `proposal/identity`), not yet agreed.
+> specification, on the branches `proposal/identity` and `proposal/owners`;
+> issues #55 and #52), not yet agreed.
 
-An object has a <dfn>name</dfn>, the digest of the genesis record written when
-it is sealed, at its owner's request, before it is first shared, and an
-<dfn>owner</dfn>, the one who decides its versions. The pair (owner, name)
-identifies a <dfn>line</dfn>: one history, with a single writer. The archive
-that keeps the object is only where it lives: mirrors keep the same line
-elsewhere.
+A work has a <dfn>name</dfn>, the digest of the genesis record written when
+it is sealed, at its owner's request, before it is first shared. Each history
+of it has an <dfn>owner</dfn>: a person, a group or an institution, which
+decides its versions and signs them. The pair (name, owner) identifies a
+<dfn>line</dfn>: one history, with a single writer. A line is its signed
+versions, wherever they are stored: the archive that keeps a copy is only
+where it lives, and an owner who moves to another archive continues its
+lines there.
 
-The owner can be light or strong. A draft has none, and no genesis record:
-that absence is what marks it as a draft. A named owner is a URI the
-owner asserts (an archive identifier, an ORCID iD, a web address): enough for
-most authors. A keyed owner is a public key: every version is signed, so the
-line can be checked even when its archive has gone.
+An owner is itself an object, named by its own genesis record, whose
+versions are its <dfn>key log</dfn>: the list of its public keys and the
+number of them that must sign, each version signed by the keys of the one
+before. Keys can thus be added, replaced or revoked while the owner stays the
+same; a group of co-authors can share one owner with a threshold, for
+instance two signatures out of three. Every version of every line is signed,
+and the key logs travel with the objects they sign, so a line can be checked
+from any copy, even when the archives that served it have gone. An owner may
+name who answers for it (an ORCID iD, an institution), which the keeper
+confirms in a place only it controls; nothing requires it. A draft has no
+owner and no genesis record: that absence is what marks it as a draft.
 
 Anyone can copy a genesis record, so the name alone cannot say whose history
-is the right one. That is why the owner is part of the identity: a copy kept
-by another owner is a <dfn>branch</dfn>, which declares the version it starts
-from. A **deep** branch copies all earlier versions and continues them (a
-co-author carrying the work on). A **shallow** branch keeps only the version
-it starts from, with the parent's inventory and `object.json` as evidence,
-and adds its own versions (a journal keeping the version it vetted, then its
-corrections). An accepted copy is a shallow branch kept by a selection.
+is the right one. That is why the owner is part of the identity: a copy
+continued by another owner is a <dfn>branch</dfn>, which declares the version
+it starts from, and an archive cannot pass its own changes off as another
+owner's, since it cannot sign for it. A **deep** branch copies all earlier
+versions and continues them (a co-author carrying the work on). A
+**shallow** branch keeps only the version it starts from, with the parent's
+inventory, `object.json` and signatures as evidence, and adds its own
+versions (a journal keeping the version it vetted, then its corrections). An
+accepted copy is a shallow branch kept by a selection's owner.
 
 A shallow branch can be checked without its parent: the genesis record gives
 the name, the copied inventory gives the parent pin, the files match that
-inventory, and the copied `object.json` says whose version it was. This shows
-only that the branch is consistent. Whether the parent version is the one
-its archive keeps is confirmed by resolving the parent through that archive,
-by the parent owner's signature, or by other witnesses; failing these, it
-rests on the branch owner's word. Resolving confirms the archive, not the
-person the owner names: that would need owner proofs (#41).
+inventory, the copied `object.json` says whose version it was, and the parent
+owner's signature, checked against its key log, shows that the version is
+that owner's.
 
 ## Can documents be linked in richer ways (a short account and its full proof)?
 

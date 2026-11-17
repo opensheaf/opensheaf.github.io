@@ -106,7 +106,11 @@ entry can list in `mirrors` the archives that mirror the paper (section
 10.2), so that readers still reach it when her co-author's archive is down. If she wants the paper in her archive too, and the
 licences of all its versions allow redistribution, she can **mirror** it: a
 byte-for-byte copy of the whole object, which stays the co-author's object
-(`mirrorOf`).
+(`mirrorOf`). Under the identity proposal (sections 6.5 and 10.4, not yet
+agreed), the mirror is simply a copy of the co-author's line, kept in her
+storage root beside her own lines: its versions are checked by the
+co-author's signatures, with the co-author's key log kept beside it, and no
+`mirrorOf` is needed.
 
 ### A research group, a seminar, lecture notes
 
@@ -130,7 +134,8 @@ A university keeps an archive of its members' work.
 - Or members keep their own archives, and the institution **mirrors** their
   documents: each mirror is a whole copy, every version, kept up to date by
   copying new versions, and listed with `mirrorOf` in the institution's
-  discovery document. Mirroring is allowed only when the licences of all the
+  discovery document (under the identity proposal, a copy of each member's
+  lines, checked by the members' signatures, with no `mirrorOf`). Mirroring is allowed only when the licences of all the
   versions copied allow redistribution (section 10.4). Many papers imported
   from arXiv carry arXiv's default licence, which does not; the institution
   then only references them, or asks the authors to deposit openly licensed
@@ -194,6 +199,15 @@ the old address, which she should keep as long as she can, or through
 the mirrors listed in member entries; curators update `archiveUrl` in a new
 version of their collections. Pins stay valid, because they fix bytes, not
 addresses.
+
+> [!NOTE]
+> Under the identity proposal (sections 6.2 and 6.5, not yet agreed), an
+> archive has no identifier: it is found at its address, and every address
+> is a hint, since what is found there is checked by pins and signatures.
+> Moving an archive is copying its files; collections, indexes and resolvers
+> learn the new address over time. An author can also move without the
+> archive: as an owner, with her key log, she copies her lines to another
+> archive and continues them there, as the same lines.
 
 ## Selections
 
