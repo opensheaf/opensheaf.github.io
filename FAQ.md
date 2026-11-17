@@ -289,8 +289,11 @@ also lets a revocation take effect against a thief who forks the key log;
 without it, the core leaves the signatures of a revoked key unconfirmed,
 except where a later signed version of the same line confirms them, and
 reports forks without resolving them, a revocation made on one side of a fork
-not applying until it is resolved. A single researcher who never loses a key
-to others may not need it: retiring a key leaves its signatures counting.
+not applying until it is resolved, so that whoever holds a revoked key can
+suspend its revocation by forking the key log at a version that lists it. A
+single researcher who never loses a key to others may not need it: retiring a
+key leaves its signatures counting. Anyone holding a copy may add timestamps
+later; the earliest is what counts.
 Witnesses are not covered by the inventory digests, and need not be: a
 signature is checked against the version it names, which the pins fix, and a
 timestamp against the signature file it stamps.

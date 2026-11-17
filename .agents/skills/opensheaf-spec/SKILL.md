@@ -157,39 +157,46 @@ November 2026; read them before touching any of this.
   message binding object, version, inventory and key-log version. A key signs
   a version at most once; signature files, and witnesses beside them, are
   never re-serialised or replaced (a completed timestamp proof is a new file);
-  stray files are ignored and reported, never fatal. **A signature is judged
-  against the key-log version it names alone**: retiring a key, raising the
-  threshold or changing extension data never undoes it, and nothing is signed
-  again (owners MAY add signatures). **Statuses, defined once in 13.2.** A
-  signature is invalid (checked against `key` first; or its key not listed in
-  the version named), unverifiable (names a known key-log number with another
-  digest), unconfirmed (its key revoked, except for key-log versions up to the
-  revoking one and for revocations after the point of an unresolved fork; its
-  key first listed after the point of an unresolved fork; or the key log not
-  available up to the version named), or it counts. A version is **signed** (=
-  "signatures hold": `threshold` counting signatures naming one key-log
-  version, or extended by a later signed version of the same line),
-  **unconfirmed** (signed only if unconfirmed signatures counted), or **not a
-  version** (reason: unsigned, unverifiable, invalid). **A signed version
-  confirms every version it extends**, and a branch point is confirmed by a
-  later signed version of the parent's line; owner tools MUST show an
-  unconfirmed version, or a key-log version the owner did not make, before
-  extending it. An unconfirmed version is kept, copied, mirrored and shown
-  with its status, but not relied on (pins, resolution, members, branch
-  points, later key-log versions). **Forks** of lines and key logs are
+  files that are not witnesses (malformed, or signatures that do not verify
+  under their own key) are ignored, reported, never fatal, and MAY be removed.
+  **A signature is judged against the key-log version it names alone**:
+  retiring a key, raising the threshold or changing extension data never
+  undoes it, and nothing is signed again (owners MAY add signatures).
+  **Statuses, defined once in 13.2.** A signature is invalid (checked against
+  `key` first; or its key not listed in the version named), unconfirmed (its
+  key revoked, except for key-log versions up to the revoking one and for
+  revocations on the sides of an unresolved fork; its key first listed after
+  the point of an unresolved fork; or the key-log version it names not found,
+  on no side of a known fork or with another digest), or it counts. A version
+  is **signed** (= "signatures hold": `threshold` counting signatures naming
+  one key-log version, or, for a line, extended by a later signed version of
+  the same line), **unconfirmed** (signed only if unconfirmed signatures
+  counted), or **not a version** (reason: unsigned or invalid). **A signed
+  version confirms every version of its line it extends**, and a branch point
+  is confirmed by a later signed version of the parent's line; owner tools
+  MUST show an unconfirmed version, or a key-log version the owner did not
+  make, before extending it. An unconfirmed version is kept, copied, mirrored
+  and shown with its status, but not relied on (pins, resolution, members,
+  branch points, later key-log versions). **Forks** of lines and key logs are
   reported, never resolved by the core, and never make an archive drop a
   version: it keeps its side and records the first differing version of each
   other side (inventory, checksum, signatures, timestamps) under
-  `extensions/opensheaf-witnesses/fork/<n>/<d>/`. During a key-log fork, keys
-  of the fork point keep counting; keys added or revoked on the sides are
-  ignored; whoever holds old keys can still fork. An archive adds a version to
-  a line only after checking it against the key log (signed, or unconfirmed
-  for a revoked key or a fork); a version found not to be one after it was
-  added may be set aside by truncating the object, its evidence kept under
-  `fork/`. An extension acts only within the unconfirmed
-  status, and may resolve a fork, applying the owner's side's revocations
-  (section 4). Third parties: `witness-<label>.json`, another owner's
-  `keyLog`.
+  `extensions/opensheaf-witnesses/fork/<n>/<d>/`. A key-log fork: versions
+  with the same number, each signed by `threshold` keys of the version before
+  on its side; during it, keys of the fork point keep counting, keys added or
+  revoked on the sides are ignored, and once resolved, signatures naming a
+  losing side are judged as naming the fork point. In the core alone, whoever
+  holds revoked keys can fork at a version listing them and suspend the
+  revocation (defences: the timestamps extension from v1, or threshold 2 from
+  v1). An archive adds a version to a line only after checking it against the
+  key log (signed, or unconfirmed for a revoked key or a fork); a version
+  found, after it was added by an archive that did not check it, not to be
+  one, or to rely on a key-log version not found, may be set aside by
+  truncating the object, the first set-aside inventory and every set-aside
+  witness folder kept under `fork/`, and verifiers report an improper removal.
+  An extension acts only within the unconfirmed status, and may resolve a
+  fork, applying the owner's side's revocations (section 4). Third parties:
+  `witness-<label>.json`, another owner's `keyLog`.
 - **Timestamps: an extension, not the core.** Defined in
   `opensheaf-timestamps-0.1.md` (URI
   `https://opensheaf.org/opensheaf-timestamps-0.1`): RFC 3161 `.tsr` and
@@ -198,17 +205,18 @@ November 2026; read them before touching any of this.
   of the SHA-256 of the timestamp file's own bytes (copies merge); the owner's
   declaration in `keys.json` under `extensions` (`timestamps`: `true`;
   `timestampAuthorities`: SHA-256 fingerprints, cumulative over the key log,
-  an authority once listed stays trusted); timestamps of signature files
-  only; checks at `genTime`, complete proofs only; the declaration in
-  force (latest known key-log version; a fork is always judged under that of
-  the last version all sides share); the time of a version (`threshold`-th
-  earliest date) and ties (two hours for Bitcoin times). It confirms a revoked
-  key's signatures dated before both the revoking version's time and the
-  earliest `since` on the owner's side, and resolves key-log forks by the
-  strictly earliest time when every side is dated, the owner's side then being
-  the key log; missing stamps never unconfirm anything; re-stamping only when
-  an algorithm weakens; adopting late cannot resolve earlier forks; owners
-  SHOULD adopt it from their first key-log version. Its schema is
+  an authority once listed stays trusted); timestamps of signature files only;
+  checks at `genTime`, complete proofs only; the declaration in force (latest
+  known key-log version, of the owner's side once a fork is resolved; a fork
+  is always resolved under that of its fork point); the time of a version
+  (`threshold`-th earliest date) and ties (two hours for Bitcoin times). It
+  confirms a revoked key's signatures dated before both the revoking version's
+  time and the earliest `since` on the owner's side, and resolves key-log
+  forks by the strictly earliest time when every side is dated, the owner's
+  side then being the key log; missing stamps never unconfirm anything; anyone
+  MAY stamp any signature file at any time, and whoever finds an undated fork
+  side stamps it; adopting late cannot resolve earlier forks; owners SHOULD
+  adopt it from their first key-log version. Its schema is
   `schemas/opensheaf-timestamps-0.1.schema.json`.
 - **Key logs travel with the objects they sign** (6.5): a copy keeps the owner
   objects of its line's owner and of its parents' owners in its storage root
