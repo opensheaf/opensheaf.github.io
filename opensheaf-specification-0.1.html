@@ -998,7 +998,8 @@
       (section 10.5). Key logs are never copied into an object's content: a
       key log checks itself from its owner name (below), so a copy kept as
       content would add no trust, would be frozen at the time it was made, and
-      would be repeated in every branch and at every level of every chain.
+      would be repeated in every branch and at every level of every chain. A
+      takedown of a line leaves these owner objects in place (section 11.2).
       Whoever copies new versions of an object also copies the new versions of
       the key logs it knows. The key log checks itself: its first version's
       genesis record has the owner name as its name and lists its first keys,
@@ -2729,6 +2730,21 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       5; OCFL forbids empty folders in a storage root), and a tombstone MUST
       be added to the discovery document.
     </p>
+    <p>
+      <strong>Owner objects.</strong> A takedown of a line does not take down
+      the owner objects whose key logs its copies carry (section 6.5): they
+      are CC0 metadata (section 16) under pseudonymous owner names, and every
+      line, branch and copy that those owners signed, in that archive and in
+      others, needs them to be checked. An archive MUST keep an owner object
+      as long as it keeps an object that carries a signature of that owner,
+      and MAY keep it after. An owner object is taken down only for itself: at
+      its owner's request, by a statement signed by the owner's keys, or by
+      law. Its line then gets a tombstone like any other (section 11.3); the
+      signatures of that owner in the objects the archive still keeps cannot
+      be checked there, so they, and the versions and branch points that rely
+      on them, are unconfirmed, not inconsistent (sections 6.5 and 13.2),
+      until the key log is found elsewhere.
+    </p>
     <h3 id="auto-33"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
     <p>
       A tombstone records <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt>, <tt class="verbatim">lastVersion</tt>,
@@ -4007,7 +4023,10 @@ keylog &lt;the value of keyLog&gt;</pre>
           (section 6.5), since a key log checks itself from its owner name,
           and a copy kept as content would be frozen and repeated in every
           branch; a branch copied without one of them is unconfirmed, not
-          inconsistent.
+          inconsistent; owner objects are kept through takedowns of the lines
+          they sign, and taken down only for themselves, at the owner's
+          request or by law, leaving the signatures that need them unconfirmed
+          (section 11.2).
         </p>
       </li>
     </ul>
