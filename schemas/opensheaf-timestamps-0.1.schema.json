@@ -9,10 +9,8 @@
   ],
   "properties": {
     "timestamps": {
-      "enum": [
-        "keylog",
-        "all"
-      ]
+      "const": true,
+      "$comment": "true: the owner timestamps every signature it makes, of its key log and of its lines"
     },
     "timestampAuthorities": {
       "type": "array",

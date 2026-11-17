@@ -324,17 +324,17 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       its checksum file by those of the new version; 3. files added in an
       object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt> folder; a file
       there, once published, is never replaced or removed (section 13.2 of the
-      specification), except with its object by a takedown, or with its
-      version by item 9: timestamps are made of the bytes of signature files,
-      which a copy may already hold, and a completed timestamp proof is a new
-      file beside the pending one; 4. the replacement of <tt class="verbatim">opensheaf.json</tt>,
-      and files added, replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
-      <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
-      which are rewritten at every deposit and takedown (section 6.6 of the
-      specification, proposal); 5. at the creation of the storage root, its
-      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
-      the configuration of the layout extension, and the loose files allowed
-      by section 5 of the specification); 6. the removal of an object folder,
+      specification), except with its object by a takedown: timestamps are
+      made of the bytes of signature files, which a copy may already hold, and
+      a completed timestamp proof is a new file beside the pending one; 4. the
+      replacement of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced
+      or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
+      <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
+      at every deposit and takedown (section 6.6 of the specification,
+      proposal); 5. at the creation of the storage root, its own files (<tt
+      class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
+      configuration of the layout extension, and the loose files allowed by
+      section 5 of the specification); 6. the removal of an object folder,
       with the folders above it that it leaves empty (an owner's folder, or
       folders of the hash), by a takedown (section 9); 7. the repair of a file
       whose bytes do not match the digest its inventory records (section 5.3);
@@ -343,14 +343,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       layout), including its removal, with the creation of the <tt class="verbatim">draft/</tt>
       folder and its removal when it is left empty: drafts are the only
       objects that may be rewritten or deleted, and are never copied out of
-      the archive. 9. in a copy of another owner's line, the removal of
-      version folders after its last signed version, whose versions are
-      unconfirmed (signed only with a key revoked since, for instance), when a
-      signed history of the line departs from them, with the addition of that
-      history's versions and the replacement of the root <tt class="verbatim">inventory.json</tt>
-      and its checksum file (section 10.4 of the specification): the signed
-      history takes the line's place; the witness files of the removed
-      versions go with them.
+      the archive.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -907,6 +900,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           versions after its last signed version when a signed history departs
           from them (section 5.1, item 9); the evidence of forks of a key log
           is kept as witness files of the owner object (item 3).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal (seventh audit of
+          the specification):</strong> a copy never drops versions because of
+          a fork (item 9 of section 5.1 removed); the evidence of forks, of
+          lines and of key logs, is kept as witness files (item 3).
         </p>
       </li>
     </ul>

@@ -260,9 +260,9 @@ particular version of each paper.
   a withdrawal) are the editors' acts, signed by the journal; the authors
   cannot change them. A journal will usually adopt the [timestamps
   extension](opensheaf-timestamps-0.1.md) in its key log, from its first
-  version, with `all`, so that every version it signs is dated, by an RFC 3161
-  authority it trusts or by OpenTimestamps, and forks of its key log are
-  resolved by time. A correction the journal makes itself is its own version 4
+  version, so that every version it signs is dated, by an RFC 3161 authority
+  it trusts or by OpenTimestamps, and forks of its key log are resolved by
+  time. A correction the journal makes itself is its own version 4
   (provisionally: the numbering on branches is an open question of section
   10.5, #57); when the editors later vet the authors' corrected version, the
   copy moves its branch point to it, with the same evidence, as the journal's
@@ -446,13 +446,13 @@ reports themselves, even if this is not customary today).
   description-only version, when the version is made public.
 - **Priority without disclosure.** The authors can timestamp the signature of
   each object version: they adopt the timestamps extension in their key log,
-  with `timestamps` `all`, listing an RFC 3161 time-stamping authority they
-  trust, or use [OpenTimestamps](https://opentimestamps.org/) alone, or both.
-  The signature file holds only digests, which reveal nothing of the content,
-  and the timestamp later shows that exactly these files existed at that date.
-  The authors' signatures, which every version carries (section 13.2), show
-  who made them. Since a line is the same wherever it is copied, the proof
-  still holds when the line is later made public.
+  listing an RFC 3161 time-stamping authority they trust, or use
+  [OpenTimestamps](https://opentimestamps.org/) alone, or both. The signature
+  file holds only digests, which reveal nothing of the content, and the
+  timestamp later shows that exactly these files existed at that date. The
+  authors' signatures, which every version carries (section 13.2), show who
+  made them. Since a line is the same wherever it is copied, the proof still
+  holds when the line is later made public.
 - **The submission.** The authors send the journal their line (a copy, with
   their key log, kept by the journal as a mirror: byte for byte, still the
   authors' line, checked by their signatures), or a small collection pinning
@@ -565,10 +565,10 @@ was done, not only of what was handed in.
   that this revision existed by that date, which is what a deadline asks; the
   student's signature shows whose it is. Timestamps come from the timestamps
   extension; an institution may adopt it, and ask its students to adopt it in
-  their key logs from the first version, with `all`, so that every version is
-  dated; a single researcher may not need it. When the institution keeps a
-  mirror of the work at each submission (if the licence allows; copying by
-  agreement is open, #39), the mirror is also its receipt.
+  their key logs from the first version, so that every version is dated; a
+  single researcher may not need it. When the institution keeps a mirror of
+  the work at each submission (if the licence allows; copying by agreement is
+  open, #39), the mirror is also its receipt.
 - **Comments.** The supervisors' comments are documents (`Text`, with a
   `resourceType` such as "Supervisor's comments"), each with `Reviews`
   pointing to the exact object version commented on: a short text, an
