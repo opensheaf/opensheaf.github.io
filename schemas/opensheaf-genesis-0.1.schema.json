@@ -2,13 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json",
   "title": "OpenSheaf genesis record (genesis.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity). Dedicated to the public domain under CC0 1.0.",
+  "$comment": "Proposal (section 6.5 of the specification, branches proposal/identity and proposal/owners). Dedicated to the public domain under CC0 1.0.",
   "type": "object",
   "required": [
     "format",
     "kind",
     "created",
-    "originator",
     "nonce"
   ],
   "properties": {
@@ -18,7 +17,8 @@
     "kind": {
       "enum": [
         "document",
-        "collection"
+        "collection",
+        "owner"
       ]
     },
     "created": {
@@ -27,12 +27,35 @@
     },
     "originator": {
       "type": "string",
-      "format": "uri",
-      "$comment": "proposal (section 6.5): a named owner (archive identifier, ORCID iD, web address) or a keyed owner (did:key:, openpgp4fpr:)"
+      "pattern": "^[a-z2-7]{52}$",
+      "$comment": "proposal (section 6.5): the owner name of the owner of the first line"
     },
     "nonce": {
       "type": "string",
       "pattern": "^([0-9a-f]{2}){16,}$"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "owner"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "originator"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "originator"
+        ]
+      }
+    }
+  ]
 }

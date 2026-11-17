@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf archives in git>
 
-  <notes-abstract|Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 16 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
+  <notes-abstract|Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 17 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
 
   <os-alert|warning|Warning.|<strong|Draft for discussion.> This document is a first draft. Its open questions are listed in section 13; none of them is settled.>
 
@@ -50,7 +50,7 @@
   <\itemize>
     <item><dfn|Repository>: a git repository holding one archive.
 
-    <item><dfn|Archive files>: the files the specification requires to be served byte for byte: the discovery document <verbatim|opensheaf.json>, the storage root (by convention <verbatim|ocfl/>) and, if used, <verbatim|witnesses/> and the indexes (<verbatim|indexes.json> and the folders <verbatim|names/>, <verbatim|owners/> and <verbatim|sha512/>, section 6.6 of the specification, proposal).
+    <item><dfn|Archive files>: the files the specification requires to be served byte for byte: the discovery document <verbatim|opensheaf.json>, the storage root (by convention <verbatim|ocfl/>) and, if used, the indexes (<verbatim|indexes.json> and the folders <verbatim|names/>, <verbatim|owners/> and <verbatim|sha512/>, section 6.6 of the specification, proposal).
 
     <item><dfn|Presentation files>: the website of the archive (appendix C of the specification), generated from the archive files.
 
@@ -67,7 +67,7 @@
 
   A repository SHOULD hold one archive, with the discovery document at the top of the repository and the storage root in <verbatim|ocfl/>. An archive kept in a sub-folder of a larger repository is allowed; what follows then applies to that folder.
 
-  Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root, <verbatim|witnesses/> or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
+  Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
 
   The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of objects of other archives are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
 
@@ -75,7 +75,7 @@
 
   <subsection*|4.1 Attributes><label|41-attributes>
 
-  The repository MUST contain a <verbatim|.gitattributes> file at its top with these lines (with <verbatim|witnesses/**> only if the archive uses that folder, the lines of the indexes only if it keeps them, and the paths adjusted if the archive is in a sub-folder):
+  The repository MUST contain a <verbatim|.gitattributes> file at its top with these lines (with the lines of the indexes only if it keeps them, and the paths adjusted if the archive is in a sub-folder):
 
   <\verbatim-code>
     # OpenSheaf archive files: stored and checked out byte for byte,
@@ -85,8 +85,6 @@
     opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
 
     ocfl/** \ \ \ \ \ \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
-
-    witnesses/** \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
 
     indexes.json \ \ -text -filter -ident -working-tree-encoding -export-subst -merge
 
@@ -133,7 +131,7 @@
 
   Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
 
-  1. a new object folder <verbatim|ocfl/\<less\>path\<gtr\>/>, where <verbatim|\<less\>path\<gtr\>> is the object's path in the layout of the storage root (<verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive); 2. a new version folder <verbatim|ocfl/\<less\>path\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version; 3. files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder, or under <verbatim|witnesses/>; 4. the replacement of <verbatim|opensheaf.json>, and files added, replaced or removed among the indexes (<verbatim|indexes.json>, <verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>), which are rewritten at every deposit and takedown (section 6.6 of the specification, proposal); 5. at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification); 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9); 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
+  1. a new object folder <verbatim|ocfl/\<less\>path\<gtr\>/>, where <verbatim|\<less\>path\<gtr\>> is the object's path in the layout of the storage root (<verbatim|\<less\>owner\<gtr\>/\<less\>name\<gtr\>> in the owner-name layout, or the folders of the hash and the encoded identifier in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive); 2. a new version folder <verbatim|ocfl/\<less\>path\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version; 3. files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder; 4. the replacement of <verbatim|opensheaf.json>, and files added, replaced or removed among the indexes (<verbatim|indexes.json>, <verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>), which are rewritten at every deposit and takedown (section 6.6 of the specification, proposal); 5. at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification); 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9); 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3). 8. any change inside the folder of a draft (section 6.5 of the specification), <verbatim|ocfl/draft/\<less\>id\<gtr\>/>, including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
 
   No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -227,7 +225,7 @@
     <item>move to a host with other limits, or to its own server.
   </itemize>
 
-  Tools working on a large archive MAY use a partial clone (<verbatim|git clone --filter=blob:none>) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the flat-direct layout reaches its limits first: every deposit rewrites the tree of <verbatim|ocfl/>, which lists every object, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 5 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19>.)
+  Tools working on a large archive MAY use a partial clone (<verbatim|git clone --filter=blob:none>) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the owner-name layout reaches its limits first: every deposit rewrites the tree of an owner's folder, which lists every line of that owner, and the tree of <verbatim|ocfl/>, which lists every owner, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 5 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19>.)
 
   <section*|9. Takedown><label|9-takedown>
 
@@ -263,6 +261,8 @@
 
   Mirroring an object of another archive is copying its files and checking them against a pin; it does not need, and SHOULD NOT use, a merge of the other archive's repository.
 
+  A mirror is a copy of a line (sections 6.5 and 10.4 of the specification), kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder <verbatim|extensions/opensheaf-witnesses/>, and <verbatim|witnesses/> is not used. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification). A branch holds the evidence of its parent version as content files (section 10.5), so it never shares an object folder with a copy of its parent's line.
+
   A public repository SHOULD be archived by <hlink|Software Heritage|https://www.softwareheritage.org/>, which keeps dated snapshots of it named by SWHIDs. A snapshot is a witness that the archive held these files at that date, as other external copies are (section 13.2 of the specification); its identifiers are git hashes, not part of the integrity of the archive. Together with the history of the published branch, snapshots also witness the successive states of the discovery document.
 
   <section*|12. Security and privacy><label|12-security-and-privacy>
@@ -293,6 +293,8 @@
     <item><strong|0.1 (draft), 16 November 2026, revision:> the hashed storage layout of the specification: the append-only rules (section 5.1) and the takedown (section 9) use the object's path in the layout, with the folders of the hash; large archives in git should use the hashed layout (section 8).
 
     <item>**0.1 (draft), 16 November 2026, proposal (branch <verbatim|proposal/identity> of the specification):** the indexes of the identity proposal (<verbatim|indexes.json>, <verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>) are archive files: stored byte for byte (section 4.1), rewritten at every deposit and takedown (sections 5.1 and 9); git branches other than the published branch are called working branches (section 6.2), not drafts, which the proposal defines as objects without a genesis record, and a sealed version is not rebuilt once shared.
+
+    <item>**0.1 (draft), 17 November 2026, proposal (branch <verbatim|proposal/owners> of the specification):** copies of lines carry the key logs of their signers, witnesses are kept only in objects' extension folders, and an owner moves by copying its folder (section 11); drafts, at <verbatim|draft/\<less\>id\<gtr\>/>, may be changed or removed by any commit (section 5.1).
   </itemize>
 
 </body>

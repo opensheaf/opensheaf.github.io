@@ -63,12 +63,23 @@
       whole and may follow them as they grow; selections are the other kind of
       collection of section 10, which pins revision sets and changes only by
       an act of its curator. Copies are of two kinds too: a <dfn>mirror</dfn>
-      copies a whole object (an archive keeping another archive's objects), an
-      <dfn>accepted copy</dfn> takes one vetted revision into the selection's
-      own archive. Collections and copies only concern documents kept in
-      OpenSheaf archives: a paper that exists only on arXiv or on a
-      publisher's site is first deposited in an archive (for instance imported
-      from arXiv into its author's archive) before it can be pinned.
+      copies a whole line, with the key log of its owner (an archive keeping
+      another owner's work), an <dfn>accepted copy</dfn> is a branch: a new
+      line of the selection's owner, starting from one vetted revision.
+      Collections and copies only concern documents kept in OpenSheaf
+      archives: a paper that exists only on arXiv or on a publisher's site is
+      first deposited in an archive (for instance imported from arXiv into its
+      author's archive) before it can be pinned.
+    </p>
+    <p>
+      Every line has an <dfn>owner</dfn>: a person, a group or an institution
+      with keys, which signs every version it makes (section 6.5). An archive
+      hosts the lines of any number of owners, and owns none of them by
+      hosting them; it is found at its address, and has no identity of its
+      own. A line is named by the work's name and its owner, written as a <tt
+      class="verbatim">sheaf:</tt> URI. The commands below name lines by their
+      <strong>labels</strong>, the readable names an archive gives them
+      (section 6.3).
     </p>
     <h2 id="auto-2"><a id="authors"></a>Authors<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-3"><a id="a-researchers-own-archive"></a>A researcher's own archive<span style="margin-left: 1em"></span></h3>
@@ -79,10 +90,26 @@
     <ul>
       <li>
         <p>
-          Each paper is a document object; each version of the paper, a
-          document version, numbered by the archive from 1 without gaps.
-          Versions imported from arXiv keep arXiv's label (<tt class="verbatim">v3</tt>)
-          in <tt class="verbatim">external</tt>.
+          She is an owner: her key log, kept in her archive at <tt class="verbatim">&lt;owner&gt;/&lt;owner&gt;/</tt>,
+          lists her keys (one for daily use, a spare kept apart), and every
+          version she deposits is signed with them. Each paper is one of her
+          lines, at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>, with a label
+          (<tt class="verbatim">kpz-uniqueness</tt>) for the website.
+        </p>
+      </li>
+      <li>
+        <p>
+          Work not yet shared can be a <strong>draft</strong> (section 6.5),
+          kept by her archive under the reserved owner <tt class="verbatim">draft</tt>:
+          unsigned, never copied, and free to be rewritten. When she first
+          shares a paper, sealing makes its line.
+        </p>
+      </li>
+      <li>
+        <p>
+          Each version of the paper is a document version, numbered by her
+          from 1 without gaps. Versions imported from arXiv keep arXiv's label
+          (<tt class="verbatim">v3</tt>) in <tt class="verbatim">external</tt>.
         </p>
       </li>
       <li>
@@ -94,11 +121,11 @@
       </li>
       <li>
         <p>
-          A draft or a submitted manuscript found later is deposited in its
-          place in the history (<tt class="verbatim">history</tt>), without renumbering
-          what exists; versions never public at the time carry a <tt class="verbatim">Created</tt>
-          date, and their <tt class="verbatim">Available</tt> date is the date of their
-          deposit.
+          An early version or a submitted manuscript found later is deposited
+          in its place in the history (<tt class="verbatim">history</tt>), without
+          renumbering what exists; versions never public at the time carry a
+          <tt class="verbatim">Created</tt> date, and their <tt class="verbatim">Available</tt>
+          date is the date of their deposit.
         </p>
       </li>
       <li>
@@ -153,7 +180,7 @@ osheaf notice kpz-uniqueness \
   --about 1 \
   --text &quot;Lemma 3 is wrong as stated; corrected in version 2.&quot;
 # papers on arXiv: download them (downloads/ is created; identifiers.json
-# in it maps arXiv identifiers to object identifiers), then import the new
+# in it maps arXiv identifiers to labels), then import the new
 # versions of papers already in the archive
 osheaf arxiv fetch downloads --refresh
 osheaf arxiv import downloads --update
@@ -168,16 +195,22 @@ osheaf verify</pre>
       Two co-authors each keep an archive; their joint paper is deposited
       once, in one of them. The other lists it in a collection of her own
       archive (for instance &quot;papers with my students&quot;) as a member
-      of another archive. In an <strong>catalogue</strong> with <tt class="verbatim">follow</tt>,
+      of another archive. In a <strong>catalogue</strong> with <tt class="verbatim">follow</tt>,
       each time she updates the collection (<tt class="verbatim">osheaf collect</tt>) it
-      pins the head of her co-author's object, its newest object version;
-      nothing is copied, and no permission is needed. Her member entry can
-      list in <tt class="verbatim">mirrors</tt> the archives that mirror the paper
-      (section 10.2), so that readers still reach it when her co-author's
-      archive is down. If she wants the paper in her archive too, and the
-      licences of all its versions allow redistribution, she can
-      <strong>mirror</strong> it: a byte-for-byte copy of the whole object,
-      which stays the co-author's object (<tt class="verbatim">mirrorOf</tt>).
+      pins the head of her co-author's line, its newest object version;
+      nothing is copied, and no permission is needed. Her member entry lists
+      in <tt class="verbatim">at</tt> the archives where the paper may be found, all
+      equal locations (section 10.2), so that readers still reach it when her
+      co-author's archive is down. If she wants the paper in her archive too,
+      and the licences of all its versions allow redistribution, she can
+      <strong>mirror</strong> it: a byte-for-byte copy of her co-author's
+      line, every version, kept in her storage root beside her own lines, with
+      her co-author's key log. Its versions stay her co-author's, checked by
+      her co-author's signatures; her archive can add nothing to them. If she
+      carries the work on herself, she makes a <strong>branch</strong>: a new
+      line of hers, starting from a version of her co-author's, and keeps the
+      mirror beside it if she wants the earlier versions at hand (section
+      10.5).
     </p>
     <h3 id="auto-5"><a id="a-research-group-a-seminar-lecture-notes"></a>A research group, a seminar, lecture notes<span style="margin-left: 1em"></span></h3>
     <p>
@@ -188,7 +221,10 @@ osheaf verify</pre>
       with <tt class="verbatim">resourceType</tt> &quot;Lecture notes&quot;, or <tt
       class="verbatim">Presentation</tt> for slides); notes revised every year are
       versions of one document, or separate documents when an edition is a
-      different work (a new title, a different course).
+      different work (a new title, a different course). A group can also be
+      one owner, with the keys of several members and a threshold of
+      signatures (section 6.5): what it publishes is then signed by that many
+      of them.
     </p>
     <h2 id="auto-6"><a id="archives"></a>Archives<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-7"><a id="an-institutional-repository"></a>An institutional repository<span style="margin-left: 1em"></span></h3>
@@ -198,22 +234,26 @@ osheaf verify</pre>
     <ul>
       <li>
         <p>
-          Members may deposit directly in the institution's archive, whose
-          main collection is a catalogue of its documents, perhaps with one
-          catalogue per department.
+          Members may deposit their lines in the institution's archive, as
+          owners with keys of their own: the archive hosts them, and lists
+          them in a catalogue, perhaps with one catalogue per department. The
+          lines stay the members': a member who leaves copies her key log and
+          her lines to another archive and continues them there (section 6.5).
+          The institution decides which owners it hosts, and lists them in <tt
+          class="verbatim">owners</tt> of its discovery document.
         </p>
       </li>
       <li>
         <p>
           Or members keep their own archives, and the institution
-          <strong>mirrors</strong> their documents: each mirror is a whole
-          copy, every version, kept up to date by copying new versions, and
-          listed with <tt class="verbatim">mirrorOf</tt> in the institution's discovery
-          document. Mirroring is allowed only when the licences of all the
-          versions copied allow redistribution (section 10.4). Many papers
-          imported from arXiv carry arXiv's default licence, which does not;
-          the institution then only references them, or asks the authors to
-          deposit openly licensed versions.
+          <strong>mirrors</strong> their lines: each mirror is a whole copy,
+          every version, with the member's key log, kept up to date by copying
+          new versions, and checked by the member's signatures. Mirroring is
+          allowed only when the licences of all the versions copied allow
+          redistribution (section 10.4). Many papers imported from arXiv carry
+          arXiv's default licence, which does not; the institution then only
+          references them, or asks the authors to deposit openly licensed
+          versions.
         </p>
       </li>
       <li>
@@ -231,37 +271,41 @@ osheaf verify</pre>
     <ul>
       <li>
         <p>
-          It mirrors whole archives, or chosen objects of them, byte for byte.
-          An archive mirrored entirely can list the copy in the <tt class="verbatim">mirrors</tt>
-          of its discovery document, which helps as long as that document can
-          be reached; collections that should survive an archive's
-          disappearance list mirrors in their members' entries (section 10.2),
-          which clients try when the archive fails (section 6.4).
+          It mirrors whole archives, or chosen lines of them, byte for byte,
+          with the key logs of their owners. An archive mirrored entirely can
+          list the copy in the <tt class="verbatim">mirrors</tt> of its discovery
+          document, which helps as long as that document can be reached;
+          collections that should survive an archive's disappearance list
+          several locations in their members' <tt class="verbatim">at</tt> (section
+          10.2), all of which clients may try (section 6.4).
         </p>
       </li>
       <li>
         <p>
           Since every collection pins its members by digest, any copy whose
           bytes match is as good as the original: integrity comes from the
-          pin, not from the place. Verifiers check mirrors exactly as
+          pin, not from the place; and a copy without a digest is its owner's
+          when its signatures hold. Verifiers check mirrors exactly as
           originals.
         </p>
       </li>
       <li>
         <p>
           Further witnesses that a version existed, with these bytes, at a
-          date: signatures and timestamps (section 13.2), made by the authors
-          or by others; a snapshot of the archive's git repository by Software
-          Heritage, cited by its SWHID (section 8.1); and Zenodo deposits
-          (appendix A), which keep the content files, though without the
-          inventory a Zenodo record cannot be checked against a pin.
+          date: the owner's signatures, which every version carries, and
+          timestamps and others' signatures (section 13.2); a snapshot of the
+          archive's git repository by Software Heritage, cited by its SWHID
+          (section 8.1); and Zenodo deposits (appendix A), which keep the
+          content files, though without the inventory a Zenodo record cannot
+          be checked against a pin.
         </p>
       </li>
     </ul>
     <div class="language-bash">
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
-# copy an object of another archive, byte for byte, with all its versions
+# copy a line of another archive, byte for byte, with all its versions and
+# its owner's key log
 osheaf mirror https://example.org/papers/ kpz-uniqueness
 # list it in a collection of the archive, so that the website shows it and
 # verify checks it (preserved.yaml below; &quot;mirror: yes&quot; copies and lists
@@ -281,21 +325,29 @@ id: preserved
 title: Papers preserved by the library
 type: catalogue
 members:
-  - archive: https://example.org/papers/   # the base URL (archiveUrl in members.json)
+  - archive: https://example.org/papers/   # a base URL (in &lsquo;at&lsquo; of members.json)
     id: kpz-uniqueness
     mirror: yes</pre>
       </div>
     </div>
     <h3 id="auto-9"><a id="an-archive-that-moves"></a>An archive that moves<span style="margin-left: 1em"></span></h3>
     <p>
-      An author moves her archive to a new domain. Its archive identifier (a
-      <tt class="verbatim">tag:</tt> URI) does not change. Collections recorded the base
-      URL of the time (<tt class="verbatim">archiveUrl</tt>): readers still reach the
+      An author moves her archive to a new domain. The archive has no
+      identifier to change: it is found at its address, and every address is a
+      hint, since what is found there is checked by pins and signatures
+      (section 6.2). Moving it is copying its files. Collections recorded the
+      base URLs of the time (<tt class="verbatim">at</tt>): readers still reach the
       archive through HTTP redirects from the old address, which she should
-      keep as long as she can, or through the mirrors listed in member
-      entries; curators update <tt class="verbatim">archiveUrl</tt> in a new version of
-      their collections. Pins stay valid, because they fix bytes, not
-      addresses.
+      keep as long as she can, through the other locations listed in member
+      entries, or through indexes and resolvers that find her lines by name;
+      curators update <tt class="verbatim">at</tt> in a new version of their
+      collections. Pins and signatures stay valid, because they fix bytes and
+      owners, not addresses.
+    </p>
+    <p>
+      She can also move without the archive: as an owner, she copies her key
+      log and her lines to another archive (an institution's, say) and
+      continues them there, as the same lines (section 6.5).
     </p>
     <h2 id="auto-10"><a id="selections"></a>Selections<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-11"><a id="an-overlay-journal"></a>An overlay journal<span style="margin-left: 1em"></span></h3>
@@ -323,14 +375,22 @@ members:
       <li>
         <p>
           To make sure what it vetted stays available, the journal keeps an
-          <strong>accepted copy</strong> of each vetted revision, as a
-          document of its own archive: exactly the files of that version, byte
-          for byte, with the source and its pin recorded. Only the copied
+          <strong>accepted copy</strong> of each vetted revision: a branch of
+          the paper, owned by the journal (an owner with keys of its own), a
+          new object holding exactly the files of that version, byte for byte,
+          with the evidence of the authors' version (their inventory, <tt
+          class="verbatim">object.json</tt>, signatures and the part of their key log
+          those need, section 10.5). It keeps the document version of the
+          revision it copies (the authors' version 3, say). Only the copied
           revision needs a licence allowing redistribution; a paper whose
           first preprint was under a restrictive licence can be accepted in a
           later, openly licensed version. Later versions of the accepted copy
-          (corrections, notices, a withdrawal) are the editors' acts; the
-          authors' archive cannot change them.
+          (corrections, notices, a withdrawal) are the editors' acts, signed
+          by the journal; the authors cannot change them. A correction the
+          journal makes itself is its own version 4 (provisionally: the
+          numbering on branches is open); when the editors later vet the
+          authors' corrected version, the copy moves its branch point to it,
+          with the same evidence, as the journal's next version.
         </p>
       </li>
     </ul>
@@ -359,20 +419,9 @@ title: Issue 7
 type: selection
 members:
   - archive: &quot;.&quot;                  # the accepted copy, in the journal's archive
-    id: network-discrimination
-    revisions: [1]                # its document version 1; after a correction, [1, 2]</pre>
+    id: network-discrimination    # its label
+    revisions: [3]                # the document version it copies; after a correction, [3, 4]</pre>
       </div>
-    </div>
-    <div class="os-alert os-note">
-      <font class="os-alert-label">Note.</font> Under the identity proposal (section 10.5, not
-      yet agreed), an accepted copy is a shallow branch: it keeps the document
-      version of the revision it copies (the authors' version 3, say), and
-      keeps the authors' <tt class="verbatim">object.json</tt> as <tt class="verbatim">parent.object.json</tt>.
-      A correction the journal makes itself is the journal's own version 4
-      (provisionally: option (a) of the numbering on branches); when the
-      editors later vet the authors' corrected version, the copy moves its
-      branch point to it, with the same evidence, as the journal's next
-      version.
     </div>
     <h3 id="auto-12"><a id="a-journal-that-publishes-its-own-version"></a>A journal that publishes its own version<span style="margin-left: 1em"></span></h3>
     <p>
@@ -382,13 +431,15 @@ members:
     <ul>
       <li>
         <p>
-          The journal's version of record is a document of the journal's
-          archive, not a version of the authors' document (section 7.3): it
-          has the journal as <tt class="verbatim">publisher</tt>, its DOI in <tt class="verbatim">doi</tt>,
-          <tt class="verbatim">stage</tt> <tt class="verbatim">VoR</tt>, the journal's <tt class="verbatim">rightsList</tt>,
+          The journal's version of record is a later version of the journal's
+          branch of the authors' document (its accepted copy, section 10.5),
+          not a version of the authors' line (section 7.3): it has the journal
+          as <tt class="verbatim">publisher</tt>, its DOI in <tt class="verbatim">doi</tt>, <tt
+          class="verbatim">stage</tt> <tt class="verbatim">VoR</tt>, the journal's <tt class="verbatim">rightsList</tt>,
           the authors' agreement in <tt class="verbatim">object.json</tt>, and a
           relation to the authors' version it was made from (<tt class="verbatim">IsVariantFormOf</tt>:
-          the same work in another form, section 8.1).
+          the same work in another form, section 8.1). A derived work, such as
+          a translation, would be a new object, with its own genesis record.
         </p>
       </li>
       <li>
@@ -400,21 +451,12 @@ members:
       </li>
       <li>
         <p>
-          The journal's issues are selections of its own documents, or
-          catalogues of them: the journal's own documents change only by its
-          own acts in either case.
+          The journal's issues are selections of its own lines, or catalogues
+          of them: the journal's lines change only by its own acts in either
+          case.
         </p>
       </li>
     </ul>
-    <div class="os-alert os-note">
-      <font class="os-alert-label">Note.</font> Under the identity proposal (section 10.5, not
-      yet agreed), the version of record is not a separate document: it is a
-      later version of the journal's branch of the authors' document (its
-      accepted copy), with the same name (or, after a clash, another name of
-      the same genesis record), the journal as <tt class="verbatim">publisher</tt> and
-      the relations above. A derived work, such as a translation, would be a
-      separate document.
-    </div>
     <h3 id="auto-13"><a id="a-short-account-of-a-proof-with-its-detailed-argument"></a>A short account of a proof, with its detailed
     argument<span style="margin-left: 1em"></span></h3>
     <p>
@@ -434,13 +476,13 @@ members:
           <strong>Two documents, not one.</strong> Each has its own versions,
           licence and history: the detailed argument may change often (a gap
           closed, a step expanded after a machine check) while the account
-          stays as it is. Each is a document object of her archive (say <tt
-          class="verbatim">kpz-account</tt> and <tt class="verbatim">kpz-details</tt>). The
-          detailed argument says how it was made in its <tt class="verbatim">datacite.json</tt>
-          (a description of type <tt class="verbatim">Methods</tt>: the AI system and
-          its version, what the authors checked and how), and lists in its <tt
-          class="verbatim">toolchain</tt> the tools needed to rebuild it and its formal
-          checks; its creators are the persons who answer for it.
+          stays as it is. Each is a line of hers, with the labels <tt class="verbatim">kpz-account</tt>
+          and <tt class="verbatim">kpz-details</tt>. The detailed argument says how it
+          was made in its <tt class="verbatim">datacite.json</tt> (a description of type
+          <tt class="verbatim">Methods</tt>: the AI system and its version, what the
+          authors checked and how), and lists in its <tt class="verbatim">toolchain</tt>
+          the tools needed to rebuild it and its formal checks; its creators
+          are the persons who answer for it.
         </p>
       </li>
       <li>
@@ -448,11 +490,12 @@ members:
           <strong>The account focuses on the detailed argument.</strong> The
           core of the format has no relation of this kind, and needs none: the
           link is made from inside. The account cites, in its text, the exact
-          object version of the detailed argument (its URL, <tt class="verbatim">&hellip;/ocfl/kpz-details/v3/</tt>,
-          and the digest of its inventory), and its <tt class="verbatim">datacite.json</tt>
-          links that URL with <tt class="verbatim">IsSupplementedBy</tt>; the detailed
-          argument may link back with <tt class="verbatim">IsSupplementTo</tt>, added by
-          a description-only version. Since the digest is in the account's own
+          object version of the detailed argument, as a <tt class="verbatim">sheaf:</tt>
+          URI with the digest of its inventory (<tt class="verbatim">sheaf:&lt;name&gt;/v3?sha512=&hellip;</tt>,
+          section 6.6), and its <tt class="verbatim">datacite.json</tt> links that URI
+          with <tt class="verbatim">IsSupplementedBy</tt>; the detailed argument may
+          link back with <tt class="verbatim">IsSupplementTo</tt>, added by a
+          description-only version. Since the digest is in the account's own
           files, a pin of the account fixes the detailed argument too: the
           hash tree goes on through the link, though only readers, and tools
           that read the text, see it.
@@ -476,11 +519,11 @@ members:
           keeps it, with all its versions. To make sure the version reviewed
           survives her server, the journal, or a storage site,
           <strong>mirrors</strong> the detailed argument, if its licences
-          allow: a mirror is the authors' object, impartial, every version,
-          which is what the journal wants for a document it vetted but does
-          not publish (an accepted copy would make it a document of the
-          journal). The selection <tt class="verbatim">issue-7-details</tt> lists the
-          mirror in its member's <tt class="verbatim">mirrors</tt>; a Software Heritage
+          allow: a mirror is a copy of her line, with her key log, impartial,
+          every version, which is what the journal wants for a document it
+          vetted but does not publish (an accepted copy would make it a line
+          of the journal). The selection <tt class="verbatim">issue-7-details</tt> lists
+          the mirror in its member's <tt class="verbatim">at</tt>; a Software Heritage
           snapshot of her archive is a further witness.
         </p>
       </li>
@@ -527,9 +570,9 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       {
         &quot;role&quot;: &quot;detailed-argument&quot;,
         &quot;kind&quot;: &quot;document&quot;,
-        &quot;archive&quot;: &quot;tag:example.org,2026:authors&quot;,
-        &quot;archiveUrl&quot;: &quot;https://authors.example.org/&quot;,
-        &quot;id&quot;: &quot;kpz-details&quot;,
+        &quot;name&quot;: &quot;kpzdetailsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;,
+        &quot;owner&quot;: &quot;janedoeownerbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbq&quot;,
+        &quot;at&quot;: [ &quot;https://authors.example.org/&quot; ],
         &quot;revisions&quot;: [
           { &quot;documentVersion&quot;: 3, &quot;version&quot;: &quot;v3&quot;, &quot;inventorySha512&quot;: &quot;9f2c&hellip;&quot; }
         ]
@@ -545,15 +588,14 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       account mirrors its companions too, or reports that their licences
       forbid it. Keeping an accepted copy of the account does the same, and
       records the relation again in the copy's own <tt class="verbatim">object.json</tt>,
-      since an accepted copy has its own <tt class="verbatim">object.json</tt> (section
-      10.5; under the identity proposal it keeps the original only as
-      evidence, in <tt class="verbatim">parent.object.json</tt>). Presentations show
-      &quot;the full argument, version 3, as reviewed&quot; beside the
-      account. A selection could also treat the companions, in their pinned
-      versions, as vetted with the account; whether an extension may do so is
-      one of the questions of #28, and in the core the journal pins them
-      itself, in a selection such as <tt class="verbatim">issue-7-details</tt>. Tools
-      that do not know the extension still read, copy and verify both
+      since an accepted copy is a line of its own, which keeps the original's
+      <tt class="verbatim">object.json</tt> only as evidence, in <tt class="verbatim">parent.object.json</tt>
+      (section 10.5). Presentations show &quot;the full argument, version 3,
+      as reviewed&quot; beside the account. A selection could also treat the
+      companions, in their pinned versions, as vetted with the account;
+      whether an extension may do so is one of the questions of #28, and in
+      the core the journal pins them itself, in a selection such as <tt class="verbatim">issue-7-details</tt>.
+      Tools that do not know the extension still read, copy and verify both
       documents by the core rules alone.
     </p>
     <p>
@@ -570,6 +612,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
     <p>
       The authors prepare a paper in an archive that is not public: an archive
       of their own kept in a private git repository, or on their own machine.
+      Until they send it, the paper can be a draft, rewritten freely; sealing
+      it, before it first leaves their hands, makes their line (section 6.5).
       A journal reviews it privately, and in the end publishes the accepted
       version together with as much of the review as the participants agree to
       make public (ideally the reports themselves, even if this is not
@@ -582,8 +626,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           archives that are served (section 5), but the same files, kept in a
           private repository, can be deposited, pinned and verified in the
           same way by whoever has them. Whether such an archive conforms, what
-          <tt class="verbatim">archiveUrl</tt> it gives and how its members are resolved
-          are open questions (issue #29). So is its <tt class="verbatim">Available</tt>
+          <tt class="verbatim">at</tt> it gives and how its members are resolved are
+          open questions (issue #29). So is its <tt class="verbatim">Available</tt>
           date: the specification asks for the date of deposit (section 8), as
           for the drafts found later in <a href="#a-researchers-own-archive">A researcher's own
           archive</a>, while a version deposited privately becomes public only
@@ -597,25 +641,24 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           timestamp each object version with <a href="https://opentimestamps.org/">OpenTimestamps</a>
           (section 13.2). The proof is made on the digest of the inventory,
           which reveals nothing of the content, and later shows that exactly
-          these files existed at that date. A signature with a key of the
-          authors (section 13.2) shows who made them. The proof holds for
-          these inventories: if the object is later published as a copy, with
-          inventories of its own, the private inventory must be disclosed too
-          for the proof to be checked.
+          these files existed at that date. The authors' signatures, which
+          every version carries (section 13.2), show who made them. Since a
+          line is the same wherever it is copied, the proof still holds when
+          the line is later made public.
         </p>
       </li>
       <li>
         <p>
-          <strong>The submission.</strong> The authors send the journal the
-          object (the whole OCFL object, kept by the journal as a mirror: byte
-          for byte, still the authors' object), or a small collection pinning
-          the objects that go together (the paper, a detailed argument, data).
-          The journal checks what it received against the pins the authors
-          give it. A manuscript under review is usually not licensed for
-          redistribution, while the specification allows mirrors only when the
-          licences allow it (section 10.4): here the mirror is made with the
-          authors' agreement, which the specification does not yet provide for
-          (#29).
+          <strong>The submission.</strong> The authors send the journal their
+          line (a copy, with their key log, kept by the journal as a mirror:
+          byte for byte, still the authors' line, checked by their
+          signatures), or a small collection pinning the objects that go
+          together (the paper, a detailed argument, data). The journal checks
+          what it received against the pins the authors give it. A manuscript
+          under review is usually not licensed for redistribution, while the
+          specification allows mirrors only when the licences allow it
+          (section 10.4): here the mirror is made with the authors' agreement,
+          which the specification does not yet provide for (#29).
         </p>
       </li>
       <li>
@@ -649,11 +692,12 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           removed afterwards only by a takedown (section 11.2), which breaks
           every pin of it. Anonymity must therefore be built in from the
           start. The journal deposits the reports itself (the inventory names
-          the editorial office as depositor), and witnesses are the journal's,
-          not the referee's. The report's files are cleared of what identifies
-          the referee (PDF metadata, comments in the sources, the <tt class="verbatim">toolchain</tt>)
-          before deposit. If the archive is kept in git, commits that are sent
-          or published name the journal, not the referee.
+          the editorial office as depositor), as lines of the journal's owner,
+          signed with its keys, not the referee's. The report's files are
+          cleared of what identifies the referee (PDF metadata, comments in
+          the sources, the <tt class="verbatim">toolchain</tt>) before deposit. If the
+          archive is kept in git, commits that are sent or published name the
+          journal, not the referee.
         </p>
       </li>
       <li>
@@ -716,17 +760,17 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
     <ul>
       <li>
         <p>
-          how an object kept privately becomes public: the discovery document
-          lists all the objects of an archive, so either an archive may serve
-          only part of them, or publishing is a copy into another archive,
-          with a new identity (and new inventories, so that published reports
-          would pin versions readers cannot resolve);
+          how a line kept privately becomes public: a copy of it in a public
+          archive is the same line, with the same inventories, so published
+          reports keep pinning versions readers can resolve; what remains open
+          is whether an archive may serve only part of its lines, and how it
+          says so;
         </p>
       </li>
       <li>
         <p>
-          what <tt class="verbatim">archiveUrl</tt> a private archive gives, and how
-          verifiers resolve its members;
+          what <tt class="verbatim">at</tt> a private archive gives, and how verifiers
+          resolve its members;
         </p>
       </li>
       <li>
@@ -782,19 +826,20 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           <strong>Where it is kept.</strong> The student keeps the work in an
           archive of their own, which they keep after leaving, or deposits it
           directly in an archive of the institution; either way the student is
-          its single writer. Until the work is examined the archive is usually
-          private (issue #29). Only what is handed in is deposited: under the
-          proposal of #29, drafts may be changed until they are sent, and
-          sending fixes them.
+          its owner, with keys of their own, signs every version, and takes
+          the line along on leaving (section 6.5). Until the work is examined
+          the archive is usually private (issue #29). Work in progress is a
+          draft (section 6.5), which may be rewritten; handing it in seals it,
+          and fixes it.
         </p>
       </li>
       <li>
         <p>
           <strong>Dates.</strong> A timestamp of each object version (section
           13.2) shows that this revision existed by that date, which is what a
-          deadline asks; a signature with the student's key shows who
-          deposited it. When the institution keeps a mirror of the work at
-          each submission, the mirror is also its receipt.
+          deadline asks; the student's signature shows whose it is. When the
+          institution keeps a mirror of the work at each submission, the
+          mirror is also its receipt.
         </p>
       </li>
       <li>
@@ -880,11 +925,11 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
     <ul>
       <li>
         <p>
-          Each review is a document of the review journal's archive (<tt
-          class="verbatim">resourceTypeGeneral</tt> <tt class="verbatim">PeerReview</tt>), written
-          by a reviewer, with <tt class="verbatim">relatedIdentifiers</tt> <tt class="verbatim">Reviews</tt>
-          pointing to the reviewed paper (its DOI, or the URL of the object
-          version reviewed).
+          Each review is a line of the review journal's owner (<tt class="verbatim">resourceTypeGeneral</tt>
+          <tt class="verbatim">PeerReview</tt>), written by a reviewer, with <tt class="verbatim">relatedIdentifiers</tt>
+          <tt class="verbatim">Reviews</tt> pointing to the reviewed paper (its DOI, or
+          a <tt class="verbatim">sheaf:</tt> URI with the digest of the object version
+          reviewed).
         </p>
       </li>
       <li>
@@ -958,12 +1003,12 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the object is deleted and a tombstone stays; verifiers
           report the member as removed</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the same for the pinned revisions; an accepted copy is a
-          document of the selection's archive, to which the takedown is
-          applied separately</td>
+          line of the selection's owner, to which the takedown is applied
+          separately</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a document kept privately is made public</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">it can be a member once its archive can be resolved (how,
-          issue #29)</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">it can be a member once a copy of its line is public: the
+          same line, so earlier pins stay valid (issue #29)</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the same; published reports keep pointing to the versions
           they reviewed</td>
         </tr><tr>
@@ -974,8 +1019,20 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           signed version as a new revision</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">the member's archive moves</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the pin stays valid; readers follow redirects or the
-          mirrors listed in member entries</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the pin stays valid; readers follow redirects, the other
+          locations listed in member entries (<tt class="verbatim">at</tt>), or
+          indexes</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the same</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">the member's owner moves to another archive</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the line continues there, as the same line; the
+          collection finds it through <tt class="verbatim">at</tt>, once updated, or
+          through indexes</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the same; vetted revisions are unchanged</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">another archive adds a version to a member's line</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">it is not the owner's: its signature does not hold, so
+          verifiers reject it, and the collection does not follow it</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the same</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">the member's archive disappears</td>
@@ -986,7 +1043,7 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           keep their cached citations</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a version's licence forbids redistribution</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the object cannot be mirrored, only referenced</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the line cannot be mirrored, only referenced</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the revision cannot be copied, only referenced (unless
           the authors grant the right)</td>
         </tr></tbody>

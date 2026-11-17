@@ -33,7 +33,8 @@ only what its two standards leave open:
   **archive identifier** (a `tag:` URI, section 6.2) that does not change
   when the archive moves. An archive is not an object and has no versions;
   it is custody and naming, and the single writer of its objects (in the
-  proposal, the writer of a line is its owner, and the archive keeps it).
+  proposal, an archive is a host with no identity, and the writer of a line
+  is its owner, who signs it).
 - **Discovery document** `opensheaf.json` (6.1): a mutable map, never a
   witness: format, archive identifier, name, storage root, layout
   (`0002-flat-direct-storage-layout`, or
@@ -90,115 +91,104 @@ only what its two standards leave open:
 - **Accepted copy** (10.5): on `main`, a selection's own document holding
   exactly the files of one vetted revision (not `datacite.json` and
   `object.json`), with the source and its pin in `external`; a new object,
-  never a mirror. In the proposal, a shallow branch kept by the selection
+  never a mirror. In the proposal, a branch kept by the selection
   (below); still never a mirror.
 - **Withdrawal** (11.1): a description-only version with `status`
   `withdrawn`; the content stays. **Takedown** (11.2): the object is deleted
   and a **tombstone** stays in the discovery document (11.3).
 - **Witnesses** (13.2): signatures and OpenTimestamps proofs of inventory
   checksum files, in `extensions/opensheaf-witnesses/` of the object; not
-  part of any version. (Proposal) `<v>.inventory.json.sha512.sig` is the
-  line owner's signature (required for keyed owners); third parties sign
-  as `.<label>.sig` with a `.<label>.json` sidecar naming the signer; a
-  branch keeps its parent's witnesses in `parent/<w>/`.
+  part of any version. (Proposal) signature files of the line's owner,
+  required for every sealed version (below); a branch keeps its parent's
+  in `parent/<w>/`.
 - **Profiles** (4, appendices A-C): `zenodo` (DOIs from Zenodo), `texmacs`,
   `website`; declared in `profiles`.
 - **Extensions** (4): specifications published separately, named by a URI,
   whose data goes under `extensions` in `object.json`; they never change the
   core, and readers ignore those they do not know.
 
-## The identity proposal (branch `proposal/identity`, PR #30)
+## The identity proposal (branches `proposal/identity`, PR #30, and `proposal/owners`)
+
+`proposal/owners` revises PR #30 after #55 and #52: owners are keyed
+identities with key logs, archives only host lines. Read #55 and #52 (and
+their revision comments) before touching any of this.
 
 - **Genesis record and name** (6.5): `genesis.json` (`format`, `kind`,
-  `created`, `originator`, `nonce`), written when the object is sealed and
-  kept byte for byte in every later version and branch, never
-  re-serialised. The **name** is the SHA-256 of the seed
-  `opensheaf-name-<k>` and a line feed, then the record, in lowercase
-  base32: 52 characters, `^[a-z2-7]{52}$`; the last character's 4 spare
-  bits hold k, from 0 to 15 (0, the default, gives `a` or `q`).
-- **Clashes** (6.5): an archive keeps at most one object per line (owner,
-  name), and a line stays taken after a takedown (tombstones keep the name,
-  owner identifier and `sealed`; the owner's URI may be erased). Sealing
-  draws a new nonce if the line is taken, so an originator's line is named
-  by algorithm 0; the originator never branches its own work (open). A
-  branch takes `parent.name`, unless that line is taken in its archive or
-  among its owner's confirmed lines elsewhere (unconfirmed ones never cause
-  a rename); if the taken line is the owner's own branch (signed, or
-  accepted by its keeping archive under that line's authority) of the same
-  parent line and the new branch point is later, the branch point is moved
-  there, in the archive that keeps it; otherwise the branch takes the
-  smallest free algorithm number above the parent's (a number not above it
-  fails verification; other unjustified renames are warnings), and is
-  refused if none up to 15 is free. A mirror whose line is taken cannot be
-  kept. Every line records `sealed` (the originator's sealing version:
-  `archiveId`, `objectId`, `objectVersion`), copied by branches; an archive
-  refuses a genesis record reused for another work (a different `sealed`)
-  and an owner identifier equal to another owner's at its heads; reuse is
-  also refused against tombstones (one of the 16 names equals a
-  tombstone's). A work is searched for under all 16 names of its genesis
-  record, keeping entries whose record is byte-identical (`names/` entries
-  carry `genesis` and `sealed`) and grouping them by `sealed`. Aliases are
-  open (#44). A deep branch's first own version that adds files of the
-  document's own takes the number after the highest in the object and goes
-  last in `history`. A move on a deep branch also takes the number after the
-  highest. `mirrorOf` is never the archive itself, and an archive's lines
-  name its own `archiveId`, except mirrors and copied versions.
-- **Draft and sealing** (6.5): a draft is an object without a genesis
-  record; no pin may name its versions. Sealing adds the genesis record,
-  at the owner's request, before a version first leaves the owner's hands.
-  Every sealed object has a genesis record (archives made earlier are
-  rebuilt).
-- **Owner** (6.5): a URI in `object.json`; **named** (archive identifier,
-  ORCID iD, web address: asserted only) or **keyed** (`did:key:` Ed25519,
-  `openpgp4fpr:`: every version signed). Compared as exact strings in
-  canonical forms. The **originator** (in the genesis record) owns the first
-  line, the only one with no parent.
-- **Line** (6.5): (owner, name), one writer, one archive identifier and one
-  object identifier in all its copies. An archive with several depositors
-  binds each named owner URI of its lines to depositors it has checked
-  (not keyed lines, not mirrors). Copies agree when their version
-  inventories are byte-identical; otherwise it is a **fork**.
+  `created`, `originator`, `nonce`; an owner's has `kind` `owner` and no
+  `originator`), written when a work is sealed or an owner created, kept
+  byte for byte in every later version and branch, never re-serialised. The
+  **name** is the SHA-256 of the seed `opensheaf-name-<k>` and a line feed,
+  then the record, in lowercase base32: 52 characters, `^[a-z2-7]{52}$`;
+  the last character's 4 spare bits hold k, from 0 to 15 (0, the default,
+  gives `a` or `q`).
+- **Owner** (6.5, 7.5): a keyed identity (person, group, institution); an
+  object of kind `owner`, named by its genesis record (the **owner name**,
+  recorded in `originator`, `owner`, `parent.owner`, `sheaf:` URIs). Its
+  versions are its **key log**: `keys.json` (`keys`, Ed25519 `did:key`;
+  `threshold`; optional `revoked` and `keeper`); each version signed by
+  `threshold` keys of the one before. No named owners, no owner
+  identifiers. One `threshold` governs both the key log and the owner's
+  lines (as in Radicle). The optional **keeper** link (ORCID iD, domain) is confirmed
+  by the keeper (ORCID record, `/.well-known/opensheaf`), never required.
+- **Signing** (6.5, 13.2): every sealed version of a line is signed by its
+  owner, `threshold` keys of the key-log version named, each in
+  `extensions/opensheaf-witnesses/<v>/signature-<k>.json` (`signed`,
+  `owner`, `key`, `keyLog` as a pin `sheaf:<owner>/v<n>?sha512=...`,
+  `signature`), with OpenTimestamps proofs; a revoked key counts only with a
+  timestamp before the revocation. Third parties: `witness-<label>.json`.
+- **Key logs travel with the objects they sign** (6.5): a copy keeps the
+  signers' owner objects in its storage root, up to the versions named. A
+  line is its signed versions, wherever stored; an archive MUST NOT add to
+  a line a version its owner did not sign. No signed list of an owner's
+  lines exists (lines are linear).
+- **Archives** (6.1 to 6.4): hosts with no identity, found at their base
+  URL; every location (`at` of members, a list of base URLs; `mirrors` of
+  a discovery document; `at` of URIs) is a hint. They choose
+  which owners they host (`owners` in the discovery document). An owner
+  moving to another archive copies its key log and continues its lines (not
+  a branch); a branch happens only when the owner changes.
+- **Identifiers and labels** (6.3, 5): an object's OCFL `id` is its first
+  line, `sheaf:<name>:<owner>`, for branches too (a draft is
+  `sheaf:draft:<id>`, `<id>` a label of at most 64 characters, chosen
+  locally, not reused while the draft exists); default layout
+  `opensheaf-owner-name-storage-layout` (`<owner>/<name>/`, drafts in
+  `draft/<id>/`; the key log at `<owner>/<owner>/`), or `0003` for large
+  archives. Readable `label`s in the discovery document, not permanent.
+- **Clashes** (6.5): one object per line in a storage root; sealing draws a
+  new nonce if the owner's line is taken; a branch takes `parent.name`,
+  moves its branch point onto the owner's own earlier branch of the same
+  parent line, or takes the smallest free algorithm number above the
+  parent's (refused if none up to 15); lines stay taken after a takedown.
+  No `sealed`: an archive accepts an object whose genesis record it
+  holds only if it is signed by the record's originator (the same line) or
+  carries parent evidence signed by its parent's owner (a branch). A work
+  is searched for under all 16 names, keeping byte-identical records and
+  lines whose signatures hold. Aliases open (#44).
+- **Draft and sealing** (6.5): drafts are a sandbox owner `draft`, at
+  `draft/<id>/`: never signed, pinned or copied out of their archive, the
+  only objects that may be rewritten or deleted, listed apart or not at
+  all. Sealing, at the owner's request before the work first leaves the
+  owner's hands, makes a new object (the line); draft versions are not part
+  of it.
 - **Branches** (10.5): lines of other owners with the same genesis record,
-  declaring `parent`. **Deep**: copies the earlier versions and continues
-  them (a co-author). **Shallow**: holds only the branch point plus
-  `parent.inventory.json` and `parent.object.json` as evidence (a journal).
-  The branch point moves only forward, to a version later in the parent
-  line's history, taking the branch's next document version; how a move
-  keeps the branch's own files is open (probably a merge). Accepted copies
-  are shallow branches, one owner per selection; the version of record is a
-  later version of the branch; derived works are new objects. Numbering on
-  branches: option (a), provisional.
-- **Verdicts** (14): for each branch point, inconsistent, confirmed,
-  attested or unconfirmed; the branch takes the weakest. Confirmed: the
-  parent resolved through its archive at a base URL known independently of
-  the branch, or a keyed parent's signature. Attested: a timestamp, a
-  signature of a signer the user trusts, an external record from a trusted
-  depositor or reached independently. Confirmation confirms the archive,
-  not the person (owner proofs are discussed in #41).
-- **`sheaf:` URIs** (6.6): `sheaf:<name>` (the originator's line),
-  `sheaf:<name>:<owner id>` (another owner's line), `sheaf:<name>:*` (all
-  lines; no version, no `sha512`), `/v<n>` (a document version),
-  `sha512=<digest>` (a pin), `at=<archive URL>` (a hint, not identity), the
-  parameters in a query after `?`, `sha512` first. The **owner identifier**
-  is made like a name (k = 0) over the owner's URI. The canonical form
-  omits the originator's owner part and `at`.
-- **Resolution** (6.6): without a digest, copies are confirmed only when
-  reached through the archive named by their `archiveId`, known
-  independently, or signed by a keyed owner; heads, forks and short-form
-  order are decided among confirmed copies, and unconfirmed ones are
-  warnings. With no confirmed copy, the latest head among agreeing
-  unconfirmed copies is used, marked unconfirmed. Confirmed copies of one
-  line in different archives are a conflict, not a choice. **Short
-  forms**: prefixes of at least 8 characters (16 when printed); a single
-  unconfirmed candidate is resolved, marked unconfirmed; confirmed
-  candidates are ordered within one owner (for a named owner, within one
-  archive), otherwise ambiguous.
-- **Indexes** (6.6): `names/<p>.json`, `owners/<p>.json`,
-  `sha512/<p>.json`, with prefixes of 2 to 4 characters declared in
-  `indexes` (or `indexes.json` for an index of many archives); maps, never
-  witnesses. **Gateways**: `https://<base>/sheaf:...`, real HTTP statuses,
-  never serving archives' files; the project's gateway and its domain are
-  open (#35), and registering `sheaf` with IANA is #36.
+  declaring `parent` (`owner`, `name`, `objectVersion`, `documentVersion`,
+  `inventorySha512`, `url`). No deep branches: a branch is a new object
+  holding the branch point plus, as content, `parent.inventory.json`,
+  `parent.object.json`, `parent.signatures/` and `parent.keylog/`
+  (required), so its evidence is complete; the parent's history, if
+  wanted, is a copy of the parent's line beside it (OCFL inventories fix
+  their object's id). Branch points move only forward; accepted copies are
+  branches of the selection's owner. Verdicts: inconsistent, unconfirmed, confirmed.
+- **`sheaf:` URIs** (6.6): `sheaf:<name>`, `sheaf:<name>:<owner>`,
+  `sheaf:<name>:*`, `/v<n>`, `?sha512=` (a pin), `at=` (a hint),
+  `sheaf:<owner>` (a key log). Copies count only if signatures hold; a
+  resolver uses the latest head among valid copies; short forms of at least
+  8 characters (16 printed), ambiguous across owners.
+- **Indexes** (6.6): `names/`, `owners/`, `sha512/` with prefixes of 2 to 4
+  characters (entries name `owner`, `id`, `label`, no `ownerId`,
+  `archiveId`); maps, never witnesses. **Gateways**: domain open (#35);
+  registering `sheaf` is #36; the format's name, and so the gateway and
+  the `opensheaf-` strings, may change.
 - **Open questions**: listed at the end of section 6.5; do not settle them
   in the text without agreement.
 
@@ -208,10 +198,12 @@ only what its two standards leave open:
   PDF, recommended), files of notes, `datacite.json`, `object.json`. No HTML
   or other presentation files.
 - **Collection**: `datacite.json`, `object.json`, `members.json`.
+- (Proposal) owner objects: `genesis.json`, `keys.json`, `object.json`
+  (no `datacite.json`).
 - (Proposal) identity files: `genesis.json` in every sealed version, and
-  `parent.inventory.json` and `parent.object.json` in every version of a
-  shallow branch, and of a deep branch from a version that moves its
-  branch point; these names are reserved.
+  `parent.inventory.json`, `parent.object.json`, `parent.signatures/` and
+  `parent.keylog/` in every version of a branch; these names are
+  reserved.
 - `datacite.json` (8): MUST `titles`, `creators`, `publicationYear`,
   `types`, `version` (the document version as a string), `publisher`;
   SHOULD abstract, subjects, dates, `rightsList`, `relatedIdentifiers`.
@@ -227,8 +219,9 @@ only what its two standards leave open:
   `sourceFormat` (or `sourcesMissing`), SHOULD `renditions`, `toolchain`;
   MAY `changes`, `stage` (NISO JAV: `AO`, `SMUR`, `AM`, `P`, `VoR`, ...),
   `history`, `notices`, `licence`, `agreement`, `external`, `withdrawal`,
-  `extensions`; (proposal) `name`, `owner` and `sealed` from the first
-  version of its line, and `parent` in a branch.
+  `extensions`; (proposal) no `archiveId` or `objectId`, but `name`,
+  `owner` (an owner name) in every version of a line, and `parent` in a
+  branch.
 - Metadata files (`datacite.json`, `object.json`, `members.json`,
   inventories, the discovery document; in the proposal also
   `genesis.json`, the `parent.*` files and the index files) are CC0 (16).
@@ -251,7 +244,9 @@ agreement among copies of a line, and the indexes the archive declares.
 `schemas/opensheaf-archive-0.1.schema.json` (`opensheaf.json`),
 `opensheaf-object-0.1.schema.json` (`object.json`),
 `opensheaf-collection-0.1.schema.json` (`members.json`), and, in the
-proposal, `opensheaf-genesis-0.1.schema.json` (`genesis.json`) and
+proposal, `opensheaf-genesis-0.1.schema.json` (`genesis.json`),
+`opensheaf-keys-0.1.schema.json` (`keys.json`),
+`opensheaf-signature-0.1.schema.json` (signature files) and
 `opensheaf-index-0.1.schema.json` (index files and `indexes.json`); JSON
 Schema 2020-12, CC0. They do not forbid additional properties (section 12). A
 change of a field in the text needs the same change in its schema, and the
@@ -276,15 +271,16 @@ other way round.
   designs (as of November 2026): #13 decentralised holding and keys (split
   into #39 custodians' copies, #40 statements by collections about their
   members, #41 owner proofs), #14
-  global names, #19 scale, #20 self-certifying names, #21 references and
+  global names (closed: `sheaf:` URIs), #19 scale, #20 self-certifying names, #21 references and
   applications, #22 external copies and pins, #28 companion documents (an
   extension), #29 private archives, draft/private/public states, review
   processes and anonymous referees, #33 takedowns and copies, #34 mirrors
   and licences, #37 and #38 resolution and pins through mirrors, #35 a
   gateway for `sheaf:` URIs, #36 registering `sheaf` with IANA, #42 an
   inconsistency in the appendix E examples, #44 name collisions and
-  aliases. PR #30 holds the identity
-  proposal. Read the relevant issue before touching its topic.
+  aliases, #52 archives as hosts, #54 custody policies, #55 owners as
+  keyed identities. PR #30 holds the identity proposal, revised on
+  `proposal/owners`. Read the relevant issue before touching its topic.
 
 ## Design principles to keep
 
@@ -297,9 +293,9 @@ other way round.
   never states the collections or reviews about it.
 - Keeping and vetting are different acts (catalogues and selections; mirrors
   and accepted copies).
-- (Proposal) Copies prove their consistency, not their author: a copy is
-  confirmed only through the archive that keeps its line or the owner's
-  key, and an unconfirmed copy never overrides a confirmed one.
+- (Proposal) Owners sign, places host: a version is its owner's when its
+  signatures hold, wherever it is found, and no archive can add to another
+  owner's line; locations are hints.
 - A minimal core: richer relations (summaries and detailed proofs, reviews,
   data and analyses) are built on top, by links, DataCite relations or
   extensions, never by growing the core.

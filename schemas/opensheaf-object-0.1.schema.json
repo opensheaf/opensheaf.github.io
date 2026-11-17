@@ -8,9 +8,6 @@
     "format",
     "specification",
     "kind",
-    "archiveId",
-    "objectId",
-    "documentVersion",
     "status"
   ],
   "properties": {
@@ -23,17 +20,9 @@
     "kind": {
       "enum": [
         "document",
-        "collection"
+        "collection",
+        "owner"
       ]
-    },
-    "archiveId": {
-      "type": "string",
-      "format": "uri"
-    },
-    "objectId": {
-      "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "maxLength": 64
     },
     "documentVersion": {
       "type": "integer",
@@ -272,32 +261,8 @@
     },
     "owner": {
       "type": "string",
-      "format": "uri",
-      "$comment": "proposal (section 6.5): a named owner (archive identifier, ORCID iD, web address) or a keyed owner (did:key:, openpgp4fpr:)"
-    },
-    "sealed": {
-      "type": "object",
-      "$comment": "proposal (section 6.5): the originator's sealing version, copied unchanged by every branch",
-      "required": [
-        "archiveId",
-        "objectId",
-        "objectVersion"
-      ],
-      "properties": {
-        "archiveId": {
-          "type": "string",
-          "format": "uri"
-        },
-        "objectId": {
-          "type": "string",
-          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-          "maxLength": 64
-        },
-        "objectVersion": {
-          "type": "string",
-          "pattern": "^v[1-9][0-9]*$"
-        }
-      }
+      "pattern": "^[a-z2-7]{52}$",
+      "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
     },
     "parent": {
       "type": "object",
@@ -305,8 +270,6 @@
       "required": [
         "owner",
         "name",
-        "archiveId",
-        "objectId",
         "objectVersion",
         "documentVersion",
         "inventorySha512"
@@ -314,22 +277,13 @@
       "properties": {
         "owner": {
           "type": "string",
-          "format": "uri",
-          "$comment": "proposal (section 6.5): a named owner (archive identifier, ORCID iD, web address) or a keyed owner (did:key:, openpgp4fpr:)"
+          "pattern": "^[a-z2-7]{52}$",
+          "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
         },
         "name": {
           "type": "string",
           "pattern": "^[a-z2-7]{52}$",
           "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
-        },
-        "archiveId": {
-          "type": "string",
-          "format": "uri"
-        },
-        "objectId": {
-          "type": "string",
-          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-          "maxLength": 64
         },
         "objectVersion": {
           "$ref": "#/$defs/objectVersion"
@@ -518,21 +472,109 @@
           ]
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "document",
+              "collection"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "documentVersion"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "owner"
+          }
+        }
+      },
+      "then": {
+        "$comment": "proposal (section 7.5): an owner object records only format, specification, kind, name, owner and status",
+        "required": [
+          "name",
+          "owner"
+        ],
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "documentVersion"
+              ]
+            },
+            {
+              "required": [
+                "parent"
+              ]
+            },
+            {
+              "required": [
+                "mainSource"
+              ]
+            },
+            {
+              "required": [
+                "sourceFormat"
+              ]
+            },
+            {
+              "required": [
+                "sourcesMissing"
+              ]
+            },
+            {
+              "required": [
+                "renditions"
+              ]
+            },
+            {
+              "required": [
+                "toolchain"
+              ]
+            },
+            {
+              "required": [
+                "changes"
+              ]
+            },
+            {
+              "required": [
+                "stage"
+              ]
+            },
+            {
+              "required": [
+                "history"
+              ]
+            },
+            {
+              "required": [
+                "notices"
+              ]
+            }
+          ]
+        }
+      }
     }
   ],
   "dependentRequired": {
     "name": [
-      "owner",
-      "sealed"
+      "owner"
     ],
     "parent": [
       "name",
       "owner"
     ],
     "owner": [
-      "name"
-    ],
-    "sealed": [
       "name"
     ]
   }
