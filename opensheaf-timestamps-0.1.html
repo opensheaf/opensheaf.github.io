@@ -276,12 +276,15 @@
       merged (section 8): a copy stripped of a side's earliest timestamps can
       show the fork resolved the wrong way, but resolution only confirms or
       leaves unconfirmed (section 6.5 of the specification), so a reader that
-      sees the stripped files restored resolves it otherwise, and nothing is
-      lost meanwhile. A fork within a side is resolved in the same way. Once a
-      fork is resolved, the owner's side is the key log: the keys it adds
-      count, its revocations apply, and those listed only on other sides are
-      ignored. A fork at a version before the owner adopted the extension is
-      never resolved by it.
+      sees the stripped files restored resolves it otherwise. Meanwhile a
+      wrong resolution can leave unconfirmed what the core lets count (the
+      revocations of the wrong side apply), but never makes anything invalid,
+      and it brings no version into an archive, since archives add only
+      versions signed under the core (section 6.5 of the specification). A
+      fork within a side is resolved in the same way. Once a fork is resolved,
+      the owner's side is the key log: the keys it adds count, its revocations
+      apply, and those listed only on other sides are ignored. A fork at a
+      version before the owner adopted the extension is never resolved by it.
     </p>
     <p>
       <strong>Missing timestamps</strong> never make anything unconfirmed:
@@ -417,14 +420,15 @@
           until a copy with the files restores them. A copy stripped of a
           side's earliest timestamps, and stamped again later by anyone, can
           even resolve a fork the wrong way for readers who see only that
-          copy; since resolution only confirms or leaves unconfirmed, and
-          never makes anything not a version, readers who merge the timestamp
-          files of every copy they see reverse it, and nothing that the core
-          lets count is lost. A host that removes the earliest timestamps of a
-          revoking key-log version and keeps later ones moves its time later;
-          <tt class="verbatim">since</tt>, signed by the owner, bounds what this can
-          confirm, and readers merge the timestamp files of every copy they
-          see (section 9).
+          copy; until then it can leave unconfirmed signatures that the core
+          lets count, since the revocations of the wrong side apply, but never
+          makes anything invalid or brings a version into an archive (section
+          6.5 of the specification), and readers who merge the timestamp files
+          of every copy they see reverse it. A host that removes the earliest
+          timestamps of a revoking key-log version and keeps later ones moves
+          its time later; <tt class="verbatim">since</tt>, signed by the owner, bounds
+          what this can confirm, and readers merge the timestamp files of
+          every copy they see (section 9).
         </p>
       </li>
       <li>
@@ -663,6 +667,16 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.js
           files of every copy reverses, since resolution only confirms or
           leaves unconfirmed; the earliest <tt class="verbatim">since</tt> is the one on
           the owner's side.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, revised after a tenth
+          audit:</strong> a wrong resolution of a fork, in a stripped copy,
+          can leave unconfirmed what the core lets count until merged copies
+          reverse it, but never makes anything invalid, and brings no version
+          into an archive, since archives add only versions signed under the
+          core.
         </p>
       </li>
     </ul>

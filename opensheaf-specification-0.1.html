@@ -965,11 +965,11 @@
       signature counts and a version is signed is defined once, in section
       13.2; throughout this specification, the signatures of a version
       <strong>hold</strong> when it is signed. Other files in the witness
-      folder of a version (stray, malformed, or signature files that do not
-      count) are ignored and reported, never fatal, and kept: a host can
-      neither break a version by adding a file nor block a signature by
-      planting one, since each signature file is named by its own digest
-      (section 13.2), so a planted file sits beside the real one.
+      folder of a version (stray, malformed, or signature files that are
+      invalid, section 13.2) are ignored and reported, never fatal, and kept:
+      a host can neither break a version by adding a file nor block a
+      signature by planting one, since each signature file is named by its own
+      digest (section 13.2), so a planted file sits beside the real one.
     </p>
     <p>
       <strong>Choosing a threshold.</strong> One <tt class="verbatim">threshold</tt>
@@ -1021,10 +1021,11 @@
       of the parent's line that extends the parent version (section 10.5).
       Nothing is signed again, and no owner needs to know where its lines are
       kept: an owner that continues a line confirms its past. <strong>Owner
-      tools MUST show the owner</strong> an unconfirmed version that a new
-      version would extend, or a version of its key log that the owner did not
-      make, before signing, so that an owner never confirms a thief's version
-      unknowingly.
+      tools MUST NOT extend a version that is not a version</strong> of the
+      line (section 13.2), <strong>and MUST show the owner</strong> an
+      unconfirmed version that a new version would extend, or a version of its
+      key log that the owner did not make, before signing, so that an owner
+      never confirms a thief's version unknowingly.
     </p>
     <p>
       <strong>Forks of a key log.</strong> Two different versions of a key log
@@ -1148,17 +1149,24 @@
       was made with keys of the owner, and is attributable to whoever holds
       them. <strong>No archive drops a version it holds because of a
       fork</strong>: it keeps its side, and readers rely only on signed
-      versions. <strong>An archive MUST NOT add a version to a line unless it
-      has checked it against the owner's key log</strong> and found it signed,
-      or unconfirmed because of a revoked key or a fork of the key log
-      (section 13.2): a version whose signatures name a key-log version not
-      found is never added, and an archive that continues another owner's line
-      makes a branch, under its own owner (section 10.5). A version that an
-      archive added without checking it, and that is not a version of the line
-      or relies on a key-log version not found, stays where it is, reported,
-      and is never shown as a version of the line (section 13.2): nothing that
-      a host or a thief can produce leads to removing a version; only a
-      takedown removes one (section 11.2).
+      versions. <strong>An archive adds to a line only versions signed under
+      the core</strong> (section 13.2), checked against the owner's key log: a
+      version counts as signed when a later signed version in the same copy
+      extends it, and nothing that depends on an extension (a fork resolved by
+      time, a timestamp) lets a version in. A copy whose newest versions are
+      unconfirmed is copied up to its last signed version, and its later
+      versions wait until a signed version extends them; a mirror lags, it is
+      not blocked. An archive that continues another owner's line makes a
+      branch, under its own owner (section 10.5). Versions an archive already
+      holds stay, whatever their status: an unconfirmed version (a key revoked
+      after it was added, a fork) is shown with its status, and a version
+      added in breach of this rule that is not a version of the line is
+      reported and never shown as one (section 13.2). Since OCFL versions
+      cannot be skipped, the owner's own version of that number can then never
+      be added there: that archive's copy is one side of a fork of the line,
+      kept and reported, and the owner continues the line in another archive.
+      Nothing that a host or a thief can produce leads to removing a version;
+      only a takedown removes one (section 11.2).
     </p>
     <p>
       <strong>Archives and owners.</strong> An archive decides which owners it
@@ -1248,7 +1256,7 @@
         <p>
           a copy of a line whose identifier is taken in a storage root by a
           different history of the same line is a fork (above): the archive
-          keeps the history it holds, and records the other as evidence;
+          keeps the history it holds, and reports the other;
         </p>
       </li>
       <li>
@@ -2513,13 +2521,15 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       possible because OCFL objects only grow; it MUST NOT be changed
       otherwise (except to add witnesses, and to record the evidence of forks
       of key logs, section 6.5), and never drops a version it holds: new
-      versions are added only after they are checked, and a copy that departs
-      from it is a fork, reported (section 6.5). Mirroring is allowed only if
-      the licences of all the versions copied allow redistribution. A
-      collection MAY list the location of a copy in the member's <tt class="verbatim">at</tt>.
-      An archive that keeps a copy of another archive entirely SHOULD be
-      listed in the <tt class="verbatim">mirrors</tt> of that archive's discovery
-      document, with the agreement of those who keep it.
+      versions are added only if signed under the core (section 6.5), so a
+      mirror lags at the last signed version, and a copy that departs from it
+      is a fork, reported. A copy MAY leave out files of a witness folder that
+      are not witnesses (section 6.5): not copying them is not removing them.
+      Mirroring is allowed only if the licences of all the versions copied
+      allow redistribution. A collection MAY list the location of a copy in
+      the member's <tt class="verbatim">at</tt>. An archive that keeps a copy of another
+      archive entirely SHOULD be listed in the <tt class="verbatim">mirrors</tt> of that
+      archive's discovery document, with the agreement of those who keep it.
     </p>
     <p>
       Mirrors serve preservation and access (an institution keeping copies of
@@ -2843,21 +2853,23 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       except when the owner object is itself taken down, and MAY keep it
       after. An owner object is taken down only for itself: at its owner's
       request, by a statement signed by <tt class="verbatim">threshold</tt> keys of the
-      latest version of its key log, or by law; during a fork of its key log
-      that is not resolved, only through its keeper or by law, since whoever
-      forked it holds keys of the fork point. Whoever holds a key not yet
-      revoked can make such a statement, so an archive SHOULD also hear the
-      owner's keeper (section 6.5), when it names one, before acting on a
-      statement alone. Its line then gets a tombstone like any other (section
-      11.3); the signatures of that owner in the objects the archive still
-      keeps cannot be checked there, so they, and the versions and branch
-      points that rely on them, are unconfirmed, not inconsistent (sections
-      6.5 and 13.2), until the key log is found elsewhere. The rule that a
-      copy carries its owners' key logs (section 6.5), and the checks of
-      section 14, then accept the tombstone in place of the owner object. An
-      owner object restored later, with the same genesis record and a key log
-      whose versions extend the version the tombstone pins, is the same line
-      returning, not a reuse of its identifier (section 11.3).
+      latest version of its key log, or by law; when any fork of its key log
+      is known, resolved or not, only through its keeper or by law, since
+      whoever forked it holds keys of the fork point, and a resolution can be
+      wrong in a stripped copy (the timestamps extension, section 11). Whoever
+      holds a key not yet revoked can make such a statement, so an archive
+      SHOULD also hear the owner's keeper (section 6.5), when it names one,
+      before acting on a statement alone. Its line then gets a tombstone like
+      any other (section 11.3); the signatures of that owner in the objects
+      the archive still keeps cannot be checked there, so they, and the
+      versions and branch points that rely on them, are unconfirmed, not
+      inconsistent (sections 6.5 and 13.2), until the key log is found
+      elsewhere. The rule that a copy carries its owners' key logs (section
+      6.5), and the checks of section 14, then accept the tombstone in place
+      of the owner object. An owner object restored later, with the same
+      genesis record and a key log whose versions extend the version the
+      tombstone pins, is the same line returning, not a reuse of its
+      identifier (section 11.3).
     </p>
     <h3 id="auto-33"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3084,10 +3096,13 @@ keylog &lt;the value of keyLog&gt;</pre>
           fork not resolved; or <strong>the key-log version it names is not
           found</strong>: the key log the reader holds does not reach it, with
           that digest (absent, taken down, section 11.2, shorter, or holding
-          another version of that number, on no side of a known fork; the
-          evidence of forks counts as part of the key log held). Anyone can
-          name a key-log version that does not exist, so archives never add
-          versions that rely on such signatures (section 6.5);
+          another version of that number, on no side of a known fork: a
+          version is on a known side when the reader reaches it from the fork
+          point through versions it holds, in the key log or in the evidence
+          of forks, each signed by <tt class="verbatim">threshold</tt> keys of the
+          version before). Anyone can name a key-log version that does not
+          exist, so archives never add versions that rely on such signatures
+          (section 6.5);
         </p>
       </li>
       <li>
@@ -3138,10 +3153,10 @@ keylog &lt;the value of keyLog&gt;</pre>
       a key log are signed in the same way, <tt class="verbatim">object</tt> being the
       owner object, by the keys of the version before (for the first, by its
       own keys, which its genesis record fixes). Files that are not witnesses
-      (section 6.5) are reported, never fatal, and kept. Signature files, and
-      the witnesses kept beside them, are never re-serialised or replaced once
-      made, here or in <tt class="verbatim">parent.signatures/</tt>, since witnesses
-      such as timestamps are made of their bytes.
+      (section 6.5) are reported, never fatal, and kept; a copy MAY leave them
+      out (section 10.4). Signature files, and the witnesses kept beside them,
+      are never re-serialised or replaced once made, here or in <tt class="verbatim">parent.signatures/</tt>,
+      since witnesses such as timestamps are made of their bytes.
     </p>
     <p>
       <strong>Timestamps.</strong> A timestamp shows that a signature existed
@@ -3289,9 +3304,11 @@ keylog &lt;the value of keyLog&gt;</pre>
           those taken down (section 6.5), reporting when a later version of a
           key log is known elsewhere; and for every sealed object version,
           that its signature files and the version are classified as in
-          section 13.2 (the signed message rebuilt, each key counted once),
-          reporting every version that is unconfirmed or not a version, with
-          its reason, and files that are not witnesses, never fatal;
+          section 13.2 (the signed message rebuilt, each key counted once): a
+          version that is not a version of the line is a failure, since an
+          archive adds only signed versions (section 6.5); every version that
+          is unconfirmed is reported with its reason, and so are files that
+          are not witnesses, never fatal;
         </p>
       </li>
       <li>
@@ -3426,7 +3443,12 @@ keylog &lt;the value of keyLog&gt;</pre>
           of its parents' owners beside it, are untrusted input, checked like
           inventories from other archives. Every line is signed by its owner,
           so no archive can add to another owner's line: a version it makes is
-          its own branch, or invalid (section 6.5).
+          its own branch, or invalid (section 6.5). Archives add only versions
+          signed under the core, so a thief's or a junk version never enters
+          by the rules; one let in against them blocks the owner's version of
+          that number in that archive, since OCFL versions cannot be skipped,
+          and that archive then holds one side of a fork of the line (section
+          6.5).
         </p>
       </li>
       <li>
@@ -4337,6 +4359,24 @@ keylog &lt;the value of keyLog&gt;</pre>
           key-log version not found excludes the sides of a known fork; during
           an unresolved fork of its key log, an owner object is taken down
           only through its keeper or by law.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised after a
+          tenth audit:</strong> archives add to a line only versions signed
+          under the core (a version extended by a later signed version in the
+          same copy included), never versions that only an extension lets
+          count, so that no thief's or junk version blocks a line; a mirror
+          lags at the last signed version; a version that is not a version is
+          a failure of section 14; owner tools never extend a version that is
+          not a version; a key-log version is on a known side of a fork when
+          reached from the fork point through versions held, each signed by
+          the version before; files that are not witnesses are invalid
+          signature files, malformed or stray files, and copies may leave them
+          out; an owner object whose key log has any known fork is taken down
+          only through its keeper or by law; a fork of a line is reported,
+          never recorded.
         </p>
       </li>
     </ul>
