@@ -172,8 +172,12 @@ version shown as "unconfirmed". They were merged into one reason, "key-log
 version not found", and archives refuse to add versions that rely on it. The
 merger then lost the exemption for the sides of a known fork, so that an
 archive holding the thief's side of the key log would refuse the owner's
-versions (ninth review). Each simplification has to be checked against every
-case the old wording covered.
+versions (ninth review). Restored, the exemption still reached only the first
+differing version of the other side, which is all the evidence of forks keeps
+(tenth review); it was completed by counting as on a known side any key-log
+version the reader reaches from the fork point through versions it holds, each
+signed by the version before. Each simplification has to be checked against
+every case the old wording covered.
 
 One attempt, in the sixth round, said that unconfirmed versions are not
 copied into mirrors until confirmed. Since OCFL cannot skip a version, a
@@ -205,13 +209,38 @@ Four rules, added at different times for good reasons, removed something:
   the wrong way (section 3.6), and so open to setting aside.
 
 Each was an attack surface for the same reason: the condition that triggered
-the removal could be produced or faked by someone other than the owner.
-After the ninth review all four were removed. Nothing is dropped, set aside
-or deleted on the strength of signatures; a version that slipped in unchecked
-is reported and never shown as a version, but stays. Signature files are
-named by key and by a digest of their own content, so a junk file sits beside
-the real one and is reported, and nothing ever needs removing. A wrong
+the removal could be produced or faked by someone other than the owner. After
+the ninth review the three removals were withdrawn, and fork resolution was
+changed rather than removed: signatures naming a losing side whose key is not
+listed at the fork point are unconfirmed, never invalid. Nothing is dropped,
+set aside or deleted on the strength of signatures; a version that slipped in
+unchecked is reported and never shown as a version, but stays. Signature files
+are named by key and by a digest of their own content, so a junk file sits
+beside the real one and is reported, and nothing ever needs removing. A wrong
 resolution in one copy is reversed by merging copies.
+
+**Keeping everything moved the problem to the door.** Once nothing is removed,
+whatever enters an object stays, and OCFL cannot skip a version: a version at
+v5 that is not the owner's holds that number for good, and the owner's real v5
+can never be added to that archive (tenth review). The rules still let such
+versions in. A thief holding a revoked key could sign a new v5, which was
+merely unconfirmed, and archives were allowed to add unconfirmed versions. In
+an archive kept in git, a pull request adding an unsigned v5 passed the
+append-only check, which looked only at what changed, not at who signed; once
+a maintainer merged it, by mistake or automatically, it could not be undone.
+And an owner's tool could sign v6 on top of such a v5, making its content part
+of the owner's signed history.
+
+The answer was to guard the door instead of cleaning up afterwards: **archives
+add only versions signed under the core**, a version counting as signed when a
+later signed version in the same copy extends it, and nothing that only an
+extension decides (a fork resolved by time) lets a version in. A mirror whose
+source ends in unconfirmed versions copies up to the last signed one and
+waits: it lags, it is not blocked. Adding anything else fails verification, so
+in git the pull request goes red before anyone can merge it, and owner tools
+never build on a version that is not a version. A version that gets in against
+the rule anyway makes that archive's copy one side of a fork of the line, kept
+and reported; the owner continues elsewhere.
 
 ### 3.6 Timestamps
 
@@ -275,7 +304,8 @@ else could produce: a status that depends on which files a host serves, a
 fork a thief can make, a signature file a host can plant or delete. The rule
 that survived is to keep everything, report it with its status, and let
 readers merge copies. Removal is left to takedowns, which are decided by
-people and the law, not by signatures.
+people and the law, not by signatures. Its corollary: since nothing leaves,
+guard the door, and add only what is signed under the core.
 
 ### 4.2 Resolution confirms or unconfirms; it never destroys
 
@@ -318,7 +348,7 @@ fewer and subtler problems after each rewrite, and more after each patch.
 
 ## 5. The rules as they stand
 
-After the commit that follows the ninth review, the rules of PR #30 are, in
+After the commit that follows the tenth review, the rules of PR #30 are, in
 short:
 
 - a signature counts if it verifies under the key-log version it names, the
@@ -331,8 +361,9 @@ short:
   unconfirmed versions are kept, shown and mirrored, not relied on;
 - the core never resolves a key-log fork: keys of the fork point keep
   counting, keys added after it are unconfirmed, revocations after it wait;
-- archives check a version before adding it; nothing is dropped, set aside
-  or deleted on the strength of signatures; signature files are named by key
+- archives add only versions signed under the core, so a mirror lags at the
+  last signed version; nothing is dropped, set aside or deleted on the
+  strength of signatures; signature files are named by key
   and their own digest, so planted files sit beside real ones;
 - the timestamps extension, declared from the first key-log version, confirms
   dated signatures of revoked keys and resolves forks by time, without ever
