@@ -31,10 +31,10 @@
       Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 17
       November 2026. How an owner dates its signatures with RFC 3161 tokens or
       OpenTimestamps proofs, declares that it does so in its key log, and so
-      confirms the signatures that a key made before its owner revoked it, and
-      resolves forks of its key log by time. The extension is named by the URI
-      <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>. The text
-      is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the
+      shows good the signatures that a key made before its owner revoked it,
+      and resolves forks of its key log by time. The extension is named by the
+      URI <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>. The
+      text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the
       public domain under CC0 1.0.
     </div>
     <div class="os-alert os-warning">
@@ -46,19 +46,20 @@
     <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
       In the <a href="opensheaf-specification-0.1.html">OpenSheaf specification</a>, every version of a line is
-      signed by its owner, under a version of the owner's key log, and a
-      signature counts when it is valid under the key-log version it names,
-      and keeps counting (sections 6.5 and 13.2 of the specification).
+      signed by its owner, under a version of the owner's key log, a signature
+      is good when it is valid under the key-log version it names, and stays
+      good, and a line is read from its signed head, its latest version signed
+      with good signatures (sections 6.5 and 13.2 of the specification).
       Signatures say who made a version, not when. Two consequences follow in
       the core:
     </p>
     <ul>
       <li>
         <p>
-          <strong>Signatures of a revoked key are unconfirmed</strong>, since
-          nothing tells those the owner made before the revocation from those
-          a thief makes after, except where a later signed version of the same
-          line confirms them.
+          <strong>Signatures of a revoked key are no longer good</strong>,
+          since nothing tells those the owner made before the revocation from
+          those a thief makes after, so a line whose signed head only that key
+          signed falls back until its owner signs it again with a good key.
         </p>
       </li>
       <li>
@@ -120,10 +121,10 @@
       </li>
     </ul>
     <p>
-      A timestamp file of the signature file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json</tt>
+      A timestamp file of the signature file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>
       (section 13.2 of the specification), in the object's extension folder
-      <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, is <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json.&lt;e&gt;.tsr</tt>
-      or <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json.&lt;e&gt;.ots</tt>,
+      <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, is <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>
+      or <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;e&gt;.ots</tt>,
       beside it, where <tt class="verbatim">&lt;e&gt;</tt> is the first 16 characters of
       the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the
       timestamp file's own bytes. Names made from the contents never collide:
@@ -182,9 +183,9 @@
       of the owner's side. A fork is always resolved under the declaration of
       its fork point, the last version all sides share (section 7), whatever
       is declared after it. An owner MAY drop the declaration by a later
-      key-log version without it: no signature of a revoked key is then
-      confirmed by this extension, so an owner that has revoked a key SHOULD
-      NOT drop it; forks are still judged under the declaration of their fork
+      key-log version without it: no signature of a revoked key is then made
+      good by this extension, so an owner that has revoked a key SHOULD NOT
+      drop it; forks are still judged under the declaration of their fork
       point.
     </p>
     <h2 id="auto-6"><a id="5-checking-a-timestamp"></a>5. Checking a timestamp<span style="margin-left: 1em"></span></h2>
@@ -243,26 +244,28 @@
     <h2 id="auto-8"><a id="7-what-timestamps-add-to-the-core"></a>7. What timestamps add to the core<span style="margin-left: 1em"></span></h2>
     <p>
       Under a declaration in force, these rules add to those of the
-      specification. They only confirm what the core leaves unconfirmed, and
-      resolve what it leaves unresolved; resolving a fork applies the
-      revocations of the owner's side, as the core does where there is no
-      fork, which is the one exception that section 4 of the specification
-      allows. They never make valid what the core rejects, nor invalid what it
-      accepts.
+      specification. They only make good signatures that the core finds
+      revoked or unchecked, so that a line's signed head comes later for
+      readers that know them, and resolve what the core leaves unresolved;
+      resolving a fork applies the revocations of the owner's side, as the
+      core does where there is no fork, which is the one exception that
+      section 4 of the specification allows. They never make good what the
+      core finds invalid, nor invalid what it accepts, and never let a version
+      into an archive, since archives add only what the core alone puts in a
+      line (section 6.5 of the specification).
     </p>
     <p>
       <strong>Signatures of a revoked key.</strong> A signature by a key
-      revoked in the key log (on the owner's side, once a fork is resolved)
-      counts, unless the core leaves it unconfirmed for another reason, if its
-      date is earlier than the time of the first key-log version that lists
-      the key in <tt class="verbatim">revoked</tt>, and than the earliest <tt class="verbatim">since</tt>
+      revoked in the key log (on the owner's side, once a fork is resolved) is
+      good, unless the core finds it unchecked or invalid, if its date is
+      earlier than the time of the first key-log version that lists the key in
+      <tt class="verbatim">revoked</tt>, and than the earliest <tt class="verbatim">since</tt>
       given for that key on the owner's side, if any. If that version has no
-      time, none is confirmed. The time of the revoking version dates the end
+      time, none is made good. The time of the revoking version dates the end
       of the owner's trust in a key, not its theft: without <tt class="verbatim">since</tt>,
-      signatures that a thief made and stamped before the revocation are
-      confirmed too, so owners revoke a key as soon as they fear it exposed,
-      and give <tt class="verbatim">since</tt> when they can tell when the exposure
-      began.
+      signatures that a thief made and stamped before the revocation are made
+      good too, so owners revoke a key as soon as they fear it exposed, and
+      give <tt class="verbatim">since</tt> when they can tell when the exposure began.
     </p>
     <p>
       <strong>Forks of a key log.</strong> A fork (section 6.5 of the
@@ -274,21 +277,22 @@
       others are reported; otherwise the fork stays unresolved, as in the
       core. A reader judges with the timestamp files of every copy it sees,
       merged (section 8): a copy stripped of a side's earliest timestamps can
-      show the fork resolved the wrong way, but resolution only confirms or
-      leaves unconfirmed (section 6.5 of the specification), so a reader that
-      sees the stripped files restored resolves it otherwise. Meanwhile a
-      wrong resolution can leave unconfirmed what the core lets count (the
-      revocations of the wrong side apply), but never makes anything invalid,
-      and it brings no version into an archive, since archives add only
-      versions signed under the core (section 6.5 of the specification). A
-      fork within a side is resolved in the same way. Once a fork is resolved,
-      the owner's side is the key log: the keys it adds count, its revocations
-      apply, and those listed only on other sides are ignored. A fork at a
-      version before the owner adopted the extension is never resolved by it.
+      show the fork resolved the wrong way, but resolution only makes
+      signatures good or leaves them unchecked, never invalid (section 6.5 of
+      the specification), so a reader that sees the stripped files restored
+      resolves it otherwise. Meanwhile a wrong resolution can take out of a
+      line what the core puts in it (the revocations of the wrong side apply),
+      but never makes anything invalid, and it brings no version into an
+      archive, since archives add only versions signed under the core (section
+      6.5 of the specification). A fork within a side is resolved in the same
+      way. Once a fork is resolved, the owner's side is the key log: the keys
+      it adds count, its revocations apply, and those listed only on other
+      sides are ignored. A fork at a version before the owner adopted the
+      extension is never resolved by it.
     </p>
     <p>
-      <strong>Missing timestamps</strong> never make anything unconfirmed:
-      they only leave unresolved, or unconfirmed, what the core leaves so.
+      <strong>Missing timestamps</strong> never take anything out of a line:
+      they only leave unresolved, or not good, what the core leaves so.
     </p>
     <h2 id="auto-9"><a id="8-copies-and-branches"></a>8. Copies and branches<span style="margin-left: 1em"></span></h2>
     <p>
@@ -303,7 +307,7 @@
       10.5 of the specification): <tt class="verbatim">parent.signatures/</tt> holds the
       parent owner's signature files of the parent version with their
       timestamp files beside them, under the same file names, without the <tt
-      class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;-&lt;d&gt;.json.&lt;e&gt;.tsr</tt>);
+      class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>);
       the timestamp files of the parent owner's key log are in its owner
       object, which travels with the branch (section 6.5 of the
       specification). Under a declaration of the parent's owner, a branch MUST
@@ -350,8 +354,8 @@
       </li>
       <li>
         <p>
-          confirms signatures of revoked keys, and resolves forks of key logs,
-          as section 7 says, reporting ties;
+          makes good the signatures of revoked keys that section 7 makes good,
+          and resolves forks of key logs, as section 7 says, reporting ties;
         </p>
       </li>
       <li>
@@ -368,7 +372,7 @@
         <p>
           Tools that create an owner SHOULD offer to adopt this extension in
           the first version of its key log: without it, the signatures of a
-          key the owner has to revoke cannot be confirmed by their dates, and
+          key the owner has to revoke cannot be shown good by their dates, and
           a fork of the key log cannot be resolved.
         </p>
       </li>
@@ -416,18 +420,18 @@
       <li>
         <p>
           <strong>Stripping.</strong> A host can remove timestamp files from a
-          copy; the signatures they confirmed are then unconfirmed again,
-          until a copy with the files restores them. A copy stripped of a
-          side's earliest timestamps, and stamped again later by anyone, can
-          even resolve a fork the wrong way for readers who see only that
-          copy; until then it can leave unconfirmed signatures that the core
-          lets count, since the revocations of the wrong side apply, but never
-          makes anything invalid or brings a version into an archive (section
-          6.5 of the specification), and readers who merge the timestamp files
-          of every copy they see reverse it. A host that removes the earliest
+          copy; the signatures they made good are then revoked again, until a
+          copy with the files restores them. A copy stripped of a side's
+          earliest timestamps, and stamped again later by anyone, can even
+          resolve a fork the wrong way for readers who see only that copy;
+          until then it can take out of a line what the core puts in it, since
+          the revocations of the wrong side apply, but never makes anything
+          invalid or brings a version into an archive (section 6.5 of the
+          specification), and readers who merge the timestamp files of every
+          copy they see reverse it. A host that removes the earliest
           timestamps of a revoking key-log version and keeps later ones moves
           its time later; <tt class="verbatim">since</tt>, signed by the owner, bounds
-          what this can confirm, and readers merge the timestamp files of
+          what this can make good, and readers merge the timestamp files of
           every copy they see (section 9).
         </p>
       </li>
@@ -457,7 +461,7 @@
       </li>
       <li>
         <p>
-          <strong>Revocation.</strong> Revocation confirms the stamped
+          <strong>Revocation.</strong> Revocation leaves good the stamped
           signatures made before it, a thief's included (section 7); the time
           between a theft and its revocation is the owner's exposure.
         </p>
@@ -501,19 +505,19 @@
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.q7swxsz56bfiyotn.tsr
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.hm5uhlee72brbz64.ots
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.yq77barzw3gj7dbj.ots</pre>
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.q7swxsz56bfiyotn.tsr
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz64.ots
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots</pre>
     </div>
     <p>
       If the owner later revokes the first key, in version 3 of its key log,
       with <tt class="verbatim">since</tt> the time it believes the key was exposed, the
       signatures of that key whose date is earlier than both the time of
-      version 3 and <tt class="verbatim">since</tt> count again for readers that know
-      this extension; the others stay unconfirmed, unless a later signed
-      version of the same line confirms them (section 6.5 of the
-      specification).
+      version 3 and <tt class="verbatim">since</tt> are good again for readers that know
+      this extension; the others stay revoked, and a line whose signed head
+      only they sign falls back until its owner signs it again with a good key
+      (section 6.5 of the specification).
     </p>
     <h2 id="auto-15"><a id="appendix-c-references"></a>Appendix C. References<span style="margin-left: 1em"></span></h2>
     <ul>
@@ -677,6 +681,19 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.js
           reverse it, but never makes anything invalid, and brings no version
           into an archive, since archives add only versions signed under the
           core.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, following the signed head of
+          the specification (PR #30):</strong> signatures of a revoked key,
+          dated before <tt class="verbatim">since</tt> and the revoking version, are
+          good, so that a line's signed head comes later for readers that know
+          the extension; nothing it decides lets a version into an archive;
+          timestamp files are again <tt class="verbatim">signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>
+          and <tt class="verbatim">.ots</tt>, beside signature files named by key alone;
+          the words of the specification (good, revoked, unchecked, the signed
+          head, the tail) replace &quot;unconfirmed&quot;.
         </p>
       </li>
     </ul>

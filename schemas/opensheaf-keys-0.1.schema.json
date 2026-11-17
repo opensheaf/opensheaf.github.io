@@ -46,7 +46,7 @@
           }
         }
       },
-      "$comment": "optional (section 6.5): keys the owner has revoked because they may have been exposed; their signatures are unconfirmed unless a later signed version of the same line confirms them or an extension dates them before the revocation (and its since); each key appears once, checked by verifiers"
+      "$comment": "optional (section 6.5): keys the owner has revoked because they may have been exposed; their signatures are no longer good, unless an extension dates them before the revocation (and its since); a line whose signed head only they sign falls back until its owner signs it again with a good key; each key appears once, checked by verifiers"
     },
     "keeper": {
       "type": "array",

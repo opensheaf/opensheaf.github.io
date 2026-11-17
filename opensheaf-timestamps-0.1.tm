@@ -7,16 +7,16 @@
 
   <chapter*|OpenSheaf timestamps>
 
-  <notes-abstract|Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 17 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, declares that it does so in its key log, and so confirms the signatures that a key made before its owner revoked it, and resolves forks of its key log by time. The extension is named by the URI <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.>
+  <notes-abstract|Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 17 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, declares that it does so in its key log, and so shows good the signatures that a key made before its owner revoked it, and resolves forks of its key log by time. The extension is named by the URI <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.>
 
   <os-alert|warning|Warning.|<strong|Proposal.> This extension belongs to the identity proposal of the specification (owners, key logs and signatures, sections 6.5 and 13.2), on the branch <verbatim|proposal/identity> (PR #30), not yet agreed. It is discussed in <hlink|issue #55|https://github.com/opensheaf/opensheaf.github.io/issues/55>.>
 
   <section*|1. Introduction (non-normative)><label|1-introduction-non-normative>
 
-  In the <hlink|OpenSheaf specification|opensheaf-specification-0.1.tm>, every version of a line is signed by its owner, under a version of the owner's key log, and a signature counts when it is valid under the key-log version it names, and keeps counting (sections 6.5 and 13.2 of the specification). Signatures say who made a version, not when. Two consequences follow in the core:
+  In the <hlink|OpenSheaf specification|opensheaf-specification-0.1.tm>, every version of a line is signed by its owner, under a version of the owner's key log, a signature is good when it is valid under the key-log version it names, and stays good, and a line is read from its signed head, its latest version signed with good signatures (sections 6.5 and 13.2 of the specification). Signatures say who made a version, not when. Two consequences follow in the core:
 
   <\itemize>
-    <item><strong|Signatures of a revoked key are unconfirmed>, since nothing tells those the owner made before the revocation from those a thief makes after, except where a later signed version of the same line confirms them.
+    <item><strong|Signatures of a revoked key are no longer good>, since nothing tells those the owner made before the revocation from those a thief makes after, so a line whose signed head only that key signed falls back until its owner signs it again with a good key.
 
     <item><strong|Forks of a key log are reported, never resolved>, and the owner's revocations made after the fork point wait until it is.
   </itemize>
@@ -39,7 +39,7 @@
     <item><strong|OpenTimestamps proofs> of the bytes of the same signature file; their names end in <verbatim|.ots>.
   </itemize>
 
-  A timestamp file of the signature file <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>-\<less\>d\<gtr\>.json> (section 13.2 of the specification), in the object's extension folder <verbatim|extensions/opensheaf-witnesses/>, is <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>-\<less\>d\<gtr\>.json.\<less\>e\<gtr\>.tsr> or <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>-\<less\>d\<gtr\>.json.\<less\>e\<gtr\>.ots>, beside it, where <verbatim|\<less\>e\<gtr\>> is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the timestamp file's own bytes. Names made from the contents never collide: two copies that add timestamps independently can be merged by taking every file of both, and the same timestamp has the same name everywhere.
+  A timestamp file of the signature file <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json> (section 13.2 of the specification), in the object's extension folder <verbatim|extensions/opensheaf-witnesses/>, is <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json.\<less\>e\<gtr\>.tsr> or <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json.\<less\>e\<gtr\>.ots>, beside it, where <verbatim|\<less\>e\<gtr\>> is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the timestamp file's own bytes. Names made from the contents never collide: two copies that add timestamps independently can be merged by taking every file of both, and the same timestamp has the same name everywhere.
 
   Both kinds stamp the signature file as stored. Signature files and their timestamp files are never re-serialised, replaced or removed once made (section 13.2 of the specification): a timestamp stamps their bytes, and a copy may already hold them. An OpenTimestamps proof is pending when made, and complete once a Bitcoin block attests it; the completed proof is a new file, named from its own bytes, beside the pending one, which stays unchanged. <strong|Anyone holding a copy MAY timestamp any signature file at any time>: a timestamp only shows that the file existed by its date, and the earliest one is the file's date (section 5), so a later timestamp never harms.
 
@@ -55,7 +55,7 @@
 
   The declaration validates against the schema of appendix A; anything else in <verbatim|keys.json> is not a declaration. It is part of the key-log version, signed with it, and changed only by a new version.
 
-  <strong|The declaration in force> is that of the latest version of the key log known to the reader; once a fork is resolved, the latest of the owner's side. A fork is always resolved under the declaration of its fork point, the last version all sides share (section 7), whatever is declared after it. An owner MAY drop the declaration by a later key-log version without it: no signature of a revoked key is then confirmed by this extension, so an owner that has revoked a key SHOULD NOT drop it; forks are still judged under the declaration of their fork point.
+  <strong|The declaration in force> is that of the latest version of the key log known to the reader; once a fork is resolved, the latest of the owner's side. A fork is always resolved under the declaration of its fork point, the last version all sides share (section 7), whatever is declared after it. An owner MAY drop the declaration by a later key-log version without it: no signature of a revoked key is then made good by this extension, so an owner that has revoked a key SHOULD NOT drop it; forks are still judged under the declaration of their fork point.
 
   <section*|5. Checking a timestamp><label|5-checking-a-timestamp>
 
@@ -77,19 +77,19 @@
 
   <section*|7. What timestamps add to the core><label|7-what-timestamps-add-to-the-core>
 
-  Under a declaration in force, these rules add to those of the specification. They only confirm what the core leaves unconfirmed, and resolve what it leaves unresolved; resolving a fork applies the revocations of the owner's side, as the core does where there is no fork, which is the one exception that section 4 of the specification allows. They never make valid what the core rejects, nor invalid what it accepts.
+  Under a declaration in force, these rules add to those of the specification. They only make good signatures that the core finds revoked or unchecked, so that a line's signed head comes later for readers that know them, and resolve what the core leaves unresolved; resolving a fork applies the revocations of the owner's side, as the core does where there is no fork, which is the one exception that section 4 of the specification allows. They never make good what the core finds invalid, nor invalid what it accepts, and never let a version into an archive, since archives add only what the core alone puts in a line (section 6.5 of the specification).
 
-  <strong|Signatures of a revoked key.> A signature by a key revoked in the key log (on the owner's side, once a fork is resolved) counts, unless the core leaves it unconfirmed for another reason, if its date is earlier than the time of the first key-log version that lists the key in <verbatim|revoked>, and than the earliest <verbatim|since> given for that key on the owner's side, if any. If that version has no time, none is confirmed. The time of the revoking version dates the end of the owner's trust in a key, not its theft: without <verbatim|since>, signatures that a thief made and stamped before the revocation are confirmed too, so owners revoke a key as soon as they fear it exposed, and give <verbatim|since> when they can tell when the exposure began.
+  <strong|Signatures of a revoked key.> A signature by a key revoked in the key log (on the owner's side, once a fork is resolved) is good, unless the core finds it unchecked or invalid, if its date is earlier than the time of the first key-log version that lists the key in <verbatim|revoked>, and than the earliest <verbatim|since> given for that key on the owner's side, if any. If that version has no time, none is made good. The time of the revoking version dates the end of the owner's trust in a key, not its theft: without <verbatim|since>, signatures that a thief made and stamped before the revocation are made good too, so owners revoke a key as soon as they fear it exposed, and give <verbatim|since> when they can tell when the exposure began.
 
-  <strong|Forks of a key log.> A fork (section 6.5 of the specification), of two sides or more, is judged under the declaration of its fork point, the last version all sides share, never under one of a side, so that a side cannot bring an authority of its own. If the first differing version of every side has a time, and one is earlier than every other and in a tie with none, its side is the owner's, and the others are reported; otherwise the fork stays unresolved, as in the core. A reader judges with the timestamp files of every copy it sees, merged (section 8): a copy stripped of a side's earliest timestamps can show the fork resolved the wrong way, but resolution only confirms or leaves unconfirmed (section 6.5 of the specification), so a reader that sees the stripped files restored resolves it otherwise. Meanwhile a wrong resolution can leave unconfirmed what the core lets count (the revocations of the wrong side apply), but never makes anything invalid, and it brings no version into an archive, since archives add only versions signed under the core (section 6.5 of the specification). A fork within a side is resolved in the same way. Once a fork is resolved, the owner's side is the key log: the keys it adds count, its revocations apply, and those listed only on other sides are ignored. A fork at a version before the owner adopted the extension is never resolved by it.
+  <strong|Forks of a key log.> A fork (section 6.5 of the specification), of two sides or more, is judged under the declaration of its fork point, the last version all sides share, never under one of a side, so that a side cannot bring an authority of its own. If the first differing version of every side has a time, and one is earlier than every other and in a tie with none, its side is the owner's, and the others are reported; otherwise the fork stays unresolved, as in the core. A reader judges with the timestamp files of every copy it sees, merged (section 8): a copy stripped of a side's earliest timestamps can show the fork resolved the wrong way, but resolution only makes signatures good or leaves them unchecked, never invalid (section 6.5 of the specification), so a reader that sees the stripped files restored resolves it otherwise. Meanwhile a wrong resolution can take out of a line what the core puts in it (the revocations of the wrong side apply), but never makes anything invalid, and it brings no version into an archive, since archives add only versions signed under the core (section 6.5 of the specification). A fork within a side is resolved in the same way. Once a fork is resolved, the owner's side is the key log: the keys it adds count, its revocations apply, and those listed only on other sides are ignored. A fork at a version before the owner adopted the extension is never resolved by it.
 
-  <strong|Missing timestamps> never make anything unconfirmed: they only leave unresolved, or unconfirmed, what the core leaves so.
+  <strong|Missing timestamps> never take anything out of a line: they only leave unresolved, or not good, what the core leaves so.
 
   <section*|8. Copies and branches><label|8-copies-and-branches>
 
   Timestamp files are witnesses, kept in the object's extension folder, and travel with the object as its signature files do (sections 6.5 and 13.2 of the specification), also in the evidence of forks. Copies that added different timestamp files are merged by keeping every file (section 3).
 
-  A branch keeps the evidence of its parent version as content (section 10.5 of the specification): <verbatim|parent.signatures/> holds the parent owner's signature files of the parent version with their timestamp files beside them, under the same file names, without the <verbatim|\<less\>version\<gtr\>/> folder (<verbatim|parent.signatures/signature-\<less\>k\<gtr\>-\<less\>d\<gtr\>.json.\<less\>e\<gtr\>.tsr>); the timestamp files of the parent owner's key log are in its owner object, which travels with the branch (section 6.5 of the specification). Under a declaration of the parent's owner, a branch MUST NOT be taken from a parent version whose timestamps are still pending, and its evidence carries complete proofs only, since the files of a version, once made, never change. A branch whose evidence carries a pending proof is reported: the pending proof counts for nothing, and the verdict of the branch point is the one that the rest of its evidence gives.
+  A branch keeps the evidence of its parent version as content (section 10.5 of the specification): <verbatim|parent.signatures/> holds the parent owner's signature files of the parent version with their timestamp files beside them, under the same file names, without the <verbatim|\<less\>version\<gtr\>/> folder (<verbatim|parent.signatures/signature-\<less\>k\<gtr\>.json.\<less\>e\<gtr\>.tsr>); the timestamp files of the parent owner's key log are in its owner object, which travels with the branch (section 6.5 of the specification). Under a declaration of the parent's owner, a branch MUST NOT be taken from a parent version whose timestamps are still pending, and its evidence carries complete proofs only, since the files of a version, once made, never change. A branch whose evidence carries a pending proof is reported: the pending proof counts for nothing, and the verdict of the branch point is the one that the rest of its evidence gives.
 
   <section*|9. Verification><label|9-verification>
 
@@ -104,7 +104,7 @@
 
     <item>computes the time of each key-log version and of each version signed under a declaration, and reports those without a time as undated, a warning;
 
-    <item>confirms signatures of revoked keys, and resolves forks of key logs, as section 7 says, reporting ties;
+    <item>makes good the signatures of revoked keys that section 7 makes good, and resolves forks of key logs, as section 7 says, reporting ties;
 
     <item>checks the timestamp files inside <verbatim|parent.signatures/> and at every level of <verbatim|parent.chain/> of every branch, and reports those that are pending (section 8).
   </itemize>
@@ -112,7 +112,7 @@
   <section*|10. Guidance for tools><label|10-guidance-for-tools>
 
   <\itemize>
-    <item>Tools that create an owner SHOULD offer to adopt this extension in the first version of its key log: without it, the signatures of a key the owner has to revoke cannot be confirmed by their dates, and a fork of the key log cannot be resolved.
+    <item>Tools that create an owner SHOULD offer to adopt this extension in the first version of its key log: without it, the signatures of a key the owner has to revoke cannot be shown good by their dates, and a fork of the key log cannot be resolved.
 
     <item>Tools SHOULD timestamp each signature when they make it, under a declaration, and before a version leaves its owner's hands.
 
@@ -126,13 +126,13 @@
   <\itemize>
     <item><strong|Trust.> An RFC 3161 token is immediate and checkable with common tools, but rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log keeps anyone else from dating with an authority of their own. An authority once listed stays trusted for its tokens: no later version removes it, so a compromised authority can backdate signatures of a stolen key before <verbatim|since>, and stamp a thief's fork before the owner's side, for good; the only remedy is a new owner, whose key log lists other authorities. Listing a root certificate trusts every authority that root certifies, so an owner that wants a single authority lists the fingerprint of its signing certificate. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after a pending period of hours, and its date is uncertain by about as long.
 
-    <item><strong|Stripping.> A host can remove timestamp files from a copy; the signatures they confirmed are then unconfirmed again, until a copy with the files restores them. A copy stripped of a side's earliest timestamps, and stamped again later by anyone, can even resolve a fork the wrong way for readers who see only that copy; until then it can leave unconfirmed signatures that the core lets count, since the revocations of the wrong side apply, but never makes anything invalid or brings a version into an archive (section 6.5 of the specification), and readers who merge the timestamp files of every copy they see reverse it. A host that removes the earliest timestamps of a revoking key-log version and keeps later ones moves its time later; <verbatim|since>, signed by the owner, bounds what this can confirm, and readers merge the timestamp files of every copy they see (section 9).
+    <item><strong|Stripping.> A host can remove timestamp files from a copy; the signatures they made good are then revoked again, until a copy with the files restores them. A copy stripped of a side's earliest timestamps, and stamped again later by anyone, can even resolve a fork the wrong way for readers who see only that copy; until then it can take out of a line what the core puts in it, since the revocations of the wrong side apply, but never makes anything invalid or brings a version into an archive (section 6.5 of the specification), and readers who merge the timestamp files of every copy they see reverse it. A host that removes the earliest timestamps of a revoking key-log version and keeps later ones moves its time later; <verbatim|since>, signed by the owner, bounds what this can make good, and readers merge the timestamp files of every copy they see (section 9).
 
     <item><strong|Freshness.> A copy that withholds later versions of a key log also withholds later declarations and revocations; the declaration in force is only as recent as the key log a reader has seen.
 
     <item><strong|Forks.> A side of a fork cannot bring its own authorities, and wins by stripping the other sides' timestamps only for readers who see no copy that keeps them (above). A side left undated keeps the fork unresolved until someone stamps it, which anyone may do (section 3). But time decides for whoever stamps first: a thief who holds <verbatim|threshold> keys of a version, forks the key log there and stamps the fork before the owner's next version, wins it, even if it publishes the fork later. Owners who want to resist the theft of one key use a threshold of 2 with three keys kept apart, from the first version of their key log (section 6.5 of the specification). An owner that adopts the extension late cannot have forks at earlier versions resolved.
 
-    <item><strong|Revocation.> Revocation confirms the stamped signatures made before it, a thief's included (section 7); the time between a theft and its revocation is the owner's exposure.
+    <item><strong|Revocation.> Revocation leaves good the stamped signatures made before it, a thief's included (section 7); the time between a theft and its revocation is the owner's exposure.
   </itemize>
 
   <section*|Appendix A. JSON Schema (normative)><label|appendix-a-json-schema-normative>
@@ -174,16 +174,16 @@
   The files of one signature of that version, in the owner object's extension folder: an RFC 3161 token, a pending OpenTimestamps proof, and the completed proof written beside it later, each named from the digest of its own bytes (placeholder digests):
 
   <\verbatim-code>
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json
 
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.q7swxsz56bfiyotn.tsr
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.q7swxsz56bfiyotn.tsr
 
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.hm5uhlee72brbz64.ots
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz64.ots
 
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.yq77barzw3gj7dbj.ots
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots
   </verbatim-code>
 
-  If the owner later revokes the first key, in version 3 of its key log, with <verbatim|since> the time it believes the key was exposed, the signatures of that key whose date is earlier than both the time of version 3 and <verbatim|since> count again for readers that know this extension; the others stay unconfirmed, unless a later signed version of the same line confirms them (section 6.5 of the specification).
+  If the owner later revokes the first key, in version 3 of its key log, with <verbatim|since> the time it believes the key was exposed, the signatures of that key whose date is earlier than both the time of version 3 and <verbatim|since> are good again for readers that know this extension; the others stay revoked, and a line whose signed head only they sign falls back until its owner signs it again with a good key (section 6.5 of the specification).
 
   <section*|Appendix C. References><label|appendix-c-references>
 
@@ -221,6 +221,8 @@
     <item><strong|0.1 (draft), 17 November 2026, revised after a ninth audit:> timestamp files follow the new names of signature files (<verbatim|signature-\<less\>k\<gtr\>-\<less\>d\<gtr\>.json.\<less\>e\<gtr\>.tsr>); the advice that whoever finds an undated side of a fork stamps it is withdrawn; a stripped and re-stamped copy can resolve a fork the wrong way for readers who see only it, which merging the timestamp files of every copy reverses, since resolution only confirms or leaves unconfirmed; the earliest <verbatim|since> is the one on the owner's side.
 
     <item><strong|0.1 (draft), 17 November 2026, revised after a tenth audit:> a wrong resolution of a fork, in a stripped copy, can leave unconfirmed what the core lets count until merged copies reverse it, but never makes anything invalid, and brings no version into an archive, since archives add only versions signed under the core.
+
+    <item><strong|0.1 (draft), 17 November 2026, following the signed head of the specification (PR #30):> signatures of a revoked key, dated before <verbatim|since> and the revoking version, are good, so that a line's signed head comes later for readers that know the extension; nothing it decides lets a version into an archive; timestamp files are again <verbatim|signature-\<less\>k\<gtr\>.json.\<less\>e\<gtr\>.tsr> and <verbatim|.ots>, beside signature files named by key alone; the words of the specification (good, revoked, unchecked, the signed head, the tail) replace "unconfirmed".
   </itemize>
 
 </body>

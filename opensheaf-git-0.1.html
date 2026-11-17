@@ -129,7 +129,7 @@
       RFC 8174) when, and only when, they appear in all capitals. Terms of the
       specification (archive, storage root, discovery document, object, object
       version, pin, mirror, witness, takedown, tombstone, owner, owner object,
-      key log, draft, signed, unconfirmed, not a version, fork) keep their
+      key log, draft, signed head, tail, not a version, fork) keep their
       meaning.
     </p>
     <ul>
@@ -320,29 +320,31 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       in the hashed layout, section 5 of the specification), with the folders
       above it that it needs (a new owner's folder, or folders of the hash),
       and the files of a complete OCFL object: a new object, or the copy of a
-      line kept elsewhere, up to its last signed version (its root inventory
-      then that of this version, section 10.4 of the specification); 2. a new
-      version folder <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt>, where <tt
-      class="verbatim">v&lt;N-1&gt;</tt> is the head of the object in C, with the
-      replacement of the object's root <tt class="verbatim">inventory.json</tt> and its
-      checksum file by those of the new version, and the version's signature
-      files in item 3; 3. files added in an object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
-      folder: signature files <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json</tt>,
-      their timestamp files, others' witnesses and, in an owner object, the
-      evidence of forks of its key log under <tt class="verbatim">fork/</tt> (section
-      6.5 of the specification). A file there, once published, is never
-      replaced or removed, except with its object by a takedown, even when it
-      is not a witness (a stray or malformed file, or an invalid signature
-      file, which is reported and kept): timestamps are made of the bytes of
-      signature files, and a completed timestamp proof is a new file beside
-      the pending one; 4. the replacement of <tt class="verbatim">opensheaf.json</tt>,
-      and files added, replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
-      <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
-      which are rewritten at every deposit and takedown (section 6.6 of the
-      specification, proposal); 5. at the creation of the storage root, its
-      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
-      the configuration of the layout extension, and the loose files allowed
-      by section 5 of the specification); 6. the removal of an object folder,
+      line kept elsewhere, up to its signed head (its root inventory then that
+      of this version, section 10.4 of the specification); 2. new version
+      folders <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt> to <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;M&gt;/</tt>,
+      M not less than N, where <tt class="verbatim">v&lt;N-1&gt;</tt> is the head of the
+      object in C, with the replacement of the object's root <tt class="verbatim">inventory.json</tt>
+      and its checksum file by those of <tt class="verbatim">v&lt;M&gt;</tt>, and the
+      versions' signature files in item 3; 3. files added in an object's <tt
+      class="verbatim">extensions/opensheaf-witnesses/</tt> folder: signature files <tt
+      class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt> of the line's owner
+      that are not invalid (section 13.2 of the specification), their
+      timestamp files, others' witnesses and, in an owner object, the evidence
+      of forks of its key log under <tt class="verbatim">fork/</tt> (section 6.5 of the
+      specification). A file there, once published, is never replaced or
+      removed, except with its object by a takedown, even when it is not a
+      witness (a stray or malformed file, which is reported and kept):
+      timestamps are made of the bytes of signature files, and a completed
+      timestamp proof is a new file beside the pending one; 4. the replacement
+      of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced or removed
+      among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
+      <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
+      at every deposit and takedown (section 6.6 of the specification,
+      proposal); 5. at the creation of the storage root, its own files (<tt
+      class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
+      configuration of the layout extension, and the loose files allowed by
+      section 5 of the specification); 6. the removal of an object folder,
       with the folders above it that it leaves empty (an owner's folder, or
       folders of the hash), by a takedown (section 9); 7. the repair of a file
       whose bytes do not match the digest its inventory records (section 5.3);
@@ -359,20 +361,24 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       changes MAY be made in one commit.
     </p>
     <p>
-      <strong>Only signed versions are added.</strong> Every object version
-      added by items 1 and 2, other than a draft's, MUST be signed under the
-      core (section 13.2 of the specification): by its line's owner, against
+      <strong>Only versions of the line are added.</strong> Every object
+      version added by items 1 and 2, other than a draft's, MUST be in its
+      line once added, under the core alone (sections 6.5 and 13.2 of the
+      specification): signed with good signatures of its line's owner, against
       the key log of the owner object kept at its path, which the same commit
-      adds or extends if needed; a version also counts as signed when a later
-      signed version added in the same commit extends it, and nothing that
-      only an extension decides (a fork resolved by time) lets a version in. A
-      version of a key log is signed by the keys of the version before. Since
-      nothing is removed from the published branch afterwards and OCFL cannot
-      skip a version, a version let in that is not signed would hold its
-      number for good, and the owner's own version of that number could never
-      be added to this archive. Versions already published stay, whatever
-      their status: a version that becomes unconfirmed later (its key revoked,
-      a fork of the key log) is kept and shown with its status (section 6.5 of
+      adds or extends if needed, or extended by a version so signed that the
+      same commit adds. Forks of key logs are those whose evidence is in the
+      commit's tree: while one is not resolved, a key revoked on any side
+      counts as revoked, and keys first listed after the fork point do not
+      count. Nothing that only an extension decides (a fork resolved by time,
+      a timestamp) lets a version in. A version of a key log added is signed
+      with good signatures of keys of the version before. Since nothing is
+      removed from the published branch afterwards and OCFL cannot skip a
+      version, a version let in that is not in the line would hold its number
+      for good, and the owner's own version of that number could never be
+      added to this archive. Versions already published stay, whatever their
+      status: a version that falls into the tail later (its key revoked, a
+      fork of the key log) is kept and shown with its status (section 6.5 of
       the specification).
     </p>
     <p>
@@ -462,13 +468,13 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       <li>
         <p>
           <strong>Versions of the same object.</strong> If both add version
-          <tt class="verbatim">v&lt;N&gt;</tt> of the same object, and neither is yet
-          signed (a draft, or a version still being prepared), the second to
-          be merged MUST be redone by the tool as <tt class="verbatim">v&lt;N+1&gt;</tt>,
-          with a new inventory; it MUST NOT be resolved by editing files. Two
-          signed versions <tt class="verbatim">v&lt;N&gt;</tt> of one line are a fork of
-          the line (section 6.5 of the specification), never redone by a
-          merge: only one is published, and the other is reported.
+          <tt class="verbatim">v&lt;N&gt;</tt> of the same draft, the second to be
+          merged MUST be redone by the tool as <tt class="verbatim">v&lt;N+1&gt;</tt>,
+          with a new inventory; it MUST NOT be resolved by editing files. A
+          sealed version is signed when it is made (section 6.5 of the
+          specification), and never rebuilt (section 6.2): two versions <tt
+          class="verbatim">v&lt;N&gt;</tt> of one line are a fork of the line, never
+          redone by a merge; only one is published, and the other is reported.
         </p>
       </li>
       <li>
@@ -491,12 +497,13 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       published by the maintainer of the archive when it is merged, after the
       checks of section 10 have passed on it. The version MUST already be
       signed by its line's owner, with the owner's own keys, before the pull
-      request is merged: a contributor adds versions only to its own lines,
-      and continues another owner's line by a branch under its own owner
-      (section 10.5 of the specification). The object version is created (its
-      <tt class="verbatim">created</tt> date in the inventory) before it is published.
-      (When a version becomes public, and how this is recorded, is discussed
-      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
+      request is merged: a contributor proposes versions of its own lines, or
+      copies of other owners' lines up to their signed heads, and continues
+      another owner's line only by a branch under its own owner (section 10.5
+      of the specification). The object version is created (its <tt class="verbatim">created</tt>
+      date in the inventory) before it is published. (When a version becomes
+      public, and how this is recorded, is discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue
+      #29</a>.)
     </p>
     <h2 id="auto-18"><a id="7-publishing"></a>7. Publishing<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-19"><a id="71-what-is-served"></a>7.1 What is served<span style="margin-left: 1em"></span></h3>
@@ -711,20 +718,26 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       </li>
       <li>
         <p>
-          <strong>signed additions</strong>: every object version added, other
-          than a draft's, is signed under the core by its line's owner, and
-          the key logs it needs are owner objects at their paths in the same
-          commit (section 5.1); an addition that is unsigned, invalid, or
-          signed only with signatures that are unconfirmed (a revoked key, a
-          key-log version not found, a key added after the point of a fork) is
-          a failure, so that a pull request adding it cannot pass;
+          <strong>additions in the line</strong>: every object version added,
+          other than a draft's, is in its line under the core once added, as
+          section 5.1 says, against key logs that are owner objects at their
+          paths in the commit's tree, and forks of key logs judged from the
+          evidence in that tree; an added version that is unsigned, invalid or
+          in the tail (its signatures revoked or unchecked: a revoked key, a
+          key-log version not found, a key added after the point of a fork),
+          and an added signature file of the owner that is invalid, are
+          failures, unless a version in the line added in the same commit
+          extends that version, so that a pull request adding them cannot
+          pass;
         </p>
       </li>
       <li>
         <p>
           <strong>reported, never failing</strong>: versions already published
-          that are now unconfirmed, files that are not witnesses, forks of
-          lines and of key logs (section 6.5 of the specification);
+          that are now in the tail, versions already published that are not
+          versions of their line (a breach of section 5.1 that cannot be
+          undone), files that are not witnesses, forks of lines and of key
+          logs (section 6.5 of the specification);
         </p>
       </li>
       <li>
@@ -764,12 +777,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       path of its identifier, with the owner objects of every owner whose
       signatures it carries (its own, and for a branch its parents' owners) at
       their own paths; signatures are in each object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>.
-      Copying a line is copying those object folders, up to the last signed
-      version of the line (section 5.1); an owner moving to another archive
-      copies its folder of the owner-name layout (section 5 of the
-      specification). A branch holds the evidence of its parent version as
-      content files (section 10.5 of the specification), so it never shares an
-      object folder with a copy of its parent's line.
+      Copying a line is copying those object folders, up to the signed head of
+      the line (section 5.1); an owner moving to another archive copies its
+      folder of the owner-name layout (section 5 of the specification). A
+      branch holds the evidence of its parent version as content files
+      (section 10.5 of the specification), so it never shares an object folder
+      with a copy of its parent's line.
     </p>
     <p>
       A public repository SHOULD be archived by <a href="https://www.softwareheritage.org/">Software
@@ -822,7 +835,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       <li>
         <p>
           <strong>Pull requests</strong> are checked before they are merged
-          (section 10): a version that is not signed by its line's owner
+          (section 10): a version that is not in its line under the core
           cannot pass, and once merged nothing can remove it (section 5.1).
         </p>
       </li>
@@ -854,151 +867,47 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     <ul>
       <li>
         <p>
-          <strong>0.1 (draft), 15 November 2026:</strong> first draft.
+          <strong>0.1 (draft), 15 November 2026:</strong> first draft; raw
+          file servers (section 7.4), which serve the archive files byte for
+          byte with cross-origin requests allowed, but not a website nor Git
+          LFS files; repairs (section 5.3) of a file whose bytes do not match
+          its inventory, the only change allowed to an existing version
+          folder.
         </p>
       </li>
       <li>
         <p>
-          <strong>0.1 (draft), 15 November 2026, revision:</strong> raw file
-          servers (section 7.4): they serve the archive files byte for byte
-          with cross-origin requests allowed, so tools can read an archive
-          from them, but not a website (content types), nor Git LFS files;
-          their base URL may be listed in <tt class="verbatim">mirrors</tt>.
+          <strong>0.1 (draft), 16 November 2026:</strong> the hashed storage
+          layout in the append-only rules, takedowns and the advice for large
+          archives (sections 5.1, 8 and 9); the indexes of the identity
+          proposal as archive files (sections 4.1, 5.1 and 9); working
+          branches (section 6.2), on which a sealed version is never rebuilt.
         </p>
       </li>
       <li>
         <p>
-          <strong>0.1 (draft), 15 November 2026, revision:</strong> repairs
-          (section 5.3): a file whose bytes do not match its inventory, such
-          as a Git LFS pointer committed by mistake, is replaced by the right
-          bytes in a new commit, the only change allowed to an existing
-          version folder; the append-only check accepts it.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 16 November 2026, revision:</strong> the hashed
-          storage layout of the specification: the append-only rules (section
-          5.1) and the takedown (section 9) use the object's path in the
-          layout, with the folders of the hash; large archives in git should
-          use the hashed layout (section 8).
-        </p>
-      </li>
-      <li>
-        <p>
-          **0.1 (draft), 16 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
-          of the specification):** the indexes of the identity proposal (<tt
-          class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>,
-          <tt class="verbatim">sha512/</tt>) are archive files: stored byte for byte
-          (section 4.1), rewritten at every deposit and takedown (sections 5.1
-          and 9); git branches other than the published branch are called
-          working branches (section 6.2), not drafts, which the proposal
-          defines as objects without a genesis record, and a sealed version is
-          not rebuilt once shared.
-        </p>
-      </li>
-      <li>
-        <p>
-          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/owners</tt>
-          of the specification):** copies of lines carry the key logs of their
-          signers, witnesses are kept only in objects' extension folders, and
-          an owner moves by copying its folder (section 11); drafts, at <tt
-          class="verbatim">draft/&lt;id&gt;/</tt>, may be changed or removed by any
-          commit (section 5.1).
-        </p>
-      </li>
-      <li>
-        <p>
-          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
-          of the specification):** two signed versions with the same number
-          are a fork, never redone by a merge (section 6); owner folders
-          created and removed with their objects (section 5.1); <tt class="verbatim">indexes.json</tt>
-          only in repositories serving indexes for several archives; sealing
-          makes a new object from a draft.
-        </p>
-      </li>
-      <li>
-        <p>
-          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
-          of the specification):** witness files are only added, never
-          replaced or removed, except with their object by a takedown (section
-          5.1).
-        </p>
-      </li>
-      <li>
-        <p>
-          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
-          of the specification):** the key logs of a branch's parents' owners
-          are owner objects beside it, not content of the branch (section 11).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 17 November 2026, proposal (fifth audit of the
-          specification):</strong> a takedown leaves in place the owner
-          objects that other objects need (section 9); the wording of witness
-          files in section 5.1 clarified.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 17 November 2026, proposal (sixth audit of the
-          specification):</strong> a copy of a line drops its unconfirmed
-          versions after its last signed version when a signed history departs
-          from them (section 5.1, item 9); the evidence of forks of a key log
-          is kept as witness files of the owner object (item 3).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 17 November 2026, proposal (seventh audit of
-          the specification):</strong> a copy never drops versions because of
-          a fork (item 9 of section 5.1 removed); the evidence of forks, of
-          lines and of key logs, is kept as witness files (item 3).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 17 November 2026, proposal (loose ends of the
-          seventh audit of the specification):</strong> setting aside versions
-          that are not versions of their line, by truncating the object
-          (section 5.1, item 9, and the append-only check of section 10).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 17 November 2026, proposal (eighth audit of the
-          specification):</strong> setting aside also covers versions that
-          rely on a key-log version not found, moves the witness folders of
-          every version set aside to <tt class="verbatim">fork/v&lt;k&gt;/&lt;d&gt;/</tt>,
-          and the append-only check reports an improper removal of versions
-          that were versions; files that are not witnesses may be removed
-          (item 3).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 17 November 2026, proposal (ninth audit of the
-          specification):</strong> setting aside versions (item 9 of section
-          5.1) and removing files that are not witnesses are withdrawn:
-          nothing in an object's version folders or witness folder is removed
-          except by a takedown, and the append-only check accepts no other
-          removal.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 17 November 2026, revised for the rules of the
-          tenth audit of the specification:</strong> only versions signed
-          under the core are added to the published branch (section 5.1), and
-          the check of section 10 fails a pull request that adds any other,
-          since nothing published is removed and OCFL cannot skip a version; a
-          copy of a line stops at its last signed version (sections 5.1 and
-          11); versions are signed before a pull request is merged, and
-          contributors add only to their own lines (section 6.3); unconfirmed
-          versions, files that are not witnesses and forks are reported, never
-          failing (section 10); witness files listed, invalid signature files
-          kept (item 3); private keys never committed (section 12).
+          <strong>0.1 (draft), 17 November 2026, for the identity proposal of
+          the specification (PR #30):</strong> copies of lines carry their
+          signers' key logs as owner objects, the parents' owners' included,
+          and an owner moves by copying its folder (section 11); drafts at <tt
+          class="verbatim">draft/&lt;id&gt;/</tt> may change or go (section 5.1, item
+          8); witness files, signature files <tt class="verbatim">signature-&lt;k&gt;.json</tt>
+          among them, are only added, never replaced or removed except with
+          their object by a takedown, and the evidence of forks of key logs is
+          kept among them (item 3); several versions of an object may be added
+          in one commit (item 2); only versions that the core alone puts in
+          their line are added, a copy stopping at its signed head, with forks
+          of key logs judged from the evidence in the commit's tree and keys
+          revoked on any side of an unresolved fork counting as revoked
+          (section 5.1), and the check of section 10 fails a commit or pull
+          request that adds any other, or an invalid signature file of the
+          owner, while what was published before is only reported; two signed
+          versions of one number are a fork, never redone by a merge, and only
+          drafts are redone (section 6.3); contributors propose their own
+          lines, or copies of others' signed lines (section 6.3); takedowns
+          leave in place the owner objects that other objects need (section
+          9); private keys are never committed (section 12). Setting aside
+          versions and removing files, tried during the day, were withdrawn.
         </p>
       </li>
     </ul>
