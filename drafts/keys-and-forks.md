@@ -2,18 +2,17 @@
 
 *Working paper, draft of 17 November 2026. Non-normative: an account of the
 difficulties met while writing the rules on owners, keys, signatures,
-revocation and forks of the proposal of
-[PR #30](https://github.com/opensheaf/opensheaf.github.io/pull/30) (merged
-from [PR #56](https://github.com/opensheaf/opensheaf.github.io/pull/56);
-discussed in issue
-[#55](https://github.com/opensheaf/opensheaf.github.io/issues/55)). Between
-the fourth and the ninth review of the proposal these rules were rewritten
-several times; each version closed the holes found in the one before and
-opened others. This paper records the attempts, the attacks that defeated
-them, and the principles that came out of it, so that the next change of
-these rules does not repeat them. Where it describes the rules, it describes
-those of PR #30 after the commit that removes setting aside and the removal of
-files (section 3.5); the specification is right where they differ.*
+revocation and forks of the proposal of [PR
+#30](https://github.com/opensheaf/opensheaf.github.io/pull/30) (merged from
+[PR #56](https://github.com/opensheaf/opensheaf.github.io/pull/56); discussed
+in issue [#55](https://github.com/opensheaf/opensheaf.github.io/issues/55)).
+Between the fourth and the eleventh review of the proposal these rules were
+rewritten several times; each version closed the holes found in the one before
+and opened others. This paper records the attempts, the attacks that defeated
+them, and the principles that came out of it, so that the next change of these
+rules does not repeat them. Where it describes the rules, it describes those
+of PR #30 after the commit that reads a line from its signed head (section
+3.8); the specification is right where they differ.*
 
 ## 1. What keys are for
 
@@ -154,14 +153,15 @@ one replaces its identity by a new owner, announced through its keeper.
 
 ### 3.4 Unconfirmed, invalid, and what is mirrored
 
-The word "unconfirmed" appeared before it was defined. For several rounds
-the core knew only "signed" and "not signed, invalid", so an unconfirmed
-version was in practice rejected, and an extension that "confirmed" it
-turned a rejection into an acceptance, which the rules on extensions forbid.
-It is now one status among three for versions (signed, unconfirmed, not a
-version), defined once in section 13.2 and referred to elsewhere: kept,
-shown and copied, but not relied on for pins, resolution, collection members
-or branch points.
+The word "unconfirmed" appeared before it was defined. For several rounds the
+core knew only "signed" and "not signed, invalid", so an unconfirmed version
+was in practice rejected, and an extension that "confirmed" it turned a
+rejection into an acceptance, which the rules on extensions forbid. It is now
+one status among three for versions (signed, unconfirmed, not a version),
+defined once in section 13.2 and referred to elsewhere: kept, shown and
+copied, but not relied on for pins, resolution, collection members or branch
+points. (The eleventh round replaced these per-version statuses by reading a
+line from its signed head, section 3.8.)
 
 Three statuses were also too many for the reasons behind them. A missing key
 log, a key-log version known with another digest, and a version beyond the
@@ -215,8 +215,9 @@ changed rather than removed: signatures naming a losing side whose key is not
 listed at the fork point are unconfirmed, never invalid. Nothing is dropped,
 set aside or deleted on the strength of signatures; a version that slipped in
 unchecked is reported and never shown as a version, but stays. Signature files
-are named by key and by a digest of their own content, so a junk file sits
-beside the real one and is reported, and nothing ever needs removing. A wrong
+were named by key and by a digest of their own content, so that a junk file
+would sit beside the real one, and nothing would ever need removing; that made
+them impossible to find over plain HTTP, and was undone (section 3.8). A wrong
 resolution in one copy is reversed by merging copies.
 
 **Keeping everything moved the problem to the door.** Once nothing is removed,
@@ -240,7 +241,8 @@ waits: it lags, it is not blocked. Adding anything else fails verification, so
 in git the pull request goes red before anyone can merge it, and owner tools
 never build on a version that is not a version. A version that gets in against
 the rule anyway makes that archive's copy one side of a fork of the line, kept
-and reported; the owner continues elsewhere.
+and reported; the owner continues elsewhere. The door was not yet shut, though
+(section 3.8).
 
 ### 3.6 Timestamps
 
@@ -295,6 +297,71 @@ through takedowns of the lines they sign. The cost is a dependency: an archive
 that keeps a branch must keep the owner objects of its whole chain, and a
 missing one leaves the signatures that need it unconfirmed.
 
+### 3.8 Reading a line from its signed head
+
+The eleventh review found that the door of section 3.5 still let a thief in,
+and that the per-version statuses still produced cases nobody wanted:
+
+- **a fork reopened the door.** A thief holding a key revoked in v3 of the key
+  log forked it at v1, before the revocation, and made the fork known (its
+  evidence is a witness file, which any commit may add). Revocations after the
+  fork point then did not apply, so the thief's v6 of the owner's line was
+  signed under the core and was added; the owner's own v6, signed with a key
+  first listed after the fork point, was refused. The thief took the number;
+- **a version fell out of the line by itself.** A v4 without signatures, added
+  together with a v5 that confirmed it, became "not a version" when the key of
+  v5 was later revoked, and the verification of section 14 then failed for
+  good in an archive that had done nothing wrong; in git, every later commit
+  failed with it;
+- **signature files could not be found.** Named by a digest of their own
+  content, they could not be guessed by a reader over plain HTTP, which cannot
+  list a folder, so no version was ever signed for such a reader;
+- **the extension promised more than it gave.** After a known fork of the key
+  log, the owner's new keys stay unchecked under the core, and archives add
+  only what the core accepts, so an owner whose keys all came after the fork
+  point cannot add again, whether or not timestamps resolve the fork for
+  readers.
+
+Radicle avoids most of this by not judging history one commit at a time. A
+repository's canonical branch is the commit that a threshold of its current
+delegates point to in their signed references; older commits are valid because
+that head reaches them. Removing a delegate only matters from then on, and
+nothing is ever signed again. OCFL gives OpenSheaf the same property: the
+inventory of a version records the digests of every file of every version
+before it, so one version fixes its whole history.
+
+So the proposal now reads a copy of a line from its **signed head**, its
+latest version signed with good signatures of the owner. That version and
+every version before it are the line, whatever their own signatures; the
+versions after it are the tail, kept and shown, never relied on; anything else
+is not a version. Signatures are good, revoked, unchecked (the key-log version
+they name not found, or a key added after an unresolved fork point) or
+invalid. A revocation makes a line whose latest version only the revoked key
+signed fall back to its last version signed with good keys, and the owner
+brings it back whole with one signature, on a later version or added to the
+current one: one signature for each line, never one for each version. The
+cases above follow:
+
+- archives add a version only if the core alone puts it in the line once
+  added, and while a fork of the key log is known and not resolved, a key
+  revoked on any side counts as revoked for adding, so the thief's v6 never
+  enters;
+- a version's place in the line no longer depends on its own signatures, so v4
+  stays in the line, or in the tail, with v5; a version that is not a version,
+  held by an archive, is reported as a breach of the rule on adding, not as a
+  failure of verification, and the git check fails only on what a commit adds;
+- signature files are again `signature-<k>.json`, named by key alone. The
+  digest was there so that a planted file could not block a real signature;
+  now that archives check what they add, junk never enters a conforming
+  archive, and one good signature for each key is enough;
+- the specification says plainly that, after a known fork, an owner whose good
+  keys all came after the fork point needs a new owner, with or without the
+  extension, which only fixes how the past is read.
+
+The outcomes are those the rules already aimed at; what changed is that one
+rule now gives them, instead of a status for every version traced through
+every revocation, fork, branch point and mirror.
+
 ## 4. What we learnt
 
 ### 4.1 Never remove on evidence an attacker can shape
@@ -307,11 +374,12 @@ readers merge copies. Removal is left to takedowns, which are decided by
 people and the law, not by signatures. Its corollary: since nothing leaves,
 guard the door, and add only what is signed under the core.
 
-### 4.2 Resolution confirms or unconfirms; it never destroys
+### 4.2 Resolution never destroys
 
 A wrong resolution of a fork in one copy, caused by stripped stamps, must be
-reversible by a copy that has them. So resolution may only move things
-between "counts" and "unconfirmed", never to "invalid" or "removed".
+reversible by a copy that has them. So resolution may only make signatures
+good or leave them unchecked, never make them invalid or remove anything, and
+it never lets a version into an archive.
 
 ### 4.3 Define statuses once
 
@@ -330,45 +398,55 @@ limit, a threshold "governing" earlier keys) produced cascades.
 Without time or a public order, whoever holds `threshold` keys of an old
 key-log version can fork the owner's key log at that version, and suspend
 revocations made after it. The core can only limit the damage: the past is
-never erased, keys added on a side do not count, and the fork is reported.
-The defences are outside the core's signatures: the timestamps extension
-adopted from the first key-log version, or a threshold of 2 or more from the
-first version (1 with a spare key protects against loss; 2 of 3 also against
-theft). When a fork cannot be resolved, or a listed timestamp authority is
-compromised, the owner replaces its identity by a new one. The specification
-now says this plainly instead of implying more.
+never erased, keys added on a side do not count, and the fork is reported. The
+defences are outside the core's signatures: the timestamps extension adopted
+from the first key-log version, or a threshold of 2 or more from the first
+version (1 with a spare key protects against loss; 2 of 3 also against theft).
+When a fork cannot be resolved, or a listed timestamp authority is
+compromised, the owner replaces its identity by a new one. The extension only
+fixes how the past is read: archives add only what the core accepts, so an
+owner whose good keys all came after a fork point cannot add again, with or
+without it. The specification now says this plainly instead of implying more.
 
 ### 4.6 Rewrite, do not patch
 
-Rounds four to six patched each finding with an exception, and the text
-grew; each exception interacted with the others. The seventh round rewrote
-sections 6.5, 13.2, 14 and 15 around the statuses and cut about 14 per cent of
-their words; the ninth removed four mechanisms outright. The audits found
-fewer and subtler problems after each rewrite, and more after each patch.
+Rounds four to six patched each finding with an exception, and the text grew;
+each exception interacted with the others. The seventh round rewrote sections
+6.5, 13.2, 14 and 15 around the statuses and cut about 14 per cent of their
+words; the ninth removed four mechanisms outright. The audits found fewer and
+subtler problems after each rewrite, and more after each patch. The eleventh
+went further, replacing the per-version statuses by one rule, the signed head
+(section 3.8).
 
 ## 5. The rules as they stand
 
-After the commit that follows the tenth review, the rules of PR #30 are, in
-short:
+After the commit that reads lines from their signed head, the rules of PR #30
+are, in short:
 
-- a signature counts if it verifies under the key-log version it names, the
-  key being listed there; later key-log versions never take it away;
-- a retired key changes nothing in the past; a revoked key's signatures are
-  unconfirmed, except in the key log up to the revoking version, in versions
-  of a line that a later signed version extends, and where the timestamps
-  extension dates them before `since` and the revocation;
-- versions are signed, unconfirmed or not a version (section 13.2);
-  unconfirmed versions are kept, shown and mirrored, not relied on;
-- the core never resolves a key-log fork: keys of the fork point keep
-  counting, keys added after it are unconfirmed, revocations after it wait;
-- archives add only versions signed under the core, so a mirror lags at the
-  last signed version; nothing is dropped, set aside or deleted on the
-  strength of signatures; signature files are named by key
-  and their own digest, so planted files sit beside real ones;
-- the timestamps extension, declared from the first key-log version, confirms
-  dated signatures of revoked keys and resolves forks by time, without ever
-  destroying anything; anyone may stamp any signature file, and the earliest
-  stamp wins.
+- a signature is good if it verifies under the key-log version it names, the
+  key being listed there and not revoked; later key-log versions never take it
+  away;
+- a copy of a line is read from its signed head, its latest version signed
+  with good signatures: that version and every version before it are the line,
+  the versions after it the tail (kept, shown, never relied on), anything else
+  not a version (section 13.2);
+- a retired key changes nothing; a revoked key's signatures are no longer
+  good, except in the key log up to the revoking version and where the
+  timestamps extension dates them before `since` and the revocation; a line
+  falls back, and comes back with one good signature;
+- the core never resolves a key-log fork: keys of the fork point stay good,
+  keys added after it are unchecked, revocations after it wait;
+- archives add a version only if the core alone puts it in the line, a key
+  revoked on any side of an unresolved fork counting as revoked for adding;
+  mirrors stop at the signed head; nothing is dropped, set aside or deleted on
+  the strength of signatures;
+- signature files are `signature-<k>.json`, one for each key, so that readers
+  over plain HTTP can find them;
+- the timestamps extension, declared from the first key-log version, makes
+  good the dated signatures of revoked keys and resolves forks by time, for
+  readers that know it, without ever destroying anything or letting a version
+  into an archive; anyone may stamp any signature file, and the earliest stamp
+  wins.
 
 ## 6. How others handle it
 
@@ -434,7 +512,7 @@ proposal.
   originator takes in another line's work
   ([#57](https://github.com/opensheaf/opensheaf.github.io/issues/57)).
 - Whether core-only verifiers, which cannot resolve forks, should report a
-  forked owner more prominently than other unconfirmed states.
+  forked owner more prominently than other states.
 
 ## 8. Pointers
 
