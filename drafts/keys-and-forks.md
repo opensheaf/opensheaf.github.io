@@ -379,8 +379,8 @@ and signatures; a thief holding a current key, who is the owner until found
 out, which no rule can prevent; and a thief holding an old key, retired or
 revoked, who signs new versions naming an old key-log version, as if made back
 then. Almost all the machinery of sections 3.1 to 3.8 (revocation and `since`,
-unconfirmed and unchecked, the tail, forks for adding, fork resolution, most
-of the timestamps extension) served the fourth case, and the fourth case
+unconfirmed versions, the tail, forks for adding, fork resolution, most of
+the timestamps extension) served the fourth case, and the fourth case
 cannot be solved without trusted time: every round only moved its edge.
 
 The editor chose Radicle's answer. A key is an identity; a compromised key
@@ -492,8 +492,8 @@ less sure of are marked.
   "retired" is a soft revocation, and implementations generally keep valid
   the signatures dated before it; a key "compromised" (or without a reason)
   is a hard revocation, and its signatures are distrusted whatever their
-  date, since the date in a signature is the signer's claim. Our retire and
-  revoke are the same split, for the same reason.
+  date, since the date in a signature is the signer's claim. Our retire is
+  the soft case; ending the owner now plays the role of the hard one.
 - **Git** signs commits and tags with OpenPGP, SSH or X.509 keys. With SSH
   keys, the verifier's `allowed_signers` file can bound a key with
   `valid-after` and `valid-before`, checked against the commit's own time,
@@ -557,9 +557,9 @@ proposal.
 
 - [PR #30](https://github.com/opensheaf/opensheaf.github.io/pull/30), branch
   `proposal/identity`: the specification, sections 6.5 (owners, key logs,
-  signing, retiring and revoking, forks), 13.2 (signatures and statuses), 14
-  (verification) and 15 (security), and its changelog, which records each
-  round; `opensheaf-timestamps-0.1.md`, the timestamps extension;
+  signing, retiring keys, ending an owner, forks), 13.2 (signatures and
+  statuses), 14 (verification) and 15 (security), and its changelog, which
+  records each round; `opensheaf-timestamps-0.1.md`, the timestamps extension;
   `opensheaf-git-0.1.md`, section 5.1, the append-only rules in git.
 - Issues [#55](https://github.com/opensheaf/opensheaf.github.io/issues/55)
   (owners and archives) and

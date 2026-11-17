@@ -461,9 +461,9 @@ version of their lines, and every change of their keys, then needs that many
 signatures. Adding a co-author, or replacing a lost key, is a new version of
 the key log. A person sets a threshold of 1, with a spare key kept apart.
 
-The cost is that a verifier replays the owner's key log to know which keys
-were valid when a version was signed; the key log is small and linear, and
-travels with the objects it signs.
+The cost is that a verifier replays the owner's key log to check each
+signature against the key-log version it names; the key log is small and
+linear, and travels with the objects it signs.
 
 #### Signed references: not needed
 
