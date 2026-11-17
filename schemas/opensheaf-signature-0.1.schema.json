@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-signature-0.1.schema.json",
+  "title": "OpenSheaf signature file, version 0.1",
+  "$comment": "Proposal (section 13.2 of the specification, branch proposal/owners; format and field names provisional, #55). Dedicated to the public domain under CC0 1.0.",
+  "type": "object",
+  "required": [
+    "format",
+    "signed",
+    "owner",
+    "key",
+    "keyLog",
+    "signature"
+  ],
+  "properties": {
+    "format": {
+      "const": "opensheaf-signature/0.1"
+    },
+    "signed": {
+      "type": "string",
+      "pattern": "^v[1-9][0-9]*/inventory\\.json\\.sha512$"
+    },
+    "owner": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{52}$"
+    },
+    "key": {
+      "type": "string",
+      "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]+$"
+    },
+    "keyLog": {
+      "type": "string",
+      "pattern": "^sheaf:[a-z2-7]{52}/v[1-9][0-9]*\\?sha512=[0-9a-f]{128}$",
+      "$comment": "a pin of the key-log version the signature relies on"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9+/]{86}==$",
+      "$comment": "an Ed25519 signature (64 bytes) in base64"
+    }
+  }
+}

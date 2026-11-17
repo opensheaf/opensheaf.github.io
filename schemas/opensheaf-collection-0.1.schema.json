@@ -26,9 +26,9 @@
         "type": "object",
         "required": [
           "kind",
-          "archive",
           "archiveUrl",
-          "id"
+          "name",
+          "owner"
         ],
         "properties": {
           "kind": {
@@ -37,19 +37,11 @@
               "collection"
             ]
           },
-          "archive": {
-            "type": "string",
-            "format": "uri"
-          },
           "archiveUrl": {
             "type": "string",
             "format": "uri",
-            "pattern": "/$"
-          },
-          "id": {
-            "type": "string",
-            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-            "maxLength": 64
+            "pattern": "/$",
+            "$comment": "proposal (section 6.2): a location where a copy was found, a hint"
           },
           "version": {
             "type": "string",
@@ -129,17 +121,9 @@
           },
           "owner": {
             "type": "string",
-            "format": "uri",
-            "$comment": "proposal (section 6.5): a named owner (archive identifier, ORCID iD, web address) or a keyed owner (did:key:, openpgp4fpr:)"
+            "pattern": "^[a-z2-7]{52}$",
+            "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
           }
-        },
-        "dependentRequired": {
-          "name": [
-            "owner"
-          ],
-          "owner": [
-            "name"
-          ]
         }
       }
     },

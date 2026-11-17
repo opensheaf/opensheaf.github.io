@@ -650,7 +650,7 @@ DataCite publishes its schema as an XML Schema only. `datacite.json` is validate
 
 ## Appendix E. Examples (non-normative)
 
-The values below come from the first archive, except the names, owners, keys and signatures added by the proposal of section 6.5, which are placeholders (the names are the real digests of the genesis records shown or described; the keys and signatures are not). Digests are shortened, and the DOIs and ORCID iDs are placeholders (with valid check digits).
+The values below come from the first archive, except the names, owners, keys and signatures added by the proposal of section 6.5, which are placeholders, except the names of the authors' owner and paper, which are the real digests of the genesis records shown. Digests are shortened, and the DOIs and ORCID iDs are placeholders (with valid check digits).
 
 A discovery document. The archive hosts one owner, whose owner object holds its key log, and the owner's document and catalogue; the labels give the website readable URLs:
 

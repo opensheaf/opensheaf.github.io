@@ -7,7 +7,6 @@
   "required": [
     "format",
     "specification",
-    "archiveId",
     "name",
     "storageRoot",
     "storageLayout",
@@ -20,10 +19,6 @@
     },
     "specification": {
       "const": "0.1"
-    },
-    "archiveId": {
-      "type": "string",
-      "format": "uri"
     },
     "name": {
       "type": "string",
@@ -40,14 +35,22 @@
     },
     "storageLayout": {
       "enum": [
-        "0002-flat-direct-storage-layout",
+        "opensheaf-owner-name-storage-layout",
         "0003-hash-and-id-n-tuple-storage-layout"
       ]
     },
     "mainCollection": {
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "maxLength": 64
+      "anyOf": [
+        {
+          "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
+        },
+        {
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "maxLength": 64
+        }
+      ],
+      "$comment": "proposal (section 6.3): the object's first line, sheaf:<name>:<owner>, or the identifier of a draft"
     },
     "profiles": {
       "type": "array",
@@ -86,13 +89,22 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-            "maxLength": 64
+            "anyOf": [
+              {
+                "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
+              },
+              {
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 64
+              }
+            ],
+            "$comment": "proposal (section 6.3): the object's first line, sheaf:<name>:<owner>, or the identifier of a draft"
           },
           "kind": {
             "enum": [
               "document",
-              "collection"
+              "collection",
+              "owner"
             ]
           },
           "head": {
@@ -109,10 +121,6 @@
               "withdrawn"
             ]
           },
-          "mirrorOf": {
-            "type": "string",
-            "format": "uri"
-          },
           "name": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
@@ -120,8 +128,14 @@
           },
           "owner": {
             "type": "string",
-            "format": "uri",
-            "$comment": "proposal (section 6.5): a named owner (archive identifier, ORCID iD, web address) or a keyed owner (did:key:, openpgp4fpr:)"
+            "pattern": "^[a-z2-7]{52}$",
+            "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+          },
+          "label": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 64,
+            "$comment": "proposal (section 6.3): a readable label, not an identifier"
           }
         },
         "dependentRequired": {
@@ -149,13 +163,22 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-            "maxLength": 64
+            "anyOf": [
+              {
+                "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
+              },
+              {
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 64
+              }
+            ],
+            "$comment": "proposal (section 6.3): the object's first line, sheaf:<name>:<owner>, or the identifier of a draft"
           },
           "kind": {
             "enum": [
               "document",
-              "collection"
+              "collection",
+              "owner"
             ]
           },
           "lastVersion": {
@@ -178,90 +201,42 @@
             "pattern": "^[a-z2-7]{52}$",
             "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
           },
-          "ownerId": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{51}[aq]$",
-            "$comment": "proposal (section 6.6): the owner identifier, which keeps the line taken"
-          },
           "sealed": {
             "type": "object",
-            "$comment": "proposal (section 6.5): the originator's sealing version, copied unchanged by every branch",
+            "$comment": "proposal (section 6.5): a pin of the originator's sealing version",
             "required": [
-              "archiveId",
-              "objectId",
-              "objectVersion"
+              "objectVersion",
+              "inventorySha512"
             ],
             "properties": {
-              "archiveId": {
-                "type": "string",
-                "format": "uri"
-              },
-              "objectId": {
-                "type": "string",
-                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-                "maxLength": 64
-              },
               "objectVersion": {
                 "type": "string",
                 "pattern": "^v[1-9][0-9]*$"
+              },
+              "inventorySha512": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{128}$"
               }
             }
           },
           "owner": {
             "type": "string",
-            "format": "uri",
-            "$comment": "proposal (section 6.5): a named owner (archive identifier, ORCID iD, web address) or a keyed owner (did:key:, openpgp4fpr:)"
+            "pattern": "^[a-z2-7]{52}$",
+            "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
           }
         },
         "dependentRequired": {
           "name": [
-            "ownerId",
+            "owner",
             "sealed"
           ],
-          "ownerId": [
+          "owner": [
             "name"
           ],
           "sealed": [
             "name"
-          ],
-          "owner": [
-            "name"
           ]
         }
-      }
-    },
-    "keys": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "minLength": 1
-          },
-          "url": {
-            "type": "string",
-            "format": "uri"
-          },
-          "fingerprint": {
-            "type": "string"
-          }
-        },
-        "anyOf": [
-          {
-            "required": [
-              "url"
-            ]
-          },
-          {
-            "required": [
-              "fingerprint"
-            ]
-          }
-        ]
       }
     },
     "extensions": {
@@ -298,6 +273,15 @@
           "maximum": 4
         }
       }
+    },
+    "owners": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z2-7]{52}$"
+      },
+      "uniqueItems": true,
+      "$comment": "proposal (section 6.5): the owner names of the owners the archive hosts"
     }
   }
 }

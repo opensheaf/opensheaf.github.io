@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json",
   "title": "OpenSheaf index file (names/, owners/, sha512/) and index declaration (indexes.json), version 0.1",
-  "$comment": "Proposal (section 6.6 of the specification, branch proposal/identity). An index file has `index` and `entries`; a declaration of indexes kept for several archives (indexes.json) has `indexes`. Dedicated to the public domain under CC0 1.0. The prefix of each entry, which must be the file's, is checked by verifiers, not by this schema.",
+  "$comment": "Proposal (section 6.6 of the specification, branches proposal/identity and proposal/owners). An index file has `index` and `entries`; a declaration of indexes kept for several archives (indexes.json) has `indexes`. Dedicated to the public domain under CC0 1.0. The prefix of each entry, which must be the file's, is checked by verifiers, not by this schema.",
   "oneOf": [
     {
       "$ref": "#/$defs/indexFile"
@@ -40,16 +40,12 @@
                 "$ref": "#/$defs/base32"
               },
               "originator": {
-                "type": "string",
-                "format": "uri"
+                "$ref": "#/$defs/base32",
+                "$comment": "proposal (section 6.5): the owner name of the originator"
               },
               "owner": {
-                "type": "string",
-                "format": "uri"
-              },
-              "ownerId": {
-                "type": "string",
-                "pattern": "^[a-z2-7]{51}[aq]$"
+                "$ref": "#/$defs/base32",
+                "$comment": "proposal (section 6.5): an owner name"
               },
               "names": {
                 "type": "array",
@@ -58,36 +54,25 @@
                   "$ref": "#/$defs/base32"
                 }
               },
-              "objectId": {
-                "type": "string",
-                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-                "maxLength": 64
-              },
               "genesis": {
                 "type": "string",
                 "$comment": "proposal (section 6.6): the exact text of genesis.json"
               },
               "sealed": {
                 "type": "object",
-                "$comment": "proposal (section 6.5): the originator's sealing version, copied unchanged by every branch",
+                "$comment": "proposal (section 6.5): a pin of the originator's sealing version",
                 "required": [
-                  "archiveId",
-                  "objectId",
-                  "objectVersion"
+                  "objectVersion",
+                  "inventorySha512"
                 ],
                 "properties": {
-                  "archiveId": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "objectId": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-                    "maxLength": 64
-                  },
                   "objectVersion": {
                     "type": "string",
                     "pattern": "^v[1-9][0-9]*$"
+                  },
+                  "inventorySha512": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{128}$"
                   }
                 }
               },
@@ -106,23 +91,30 @@
                   "removed"
                 ]
               },
-              "archiveId": {
-                "type": "string",
-                "format": "uri"
-              },
               "archiveUrl": {
                 "type": "string",
                 "format": "uri",
-                "pattern": "/$"
+                "pattern": "/$",
+                "$comment": "proposal (section 6.6): in an index kept for several archives, the base URL serving the copy, a location"
+              },
+              "id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
+                  },
+                  {
+                    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                    "maxLength": 64
+                  }
+                ],
+                "$comment": "proposal (section 6.3): the object identifier in that storage root"
+              },
+              "label": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 64
               }
-            },
-            "dependentRequired": {
-              "archiveId": [
-                "archiveUrl"
-              ],
-              "archiveUrl": [
-                "archiveId"
-              ]
             }
           }
         }
@@ -142,8 +134,8 @@
                 "items": {
                   "required": [
                     "name",
-                    "ownerId",
-                    "objectId",
+                    "owner",
+                    "id",
                     "status",
                     "sealed"
                   ],
@@ -160,7 +152,6 @@
                   "then": {
                     "required": [
                       "originator",
-                      "owner",
                       "genesis"
                     ]
                   }
@@ -182,7 +173,6 @@
               "entries": {
                 "items": {
                   "required": [
-                    "ownerId",
                     "owner",
                     "names"
                   ]
@@ -205,7 +195,7 @@
                 "items": {
                   "required": [
                     "inventorySha512",
-                    "objectId",
+                    "id",
                     "version",
                     "status"
                   ]
