@@ -389,8 +389,9 @@ of its key log, signed as usual, says `ended` and names an optional
 `successor`; a fork of the key log has the same effect from the fork point.
 The owner's signatures stay good, since the core cannot date them; readers
 trust its history only as far as other evidence goes (copies held earlier, the
-pins of collections, timestamps); archives add nothing more to its lines; and
-its work continues under the successor, by branches. Retiring a key still
+pins of collections, timestamps); archives take its lines only from copies,
+never as new deposits; and its work continues under the successor, by
+branches. Retiring a key still
 changes nothing. `revoked`, `since`, the tail, the signed head as a term, the
 rules on forks for adding and their resolution are gone, and the timestamps
 extension only gives dates that readers may weigh. A version is signed by its
@@ -458,8 +459,8 @@ by ending an owner whose key may have been exposed (section 3.9).
 
 ## 5. The rules as they stand
 
-After the commit in which an exposed key ends its owner, the rules of PR #30
-are, in short:
+After the fourteenth review (18 November 2026), the rules of PR #30 are, in
+short:
 
 - a signature is good if it verifies under the key-log version it names, the
   key being listed there; it stays good for ever, whatever later versions of
@@ -470,8 +471,10 @@ are, in short:
   anything else is not a version (section 13.2);
 - a retired key changes nothing; an owner whose key may have been exposed
   ends, with an optional successor, and a fork of its key log has the same
-  effect: signatures stay good, archives add nothing more to its lines,
-  readers trust its history as far as other evidence goes, and the successor
+  effect from the fork point (the versions each side holds stay versions):
+  signatures stay good, archives take its lines only from copies, up to the
+  latest signed version of a copy that agrees, never as new deposits, readers
+  trust its history as far as other evidence goes, and the successor
   continues by branches;
 - archives add only signed versions; mirrors stop at the latest signed
   version; nothing is dropped, set aside or deleted on the strength of
@@ -480,8 +483,10 @@ are, in short:
   over plain HTTP can find them; a file whose `object`, `version` or inventory
   digest are not those of its folder is invalid;
 - the timestamps extension gives dates that readers may weigh, for instance
-  for an ended owner's versions; it changes no status, resolves no fork and
-  lets nothing into an archive.
+  for an ended owner's versions; a date never precedes the key-log version
+  its signature names, so an authority listed later dates nothing before its
+  listing; it changes no status, decides no fork and lets nothing into an
+  archive.
 
 ## 6. How others handle it
 

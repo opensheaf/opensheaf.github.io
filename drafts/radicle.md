@@ -314,7 +314,7 @@ instead. Uniqueness is a rule ("Two different archives MUST NOT use the same
 archive identifier") that nothing checks: anyone can claim any `tag:`. The
 archive is also the writer of its objects.
 
-**In the proposal** (#55, #52, PR #56):
+**In the proposal** (PR #30 as revised by PR #56; #55, #52):
 
 - an **owner** is a keyed identity (a person, a group, an institution), named
   by the digest of its own genesis record, whose versions are its **key log**:
