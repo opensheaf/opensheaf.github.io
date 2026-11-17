@@ -269,14 +269,15 @@ place OCFL provides for data that is not part of any version is the object's
 `extensions/` folder (the registered mutable-head extension keeps its data
 there). So OpenSheaf puts witnesses in `extensions/opensheaf-witnesses/`,
 where they travel with the object: the owner's signature of every version,
-required, and timestamps and others' signatures, optional. Timestamps can be
-RFC 3161 tokens from a time-stamping authority the owner chooses, or
-OpenTimestamps proofs, or both; an owner that wants them for every version, a
-journal for instance, declares it in its key log, with the RFC 3161
-authorities it trusts, and its versions without one are then unconfirmed.
-Witnesses need no digests of their own: a signature is checked against the
-version it names, which the pins fix, and a timestamp against the signature
-file it stamps.
+required, and timestamps and others' signatures, optional. Timestamps are
+defined by an extension, [OpenSheaf timestamps](opensheaf-timestamps-0.1.md):
+RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or
+both. An owner that wants its versions dated, a journal or an institution for
+instance, adopts it in its key log, and forks of its key log are then resolved
+by time; without it, the core reports such forks and does not resolve them. A
+single researcher who never removes a key may not need it. Witnesses need no
+digests of their own: a signature is checked against the version it names,
+which the pins fix, and a timestamp against the signature file it stamps.
 
 ## Why is the HTML version not part of the deposit?
 

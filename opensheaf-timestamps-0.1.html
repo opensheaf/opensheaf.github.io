@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:x="https://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <head>
+    <title>OpenSheaf</title>
+    <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
+    <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
+    <script src="resources/theme.js" language="javascript"></script>
+    <link href="resources/brand/favicon.svg" rel="icon"></link>
+    <link href="resources/opensheaf.css" type="text/css" rel="stylesheet"></link>
+    <script src="resources/highlight.pack.js" language="javascript" defer></script>
+    <script src="resources/notes-base.js" language="javascript" defer></script>
+    <script language="javascript" defer>var bs = String.fromCharCode(92), sp =
+    String.fromCharCode(32); window.MathJax = {tex: {macros: {xequal: [bs +
+    'xlongequal[#1]{#2}', 2, ''], marked: [bs + 'class{tm-marked}{#1}', 1],
+    llbracket: bs + 'mathopen{' + bs + 'unicode{x27E6}}', rrbracket: bs +
+    'mathclose{' + bs + 'unicode{x27E7}}', hyperref: ['#2', 2, ''], rotatebox:
+    [bs + 'style{display:inline-block;transform:rotate(calc(-1deg' + sp + '*'
+    + sp + '#2))}{#3}', 3, '']}}};</script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" language="javascript"></script>
+  </head>
+  <body>
+    <div class="notes-header">
+      <p>
+        [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.1.html">specification</a>] [<a href="use-cases.html">use
+        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="https://mgubi.org/papers/">first archive</a>]<em class="notes-header-name">OpenSheaf</em>
+      </p>
+    </div>
+    <h1 id="auto-1">OpenSheaf timestamps<span style="margin-left: 1em"></span></h1>
+    <div class="notes-abstract">
+      Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 17
+      November 2026. How an owner dates its signatures with RFC 3161 tokens or
+      OpenTimestamps proofs, declares that it does so in its key log, and so
+      resolves forks of its key log by time and confirms signatures that the
+      core leaves unconfirmed after a key is removed. The extension is named
+      by the URI <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>.
+      The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to
+      the public domain under CC0 1.0.
+    </div>
+    <div class="os-alert os-warning">
+      <font class="os-alert-label">Warning.</font> <strong>Proposal.</strong> This extension
+      belongs to the identity proposal of the specification (owners, key logs
+      and signatures, sections 6.5 and 13.2), on the branch <tt class="verbatim">proposal/identity</tt>
+      (PR #30), not yet agreed. It is discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/55">issue #55</a>.
+    </div>
+    <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
+    <p>
+      In the <a href="opensheaf-specification-0.1.html">OpenSheaf specification</a>, every version of a line is
+      signed by its owner, under a version of the owner's key log that lists
+      the keys allowed to sign (sections 6.5 and 13.2 of the specification).
+      Signatures say who made a version; they say nothing of when. Two
+      consequences follow in the core:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>Forks of a key log are reported, not resolved.</strong> A
+          key removed from a key log can still sign a different version of an
+          older key log, and so fork it; nothing in the core says which side
+          is the owner's.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Signatures after a change of keys are unconfirmed.</strong>
+          A signature naming an older key-log version counts in the core only
+          while its key is still listed and the threshold has not been raised;
+          otherwise the core cannot tell whether it was made before the change
+          or after it.
+        </p>
+      </li>
+    </ul>
+    <p>
+      Timestamps answer both, by showing that a signature existed by a date. A
+      single researcher who never removes a key needs none of this. A journal,
+      an institution, or anyone who rotates keys may want it, and may want it
+      from a provider it can name. So timestamps are an extension, which an
+      owner adopts by declaring it in its key log, and SHOULD adopt from the
+      first version of its key log, before any key is ever removed.
+    </p>
+    <h2 id="auto-3"><a id="2-conventions"></a>2. Conventions<span style="margin-left: 1em"></span></h2>
+    <p>
+      The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD
+      NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL in this document are
+      to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when,
+      and only when, they appear in all capitals. Terms are those of the
+      specification: owner, key log, key-log version, signature file, witness,
+      line, branch.
+    </p>
+    <p>
+      This extension follows the extension mechanism of section 4 of the
+      specification: it never changes the meaning of what the specification
+      defines, nor relaxes its requirements; it adds evidence, and rules that
+      use it. A reader that does not know it reads and verifies everything by
+      the core rules, and ignores the files and data it defines.
+    </p>
+    <h2 id="auto-4"><a id="3-timestamps"></a>3. Timestamps<span style="margin-left: 1em"></span></h2>
+    <p>
+      A timestamp of a signature file shows that the file, and so the
+      signature and the signed message it holds, existed by a date. It proves
+      existence, nothing more. Two kinds are defined, which an owner MAY
+      combine:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>RFC 3161 tokens</strong>, from a time-stamping authority (a
+          free public one, or a qualified provider under eIDAS): <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.tsr</tt>,
+          beside the signature file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>
+          in the object's extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>.
+          The file holds a DER-encoded <tt class="verbatim">TimeStampResp</tt> whose
+          message imprint is the SHA-512 digest of the bytes of the signature
+          file, requested with the authority's certificates included (<tt
+          class="verbatim">-cert</tt> with <tt class="verbatim">openssl ts -query</tt>), so that
+          it can be checked with <tt class="verbatim">openssl ts -verify</tt> without
+          fetching them.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>OpenTimestamps proofs</strong> of the bytes of the same
+          signature file: <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.ots</tt>,
+          beside it.
+        </p>
+      </li>
+    </ul>
+    <p>
+      Both stamp the signature file as stored. Signature files and their
+      timestamp files are never re-serialised or replaced once made (section
+      13.2 of the specification): a timestamp stamps their bytes. A timestamp
+      MAY be supplemented later by another one of the same file (re-stamping),
+      with another authority or with an OpenTimestamps proof, so that the
+      evidence outlives the certificates of the first; the files are then
+      named <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;n&gt;.tsr</tt>
+      or <tt class="verbatim">.&lt;n&gt;.ots</tt>, <tt class="verbatim">&lt;n&gt;</tt> from 2.
+    </p>
+    <p>
+      A timestamp of a version's checksum file MAY also be kept, as <tt class="verbatim">&lt;version&gt;/inventory.json.sha512.tsr</tt>
+      or <tt class="verbatim">.ots</tt>; it dates the version, not a signature, and is
+      not used by the rules below.
+    </p>
+    <h2 id="auto-5"><a id="4-the-owners-declaration"></a>4. The owner's declaration<span style="margin-left: 1em"></span></h2>
+    <p>
+      An owner adopts this extension in its key log: a version of the key log
+      holds, in its <tt class="verbatim">keys.json</tt>, under <tt class="verbatim">extensions</tt>
+      (section 6.5 of the specification), an entry keyed by <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>,
+      an object with:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">timestamps</tt>, REQUIRED: <tt class="verbatim">&quot;keylog&quot;</tt>,
+          every version of the key log is timestamped, or <tt class="verbatim">&quot;all&quot;</tt>,
+          every version of the key log and of the owner's lines is
+          timestamped;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">timestampAuthorities</tt>, OPTIONAL: the RFC 3161
+          time-stamping authorities the owner trusts, each the SHA-256
+          fingerprint (lowercase hexadecimal) of the authority's signing
+          certificate or of the root certificate of its chain. Without any,
+          only OpenTimestamps proofs meet the policy.
+        </p>
+      </li>
+    </ul>
+    <p>
+      The declaration is part of the key-log version, so it is signed with it,
+      and changed only by a new version. <strong>The declaration in
+      force</strong> for any version is that of the latest version of the key
+      log known to the reader, not that of the version a signature names: an
+      owner that adopts the extension, tightens its policy, or changes its
+      authorities does so for everything checked afterwards.
+    </p>
+    <h2 id="auto-6"><a id="5-checking-a-timestamp"></a>5. Checking a timestamp<span style="margin-left: 1em"></span></h2>
+    <p>
+      A timestamp is <strong>valid</strong> for a signature file when:
+    </p>
+    <ul>
+      <li>
+        <p>
+          for an RFC 3161 token: its message imprint is the SHA-512 digest of
+          the file's bytes; its signing certificate, or the root of the chain
+          it carries, has a fingerprint listed in <tt class="verbatim">timestampAuthorities</tt>
+          of the declaration in force; the chain was valid at the token's <tt
+          class="verbatim">genTime</tt>; and the token verifies. An authority that the
+          owner stops trusting is removed from the list by a new key-log
+          version: its tokens then count only if their <tt class="verbatim">genTime</tt>
+          is earlier than the time of that version (section 6);
+        </p>
+      </li>
+      <li>
+        <p>
+          for an OpenTimestamps proof: it is complete, attested in a Bitcoin
+          block; an incomplete (pending) proof counts for nothing until it is
+          completed.
+        </p>
+      </li>
+    </ul>
+    <p>
+      The <strong>date</strong> of a valid timestamp is the <tt class="verbatim">genTime</tt>
+      of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps
+      proof reaches. The earliest valid timestamp of a signature file is its
+      date.
+    </p>
+    <h2 id="auto-7"><a id="6-the-time-of-a-version"></a>6. The time of a version<span style="margin-left: 1em"></span></h2>
+    <p>
+      The <strong>time</strong> of a version (of a line or of a key log) is
+      the <tt class="verbatim">threshold</tt>-th earliest of the dates of its valid
+      signature files from distinct keys naming one key-log version (section
+      6.5 of the specification), <tt class="verbatim">threshold</tt> being that key-log
+      version's. A version with fewer dated signatures has no time.
+    </p>
+    <p>
+      Two times are a <strong>tie</strong> when they are equal, or when one of
+      them is the time of a Bitcoin block and they are within two hours of
+      each other, since block times are that uncertain. A tie is reported and
+      decides nothing.
+    </p>
+    <h2 id="auto-8"><a id="7-what-timestamps-add-to-the-core"></a>7. What timestamps add to the core<span style="margin-left: 1em"></span></h2>
+    <p>
+      Under a declaration, the following rules apply in addition to those of
+      the specification. They only confirm or resolve what the core leaves
+      unconfirmed or unresolved; they never make valid what the core rejects.
+    </p>
+    <p>
+      <strong>Forks of a key log.</strong> When two valid versions of a key
+      log with the same number fork it (section 6.5 of the specification), and
+      the declaration in force (in the last version both branches share) is
+      <tt class="verbatim">keylog</tt> or <tt class="verbatim">all</tt>, the branch whose first
+      differing version has the earlier time is the owner's, and the other is
+      reported. If neither has a time, or the times are a tie, the fork stays
+      unresolved, as in the core.
+    </p>
+    <p>
+      <strong>Signatures after a change of keys.</strong> A signature naming
+      an older key-log version vk, which the core leaves unconfirmed because a
+      later known version removed its key or raised the threshold, counts if
+      its date is earlier than the time of the first key-log version after vk
+      that made that change. The same holds for a key removed and later added
+      again, for signatures made while it was absent. Since the declaration in
+      force is that of the latest known version, a signature naming vk also
+      needs such a date when a version after vk adopted the extension,
+      tightened <tt class="verbatim">timestamps</tt> or changed <tt class="verbatim">timestampAuthorities</tt>.
+      Where the version that made the change has no time, no such signature
+      can be confirmed.
+    </p>
+    <p>
+      <strong>Missing timestamps.</strong> A version that the declaration in
+      force covers, and that has no time in a given copy, is unconfirmed
+      there, not invalid: a host can strip timestamp files from a copy, and
+      anyone can add one later. A declaration decides forks and confirms
+      signatures only through timestamps that are present and valid.
+    </p>
+    <h2 id="auto-9"><a id="8-copies-and-branches"></a>8. Copies and branches<span style="margin-left: 1em"></span></h2>
+    <p>
+      Timestamp files are witnesses, kept in the object's extension folder,
+      and travel with the object as its signature files do (sections 6.5 and
+      13.2 of the specification). A copy keeps them.
+    </p>
+    <p>
+      A branch keeps the evidence of its parent version as content (section
+      10.5 of the specification): <tt class="verbatim">parent.signatures/</tt> holds the
+      parent owner's signature files of the parent version with their
+      timestamp files beside them, and <tt class="verbatim">parent.keylog/</tt> holds,
+      for each version of the parent owner's key log, its signature files with
+      their timestamp files. Under a declaration of the parent's owner, a
+      branch MUST NOT be taken from a parent version whose timestamps are
+      still pending, and its evidence carries complete proofs only, since the
+      files of a version, once made, never change.
+    </p>
+    <h2 id="auto-10"><a id="9-verification"></a>9. Verification<span style="margin-left: 1em"></span></h2>
+    <p>
+      A verifier that knows this extension, in addition to the checks of
+      section 14 of the specification:
+    </p>
+    <ul>
+      <li>
+        <p>
+          validates each declaration against the schema of appendix A;
+        </p>
+      </li>
+      <li>
+        <p>
+          checks every timestamp file it finds against the signature file it
+          stamps (section 5), reporting each as valid, invalid, pending, or
+          from an authority not listed;
+        </p>
+      </li>
+      <li>
+        <p>
+          computes the time of each key-log version and of each version a
+          declaration covers, and reports those without a time as unconfirmed;
+        </p>
+      </li>
+      <li>
+        <p>
+          resolves forks of key logs, and confirms signatures after changes of
+          keys, as section 7 says, reporting ties;
+        </p>
+      </li>
+      <li>
+        <p>
+          checks the timestamp files inside <tt class="verbatim">parent.signatures/</tt>
+          and <tt class="verbatim">parent.keylog/</tt> of every branch, and that none of
+          them is pending.
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-11"><a id="10-guidance-for-tools"></a>10. Guidance for tools<span style="margin-left: 1em"></span></h2>
+    <ul>
+      <li>
+        <p>
+          Tools that create an owner SHOULD offer to adopt this extension in
+          the first version of its key log, with <tt class="verbatim">timestamps</tt> at
+          least <tt class="verbatim">keylog</tt>: without a declaration, a key once
+          removed can fork the key log at any later time, and the fork cannot
+          be resolved.
+        </p>
+      </li>
+      <li>
+        <p>
+          Tools SHOULD timestamp each signature when they make it, under a
+          declaration, and before a version leaves its owner's hands.
+        </p>
+      </li>
+      <li>
+        <p>
+          Tools SHOULD let an owner choose its authorities, and SHOULD keep an
+          OpenTimestamps proof beside an RFC 3161 token where an owner wants
+          evidence that rests on no authority.
+        </p>
+      </li>
+      <li>
+        <p>
+          Tools SHOULD re-stamp RFC 3161 tokens whose certificates near their
+          end.
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-12"><a id="11-security-considerations"></a>11. Security considerations<span style="margin-left: 1em"></span></h2>
+    <ul>
+      <li>
+        <p>
+          <strong>Trust.</strong> An RFC 3161 token is immediate and checkable
+          with common tools, but rests on the authority's clock and keys: an
+          authority that misdates, or whose key is stolen, can date a
+          signature falsely. Listing the authorities in the key log keeps
+          anyone else from dating with an authority of their own. An
+          OpenTimestamps proof rests on no authority, only on Bitcoin, but is
+          complete only after a pending period of hours, and its date is
+          uncertain by about as long.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Stripping.</strong> A host can remove timestamp files from a
+          copy; versions then become unconfirmed, not invalid, and a copy with
+          the files restores them.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Freshness.</strong> A copy that withholds later versions of
+          a key log also withholds later declarations; the declaration in
+          force is only as recent as the key log a reader has seen.
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-13"><a id="appendix-a-json-schema-normative"></a>Appendix A. JSON Schema (normative)<span style="margin-left: 1em"></span></h2>
+    <p>
+      The data of the declaration, the value of <tt class="verbatim">extensions[&quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;]</tt>
+      in <tt class="verbatim">keys.json</tt>, validates against <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json">opensheaf-timestamps-0.1.schema.json</a>
+      (JSON Schema 2020-12, CC0 1.0).
+    </p>
+    <h2 id="auto-14"><a id="appendix-b-example-non-normative"></a>Appendix B. Example (non-normative)<span style="margin-left: 1em"></span></h2>
+    <p>
+      The <tt class="verbatim">keys.json</tt> of a version of an owner's key log that
+      adopts the extension, with one RFC 3161 authority (a placeholder
+      fingerprint) and OpenTimestamps:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
+  &quot;keys&quot;: [ &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
+            &quot;did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH&quot; ],
+  &quot;threshold&quot;: 1,
+  &quot;extensions&quot;: {
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
+      &quot;timestamps&quot;: &quot;keylog&quot;,
+      &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <p>
+      The files of one signature of a key-log version, in the owner object's
+      extension folder:
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json
+extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.tsr
+extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.ots</pre>
+    </div>
+    <h2 id="auto-15"><a id="appendix-c-references"></a>Appendix C. References<span style="margin-left: 1em"></span></h2>
+    <ul>
+      <li>
+        <p>
+          <a href="opensheaf-specification-0.1.html">OpenSheaf specification 0.1</a>, sections 4, 6.5, 10.5,
+          13.2 and 14
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc3161">RFC 3161</a>, Time-Stamp Protocol, and <a href="https://www.rfc-editor.org/rfc/rfc5816">RFC
+          5816</a>, its update for other hash algorithms
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://opentimestamps.org/">OpenTimestamps</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc2119">RFC 2119</a> and <a href="https://www.rfc-editor.org/rfc/rfc8174">RFC 8174</a>
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-16"><a id="changelog"></a>Changelog<span style="margin-left: 1em"></span></h2>
+    <ul>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026:</strong> first draft, moving
+          the timestamp rules out of the identity proposal of the
+          specification: RFC 3161 tokens and OpenTimestamps proofs of
+          signature files, the owner's declaration in <tt class="verbatim">keys.json</tt>
+          under <tt class="verbatim">extensions</tt> (<tt class="verbatim">timestamps</tt>, <tt
+          class="verbatim">timestampAuthorities</tt>), checking at <tt class="verbatim">genTime</tt>
+          with listed authorities and complete proofs only, re-stamping, the
+          time of a version and ties, resolution of key-log forks by time,
+          confirmation of signatures after changes of keys, missing timestamps
+          as unconfirmed, branches with complete proofs, guidance and security
+          considerations.
+        </p>
+      </li>
+    </ul>
+  </body>
+</html>

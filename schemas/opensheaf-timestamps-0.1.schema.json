@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json",
+  "title": "OpenSheaf timestamps extension: the owner's declaration, version 0.1",
+  "$comment": "Proposal (OpenSheaf timestamps 0.1, extension https://opensheaf.org/opensheaf-timestamps-0.1). The value of extensions[\"https://opensheaf.org/opensheaf-timestamps-0.1\"] in keys.json. Dedicated to the public domain under CC0 1.0.",
+  "type": "object",
+  "required": [
+    "timestamps"
+  ],
+  "properties": {
+    "timestamps": {
+      "enum": [
+        "keylog",
+        "all"
+      ]
+    },
+    "timestampAuthorities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "$comment": "SHA-256 fingerprints of the signing or root certificates of trusted RFC 3161 authorities"
+    }
+  }
+}

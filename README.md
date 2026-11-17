@@ -132,6 +132,10 @@ on GitHub, and archives made with them.
 - [`opensheaf-git-0.1.md`](opensheaf-git-0.1.md): OpenSheaf archives in git,
   a companion to the specification: how to keep, publish and copy an archive
   in a git repository without changing its bytes.
+- [`opensheaf-timestamps-0.1.md`](opensheaf-timestamps-0.1.md): OpenSheaf
+  timestamps, an extension to the identity proposal: how an owner dates its
+  signatures (RFC 3161, OpenTimestamps), declares it in its key log, and so
+  resolves forks of its key log by time.
 - [`README.md`](https://github.com/opensheaf/opensheaf.github.io/blob/main/README.md): this text, also the home page of the site.
 - [`schemas/`](https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas): the JSON Schemas of the files defined by the
   specification, also published at `https://opensheaf.org/schemas/`:
@@ -148,12 +152,15 @@ on GitHub, and archives made with them.
   [`opensheaf-signature-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-signature-0.1.schema.json)
   for signature files and
   [`opensheaf-index-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json)
-  for the index files.
+  for the index files; and, for the timestamps extension,
+  [`opensheaf-timestamps-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json)
+  for its declaration in `keys.json`.
 - [`index.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm)/[`index.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html),
   [`opensheaf-specification-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html),
   [`faq.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm)/[`faq.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html),
   [`use-cases.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm)/[`use-cases.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html),
-  [`opensheaf-git-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.html): the pages of the site,
+  [`opensheaf-git-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.html),
+  [`opensheaf-timestamps-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.1.html): the pages of the site,
   generated from the Markdown files (for TeXmacs and for the web); do not
   edit them.
 - [`notes-meta.ts`](https://github.com/opensheaf/opensheaf.github.io/blob/main/notes-meta.ts): the TeXmacs style package of the

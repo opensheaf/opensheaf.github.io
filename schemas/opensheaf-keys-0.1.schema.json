@@ -35,21 +35,12 @@
       },
       "$comment": "optional: who answers for the owner (an ORCID iD, a web address, a domain)"
     },
-    "timestamps": {
-      "enum": [
-        "keylog",
-        "all"
-      ],
-      "$comment": "proposal (sections 6.5, 13.2): the owner's timestamp policy"
-    },
-    "timestampAuthorities": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "pattern": "^[0-9a-f]{64}$"
-      },
-      "$comment": "proposal (sections 6.5, 13.2): SHA-256 fingerprints of the signing or root certificates of trusted RFC 3161 authorities"
+    "extensions": {
+      "type": "object",
+      "$comment": "proposal (sections 4, 6.5): the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.1",
+      "propertyNames": {
+        "format": "uri"
+      }
     }
   },
   "$defs": {

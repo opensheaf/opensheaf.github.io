@@ -96,12 +96,13 @@ what its two standards leave open:
   and a **tombstone** stays in the discovery document (11.3).
 - **Witnesses** (13.2): in `extensions/opensheaf-witnesses/` of the object,
   not part of any version: the owner's signature files (required for every
-  sealed version), timestamps of signature files (RFC 3161 `.tsr`,
-  OpenTimestamps `.ots`), others' `witness-<label>.json`.
+  sealed version), others' `witness-<label>.json`, and timestamp proofs of
+  signature files as the timestamps extension defines them.
 - **Profiles** (4, appendices A-C): `zenodo` (DOIs from Zenodo), `texmacs`,
   `website`; declared in `profiles`.
 - **Extensions** (4): specifications published separately, named by a URI,
-  whose data goes under `extensions` in `object.json`; they never change the
+  whose data goes under `extensions` in `object.json` (or, for the key log,
+  in `keys.json`, as the timestamps extension does); they never change the
   core, and readers ignore those they do not know.
 
 ## Names, owners and lines (6.5, 6.6, 10.5)
@@ -124,16 +125,16 @@ November 2026; read them before touching any of this.
   originator, always `active`, never withdrawn, branched or mirrored apart
   from the lines it signs. Its versions are its **key log**: `keys.json`
   (`format`, `keys` as Ed25519 `did:key`, `threshold` at most the number of
-  keys; optional `keeper`, `https` URLs; `timestamps`, `keylog` or `all`;
-  `timestampAuthorities`, SHA-256 fingerprints of trusted RFC 3161
-  certificates); no `revoked`: a key is revoked by removing it from `keys`.
-  The first `keys.json` repeats the genesis record's keys and threshold and is
-  signed by them (`keyLog` naming itself); vN+1 is signed by `threshold` keys
-  of vN (`keyLog` naming vN). One `threshold` governs the key log and the
-  lines (as in Radicle). The optional **keeper** link (ORCID iD, domain) is
-  confirmed by the keeper (ORCID record, `/.well-known/opensheaf`). No named
-  owners, no owner identifiers. Anonymous owners (16): an owner made for the
-  purpose, without `keeper`.
+  keys; optional `keeper`, `https` URLs; `extensions`, the data of extensions
+  concerning the key log, keyed by URI, such as the timestamps declaration);
+  no `revoked`: a key is revoked by removing it from `keys`. The first
+  `keys.json` repeats the genesis record's keys and threshold and is signed by
+  them (`keyLog` naming itself); vN+1 is signed by `threshold` keys of vN
+  (`keyLog` naming vN). One `threshold` governs the key log and the lines (as
+  in Radicle). The optional **keeper** link (ORCID iD, domain) is confirmed by
+  the keeper (ORCID record, `/.well-known/opensheaf`). No named owners, no
+  owner identifiers. Anonymous owners (16): an owner made for the purpose,
+  without `keeper`.
 - **Signing** (6.5, 13.2): every sealed version of a line is signed by its
   owner: at least `threshold` valid signature files of the owner naming one
   key-log version; other files (stray, other key-log versions, other owners)
@@ -144,31 +145,35 @@ November 2026; read them before touching any of this.
   line's owner, `key`, `keyLog` as a pin `sheaf:<owner>/v<n>?sha512=...`,
   `signature`), signing a defined five-line message binding object, version,
   inventory and key-log version. A key signs a version at most once; signature
-  and stamp files are never re-serialised. **Decision B** (section 6.5,
-  Signing): a signature naming an older key-log version counts without a
-  timestamp only while its key is still in `keys` of the latest known version
-  and every version between, the threshold has not been raised, and no later
-  version has declared or tightened `timestamps` or changed
-  `timestampAuthorities`; otherwise only with a timestamp earlier than the
-  time of the key-log version that made the change (unconfirmed otherwise); a
-  key removed and re-added needs a timestamp for signatures made while absent;
-  never for a key-log version under an older one. Third parties:
+  files, and witnesses beside them, are never re-serialised. **Decision B**
+  (section 6.5, Signing): a signature naming an older key-log version counts
+  only while its key is still in `keys` of the latest known version and every
+  version between and the threshold has not been raised (nor extension data
+  governing signatures changed); otherwise it is unconfirmed in the core (the
+  timestamps extension can confirm it); never for a key-log version under an
+  older one. Third parties:
   `witness-<label>.json`, another owner's `keyLog`.
-- **Timestamps** (13.2): optional, of two kinds, on the signature file: RFC
-  3161 tokens (`signature-<k>.json.tsr`, DER `TimeStampResp`, SHA-512 imprint
-  of the file, `openssl ts -verify`) and OpenTimestamps proofs
-  (`signature-<k>.json.ots`, counting only when complete); an owner may use
-  both. RFC 3161 tokens count only from listed `timestampAuthorities`, checked
-  at `genTime` with the certificates they carry, and may be re-stamped. The
-  policy in force is that of the latest known key-log version; a version it
-  covers without a valid timestamp is unconfirmed, not invalid (hosts can
-  strip stamps). Time of a version: the `threshold`-th earliest valid
-  timestamp of its signatures naming one key-log version. **Decision A**
-  (section 6.5, Forks): a fork of valid key-log versions is resolved by the
-  earlier time of the first differing version under a declared policy (equal
-  times, or within two hours of a Bitcoin block time, are a tie, reported),
-  and otherwise reported, not resolved, signatures after the fork point being
-  unconfirmed. Tools declare `keylog` at least from the first version.
+- **Timestamps: an extension, not the core.** The core (6.5, 13.2) defines no
+  timestamps: a fork of a key log is reported, not resolved, and signatures
+  naming key-log versions after an unresolved fork point are unconfirmed; a
+  signature naming an older key-log version counts only while its key is still
+  listed and the threshold has not been raised (and no extension data
+  governing signatures changed), otherwise it is unconfirmed; a key removed
+  and re-added leaves its signatures while absent unconfirmed. Timestamp
+  proofs MAY sit beside signature files as witnesses; the core verifier
+  ignores what it does not know. Everything else is in
+  `opensheaf-timestamps-0.1.md` (URI
+  `https://opensheaf.org/opensheaf-timestamps-0.1`): RFC 3161 `.tsr` and
+  OpenTimestamps `.ots` beside signature files, the owner's declaration in
+  `keys.json` under `extensions` (`timestamps`: `keylog`/`all`;
+  `timestampAuthorities`: SHA-256 fingerprints), checks at `genTime`, complete
+  proofs only, re-stamping, the policy in force (latest known key-log
+  version), the time of a version (`threshold`-th earliest date) and ties (two
+  hours for Bitcoin times), resolution of forks by the earlier time,
+  confirmation of signatures after changes of keys, missing stamps as
+  unconfirmed, branches with complete proofs; owners SHOULD adopt it from
+  their first key-log version. Its schema is
+  `schemas/opensheaf-timestamps-0.1.schema.json`.
 - **Key logs travel with the objects they sign** (6.5): a copy keeps the
   signers' owner objects in its storage root, up to the latest key-log version
   its maker knows; readers use the longest of copies that extend one another,

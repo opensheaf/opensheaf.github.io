@@ -179,11 +179,11 @@ that they survive their owners' servers.
   Verifiers check mirrors exactly as originals.
 - Further witnesses: the owner's signatures, which every version carries, and
   others' signatures, which say who made or vouched for a version; and
-  timestamps (section 13.2), which show that it existed by a date; a snapshot
-  of the archive's git repository by Software Heritage, cited by its SWHID
-  (section 8.1); and Zenodo deposits (appendix A), which keep the content
-  files, though without the inventory a Zenodo record cannot be checked
-  against a pin.
+  timestamps (section 13.2, and the timestamps extension), which show that it
+  existed by a date; a snapshot of the archive's git repository by Software
+  Heritage, cited by its SWHID (section 8.1); and Zenodo deposits (appendix
+  A), which keep the content files, though without the inventory a Zenodo
+  record cannot be checked against a pin.
 
 ```sh
 # copy a line of another archive, byte for byte, with all its versions and
@@ -256,14 +256,15 @@ particular version of each paper.
   paper whose first preprint was under a restrictive licence can be accepted
   in a later, openly licensed version. Later versions of the accepted copy
   (corrections, notices, a withdrawal) are the editors' acts, signed by the
-  journal; the authors cannot change them. A journal will usually declare in
-  its key log that every version it signs is timestamped, by an RFC 3161
-  authority it trusts or by OpenTimestamps (section 13.2), so that its record
-  is dated. A correction the journal makes itself is its own version 4
-  (provisionally: the numbering on branches is open); when the editors later
-  vet the authors' corrected version, the copy moves its branch point to it,
-  with the same evidence, as the journal's next version (the journal's own
-  files are then dropped; how a move keeps them is open, section 6.5).
+  journal; the authors cannot change them. A journal will usually adopt the
+  [timestamps extension](opensheaf-timestamps-0.1.md) in its key log, so that
+  every version it signs is dated, by an RFC 3161 authority it trusts or by
+  OpenTimestamps, and forks of its key log are resolved by time. A correction
+  the journal makes itself is its own version 4 (provisionally: the numbering
+  on branches is open); when the editors later vet the authors' corrected
+  version, the copy moves its branch point to it, with the same evidence, as
+  the journal's next version (the journal's own files are then dropped; how a
+  move keeps them is open, section 6.5).
 
 ```sh
 # keep an accepted copy of the version the editors vetted; --version names
@@ -441,13 +442,14 @@ reports themselves, even if this is not customary today).
   becomes public only later; #29 proposes to leave it out and add it, by a
   description-only version, when the version is made public.
 - **Priority without disclosure.** The authors can timestamp the signature of
-  each object version (section 13.2), with an RFC 3161 time-stamping authority
-  or with [OpenTimestamps](https://opentimestamps.org/), or both. The
-  signature file holds only digests, which reveal nothing of the content, and
-  the timestamp later shows that exactly these files existed at that date. The
-  authors' signatures, which every version carries (section 13.2), show who
-  made them. Since a line is the same wherever it is copied, the proof still
-  holds when the line is later made public.
+  each object version (the timestamps extension), with an RFC 3161
+  time-stamping authority or with
+  [OpenTimestamps](https://opentimestamps.org/), or both. The signature file
+  holds only digests, which reveal nothing of the content, and the timestamp
+  later shows that exactly these files existed at that date. The authors'
+  signatures, which every version carries (section 13.2), show who made them.
+  Since a line is the same wherever it is copied, the proof still holds when
+  the line is later made public.
 - **The submission.** The authors send the journal their line (a copy, with
   their key log, kept by the journal as a mirror: byte for byte, still the
   authors' line, checked by their signatures), or a small collection pinning
@@ -558,9 +560,10 @@ was done, not only of what was handed in.
   seals it: sealing makes a new, fixed object, the line, from the draft.
 - **Dates.** A timestamp of each object version (section 13.2) shows that this
   revision existed by that date, which is what a deadline asks; the student's
-  signature shows whose it is. Timestamps are optional; an institution may ask
-  its students to declare them in their key logs. When the institution keeps a
-  mirror of the work at each submission (if the licence allows; copying by
+  signature shows whose it is. Timestamps come from the timestamps extension;
+  an institution may adopt it, and ask its students to adopt it in their key
+  logs, while a single researcher may not need it. When the institution keeps
+  a mirror of the work at each submission (if the licence allows; copying by
   agreement is open, #39), the mirror is also its receipt.
 - **Comments.** The supervisors' comments are documents (`Text`, with a
   `resourceType` such as "Supervisor's comments"), each with `Reviews`

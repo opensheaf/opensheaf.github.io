@@ -456,7 +456,11 @@
           any of its extensions. Readers ignore extensions they do not know,
           as they ignore unknown properties (section 12). The data of an
           extension is part of the object version, covered by its inventory
-          like the rest of <tt class="verbatim">object.json</tt>, so pins fix it too.
+          like the rest of <tt class="verbatim">object.json</tt>, so pins fix it too. An
+          extension that concerns an owner's key log records its data, in the
+          same way, under <tt class="verbatim">extensions</tt> in <tt class="verbatim">keys.json</tt>
+          (section 6.5), where the owner's signatures of the key-log version
+          fix it; the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> is one.
         </p>
       </li>
     </ul>
@@ -875,28 +879,10 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">timestamps</tt>, OPTIONAL: the owner's timestamp policy
-          (section 13.2): absent, no promise; <tt class="verbatim">&quot;keylog&quot;</tt>,
-          every version of the key log is timestamped; <tt class="verbatim">&quot;all&quot;</tt>,
-          every version of the key log and of the owner's lines is
-          timestamped. The policy in force for a version is that of the latest
-          version of the key log known to the reader. A version it covers
-          without a valid timestamp is unconfirmed (not invalid: a host can
-          strip timestamps, and anyone can add one later), and the policy
-          decides forks and cut-offs only through timestamps that are present
-          and valid;
-        </p>
-      </li>
-      <li>
-        <p>
-          <tt class="verbatim">timestampAuthorities</tt>, OPTIONAL: the RFC 3161
-          time-stamping authorities the owner trusts, each the SHA-256
-          fingerprint (lowercase hexadecimal) of the authority's signing
-          certificate or of the root certificate of its chain. RFC 3161 tokens
-          count only from authorities listed in the version of the key log in
-          force (section 13.2); OpenTimestamps proofs need no listing. A
-          policy without any listed authority is met only by OpenTimestamps
-          proofs;
+          <tt class="verbatim">extensions</tt>, OPTIONAL: the data of extensions
+          concerning the key log (section 4), keyed by the names of the
+          extensions, for instance the declaration of the <a href="opensheaf-timestamps-0.1.html">timestamps
+          extension</a>;
         </p>
       </li>
       <li>
@@ -909,26 +895,22 @@
     <p>
       The first version of the key log holds the genesis record and the first
       <tt class="verbatim">keys.json</tt>, whose <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt>
-      MUST be exactly those of the genesis record (it MAY add <tt class="verbatim">keeper</tt>,
-      <tt class="verbatim">timestamps</tt> and <tt class="verbatim">timestampAuthorities</tt>).
-      Its authority comes from the genesis record, whose digest is the owner
-      name: no one can make another first version under that name without
-      changing the keys it lists, and so the name. It is signed, like every
-      version, by <tt class="verbatim">threshold</tt> of those keys, which binds the
-      rest of it; its signatures name the first version itself in <tt class="verbatim">keyLog</tt>.
-      **Every later version vN+1 MUST be signed by at least <tt class="verbatim">threshold</tt>
-      distinct keys of vN, its signatures naming vN in <tt class="verbatim">keyLog</tt>.**
-      A new key is added, an old one removed (which is how a key is revoked),
-      or a threshold, timestamp policy or list of authorities changed, by a
-      new version; the owner name never changes. Tools SHOULD create two keys
-      when an owner is created, one of them kept apart (on a hardware token,
-      for instance), or give the owner the keys of several people with a
-      threshold; losing every key of the latest version cannot be recovered.
-      Tools SHOULD also declare a timestamp policy, <tt class="verbatim">keylog</tt> at
-      least, in the first version, before any key is ever removed: without
-      one, a removed key can fork the key log at any later time, and the fork
-      cannot be resolved (below). The field names of <tt class="verbatim">keys.json</tt>
-      are provisional (#55).
+      MUST be exactly those of the genesis record (it MAY add <tt class="verbatim">keeper</tt>
+      and <tt class="verbatim">extensions</tt>). Its authority comes from the genesis
+      record, whose digest is the owner name: no one can make another first
+      version under that name without changing the keys it lists, and so the
+      name. It is signed, like every version, by <tt class="verbatim">threshold</tt> of
+      those keys, which binds the rest of it; its signatures name the first
+      version itself in <tt class="verbatim">keyLog</tt>. **Every later version vN+1
+      MUST be signed by at least <tt class="verbatim">threshold</tt> distinct keys of
+      vN, its signatures naming vN in <tt class="verbatim">keyLog</tt>.** A new key is
+      added, an old one removed (which is how a key is revoked), or a
+      threshold or the data of an extension changed, by a new version; the
+      owner name never changes. Tools SHOULD create two keys when an owner is
+      created, one of them kept apart (on a hardware token, for instance), or
+      give the owner the keys of several people with a threshold; losing every
+      key of the latest version cannot be recovered. The field names of <tt
+      class="verbatim">keys.json</tt> are provisional (#55).
     </p>
     <p>
       <strong>Signing.</strong> Every sealed object version of a line MUST be
@@ -940,40 +922,35 @@
       never fatal, so that a host cannot break a version by adding a file. A
       key signs a given object version at most once. A signature SHOULD name
       the latest version of the key log at the time it is made. One naming an
-      older version vk, while vL is the latest version known to the reader, is
-      valid without a timestamp only if its key is listed in <tt class="verbatim">keys</tt>
-      of vL and of every version between, no version after vk has raised the
-      threshold, and no version after vk has declared or tightened <tt class="verbatim">timestamps</tt>
-      or changed <tt class="verbatim">timestampAuthorities</tt>; otherwise it needs a
-      timestamp (section 13.2) earlier than the time of the first key-log
-      version after vk that removed its key, raised the threshold or made such
-      a change, and without one it is reported as unconfirmed and does not
-      count. A key removed and later added again needs a timestamp for
-      signatures made while it was absent. Where the key-log version that made
-      the change has no time, no such signature can be confirmed. A signature
-      never counts for a version of a key log under an older version of it:
-      vN+1 is signed under vN only. One <tt class="verbatim">threshold</tt> governs both
-      the key log and every line of the owner, as in Radicle, where the
-      threshold of an identity document also decides its canonical branch: a
-      person uses a threshold of 1 with a spare key; a group raises it, and
-      then also governs together what it publishes. A second threshold, for
-      lines alone, can be added later if needed.
+      older version vk, while vL is the latest version known to the reader,
+      counts only if its key is listed in <tt class="verbatim">keys</tt> of vL and of
+      every version between, no version after vk has raised the threshold, and
+      no version after vk has changed extension data that the reader knows to
+      govern signatures (the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> says when its
+      declaration does); otherwise it is unconfirmed, since nothing in the
+      core shows whether it was made before the change or after it (the <a
+      href="opensheaf-timestamps-0.1.html">timestamps extension</a> can confirm it). A key removed and later
+      added again leaves the signatures it made while absent unconfirmed in
+      the same way. A signature never counts for a version of a key log under
+      an older version of it: vN+1 is signed under vN only. One <tt class="verbatim">threshold</tt>
+      governs both the key log and every line of the owner, as in Radicle,
+      where the threshold of an identity document also decides its canonical
+      branch: a person uses a threshold of 1 with a spare key; a group raises
+      it, and then also governs together what it publishes. A second
+      threshold, for lines alone, can be added later if needed.
     </p>
     <p>
       <strong>Forks of a key log.</strong> Two different valid versions of a
-      key log with the same number are a fork of the owner. If the owner
-      declares a timestamp policy (in the last version the two branches
-      share), the branch whose first differing version has the earlier time
-      (section 13.2) is the owner's, and the other is reported; two times that
-      are equal, or within two hours when one of them is the time of a Bitcoin
-      block (whose time is that uncertain), are a tie, reported and not
-      resolved. Otherwise the fork is reported and not resolved: readers see
-      the conflict, and signatures naming key-log versions after the fork
-      point are unconfirmed, until the owner resolves it by other means (for
-      instance a new owner, announced through its keeper). Without a declared
-      policy, any key removed at some time can fork the key log at any later
-      time, and the owner's identity is then in doubt; this is why tools
-      declare a policy from the first version.
+      key log with the same number are a fork of the owner. The core does not
+      resolve it: the fork is reported, readers see the conflict, and
+      signatures naming key-log versions after the fork point are unconfirmed,
+      until the owner resolves it by other means (for instance a new owner,
+      announced through its keeper). A key once removed can make such a fork
+      at any later time, since it can still sign a different version of the
+      key log it was listed in; owners who want forks resolved by time adopt
+      the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>, which resolves them by the
+      earliest timestamp, and SHOULD adopt it from the first version of their
+      key log, before any key is removed.
     </p>
     <p>
       <strong>Key logs travel with the objects they sign.</strong> A copy of
@@ -996,10 +973,8 @@
       never chosen across a fork. No one can prove offline that a key log is
       complete: a copy that stops early may hide a later version, such as one
       that removes a key, so the freshness of a key log is only as good as the
-      copies a reader has seen. Since a version in force decides which
-      signatures count, readers use the latest version they know; a version of
-      a key log whose required timestamps are missing in a copy is unconfirmed
-      there, not invalid.
+      copies a reader has seen. Since the latest version decides which
+      signatures count, readers use the latest version they know.
     </p>
     <p>
       <strong>Keepers (optional).</strong> An owner MAY name, in <tt class="verbatim">keeper</tt>
@@ -2456,11 +2431,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <tt class="verbatim">parent.keylog/</tt> and <tt class="verbatim">parent.chain/</tt>; the
       genesis record included), byte for byte, and the evidence of the parent
       version, as plain files of its content (the field and folder names below
-      are provisional, #55). A branch MUST NOT be taken from a parent version
-      whose required timestamps are still pending (an incomplete
-      OpenTimestamps proof), and its evidence carries complete proofs only.
-      Signature files and their timestamp files are copied byte for byte,
-      never re-serialised or replaced, since timestamps stamp their bytes:
+      are provisional, #55). Signature files, and any witnesses kept beside
+      them, are copied byte for byte, never re-serialised or replaced:
     </p>
     <ul>
       <li>
@@ -2478,7 +2450,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
         <p>
           <tt class="verbatim">parent.signatures/</tt>, the parent owner's signature
           files of the parent version (section 13.2), as named in the parent's
-          extension folder, with their timestamp proofs if any;
+          extension folder, with the witnesses kept beside them (such as
+          timestamp proofs of the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>), if any;
         </p>
       </li>
       <li>
@@ -2487,8 +2460,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           first version up to the latest the branch owner knows when it takes
           the branch point (at least up to the one the signatures name): for
           each version, <tt class="verbatim">v&lt;n&gt;/inventory.json</tt>, <tt class="verbatim">v&lt;n&gt;/keys.json</tt>
-          and its signature files with their timestamp files (<tt class="verbatim">.tsr</tt>,
-          <tt class="verbatim">.ots</tt>), and <tt class="verbatim">v1/genesis.json</tt>;
+          and its signature files with the witnesses kept beside them, and <tt
+          class="verbatim">v1/genesis.json</tt>;
         </p>
       </li>
       <li>
@@ -2608,9 +2581,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           the parent's signature: at least <tt class="verbatim">threshold</tt> signature
           files in <tt class="verbatim">parent.signatures/</tt>, of distinct keys of
           that key-log version, naming it, sign the parent version (section
-          13.2), under the rules of section 6.5 on later key-log versions,
-          removed keys and timestamp policies (other signature files are
-          ignored);
+          13.2), under the rules of section 6.5 on later key-log versions and
+          removed keys (other signature files are ignored);
         </p>
       </li>
       <li>
@@ -2930,70 +2902,27 @@ keylog &lt;the value of keyLog&gt;</pre>
       A signature is valid when the file's name matches the digest of its key,
       the key log, checked from its first version (section 6.5), reaches the
       version named with that digest, the key is listed there, the rules of
-      section 6.5 on later key-log versions and timestamp policies allow it,
-      and the signature verifies. A version is signed by its owner when at
-      least <tt class="verbatim">threshold</tt> distinct keys of one key-log version
-      have valid signature files naming that version (section 6.5); other
-      signature files, stray or malformed, are ignored and reported, never
-      fatal. The versions of an owner's key log are signed in the same way,
-      <tt class="verbatim">object</tt> being the owner object, by the keys of the
-      version before (for the first, by its own keys, which its genesis record
-      fixes). Signature files, and the timestamp files beside them, are never
-      re-serialised or replaced once made, here or in <tt class="verbatim">parent.signatures/</tt>,
-      since timestamps stamp their bytes.
+      section 6.5 on later key-log versions allow it, and the signature
+      verifies. A version is signed by its owner when at least <tt class="verbatim">threshold</tt>
+      distinct keys of one key-log version have valid signature files naming
+      that version (section 6.5); other signature files, stray or malformed,
+      are ignored and reported, never fatal. The versions of an owner's key
+      log are signed in the same way, <tt class="verbatim">object</tt> being the owner
+      object, by the keys of the version before (for the first, by its own
+      keys, which its genesis record fixes). Signature files, and the
+      witnesses kept beside them, are never re-serialised or replaced once
+      made, here or in <tt class="verbatim">parent.signatures/</tt>, since witnesses
+      such as timestamps may be made of their bytes.
     </p>
     <p>
       <strong>Timestamps.</strong> A timestamp shows that a signature existed
-      by a date; it proves existence, nothing more. Timestamps are OPTIONAL,
-      unless the owner's key log declares a policy (<tt class="verbatim">timestamps</tt>
-      in <tt class="verbatim">keys.json</tt>, section 6.5), and of two kinds, which an
-      owner MAY combine:
-    </p>
-    <ul>
-      <li>
-        <p>
-          an RFC 3161 time-stamp token from a time-stamping authority the
-          owner lists in <tt class="verbatim">timestampAuthorities</tt> (a free public
-          one, or a qualified provider under eIDAS), kept as <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.tsr</tt>:
-          a DER-encoded <tt class="verbatim">TimeStampResp</tt> whose message imprint is
-          the SHA-512 digest of the bytes of the signature file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>,
-          requested with the authority's certificates included (<tt class="verbatim">-cert</tt>),
-          and checkable with <tt class="verbatim">openssl ts -verify</tt>. It counts
-          only when the fingerprint of its signing certificate, or of the root
-          of the chain it carries, is listed in the key-log version in force,
-          and the chain was valid at the token's <tt class="verbatim">genTime</tt>. An
-          authority the owner stops trusting is removed from the list by a new
-          key-log version; its tokens then count only if dated before that
-          version's time. A token MAY be supplemented later by another
-          timestamp of the same file (re-stamping), so that the evidence
-          outlives the authority's certificates;
-        </p>
-      </li>
-      <li>
-        <p>
-          an OpenTimestamps proof of the bytes of the same signature file,
-          kept as <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.ots</tt>.
-        </p>
-      </li>
-    </ul>
-    <p>
-      Both stamp the signature file as stored, which contains the signature
-      and so the signed message. The date of a timestamp is the time it
-      attests (<tt class="verbatim">genTime</tt> for RFC 3161; the time of the Bitcoin
-      block it reaches, for OpenTimestamps); an OpenTimestamps proof counts
-      only once it is complete. The <strong>time of a version</strong> is the
-      <tt class="verbatim">threshold</tt>-th earliest of the valid timestamps of its
-      valid signature files, from distinct keys naming the same key-log
-      version (the earliest timestamp of each signature file counting); a
-      version with fewer timestamped signatures has no time. A missing
-      timestamp makes a version unconfirmed, not invalid: a host can strip
-      timestamps from a copy, and anyone can add one later. A timestamp of the
-      checksum file MAY also be kept, as <tt class="verbatim">&lt;version&gt;/inventory.json.sha512.tsr</tt>
-      or <tt class="verbatim">.ots</tt>, but does not date a signature. Tools SHOULD
-      timestamp signatures when they make them where an owner relies on
-      removing keys, since a signature naming a key-log version that is no
-      longer the latest, under the conditions of section 6.5, is confirmed
-      only by a timestamp.
+      by a date. The core defines none: RFC 3161 tokens and OpenTimestamps
+      proofs of signature files MAY be kept beside them, as defined by the <a
+      href="opensheaf-timestamps-0.1.html">timestamps extension</a>, which an owner adopts in its key log,
+      and which uses them to resolve forks of key logs and to confirm
+      signatures that section 6.5 leaves unconfirmed after a key is removed. A
+      verifier that does not know the extension ignores these files, as it
+      ignores any witness it does not know.
     </p>
     <p>
       <strong>Others' witnesses.</strong> A signature by someone other than
@@ -3012,10 +2941,10 @@ keylog &lt;the value of keyLog&gt;</pre>
       branch point, the parent owner's signatures and its key log up to the
       latest version known, in its content (section 10.5), not among its
       witnesses; the branch's own versions are signed by the branch's owner
-      like any line. The timestamp files of the parent's signatures are kept
-      beside them in <tt class="verbatim">parent.signatures/</tt>, and other witnesses
-      of a parent version (a timestamp of its checksum file, a third party's
-      signature) MAY be kept with them.
+      like any line. Witnesses of the parent's signatures (such as timestamp
+      proofs) are kept beside them in <tt class="verbatim">parent.signatures/</tt>, and
+      other witnesses of a parent version (a third party's signature) MAY be
+      kept with them.
     </p>
     <p>
       External deposits (appendix A) and software archive snapshots are
@@ -3120,24 +3049,21 @@ keylog &lt;the value of keyLog&gt;</pre>
           are those of its first <tt class="verbatim">keys.json</tt>, that every <tt
           class="verbatim">threshold</tt> (in the genesis record and in each <tt class="verbatim">keys.json</tt>)
           is at most the number of keys, that every signature file's name
-          matches the digest of its key, that RFC 3161 tokens come from listed
-          authorities and their chains were valid at <tt class="verbatim">genTime</tt>,
-          reporting as unconfirmed the versions a declared timestamp policy
-          covers that have no valid timestamp, and that every version is
-          signed by at least <tt class="verbatim">threshold</tt> keys of the version
-          before it (of its own, for the first), reporting a fork of a key
-          log; for every object, that the storage root holds the key logs of
-          the owners that signed its versions, at least up to the versions
-          their signatures name (section 6.5), reporting when a later version
-          of a key log is known elsewhere, and that every sealed object
-          version is signed by the owner of its line (section 13.2): at least
-          <tt class="verbatim">threshold</tt> valid signature files of the owner naming
-          one key-log version, the signed message rebuilt from them, a
-          signature naming an older key-log version counting only under the
-          rules of section 6.5 (otherwise reported as unconfirmed), and other
-          signature files, stray or malformed, reported, never fatal; and that
-          forks of key logs are resolved by timestamps when the owner declares
-          a policy, and otherwise reported;
+          matches the digest of its key, and that every version is signed by
+          at least <tt class="verbatim">threshold</tt> keys of the version before it (of
+          its own, for the first), reporting a fork of a key log; for every
+          object, that the storage root holds the key logs of the owners that
+          signed its versions, at least up to the versions their signatures
+          name (section 6.5), reporting when a later version of a key log is
+          known elsewhere, and that every sealed object version is signed by
+          the owner of its line (section 13.2): at least <tt class="verbatim">threshold</tt>
+          valid signature files of the owner naming one key-log version, the
+          signed message rebuilt from them, a signature naming an older
+          key-log version counting only under the rules of section 6.5
+          (otherwise reported as unconfirmed), and other signature files,
+          stray or malformed, reported, never fatal; and that forks of key
+          logs are reported, not resolved (the <a href="opensheaf-timestamps-0.1.html">timestamps
+          extension</a> resolves them by time);
         </p>
       </li>
       <li>
@@ -3279,23 +3205,22 @@ keylog &lt;the value of keyLog&gt;</pre>
           write another first version of a key log under it. A stolen key lets
           its holder sign versions of the owner's lines, and new versions of
           its key log if the threshold is 1, racing the owner; a threshold
-          above 1 prevents that. A removed key can still sign versions of an
-          older key log and so fork it: with a declared timestamp policy, the
-          fork is resolved by the earlier time, and RFC 3161 tokens count only
-          from authorities the owner lists; without one, the fork is reported,
-          not resolved, and the owner's identity is in doubt, which is why
-          tools declare a policy, <tt class="verbatim">keylog</tt> at least, from the
-          first version (section 6.5). A signature binds the object, the
-          version, its inventory and the key-log version it relies on (section
-          13.2), so none can be swapped; signature files of other owners,
-          naming other key-log versions, stray or malformed, are ignored, so a
-          host cannot break a version by adding files. A signature naming an
-          older key-log version counts without a timestamp only while its key
-          is still listed and nothing has been tightened since; otherwise it
-          needs a timestamp earlier than the change. A host can strip
-          timestamps from a copy, which makes versions unconfirmed there, not
-          invalid. A copy that withholds the later versions of a key log hides
-          a removal: copies carry the key logs up to the latest versions their
+          above 1 prevents that. This is the limit of the core: a key once
+          removed can still sign a different version of a key log it was
+          listed in, and so fork the key log at any later time; the core
+          reports the fork and does not resolve it, and signatures after the
+          fork point are unconfirmed, so the owner's identity is in doubt
+          until it acts. Owners who want forks resolved by time adopt the <a
+          href="opensheaf-timestamps-0.1.html">timestamps extension</a>, and SHOULD adopt it from the first
+          version of their key log. A signature binds the object, the version,
+          its inventory and the key-log version it relies on (section 13.2),
+          so none can be swapped; signature files of other owners, naming
+          other key-log versions, stray or malformed, are ignored, so a host
+          cannot break a version by adding files. A signature naming an older
+          key-log version counts only while its key is still listed and the
+          threshold has not been raised; otherwise it is unconfirmed in the
+          core. A copy that withholds the later versions of a key log hides a
+          removal: copies carry the key logs up to the latest versions their
           makers know, readers use the longest of copies that extend one
           another, and no one can prove offline that a key log is complete.
           Losing every key of an owner cannot be recovered, so tools create a
@@ -4001,6 +3926,22 @@ keylog &lt;the value of keyLog&gt;</pre>
           wording.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised:</strong>
+          the timestamp rules move to a separate extension, <a href="opensheaf-timestamps-0.1.html">OpenSheaf
+          timestamps</a> (<tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>):
+          the core reports forks of key logs and does not resolve them, and
+          leaves unconfirmed a signature under an older key-log version whose
+          key has been removed or whose threshold has been raised; <tt class="verbatim">timestamps</tt>
+          and <tt class="verbatim">timestampAuthorities</tt> leave <tt class="verbatim">keys.json</tt>,
+          which gains <tt class="verbatim">extensions</tt>, as <tt class="verbatim">object.json</tt>
+          has (section 4); the rules on <tt class="verbatim">.tsr</tt> and <tt class="verbatim">.ots</tt>
+          files, authorities, <tt class="verbatim">genTime</tt>, re-stamping, pending
+          proofs, the time of a version and ties are in the extension; section
+          13.2 keeps timestamps as witnesses the core ignores.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4248,6 +4189,11 @@ keylog &lt;the value of keyLog&gt;</pre>
       </li>
     </ul>
     <p>
+      The schema of the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>, <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json">opensheaf-timestamps-0.1.schema.json</a>,
+      is published with that extension, which is not part of this
+      specification.
+    </p>
+    <p>
       DataCite publishes its schema as an XML Schema only. <tt class="verbatim">datacite.json</tt>
       is validated by converting it to DataCite XML (following DataCite's
       mapping between the REST API's JSON and XML) and validating the result
@@ -4482,10 +4428,10 @@ ocfl/
     </div>
     <p>
       The <tt class="verbatim">keys.json</tt> of the second version of that owner's key
-      log, which added a spare key, declares that every version of the key log
-      is timestamped, lists one RFC 3161 authority it trusts (a placeholder
-      fingerprint) and names the keeper; it is signed by the key of the first
-      version:
+      log, which added a spare key, names the keeper, and adopts the <a href="opensheaf-timestamps-0.1.html">timestamps
+      extension</a>, declaring that every version of the key log is
+      timestamped and listing one RFC 3161 authority it trusts (a placeholder
+      fingerprint); it is signed by the key of the first version:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4495,9 +4441,13 @@ ocfl/
   &quot;keys&quot;: [ &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
             &quot;did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH&quot; ],
   &quot;threshold&quot;: 1,
-  &quot;timestamps&quot;: &quot;keylog&quot;,
-  &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ],
-  &quot;keeper&quot;: [ &quot;https://orcid.org/0000-0002-1234-5677&quot; ]
+  &quot;keeper&quot;: [ &quot;https://orcid.org/0000-0002-1234-5677&quot; ],
+  &quot;extensions&quot;: {
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
+      &quot;timestamps&quot;: &quot;keylog&quot;,
+      &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
+    }
+  }
 }</pre>
       </div>
     </div>
@@ -4751,36 +4701,29 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           version would revive removed keys; signing a message that names the
           object, the version, the inventory and the key-log version closes
           the first; the second is closed by counting a signature under an
-          older key-log version only while its key is still listed and nothing
-          has been tightened since, and otherwise only with a timestamp
-          earlier than the change (section 6.5). Key logs are carried in full,
-          up to the latest version known, because a truncated log hides
-          revocations; a branch carries the chain of its parents' evidence,
-          because a check one level deep lets a chain of branches pass a
-          reused genesis record.
+          older key-log version only while its key is still listed and the
+          threshold has not been raised since, and leaving it unconfirmed
+          otherwise (section 6.5), unless the <a href="opensheaf-timestamps-0.1.html">timestamps
+          extension</a> dates it. Key logs are carried in full, up to the
+          latest version known, because a truncated log hides revocations; a
+          branch carries the chain of its parents' evidence, because a check
+          one level deep lets a chain of branches pass a reused genesis
+          record.
         </p>
       </li>
       <li>
         <p>
-          <strong>Why timestamps are optional, and of several kinds
-          (proposal).</strong> A single researcher who never rotates a key
-          needs no timestamp: every signature names the latest key-log
-          version, and the key stays listed. A journal or an institution may
-          want every version dated, and dated by a provider it can name, such
-          as a qualified eIDAS time-stamping authority. So timestamps are
-          optional, and an owner that wants them declares a policy in its key
-          log, which then binds it: versions without timestamps become invalid
-          for it, and forks of its key log are resolved by the earliest
-          timestamp. The kinds trade trust differently: an RFC 3161 token is
-          immediate and checkable with common tools, but rests on the
-          authority's clock and keys; an OpenTimestamps proof rests on no
-          authority, only on Bitcoin, but is complete only after a pending
-          period of hours. An owner MAY use both, and lists the RFC 3161
-          authorities it trusts, so that no one can date a signature with a
-          token from an authority of their own. Without a declared policy, a
-          key once removed can fork the key log at any later time, and nothing
-          can resolve the fork; so tools declare a policy, <tt class="verbatim">keylog</tt>
-          at least, from the first version.
+          <strong>Why timestamps are an extension (proposal).</strong> A
+          single researcher who never removes a key needs no timestamp: every
+          signature names the latest key-log version, and its key stays
+          listed. A journal or an institution may want every version dated,
+          and dated by a provider it can name. The core therefore stops where
+          signatures stop: a fork of a key log is reported and not resolved,
+          and a signature made under a key removed since is unconfirmed. The
+          <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> adds the evidence that resolves
+          both, for the owners who declare it, and keeps the trade-offs of its
+          kinds (an RFC 3161 authority's clock and keys, or OpenTimestamps'
+          pending period and Bitcoin) out of the core.
         </p>
       </li>
       <li>
