@@ -226,14 +226,14 @@ it starts from, and an archive cannot pass its own changes off as another
 owner's, since it cannot sign for it. A branch is a new object: it keeps only
 the version it starts from, with the parent's inventory, `object.json` and
 signatures as evidence, and, for a branch of a branch, the evidence of its own
-parents, and adds its own versions (a journal keeping the version it vetted, then its
-corrections; a co-author carrying the work on). It cannot continue the
-parent's object, whose inventories record the parent's identifier. A co-author
-who wants the whole past at hand keeps a copy of the parent's line beside the
-branch, as a separate object; in git the files they share are stored once. The key
-logs of the parents' owners travel beside the branch as owner objects, one for
-each owner, as every key log does, never inside its content. An accepted copy
-is a branch kept by a selection's owner.
+parents, and adds its own versions (a journal keeping the version it vetted,
+then its corrections; a co-author carrying the work on). It cannot continue
+the parent's object, whose inventories record the parent's identifier. A
+co-author who wants the whole past at hand keeps a copy of the parent's line
+beside the branch, as a separate object; in git the files they share are
+stored once. The key logs of the parents' owners travel beside the branch as
+owner objects, one for each owner, as every key log does, never inside its
+content. An accepted copy is a branch kept by a selection's owner.
 
 A branch can be checked without its parent: the genesis record gives the name,
 the copied inventory gives the parent pin, the files match that inventory, the
