@@ -177,7 +177,12 @@ osheaf verify</pre>
       archive is down. If she wants the paper in her archive too, and the
       licences of all its versions allow redistribution, she can
       <strong>mirror</strong> it: a byte-for-byte copy of the whole object,
-      which stays the co-author's object (<tt class="verbatim">mirrorOf</tt>).
+      which stays the co-author's object (<tt class="verbatim">mirrorOf</tt>). Under the
+      identity proposal (sections 6.5 and 10.4, not yet agreed), the mirror is
+      simply a copy of the co-author's line, kept in her storage root beside
+      her own lines: its versions are checked by the co-author's signatures,
+      with the co-author's key log kept beside it, and no <tt class="verbatim">mirrorOf</tt>
+      is needed.
     </p>
     <h3 id="auto-5"><a id="a-research-group-a-seminar-lecture-notes"></a>A research group, a seminar, lecture notes<span style="margin-left: 1em"></span></h3>
     <p>
@@ -209,10 +214,12 @@ osheaf verify</pre>
           <strong>mirrors</strong> their documents: each mirror is a whole
           copy, every version, kept up to date by copying new versions, and
           listed with <tt class="verbatim">mirrorOf</tt> in the institution's discovery
-          document. Mirroring is allowed only when the licences of all the
-          versions copied allow redistribution (section 10.4). Many papers
-          imported from arXiv carry arXiv's default licence, which does not;
-          the institution then only references them, or asks the authors to
+          document (under the identity proposal, a copy of each member's
+          lines, checked by the members' signatures, with no <tt class="verbatim">mirrorOf</tt>).
+          Mirroring is allowed only when the licences of all the versions
+          copied allow redistribution (section 10.4). Many papers imported
+          from arXiv carry arXiv's default licence, which does not; the
+          institution then only references them, or asks the authors to
           deposit openly licensed versions.
         </p>
       </li>
@@ -297,6 +304,16 @@ members:
       their collections. Pins stay valid, because they fix bytes, not
       addresses.
     </p>
+    <div class="os-alert os-note">
+      <font class="os-alert-label">Note.</font> Under the identity proposal (sections 6.2 and
+      6.5, not yet agreed), an archive has no identifier: it is found at its
+      address, and every address is a hint, since what is found there is
+      checked by pins and signatures. Moving an archive is copying its files;
+      collections, indexes and resolvers learn the new address over time. An
+      author can also move without the archive: as an owner, with her key log,
+      she copies her lines to another archive and continues them there, as the
+      same lines.
+    </div>
     <h2 id="auto-10"><a id="selections"></a>Selections<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-11"><a id="an-overlay-journal"></a>An overlay journal<span style="margin-left: 1em"></span></h3>
     <p>

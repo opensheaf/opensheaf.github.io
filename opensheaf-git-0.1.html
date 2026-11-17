@@ -28,7 +28,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 16
+      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 17
       November 2026. How to keep an OpenSheaf archive in a git repository,
       publish it from there and copy it, without git changing a byte of what
       the archive holds. It adds nothing to the format: readers of an archive
@@ -704,6 +704,17 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       other archive's repository.
     </p>
     <p>
+      Under the revised identity proposal of the specification (branch <tt
+      class="verbatim">proposal/owners</tt>, sections 6.5 and 10.4), a mirror is a copy
+      of a line, kept in the storage root at the path of its identifier,
+      together with the key logs of the owners that signed it, which are owner
+      objects at their own paths; the signatures are in each object's
+      extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, and
+      <tt class="verbatim">witnesses/</tt> is not used. Copying a line is copying those
+      object folders, and an owner moving to another archive copies its folder
+      of the owner-name layout (section 5 of the specification).
+    </p>
+    <p>
       A public repository SHOULD be archived by <a href="https://www.softwareheritage.org/">Software
       Heritage</a>, which keeps dated snapshots of it named by SWHIDs. A
       snapshot is a witness that the archive held these files at that date, as
@@ -816,6 +827,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           working branches (section 6.2), not drafts, which the proposal
           defines as objects without a genesis record, and a sealed version is
           not rebuilt once shared.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/owners</tt>
+          of the specification):** copies of lines carry the key logs of their
+          signers, witnesses are kept only in objects' extension folders, and
+          an owner moves by copying its folder (section 11).
         </p>
       </li>
     </ul>

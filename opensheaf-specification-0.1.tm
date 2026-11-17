@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf: an open format for document archives and collections>
 
-  <notes-abstract|Specification, version 0.1 (draft), 16 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.>
+  <notes-abstract|Specification, version 0.1 (draft), 17 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.>
 
   <os-alert|warning|Warning.|<strong|Draft.> This version is a draft. Until version 1.0, any revision may change the format in incompatible ways, and archives and collections made now may have to be rebuilt or migrated. Do not rely on it yet for anything you cannot redo. Changes are listed in the changelog (section 17) and discussed in the <hlink|issues|https://github.com/opensheaf/opensheaf.github.io/issues>.>
 
@@ -40,21 +40,19 @@
   <section*|3. Terminology><label|3-terminology>
 
   <\itemize>
-    <item><dfn|Archive>: a set of objects kept by one archive owner (a person, group or institution), with one storage root and one discovery document, identified by an archive identifier.
+    <item><dfn|Archive>: a host of lines: one storage root and one discovery document, served at a base URL, holding the objects of any number of owners, the lines they write there and copies of lines kept elsewhere. With the proposal of section 6.5, an archive has no identity of its own: it is found at its base URL, and owns nothing by hosting it (sections 6.2 and 6.5).
 
-    <item><dfn|Archive identifier>: a URI naming the archive independently of where it is served (section 6).
-
-    <item><dfn|Base URL>: the URL at which an archive is currently served, ending with <verbatim|/>; its discovery document is at <verbatim|\<less\>base URL\<gtr\>opensheaf.json>.
+    <item><dfn|Base URL>: the URL at which an archive is currently served, ending with <verbatim|/>; its discovery document is at <verbatim|\<less\>base URL\<gtr\>opensheaf.json>. It is a location, not an identity, and may change.
 
     <item><dfn|Storage root>: an OCFL 1.1 storage root holding the objects of the archive.
 
-    <item><dfn|Object>: an OCFL object. Its <dfn|kind> is <verbatim|document> or <verbatim|collection>.
+    <item><dfn|Object>: an OCFL object. Its <dfn|kind> is <verbatim|document>, <verbatim|collection> or (proposal, section 6.5) <verbatim|owner>.
 
     <item><dfn|Document>: an object holding one scholarly work (an article, notes, a thesis, a book) with its sources and renditions.
 
     <item><dfn|Collection>: an object holding a list of members. A collection is a catalogue or a selection (section 10.1).
 
-    <item><dfn|Catalogue>: a collection that keeps objects whole, impartial about their versions: each member pins an object with all its versions, and may follow it as it grows. An archive's main collection, and the list of objects an archive mirrors, are catalogues.
+    <item><dfn|Catalogue>: a collection that keeps objects whole, impartial about their versions: each member pins an object with all its versions, and may follow it as it grows. The main collection of an archive's documents, and the list of lines an archive keeps copies of, are catalogues.
 
     <item><dfn|Selection>: a collection that vets particular revisions of documents (a journal, a digest, a review journal, a reading list): each member pins a revision set, and earlier or later versions are not part of the selection unless its curator adds them, by a new version of the selection.
 
@@ -62,31 +60,37 @@
 
     <item><dfn|Revision set>: the revisions of one document vetted by a selection (usually one; more after a correction).
 
-    <item><dfn|Mirror>: a copy, in an archive's storage root, of another archive's object, whole and byte for byte (section 10.4).
+    <item><dfn|Mirror>: a copy of a line, whole and byte for byte, with the key logs of its signers, kept in an archive where its owner does not write it (section 10.4).
 
-    <item><dfn|Accepted copy>: a shallow branch kept by a selection, starting from a revision it vetted from another archive (section 10.5).
+    <item><dfn|Accepted copy>: a shallow branch kept by the owner of a selection, starting from a revision it vetted (section 10.5).
 
     <item><dfn|Draft>: an object without a genesis record, not yet sealed; no pin may name its versions (section 6.5).
 
     <item><dfn|Sealing>: the object version that adds the genesis record, made at the owner's request before a version first leaves the owner's hands (section 6.5).
 
-    <item><dfn|Genesis record>: the file <verbatim|genesis.json>, written when an object is sealed and kept unchanged in all its later versions and in its branches; its seeded digest is the object's name (section 6.5).
+    <item><dfn|Genesis record>: the file <verbatim|genesis.json>, written when a work is sealed or an owner is created, and kept unchanged in all later versions and in branches; its seeded digest is the name of the work or of the owner (section 6.5).
 
-    <item><dfn|Name>: 52 characters of base32 from the digest of the genesis record, the same for the object in every archive, copy and branch, except a branch renamed after a clash, which takes another name of the same genesis record (section 6.5).
+    <item><dfn|Name>: 52 characters of base32 from the digest of a genesis record, the same in every archive, copy and branch, except a branch renamed after a clash, which takes another name of the same genesis record (section 6.5).
 
-    <item><dfn|Owner>: whoever decides the versions of a line (a person, group, institution or key holder), identified by a URI: none for a draft, a named owner (an archive identifier, an ORCID iD, a web address) or a keyed owner (a public key) (section 6.5).
+    <item><dfn|Owner>: a keyed identity (a person, a group, an institution) that decides the versions of its lines and signs them, wherever they are stored. It is an object of kind <verbatim|owner>, whose versions are its key log (section 6.5).
 
-    <item><dfn|Owner identifier>: 52 characters of base32 from the digest of an owner's URI, which names the owner in a <verbatim|sheaf:> URI (section 6.6).
+    <item><dfn|Owner name>: the name of an owner's genesis record, which names the owner in genesis records, in <verbatim|object.json> and in <verbatim|sheaf:> URIs (sections 6.5 and 6.6).
 
-    <item><dfn|Originator>: the owner named in the genesis record, whose line is the origin of the name and has no parent (section 6.5).
+    <item><dfn|Key log>: the versions of an owner object, each listing the owner's keys and the threshold of signatures it requires, each signed by the keys of the one before (section 6.5).
 
-    <item><dfn|Line>: the history of an object as decided by one owner, identified by the pair (owner, name); its object versions form a single sequence (section 6.5).
+    <item><dfn|Signature file>: a witness holding an owner's signature of an object version, naming the version of the owner's key log it relies on (section 13.2).
 
-    <item><dfn|Branch>: a line of another owner continuing an object from one of its versions, the branch point: deep when it holds the earlier versions too, shallow when it holds only the branch point and its own versions (section 10.5).
+    <item><dfn|Originator>: the owner named in the genesis record of a work, whose line is the origin of the name and has no parent (section 6.5).
+
+    <item><dfn|Line>: the history of a work as decided by one owner, identified by the pair (name, owner); its object versions form a single sequence, signed by the owner, and it is the same line wherever its copies are stored (section 6.5).
+
+    <item><dfn|Branch>: a line of another owner continuing a work from one of its versions, the branch point: deep when it holds the earlier versions too, shallow when it holds only the branch point and its own versions (section 10.5).
+
+    <item><dfn|Label>: a short readable name that an archive gives a line it holds, in its discovery document; not an identifier (section 6.3).
 
     <item><dfn|Object version>: an OCFL version of an object (<verbatim|v1>, <verbatim|v2>, ...). It changes at every change of the object.
 
-    <item><dfn|Document version>: the version of the work, a positive integer numbered by the owner of the line (for a draft, or an archive's own documents, the archive), in <verbatim|object.json> and <verbatim|datacite.json>. It changes exactly when the document's own files change (section 7.3).
+    <item><dfn|Document version>: the version of the work, a positive integer numbered by the owner of the line (for a draft, by whoever keeps it), in <verbatim|object.json> and <verbatim|datacite.json>. It changes exactly when the document's own files change (section 7.3).
 
     <item><dfn|Description-only version>: an object version that holds an existing document version with its files unchanged, changing only the description, the state or the notices of the object (section 7.3).
 
@@ -96,7 +100,7 @@
 
     <item><dfn|Note>: a short text, a file of the content, or both, as used for change notes, notices and withdrawals (section 9).
 
-    <item><dfn|Member>: an entry of a collection: an object (in a catalogue) or a revision set of a document (in a selection), of any archive.
+    <item><dfn|Member>: an entry of a collection: an object (in a catalogue) or a revision set of a document (in a selection), of any line.
 
     <item><dfn|Pin>: the pair (object version, SHA-512 digest of that version's inventory file).
 
@@ -104,7 +108,7 @@
 
     <item><dfn|Presentation>: files generated from the archive for readers (web pages, indexes, HTML versions of documents). It is never authoritative.
 
-    <item><dfn|Custodian>: anyone who keeps copies of other archives' objects, or indexes of them, apart from those archives (section 6.6, #39).
+    <item><dfn|Custodian>: anyone who keeps copies of other owners' lines, or indexes of them (section 6.6, #39).
 
     <item><dfn|Resolver>: a program that finds and checks the object versions named by a <verbatim|sheaf:> URI (section 6.6); a <dfn|gateway> is a resolver serving web links.
 
@@ -131,7 +135,7 @@
     <item><strong|Extensions>, optional: an extension is a specification published separately from this one, named by a URI (RECOMMENDED: the <verbatim|https> URL at which it is published), that records in <verbatim|object.json> what this specification leaves open, so that tools aware of it can act on it (for instance relations between documents that tools must follow when they copy or verify them). An object version records the data of an extension under <verbatim|extensions> in its <verbatim|object.json> (section 9), keyed by the name of the extension; the discovery document SHOULD list the extensions its objects use (section 6.1). Extensions MUST NOT change the meaning of what this specification defines, nor relax its requirements: an archive is conforming, and its objects and collections are read and verified, without knowing any of its extensions. Readers ignore extensions they do not know, as they ignore unknown properties (section 12). The data of an extension is part of the object version, covered by its inventory like the rest of <verbatim|object.json>, so pins fix it too.
   </itemize>
 
-  The JSON files defined here (<verbatim|opensheaf.json>, <verbatim|object.json>, <verbatim|members.json>, <verbatim|genesis.json>, the index files and <verbatim|indexes.json> of section 6.6) MUST validate against the JSON Schemas of appendix D for their declared format version.
+  The JSON files defined here (<verbatim|opensheaf.json>, <verbatim|object.json>, <verbatim|members.json>, <verbatim|genesis.json>, <verbatim|keys.json>, the signature files of section 13.2, the index files and <verbatim|indexes.json> of section 6.6) MUST validate against the JSON Schemas of appendix D for their declared format version.
 
   <section*|5. Layout><label|5-layout>
 
@@ -140,18 +144,20 @@
   <\itemize>
     <item><strong|A discovery document>, <verbatim|opensheaf.json>, at its base URL (section 6). It is REQUIRED.
 
-    <item><strong|A storage root>, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST contain <verbatim|ocfl_layout.json>, whose <verbatim|extension> MUST be the storage layout named by <verbatim|storageLayout> in the discovery document (section 6.1), one of two storage layout extensions of OCFL: <verbatim|0002-flat-direct-storage-layout>, so that an object with identifier <verbatim|\<less\>id\<gtr\>> is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>id\<gtr\>/>; or, for large archives, <verbatim|0003-hash-and-id-n-tuple-storage-layout> with its default parameters (<verbatim|digestAlgorithm> <verbatim|sha256>, <verbatim|tupleSize> 3, <verbatim|numberOfTuples> 3; its configuration file <verbatim|extensions/0003-hash-and-id-n-tuple-storage-layout/config.json>, if present, MUST NOT set other values, and a parameter it omits takes its default), so that the object is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>/>, where <verbatim|\<less\>t1\<gtr\>>, <verbatim|\<less\>t2\<gtr\>> and <verbatim|\<less\>t3\<gtr\>> are the first three groups of three characters of the lowercase hexadecimal SHA-256 digest of the identifier (as UTF-8). Since object identifiers are short and use only safe characters (section 6.3), the folder of an object is named by its identifier in both. Archives SHOULD use the flat-direct layout unless their size makes one folder holding every object impractical (for instance from tens of thousands of objects, or fewer in a git repository; appendix F). The layout is chosen when the archive is created: changing it keeps every pin valid, since clients compute paths from <verbatim|storageLayout>, but moves every object and so changes every URL into the storage root (the <verbatim|url> of a branch's <verbatim|parent>, section 10.5, or a link in a document), so archives SHOULD NOT change it. The storage root MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
+    <item><strong|A storage root>, REQUIRED, conforming to OCFL 1.1, at a URL given by the discovery document. It MUST contain <verbatim|ocfl_layout.json>, whose <verbatim|extension> MUST be the storage layout named by <verbatim|storageLayout> in the discovery document (section 6.1), one of two: <verbatim|opensheaf-owner-name-storage-layout>, the default, defined below; or, for large archives, the OCFL extension <verbatim|0003-hash-and-id-n-tuple-storage-layout> with its default parameters (<verbatim|digestAlgorithm> <verbatim|sha256>, <verbatim|tupleSize> 3, <verbatim|numberOfTuples> 3; its configuration file <verbatim|extensions/0003-hash-and-id-n-tuple-storage-layout/config.json>, if present, MUST NOT set other values, and a parameter it omits takes its default), so that an object is at <verbatim|\<less\>storage root URL\<gtr\>\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>encoded id\<gtr\>/>, where <verbatim|\<less\>t1\<gtr\>>, <verbatim|\<less\>t2\<gtr\>> and <verbatim|\<less\>t3\<gtr\>> are the first three groups of three characters of the lowercase hexadecimal SHA-256 digest of the identifier (as UTF-8), and <verbatim|\<less\>encoded id\<gtr\>> is the identifier encoded as that extension says. Archives SHOULD use the owner-name layout unless their size makes one folder per owner, or per name, impractical (for instance from tens of thousands of lines, or fewer in a git repository; appendix F). The layout is chosen when the archive is created: changing it keeps every pin valid, since clients compute paths from <verbatim|storageLayout>, but moves every object and so changes every URL into the storage root (the <verbatim|url> of a branch's <verbatim|parent>, section 10.5, or a link in a document), so archives SHOULD NOT change it. The storage root MAY contain, as loose files allowed by OCFL, a copy of the OCFL specification and of this specification.
 
-    <item><strong|Witnesses>, OPTIONAL: signatures and timestamp proofs of object versions, in each object's extension folder <verbatim|extensions/opensheaf-witnesses/>, or under <verbatim|witnesses/> next to the discovery document (section 13.2).
+    <item><strong|Witnesses>, OPTIONAL except for the signatures that section 13.2 requires: signatures and timestamp proofs of object versions, in each object's extension folder <verbatim|extensions/opensheaf-witnesses/> (section 13.2).
 
     <item><strong|Indexes>, RECOMMENDED: <verbatim|names/>, <verbatim|owners/> and <verbatim|sha512/> next to the discovery document (section 6.6, proposal).
 
-    <item><strong|Presentation files>, OPTIONAL, anywhere outside the storage root, <verbatim|witnesses/> and the indexes (appendix C).
+    <item><strong|Presentation files>, OPTIONAL, anywhere outside the storage root and the indexes (appendix C).
   </itemize>
 
-  Because OCFL allows inside a storage root only the folders that hold objects (the objects themselves and, in the hashed layout, the folders of the hash above them) and extensions, the storage root SHOULD be a dedicated folder (by convention <verbatim|ocfl/>), and presentation files MUST NOT be placed inside it.
+  <strong|The owner-name layout (proposal).> <verbatim|opensheaf-owner-name-storage-layout> is a storage layout extension defined by this specification, not yet registered with OCFL, so validators may warn about it. It places the object whose identifier is <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> (section 6.3) at <verbatim|\<less\>storage root URL\<gtr\>\<less\>owner\<gtr\>/\<less\>name\<gtr\>/>, and an object with any other identifier (a draft, section 6.3) at <verbatim|\<less\>storage root URL\<gtr\>drafts/\<less\>id\<gtr\>/>. An owner object, whose line is <verbatim|sheaf:\<less\>owner\<gtr\>:\<less\>owner\<gtr\>>, is thus at <verbatim|\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/>, so that the folder of an owner holds its key log and every line of that owner in the archive, and an owner moving to another archive (section 6.5) copies one folder. It has no parameters; <verbatim|ocfl_layout.json> names it with a <verbatim|description> (<verbatim|"Lines at \<less\>owner\<gtr\>/\<less\>name\<gtr\>, drafts at drafts/\<less\>id\<gtr\>">).
 
-  All files of the discovery document, the storage root, <verbatim|witnesses/> and the indexes (if used) MUST be served byte for byte, as stored: no conversion of line endings or character sets, no compression that changes the bytes delivered after decoding. Archives kept in git SHOULD mark these files as binary (for instance with <verbatim|.gitattributes> lines <verbatim|ocfl/** -text>, <verbatim|opensheaf.json -text> and, where used, <verbatim|witnesses/** -text>, <verbatim|names/** -text>, <verbatim|owners/** -text> and <verbatim|sha512/** -text>). Archives SHOULD be served over HTTPS and SHOULD allow cross-origin requests to these files (<verbatim|Access-Control-Allow-Origin: *>), so that tools running in a browser can resolve members.
+  Because OCFL allows inside a storage root only the folders that hold objects (the objects themselves and the folders above them that the layout gives: the folders of owners and <verbatim|drafts/>, or the folders of the hash) and extensions, the storage root SHOULD be a dedicated folder (by convention <verbatim|ocfl/>), and presentation files MUST NOT be placed inside it.
+
+  All files of the discovery document, the storage root and the indexes (if used) MUST be served byte for byte, as stored: no conversion of line endings or character sets, no compression that changes the bytes delivered after decoding. Archives kept in git SHOULD mark these files as binary (for instance with <verbatim|.gitattributes> lines <verbatim|ocfl/** -text>, <verbatim|opensheaf.json -text> and, where used, <verbatim|names/** -text>, <verbatim|owners/** -text> and <verbatim|sha512/** -text>). Archives SHOULD be served over HTTPS and SHOULD allow cross-origin requests to these files (<verbatim|Access-Control-Allow-Origin: *>), so that tools running in a browser can resolve members.
 
   An archive MAY be kept in git and served by any static web server (GitHub Pages, object storage, a university server). The companion document <hlink|OpenSheaf archives in git|opensheaf-git-0.1.tm>, outside this specification, says how to keep, publish and copy an archive in git without changing its bytes.
 
@@ -166,201 +172,211 @@
 
     <item><verbatim|specification>: the version of this specification the archive follows, <verbatim|"0.1">;
 
-    <item><verbatim|archiveId>: the archive identifier (section 6.2);
-
-    <item><verbatim|name>: a human-readable name;
+    <item><verbatim|name>: a human-readable name of the archive;
 
     <item><verbatim|storageRoot>: the URL of the storage root, ending with <verbatim|/> (relative URLs are allowed);
 
-    <item><verbatim|storageLayout>: the storage layout extension of the storage root, <verbatim|"0002-flat-direct-storage-layout"> or <verbatim|"0003-hash-and-id-n-tuple-storage-layout"> (section 5);
+    <item><verbatim|storageLayout>: the storage layout of the storage root, <verbatim|"opensheaf-owner-name-storage-layout"> or <verbatim|"0003-hash-and-id-n-tuple-storage-layout"> (section 5);
 
-    <item><verbatim|objects>: the list of all objects in the storage root, each with <verbatim|id>, <verbatim|kind>, <verbatim|head> (the head object version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as written in its checksum file) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, section 11); a mirror (section 10.4) also has <verbatim|mirrorOf>, the archive identifier of the archive whose object it copies, which is not the archive's own; an object with a genesis record (section 6.5) also has its <verbatim|name> and <verbatim|owner>.
+    <item><verbatim|objects>: the list of all objects in the storage root, each with <verbatim|id> (its identifier, section 6.3), <verbatim|kind>, <verbatim|head> (the head object version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as written in its checksum file) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, section 11); an object with a genesis record (section 6.5) also has its <verbatim|name> and <verbatim|owner>, and MAY have a <verbatim|label> (section 6.3).
   </itemize>
 
-  It MUST also contain <verbatim|profiles>, the list of profiles followed, from <verbatim|zenodo>, <verbatim|texmacs>, <verbatim|website> (an empty list if none). It SHOULD contain <verbatim|mainCollection> (the identifier of the collection that lists the archive's own documents), <verbatim|contact> (a URI) and, if its objects use extensions, <verbatim|extensions> (their names, section 4). It MAY contain <verbatim|mirrors> (base URLs of complete copies of the archive), <verbatim|tombstones> (section 11.3), <verbatim|indexes> (the indexes kept, each with the length of its prefix, section 6.6), <verbatim|keys> (section 13.2) and <verbatim|feed> (the URL of an Atom feed of new object versions).
+  It MUST also contain <verbatim|profiles>, the list of profiles followed, from <verbatim|zenodo>, <verbatim|texmacs>, <verbatim|website> (an empty list if none). It SHOULD contain <verbatim|mainCollection> (the identifier of the collection that lists the archive's documents), <verbatim|contact> (a URI) and, if its objects use extensions, <verbatim|extensions> (their names, section 4). It MAY contain <verbatim|owners> (the owner names of the owners it hosts, section 6.5), <verbatim|mirrors> (base URLs of complete copies of the archive), <verbatim|tombstones> (section 11.3), <verbatim|indexes> (the indexes kept, each with the length of its prefix, section 6.6) and <verbatim|feed> (the URL of an Atom feed of new object versions).
 
-  The discovery document is mutable: it is rewritten whenever an object is added or changed. It is a map, not a witness: what it states about objects (<verbatim|objects>: kinds, head versions, digests, status) MUST be verifiable from the storage root. Digests are written in lowercase hexadecimal, here and in every file defined by this specification.
+  The discovery document is mutable: it is rewritten whenever an object is added or changed. It is a map, not a witness: what it states about objects (<verbatim|objects>: kinds, head versions, digests, status, names and owners) MUST be verifiable from the storage root. It is a convenient list of the lines an archive holds, not a guarantee that an owner has no lines elsewhere (section 6.5). Digests are written in lowercase hexadecimal, here and in every file defined by this specification.
 
-  <subsection*|6.2 Archive identifiers><label|62-archive-identifiers>
+  <subsection*|6.2 Archives and their addresses><label|62-archives-and-their-addresses>
 
-  An archive identifier is a URI that does not change when the archive moves. It SHOULD be a <verbatim|tag:> URI (RFC 4151) built from a domain or e-mail address controlled by the archive owner at the time of creation and a date, for instance <verbatim|tag:opensheaf.org,2026:mgubi>. A DOI or another persistent URI MAY be used instead. Two different archives MUST NOT use the same archive identifier.
+  An archive is found at its base URL. With the proposal of section 6.5, an archive has no identifier of its own: it hosts lines, which belong to their owners, and is not named in their files (#52). Its base URL, the <verbatim|mirrors> of its discovery document, and the locations given in collection members and <verbatim|sheaf:> URIs (sections 6.4 and 6.6) are locations: hints of where copies are expected, which need no signature, since every copy fetched from them is checked against pins and signatures. A wrong or stale location can give a reader nothing, or an older valid copy, never a forged one.
 
-  <subsection*|6.3 Object identifiers><label|63-object-identifiers>
+  An archive moving to another site copies its files (its discovery document, its storage root and its indexes); nothing in them changes, so every pin, signature and witness stays valid. Collections, indexes and resolvers learn the new base URL over time; meanwhile, copies found elsewhere stay valid.
 
-  An object identifier MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$> and MUST be at most 64 characters long. It is the OCFL <verbatim|id> of the object and the name of its folder in the storage root (under the folders of the hash, in the hashed layout, section 5). It MUST be unique in the archive and MUST NOT be reused, also after a takedown. Since it is permanent and appears in every URL of the object, it SHOULD be short (at most 32 characters), readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title, which may change between versions while the identifier cannot; tools importing documents propose identifiers and the depositor decides. Notwithstanding these recommendations, an archive MAY use the object's name (section 6.5), 52 characters, as its identifier, unless it keeps two objects of that name (lines of several owners). The kind of an object is given by its <verbatim|object.json>, never by its identifier. Outside the archive, an object is named by the pair (archive identifier, object identifier) of its <verbatim|object.json>, which a mirror keeps unchanged; with the proposal of section 6.5, its line is also named by the pair (owner, name), independently of any archive.
+  <subsection*|6.3 Object identifiers and labels><label|63-object-identifiers-and-labels>
+
+  The identifier of an object (its OCFL <verbatim|id>) is its first line, written as a <verbatim|sheaf:> URI with its owner part: <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>>, the name and owner of the first sealed version of the object (section 6.5). For an originator's line, an owner object and a shallow branch, this is the line itself; a deep branch keeps the identifier of the object it copies, which its copied inventories record (section 10.5). Two objects of different lines never have the same identifier, in any archive, so an archive keeps the lines its owners write and copies of lines kept elsewhere side by side in one storage root. The identifier MUST be unique in the storage root, and MUST NOT be reused, also after a takedown. The kind of an object is given by its <verbatim|object.json>, never by its identifier.
+
+  A draft kept in an archive (section 6.5) has no line yet; its identifier is chosen by the archive, MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$> and MUST be at most 64 characters long, and the object keeps it after it is sealed, since OCFL identifiers cannot change (whether sealing should instead start a new object, named by its line, is open, section 6.5).
+
+  <strong|Labels.> An archive MAY give each line it holds a label, in <verbatim|objects> of its discovery document: a short readable name, matching <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>, at most 64 characters, unique among the labels of the discovery document, which its website MAY use for readable URLs. A label is not an identifier: it is the archive's choice, may be added or changed, and URLs built on it may break; permanent links use <verbatim|sheaf:> URIs (section 6.6). Labels SHOULD be short, readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title.
 
   <subsection*|6.4 Resolution><label|64-resolution>
 
   To fetch an object version of a member, a client:
 
   <\itemize>
-    <item>reads the discovery document at the member's archive URL (section 10.2) and fetches <verbatim|\<less\>storageRoot\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/inventory.json>, where <verbatim|\<less\>path\<gtr\>> is the path of the object given by the <verbatim|storageLayout> of the discovery document (section 5): <verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout;
+    <item>reads the discovery document at a location of the member (its <verbatim|archiveUrl>, section 10.2) and fetches <verbatim|\<less\>storageRoot\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/inventory.json>, where <verbatim|\<less\>path\<gtr\>> is the path of the member's object, <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> (section 6.3), given by the <verbatim|storageLayout> of that discovery document (section 5): <verbatim|\<less\>owner\<gtr\>/\<less\>name\<gtr\>>, or the folders of the hash and the encoded identifier in the hashed layout;
 
-    <item>if this fails, tries the mirrors listed in the member, then those listed in the archive's discovery document, each resolved through its own discovery document and layout;
+    <item>if this fails, tries the mirrors listed in the member, then those listed in that archive's discovery document, each resolved through its own discovery document and layout, then MAY look the line up in indexes and resolvers (section 6.6);
 
     <item>if this fails, MAY use external copies: the files of an external record named in the version's <verbatim|object.json> (a DOI record), or a software archive snapshot (a SWHID).
   </itemize>
 
-  To fetch the parent version of a branch (section 10.5, proposal), a client fetches <verbatim|inventory.json> at the <verbatim|url> of <verbatim|parent>; if this fails, or no <verbatim|url> is given, it tries the copies it knows of the parent's archive (a member or a mirror naming the same <verbatim|archiveId>, with its archive URL) and then external copies, as above. The <verbatim|url> is chosen by the branch, so a copy found only there shows that the parent can be fetched, not that it is the parent's own: a verifier counts a resolved parent as confirmation (section 14) only when it reached it at a base URL of the parent's archive known independently of the branch: the <verbatim|archiveUrl> of a member of a collection the verifier trusts (not a collection of the branch's own archive or owner, unless its user configured it), or a location configured by its user (and the mirrors listed in the discovery document found there). External copies (a DOI deposit) can attest the parent version, but do not resolve it, since they hold no inventory.
+  The object of a deep branch is at the path of its identifier, which is that of the line it copies (section 6.3): a client looking for a deep branch at the path of the branch's own line, and not finding it, looks it up in the archive's discovery document by <verbatim|name> and <verbatim|owner>.
 
-  Any copy whose bytes match the pinned digest is acceptable: integrity comes from the pin, not from the place.
+  To fetch the parent version of a branch (section 10.5, proposal), a client fetches <verbatim|inventory.json> at the <verbatim|url> of <verbatim|parent>; if this fails, or no <verbatim|url> is given, it looks for the parent's line as above and then for external copies. Whatever location it was fetched from, a parent version is the parent owner's when its signature holds (section 13.2), which a branch carries (section 10.5).
+
+  Any copy whose bytes match the pinned digest is acceptable: integrity comes from the pin, not from the place; and a version without a digest is its owner's when its signatures hold, wherever it was found (section 6.5).
 
   <subsection*|6.5 Names, owners and lines><label|65-names-owners-and-lines>
 
-  <os-alert|note|Note.|<strong|Proposal.> This section, and the sections it changes (3 to 5, 6.1 to 6.4, 7, 8.1, 9, 10.2 to 10.6, 11.3, 13.2, 14 to 16 and appendices D to F, with the FAQ, the use cases and the companion OpenSheaf archives in git), together with section 6.6, are a proposal on the branch <verbatim|proposal/identity>, not yet agreed. It builds on the discussions of self-certifying names (#20), decentralised holding and keys (#13), global names (#14), private and draft objects (#29) and the evidence of accepted copies (#22).>
+  <os-alert|note|Note.|<strong|Proposal.> This section, and the sections it changes (3 to 5, 6.1 to 6.4, 7, 8.1, 9, 10.2 to 10.6, 11.3, 13.2, 14 to 16 and appendices D to F, with the FAQ, the use cases and the companion OpenSheaf archives in git), together with section 6.6, are a proposal on the branch <verbatim|proposal/identity>, revised on the branch <verbatim|proposal/owners>, not yet agreed. It builds on the discussions of self-certifying names (#20), decentralised holding and keys (#13), private and draft objects (#29) and the evidence of accepted copies (#22); the revision follows #55 (owners are keyed identities with a key log; archives host their lines) and #52 (archives are hosts; identifiers from lines), which also settle #14 and #53.>
 
-  An object identifier names an object within its archive (section 6.3). An object also has a name, independent of any archive, and an owner. The pair (owner, name) identifies a line: the history of the object as decided by that owner. Copies of a line (mirrors, section 10.4) are the same line wherever they are kept; lines of other owners with the same genesis record are branches (section 10.5).
+  A work has a name, independent of any archive, and each history of it an owner. The pair (name, owner) identifies a line: the history of the work as decided by that owner, made of object versions that the owner signs. <strong|A line is its signed versions, wherever they are stored>: in an archive where its owner writes, in a mirror, in any other archive. Lines of other owners with the same genesis record are branches (section 10.5). An archive hosts the lines of any number of owners, and owns nothing by hosting them (section 6.2).
 
-  <strong|Genesis record.> When an object is sealed, at its owner's request, before a version of it first leaves its owner's hands (shared privately, for instance submitted to a journal, or published; #29), its owner writes the genesis record, the JSON file <verbatim|genesis.json> at the root of the content, with <verbatim|format> (<verbatim|"opensheaf-genesis/0.1">), <verbatim|kind> (<verbatim|document> or <verbatim|collection>, the <verbatim|kind> of the object), <verbatim|created> (the date and time, in UTC), <verbatim|originator> (the owner of the first line, a URI) and <verbatim|nonce> (at least 128 bits from a cryptographically secure random generator, in lowercase hexadecimal). The genesis record MUST be part of every later object version of the object and of its branches, byte for byte. It contains neither the name nor the object identifier, so that the name does not depend on itself. It MUST be written in UTF-8 without a byte order mark (section 2), and SHOULD have LF line ends; since the name is the digest of its bytes as stored, tools MUST NOT rewrite or re-serialise it, and need no canonical form to check it.
+  <strong|Genesis record.> When a work is sealed, at its owner's request, before a version of it first leaves its owner's hands (shared privately, for instance submitted to a journal, or published; #29), its owner writes the genesis record, the JSON file <verbatim|genesis.json> at the root of the content, with <verbatim|format> (<verbatim|"opensheaf-genesis/0.1">), <verbatim|kind> (<verbatim|document> or <verbatim|collection>, the <verbatim|kind> of the object), <verbatim|created> (the date and time, in UTC), <verbatim|originator> (the owner name of the owner of the first line) and <verbatim|nonce> (at least 128 bits from a cryptographically secure random generator, in lowercase hexadecimal). The genesis record of an owner (below) has <verbatim|kind> <verbatim|owner> and no <verbatim|originator>. The genesis record MUST be part of every later object version of the object and of its branches, byte for byte. It contains neither its own name nor the object identifier, so that the name does not depend on itself. It MUST be written in UTF-8 without a byte order mark (section 2), and SHOULD have LF line ends; since the name is the digest of its bytes as stored, tools MUST NOT rewrite or re-serialise it, and need no canonical form to check it.
 
-  <strong|Name.> The name of the object is the SHA-256 digest of the seed <verbatim|opensheaf-name-0> (ASCII, followed by a line feed) followed by the bytes of <verbatim|genesis.json>, written in lowercase base32 (RFC 4648, without padding): 52 characters, a valid object identifier (section 6.3). The last character carries the last bit of the digest and, in its four remaining bits, the number k of the algorithm that made the name, from 0 to 15: algorithm k is the same with the seed <verbatim|opensheaf-name-\<less\>k\<gtr\>> (k in decimal), so that algorithm 0 gives a last character <verbatim|a> or <verbatim|q>. Names are made by algorithm 0, except a branch named by another algorithm to avoid a clash (below); names made by different algorithms never coincide. A later version of the genesis record MAY use another hash function. Since RFC 4648 sets the four bits to zero, names are compared as strings and never decoded. Anyone holding a copy can compute it; it is unique without a registry in practice, since the record holds a random nonce; since a name is used to refer to objects, clashes are resolved where objects are created (below). <verbatim|object.json> records it as <verbatim|name>. An archive MAY use the name as the object identifier.
+  <strong|Name.> The name of a work, or of an owner, is the SHA-256 digest of the seed <verbatim|opensheaf-name-0> (ASCII, followed by a line feed) followed by the bytes of <verbatim|genesis.json>, written in lowercase base32 (RFC 4648, without padding): 52 characters. The last character carries the last bit of the digest and, in its four remaining bits, the number k of the algorithm that made the name, from 0 to 15: algorithm k is the same with the seed <verbatim|opensheaf-name-\<less\>k\<gtr\>> (k in decimal), so that algorithm 0 gives a last character <verbatim|a> or <verbatim|q>. Names are made by algorithm 0, except a branch named by another algorithm to avoid a clash (below); names made by different algorithms never coincide. A later version of the genesis record MAY use another hash function. Since RFC 4648 sets the four bits to zero, names are compared as strings and never decoded. Anyone holding a copy can compute it; it is unique without a registry in practice, since the record holds a random nonce; since a name is used to refer to objects, clashes are resolved where lines are made (below). <verbatim|object.json> records it as <verbatim|name>.
 
-  <strong|Owner.> The owner of a line is a URI, recorded in <verbatim|object.json> as <verbatim|owner> from the first version of its line. There are three cases:
+  <strong|Owners.> An owner is a keyed identity: a person, a group or an institution, which decides the versions of its lines and signs them. It is an object of kind <verbatim|owner> (section 7.5), whose genesis record names it: its <strong|owner name> is the name of that record, and is what genesis records (<verbatim|originator>), <verbatim|object.json> (<verbatim|owner>, and <verbatim|owner> in <verbatim|parent>) and <verbatim|sheaf:> URIs record. The line of an owner object is <verbatim|(owner name, owner name)>, and its object versions are the owner's <strong|key log>: each holds a file <verbatim|keys.json> with:
 
   <\itemize>
-    <item>a <strong|draft> has no owner and no genesis record yet; it receives both when it is sealed. The absence of a genesis record is what marks a draft: it is part of the content, so it travels with every copy, and no other mark is needed. An object version without a genesis record MUST NOT be named by a pin (in a collection, or as a parent). Whether a draft may be rewritten before sealing is open (#29, below);
+    <item><verbatim|keys>: the public keys of the owner, each an Ed25519 key written as a <verbatim|did:key> URI (W3C CCG, multibase base58btc, multicodec <verbatim|ed25519-pub>, code <verbatim|0xed>, written as the varint bytes <verbatim|0xed 0x01>); at least one;
 
-    <item>a <strong|named owner> is a URI that the owner asserts: the archive identifier, an ORCID iD (<verbatim|https://orcid.org/...>), a web address the owner controls. It costs nothing, and proves no more than the archive that serves the line;
+    <item><verbatim|threshold>: the number of distinct keys of this version that must sign, a positive integer not greater than the number of keys;
 
-    <item>a <strong|keyed owner> is a public key written as a URI: <verbatim|did:key:> (the key itself) or <verbatim|openpgp4fpr:> followed by an OpenPGP fingerprint. Every object version of a keyed line (from its first sealed version, or for a branch after the branch point) MUST be signed with that key, and the key needed to check the signatures MUST travel with the object (section 13.2), so that the line can be checked without trusting any host, also after its archive has disappeared.
+    <item><verbatim|revoked>, OPTIONAL: keys of earlier versions that are no longer to be trusted (below);
+
+    <item><verbatim|keeper>, OPTIONAL: URIs of the person or institution who answers for the owner (below).
   </itemize>
 
-  A named owner MAY sign its versions with keys of its own (<verbatim|keys> of the discovery document); its line is still identified by the named URI, and such signatures are witnesses, not proofs of ownership.
+  The first version of the key log holds the genesis record and the first <verbatim|keys.json>; it is signed by <verbatim|threshold> of its own keys. **Every later version MUST be signed by at least <verbatim|threshold> distinct keys of the version before it.** A new key is added, an old one removed, or a threshold changed, by a new version; the owner name never changes. Tools SHOULD create two keys when an owner is created, one of them kept apart (on a hardware token, for instance), or give the owner the keys of several people with a threshold; losing every key of the latest version cannot be recovered. The field names of <verbatim|keys.json> are provisional (#55).
 
-  <strong|Comparing owners.> Owners, originators and the owners in <verbatim|parent> are compared as strings, exactly. Tools MUST write them in these forms: an ORCID iD as <verbatim|https://orcid.org/> followed by the iD, without a trailing slash; <verbatim|openpgp4fpr:> followed by the fingerprint in lowercase hexadecimal; <verbatim|did:key:> as defined by the did:key method (W3C CCG), multibase base58btc, for an Ed25519 key (multicodec <verbatim|ed25519-pub>, code <verbatim|0xed>, written as the varint bytes <verbatim|0xed 0x01>); other URIs as the owner first wrote them.
+  <strong|Signing.> Every sealed object version of a line MUST be signed by its owner: by at least <verbatim|threshold> distinct keys of the version of the owner's key log that the signatures name, each in a signature file (section 13.2) that names that key-log version with its pin. A signature SHOULD name the latest version of the key log its signer knows. A key listed in <verbatim|revoked> of a version of the key log is not trusted for signatures naming that version or a later one; a signature by it naming an earlier version is trusted only with a timestamp proof (section 13.2) of a date earlier than the <verbatim|created> date, in the key log's inventory, of the first version that revokes it, since anyone holding a stolen key can name an old version. Two different versions of a key log with the same number are a fork of the owner, reported as any fork.
 
-  <strong|One writer per line.> The object versions of a line form a single sequence, each extending the one before, as OCFL objects do: an owner MUST NOT publish two different object versions with the same number for the same line, in one archive or in several. A line keeps one archive identifier and one object identifier in all its copies (a mirror keeps them unchanged, section 6.3); moving a line to another archive is open, with handing it over (below). Since every version directory keeps the inventory as of that version (section 7.1), two copies of a line can be compared from their inventories alone: two copies whose heads are <verbatim|vk> and <verbatim|vm>, with k not greater than m, agree when <verbatim|vk/inventory.json> is the same file, byte for byte, in both. Two copies that do not agree are a fork of the line. For a keyed owner the signatures show that the owner made both, and the fork is its error; for a named owner it shows only that two parties wrote under the same URI, since anyone can assert it. A fork is found only by someone who sees both copies.
+  <strong|Key logs travel with the objects they sign.> A copy of an object, in any archive, MUST include the key log of every owner that signed one of its versions, up to the key-log versions its signatures name, as copies of those owner objects in the same storage root (at their paths, section 5): the originator's for an originator's line, the parent's and the branch's for a deep branch, the branch's for a shallow branch, whose parent version is evidenced as section 10.5 says. A mirror copies new versions of a key log with the object versions signed under them. The key log checks itself: its first version's genesis record has the owner name as its name, and each later version is signed by the keys of the one before; so a copy of it from any source is as good as the original, and a reader checks a line without trusting any host, also after the archives that served it have gone.
 
-  <strong|Depositors.> An archive that accepts deposits from more than one depositor MUST bind each named owner URI of the lines it keeps (those with its own <verbatim|archiveId>) to the depositors allowed to write under it, and MUST bind a URI only to a depositor it has checked can use it (for an ORCID iD, by an ORCID login; for a web address or an archive identifier, by control of it), so that no depositor continues another's line or opens a line under another's URI. Keyed lines need no binding, since their signatures decide, and mirrors are not bound, since they copy lines of other archives unchanged.
+  <strong|Keepers (optional).> An owner MAY name, in <verbatim|keeper> of its key log, the person or institution who answers for it: an ORCID iD (<verbatim|https://orcid.org/...>), a web address, an institution's domain. The keeper MAY confirm it, in a place only the keeper controls: a link naming the owner in its ORCID record, or a file <verbatim|https://\<less\>domain\<gtr\>/.well-known/opensheaf> on its domain, a JSON object with <verbatim|owners>, the owner names it answers for. When a keeper is named, a verifier MAY check both directions, and reports the link as confirmed, claimed only (the owner names a keeper who does not confirm it), or absent. A confirmation is read as it is now: a keeper who withdraws it ends the link, and what the owner signed stays authentic. The link says who answers for an owner, not who owns its lines, which only keys decide, nor who wrote its documents, which <verbatim|creators> in <verbatim|datacite.json> say (#41). The form of a confirmation on ORCID depends on an <verbatim|https> form of <verbatim|sheaf:\<less\>owner\<gtr\>>, and so on the gateway (section 6.6).
+
+  <strong|Drafts.> A draft has no owner and no genesis record yet; it receives both when it is sealed, and is not signed before. The absence of a genesis record is what marks a draft: it is part of the content, so it travels with every copy, and no other mark is needed. An object version without a genesis record MUST NOT be named by a pin (in a collection, or as a parent). Drafts are usually kept by their owners, outside archives; a draft kept in an archive is served only to its owner, or listed in a public discovery document as work not yet shared, on which nothing may rely (#29). Whether a draft may be rewritten before sealing is open (below).
+
+  <strong|One writer per line.> The object versions of a line form a single sequence, each extending the one before, as OCFL objects do: an owner MUST NOT sign two different object versions with the same number for the same line, in one archive or in several. Since every version directory keeps the inventory as of that version (section 7.1), two copies of a line can be compared from their inventories alone: two copies whose heads are <verbatim|vk> and <verbatim|vm>, with k not greater than m, agree when <verbatim|vk/inventory.json> is the same file, byte for byte, in both. Two copies whose signatures hold and that do not agree are a fork of the line, made by its owner, and attributable to it. A version whose signatures do not hold is not a version of the line, wherever it is found: <strong|an archive MUST NOT add to a line a version that its owner has not signed>, and another archive that continues a line is a branch, under its own owner (section 10.5). Since a line is linear and each version fixes those before it, a copy that stops at an earlier version is simply older; no signed list of an owner's lines is needed, and none is defined: an archive's discovery document lists what it holds, without guaranteeing that an owner has no lines elsewhere.
+
+  <strong|Archives and owners.> An archive decides which owners it hosts (a university admitting its staff, a journal its editors), and how they deposit; this is its own policy. It MAY list the owners it hosts in <verbatim|owners> of its discovery document. What is authentic is decided by each owner's signatures, not by the archive. An archive that makes collections (a catalogue of its documents, a journal's selections) does so as an owner, with a key log like any other.
+
+  <strong|Moving.> An owner moving to another archive copies its key log there (its owner object), with the lines it wants to keep there, and continues its lines in the new archive: the same owner, the same lines, not a branch. The old copies stay valid where they are, and copies of different heads are older and newer copies of the same line (above). An archive moving to another site copies its files (section 6.2).
 
   <strong|Origin.> The line of the originator is the origin of the name, and has no parent. Every other line with the same genesis record MUST declare its parent (section 10.5); a line of another owner that declares none is not a valid line of the name.
 
-  <strong|Sealing and transfer.> The object version that seals a draft adds the genesis record and makes its owner the first writer. The owner seals an object before first sharing or publishing a version of it, and tools SHOULD seal only at the owner's request, not as a side effect. A draft MAY be kept in an archive (served only to its owner, or listed in a public discovery document as work not yet shared, on which nothing may rely, #29), but cannot be pinned: a catalogue that follows it (section 10.2) pins it only once it is sealed. Versions made before sealing stay in the object's history, fixed by every later pin like any earlier version, but belong to no line and cannot be named by a pin or vetted (whether sealing may instead rewrite them is open, below). This proposal does not hand lines over (an open question, below): when another owner continues the work (an author leaving an institution's repository, when the line is the institution's; a journal handing a report to its referee; a line the author owns as originator is not branched by the author but moved, an open question below), the new owner makes a deep branch (section 10.5), and the previous owner MAY add a notice to its own line pointing to the branch.
+  <strong|Sealing and transfer.> The object version that seals a draft adds the genesis record, makes its owner the first writer, and is the first version that owner signs. The owner seals an object before first sharing or publishing a version of it, and tools SHOULD seal only at the owner's request, not as a side effect. A draft cannot be pinned: a catalogue that follows it (section 10.2) pins it only once it is sealed. Versions made before sealing stay in the object's history, fixed by every later pin like any earlier version, but belong to no line and cannot be named by a pin or vetted (whether sealing may instead rewrite them is open, below). A line is not handed over: when another owner continues the work (an author leaving an institution, when the line is the institution's; a journal handing a report to its referee), the new owner makes a deep branch (section 10.5), and the previous owner MAY add a notice to its own line pointing to the branch. An owner taking its own lines elsewhere moves (above), which is not a hand-over.
 
-  <strong|Clashes.> A name is used to refer to objects, so the format does not assume that two works never share one: in an archive, an object is identified by its line, and no two objects of an archive have the same owner and name (section 14). A clash can arise only when an object is created or deposited in an archive, and is resolved there, against the archive and the confirmed lines of the same owner elsewhere:
+  <strong|Clashes.> A name is used to refer to objects, so the format does not assume that two works never share one. No two objects of a storage root have the same line, since their identifiers would coincide (section 6.3), and an owner has one line of each name. A clash can arise only when a line is made, and is resolved by the tool that makes it, against the archive where it writes and the lines of the same owner it knows elsewhere (whose signatures hold):
 
   <\itemize>
-    <item>when sealing, a tool checks the line (owner, name) against the archive and, if it is taken, draws a new nonce, so that the originator's line is always named by algorithm 0; an object sealed outside the archive's storage root and shared before its deposit can still meet a taken line when it is deposited (after a reused genesis record or a collision, or when the archive already holds a copy or a tombstone of the same line), and is then refused: when the archive holds a copy, the line stays with the archive that keeps it (moving a line is open, below); otherwise its owner seals it anew;
+    <item>when sealing, a tool checks the line (name, owner) and, if it is taken, draws a new nonce, so that the originator's line is always named by algorithm 0; an object sealed outside the archive and shared before its deposit can still meet a taken line when it is deposited (after a reused genesis record or a collision), and is then refused, and its owner seals it anew;
 
     <item>a branch is never owned by the originator, whose line is the origin and has no parent: how the originator takes in another line's work is open (below); a tool refuses such a branch;
 
-    <item>a branch is named by <verbatim|parent.name>, unless its line (its owner, that name) is taken by another object, in its archive (any object there, or a tombstone) or among the other lines of its owner that the tool knows elsewhere and that are confirmed (section 6.6: reached through the archive named by their <verbatim|archiveId>, known independently, or signed by a keyed owner); a line known elsewhere only from index entries, without a confirmed copy, is reported and never causes a rename; if that object is the owner's own branch (one the owner made: for a keyed owner, its signatures hold; for a named owner, the archive that keeps it accepts the move under the same authority it requires for any new version of that line; any other object counts as another object; a mirror of the owner's own branch counts as that branch) of the same parent line and the new branch point is later in the parent line's history than that branch's current branch point, the owner moves its branch point instead (section 10.5), in the archive that keeps that branch, and a mirror of it is then brought up to date; a tool that cannot do so renames the new branch as below; otherwise (another genesis record, a mirror of anything else, another parent line, an earlier or equal branch point) the branch is named by the smallest algorithm number greater than that of <verbatim|parent.name> whose name, over the same genesis record, gives a line free in the archive and among the owner's known confirmed lines; <verbatim|parent> keeps the parent's name; if no number up to 15 is free, the branch is refused. An accepted copy of another selection is not renamed: owners differ between selections (section 10.5);
+    <item>a branch is named by <verbatim|parent.name>, unless its line (its owner, that name) is taken by another line of its owner; if that line is the owner's own branch of the same parent line and the new branch point is later in the parent line's history than that branch's current branch point, the owner moves its branch point instead (section 10.5); otherwise (another genesis record, another parent line, an earlier or equal branch point) the branch is named by the smallest algorithm number greater than that of <verbatim|parent.name> whose name, over the same genesis record, gives a line free for its owner; <verbatim|parent> keeps the parent's name; if no number up to 15 is free, the branch is refused. An accepted copy of another selection is not renamed: selections are different owners (section 10.5);
 
-    <item>a mirror whose line is taken cannot be kept there;
+    <item>a copy of a line whose identifier is taken in a storage root by a different history of the same line is a fork (above), and cannot be kept there beside it;
 
-    <item>a line stays taken after a takedown (section 11.3: the tombstone keeps the name and the owner identifier), like the object identifier, so that a removed line and a new one never share a URI in that archive.
+    <item>a line stays taken in an archive after a takedown (section 11.3: the tombstone keeps the identifier), so that a removed line and a new one never share an identifier there.
   </itemize>
 
-  Other owners' lines are different lines and never clash. A renamed branch is always written with its owner part (section 6.6), since a URI without an owner part names the originator's line, which is named by algorithm 0; a resolver given a renamed name without an owner part finds no originator's line, and reports it, pointing to the search for the work. Lines of one owner in archives the tool does not know may still duplicate each other; they are forks of the line, found by resolvers (section 6.6).
+  Other owners' lines are different lines and never clash. A renamed branch is always written with its owner part (section 6.6), since a URI without an owner part names the originator's line, which is named by algorithm 0.
 
-  <strong|Refusals.> One genesis record names one work, and one owner identifier one owner. Every line records, in <verbatim|sealed> of its <verbatim|object.json> (section 9), the version that sealed the work: the <verbatim|archiveId>, <verbatim|objectId> and <verbatim|objectVersion> of the originator's sealing version, which every branch copies unchanged from its parent. When an object is created or deposited, an archive refuses an object whose genesis record is that of an object it holds, or one of whose 16 names is the name of a tombstone it holds (section 11.3), but whose <verbatim|sealed> differs from that object's or tombstone's (a genesis record reused for another work: its owner seals the other work anew); and an object whose owner (at its head; for a mirror, the mirrored line's) has the owner identifier of another owner at the heads of the archive (another URI): it is kept only under another owner URI, and a mirror is then refused. A tool MUST NOT copy a genesis record into an object that is not a mirror or a branch of the work it was written for, nor reuse a nonce. What an archive cannot see (a clash with an object or an owner of another archive) is found by resolvers: the search for a work groups lines by <verbatim|sealed> and lists different groups as different works, and owner identifiers are compared through <verbatim|owners/> (section 6.6).
+  <strong|Refusals.> One genesis record names one work. Every line records, in <verbatim|sealed> of its <verbatim|object.json> (section 9), the version that sealed the work: the <verbatim|objectVersion> and <verbatim|inventorySha512> of the originator's sealing version, which every branch copies unchanged from its parent. When an object is created or deposited, an archive refuses an object whose genesis record is that of an object it holds, or one of whose 16 names is the name of a tombstone it holds (section 11.3), but whose <verbatim|sealed> differs from that object's or tombstone's (a genesis record reused for another work: its owner seals the other work anew). A tool MUST NOT copy a genesis record into an object that is not a copy or a branch of the work it was written for, nor reuse a nonce. What an archive cannot see (a clash with a line kept elsewhere) is found by resolvers: the search for a work groups lines by <verbatim|sealed> and lists different groups as different works (section 6.6).
 
-  <strong|Existing objects.> This draft assumes that every sealed object has a genesis record: archives made under earlier drafts are rebuilt, as the warning at the head of this specification allows before version 1.0.
+  <strong|Existing objects.> This draft assumes that every sealed object has a genesis record and an owner with a key log: archives made under earlier drafts are rebuilt, as the warning at the head of this specification allows before version 1.0.
 
   <strong|Open questions.>
 
   <\itemize>
-    <item>Registering the scheme <verbatim|sheaf> with IANA, as a provisional scheme (RFC 7595), since section 6.6 uses it in place of the <verbatim|tag:> or ARK form chosen in #14 (#36); whether the pair (archive identifier, object identifier) keeps a URI form of its own beside <verbatim|sheaf:> URIs; the form of archive identifiers (<verbatim|tag:> or ARK) (#14), or names made as object names are, from a genesis record of the archive, with an owner (#52).
+    <item>Registering the scheme <verbatim|sheaf> with IANA, as a provisional scheme (RFC 7595) (#36).
 
-    <item>Who keeps indexes of many archives, so that an object can be found once its archive has gone, how resolvers find them, and whether the project runs a shared resolver of <verbatim|sheaf:> URIs, a gateway (section 6.6): at <verbatim|https://opensheaf.org/sheaf:...>, as written provisionally, or on a domain used only for resolution, such as <verbatim|https://sheaf.pub/>, without <verbatim|sheaf:> in the path (#13, #20, #35).
+    <item>Who keeps indexes of many archives, so that an object can be found once its archives have gone, how resolvers find them, and whether the project runs a shared resolver of <verbatim|sheaf:> URIs, a gateway (section 6.6), and on which domain; the gateway's domain, and the format strings <verbatim|opensheaf-...>, follow the name chosen for the format (#13, #20, #35).
 
-    <item>How co-authors own a line: one owner, a group key, several controllers as #20 proposes, or a branch each; and how the originator takes in another line's work (a co-author's, a journal's corrections), since its line has no parent and it does not branch its own work.
-
-    <item>Lines of one owner duplicated in archives that do not know of each other (two branches of one co-author, accepted copies of one journal in two archives): forks that only resolvers see.
+    <item>How the originator takes in another line's work (a co-author's, a journal's corrections), since its line has no parent and it does not branch its own work.
 
     <item>The numbering of document versions on branches after the branch point (section 10.5), which <verbatim|/v\<less\>n\<gtr\>> in a <verbatim|sheaf:> URI follows (section 6.6).
 
-    <item>Whether a line may be handed over to another owner, instead of being continued by a deep branch, or moved to another archive, under another archive identifier.
-
     <item>Moving a branch point when the branch has files of its own (the files of its notices, of a withdrawal, of its version of record): the moving version should probably be a merge keeping both, the new parent version's files and the branch's own, with evidence that tells them apart (section 10.5).
 
-    <item>Keys: whether lines should require them (#20 proposes so); loss, compromise and rotation (<verbatim|did:key> cannot rotate, while <verbatim|did:web> or <verbatim|did:webvh> can); several keys per line, including a recovery key; tying a key to an identity such as an ORCID iD (#13, #41).
+    <item>A deep branch keeps the OCFL identifier of the object it copies (section 6.3), so it cannot be kept in a storage root that holds a copy of that object; whether a deep branch should instead be a new object, holding its parent's inventories as evidence, as a shallow branch does.
 
-    <item>Whether a draft may be rewritten before it is sealed, against the rule that versions are fixed, and whether tools MUST seal only at the owner's request (#29).
+    <item>Whether a draft may be rewritten before it is sealed, against the rule that versions are fixed; whether tools MUST seal only at the owner's request; and whether sealing a draft kept in an archive should start a new object named by its line, rather than keep the draft's identifier (section 6.3) (#29).
 
-    <item>Holding and copying among custodians, which this proposal leaves to #39: copies kept apart from the storage root, <verbatim|mirrors> as locations, mirrors made by agreement, and statements of custodians; #52 proposes that a site keep one storage root per archive it holds, writing only to the one whose owner authorises it, which would remove the refusals of mirrors in section 10.4 and under Clashes above.
+    <item>The field names of <verbatim|keys.json> and of signature files, and the format of signature files (section 13.2) (#55).
 
-    <item>Takedowns: a branch keeps the parent version after the parent is taken down, and mirrors, indexes kept by others and gateways may go on serving a taken-down object (#33).
+    <item>Holding and copying among custodians: copies up to a pinned version, copying by agreement, and what a custodian promises to keep (#39, #54).
 
-    <item>A deep branch whose parent's object identifier is already taken in the branch's archive.
+    <item>Takedowns: a branch keeps the parent version after the parent is taken down, and mirrors, indexes kept by others and gateways may go on serving a taken-down object; with lines stored anywhere, an owner's takedown needs a statement signed by the owner (#33).
 
-    <item>Whether aliases (a new genesis record that wraps the old one) are needed, if refusing reused genesis records and colliding owner identifiers at creation (section 6.5) proves too strict, and whether a <verbatim|sheaf:> URI may write the owner itself instead of its identifier (#44).
-
-    <item>The field names: <verbatim|name> also names the archive, in the discovery document.
+    <item>Whether aliases (a new genesis record that wraps the old one) are needed, if refusing reused genesis records at creation proves too strict (#44).
   </itemize>
 
   <subsection*|6.6 Names as URIs and finding objects><label|66-names-as-uris-and-finding-objects>
 
-  <os-alert|note|Note.|<strong|Proposal.> This section is part of the proposal of section 6.5 (branch <verbatim|proposal/identity>): writing lines, versions and pins as URIs, and finding objects by name (#14, #20). It replaces the decision recorded in #14 (global names as <verbatim|tag:> or ARK URIs built from the archive identifier, with <verbatim|sheaf:> kept in reserve): a line now has a name independent of any archive, and <verbatim|sheaf:> URIs write it; archive identifiers stay as section 6.2 says.>
+  <os-alert|note|Note.|<strong|Proposal.> This section is part of the proposal of section 6.5: writing lines, versions, pins and owners as URIs, and finding objects by name (#14, #20). It replaces the decision first recorded in #14 (global names as <verbatim|tag:> or ARK URIs built from an archive identifier): a line has a name and an owner independent of any archive, and <verbatim|sheaf:> URIs write them; archives have no identifiers (section 6.2, #52).>
 
-  <strong|Owner identifier.> The owner identifier of an owner is computed as a name by algorithm 0 (section 6.5), over its URI as recorded (in the canonical form of section 6.5, where one is defined), encoded in UTF-8 without a line end, instead of <verbatim|genesis.json>: 52 characters. It names an owner inside a URI, where the owner's own URI, which holds <verbatim|:> and <verbatim|/>, cannot be written. <verbatim|genesis.json>, <verbatim|object.json>, <verbatim|parent> and the members of collections record the owner's URI, never its identifier; indexes record both (below), and tombstones the identifier, and the URI unless a takedown erases it (section 11.3).
-
-  **The <verbatim|sheaf> URI.** A line, a document version of a line, one object version, or the object as a whole, is written as a URI of the scheme <verbatim|sheaf>:
+  **The <verbatim|sheaf> URI.** A line, a document version of a line, one object version, the work as a whole, or an owner, is written as a URI of the scheme <verbatim|sheaf>:
 
   <\verbatim-code>
     sheaf:\<less\>name\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the line of the originator
 
-    sheaf:\<less\>name\<gtr\>:\<less\>owner id\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the line of that owner
+    sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the line of that owner
 
-    sheaf:\<less\>name\<gtr\>:* \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the object as a whole, all its lines
+    sheaf:\<less\>name\<gtr\>:* \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the work as a whole, all its lines
 
     sheaf:\<less\>name\<gtr\>/v\<less\>n\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ document version n of the originator's line
 
-    sheaf:\<less\>name\<gtr\>:\<less\>owner id\<gtr\>/v\<less\>n\<gtr\> \ \ \ \ \ \ \ \ \ \ \ document version n of that owner's line
+    sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>/v\<less\>n\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ document version n of that owner's line
 
-    sheaf:\<less\>name\<gtr\>[:\<less\>owner id\<gtr\>]/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\> \ \ one object version holding it
+    sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\> \ \ one object version holding it
+
+    sheaf:\<less\>owner\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ an owner (its key log)
+
+    sheaf:\<less\>owner\<gtr\>/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\> \ \ \ \ \ a version of an owner's key log
   </verbatim-code>
 
-  The parts are, in this order: <verbatim|sheaf:> and the name; optionally <verbatim|:> and an owner identifier, or <verbatim|:*>, which names all the lines and takes no document version and no <verbatim|sha512> (the owner part is <verbatim|:> and an owner identifier; <verbatim|:*> is not an owner part); optionally <verbatim|/v> and a document version, a positive integer without leading zeros; optionally <verbatim|?> and a query of parameters <verbatim|key=value> joined by <verbatim|&>, among them at most one <verbatim|sha512>, only after a document version, whose value is the SHA-512 digest of an inventory file, 128 lowercase hexadecimal digits, as in a pin (section 10.2), and at most one <verbatim|at>, after <verbatim|sha512> if both are present (below). A resolver ignores parameters it does not know; no part other than the value of <verbatim|at> is percent-encoded; this proposal defines no fragment. The scheme, the name, the owner identifier, <verbatim|v>, the digest and the parameter names are lowercase, and a resolver MAY fold uppercase letters in them; the value of <verbatim|at> is case-sensitive.
+  where <verbatim|\<less\>owner\<gtr\>> is an owner name (section 6.5). The parts are, in this order: <verbatim|sheaf:> and the name; optionally <verbatim|:> and an owner name, or <verbatim|:*>, which names all the lines and takes no document version and no <verbatim|sha512> (the owner part is <verbatim|:> and an owner name; <verbatim|:*> is not an owner part); optionally <verbatim|/v> and a document version, a positive integer without leading zeros; optionally <verbatim|?> and a query of parameters <verbatim|key=value> joined by <verbatim|&>, among them at most one <verbatim|sha512>, only after a document version, whose value is the SHA-512 digest of an inventory file, 128 lowercase hexadecimal digits, as in a pin (section 10.2), and at most one <verbatim|at>, after <verbatim|sha512> if both are present (below). A resolver ignores parameters it does not know; no part other than the value of <verbatim|at> is percent-encoded; this proposal defines no fragment. The scheme, the name, the owner name, <verbatim|v>, the digest and the parameter names are lowercase, and a resolver MAY fold uppercase letters in them; the value of <verbatim|at> is case-sensitive. The name of an owner is the name of its genesis record, so <verbatim|sheaf:\<less\>owner\<gtr\>> names the originator's line of that record, which is the owner object itself; for the versions of a key log, <verbatim|/v\<less\>n\<gtr\>> is the object version number.
 
   <\itemize>
-    <item><strong|The owner.> Without an owner part, a URI names the line of the originator, the owner named by <verbatim|originator> in the genesis record, which every copy of the object and of its branches carries. If a resolver finds several genesis records under one name (with the same originator or not), the URI is ambiguous: it lists them with their originators and does not choose. It does not mean the latest line or the most authoritative one: the versions of any other line, such as a journal's or a co-author's, are written with their owner, and if the originator stops and another owner continues the work in a deep branch, the URI still names the originator's line. <verbatim|sheaf:\<less\>name\<gtr\>:*> names the object as a whole, with all its lines: a resolver shows the lines it knows that pass the checks below, each marked confirmed or unconfirmed. A resolver rejects <verbatim|:*> with a document version or <verbatim|sha512>, since every line has its own document versions (section 10.5); <verbatim|at> is allowed with it.
+    <item><strong|The owner.> Without an owner part, a URI names the line of the originator, the owner named by <verbatim|originator> in the genesis record, which every copy of the object and of its branches carries. If a resolver finds several genesis records under one name (with the same originator or not), the URI is ambiguous: it lists them with their originators and does not choose. It does not mean the latest line or the most authoritative one: the versions of any other line, such as a journal's or a co-author's, are written with their owner, and if the originator stops and another owner continues the work in a deep branch, the URI still names the originator's line. <verbatim|sheaf:\<less\>name\<gtr\>:*> names the work as a whole, with all its lines: a resolver shows the lines it knows that pass the checks below. A resolver rejects <verbatim|:*> with a document version or <verbatim|sha512>, since every line has its own document versions (section 10.5); <verbatim|at> is allowed with it.
 
-    <item><strong|The version.> <verbatim|/v\<less\>n\<gtr\>> is a document version of the line (section 7.3, also on a branch), not an OCFL object version. It names only object versions of the line: sealed versions (with a genesis record) whose <verbatim|object.json> has the line's owner. The versions of a deep branch up to its branch point belong to the lines they were copied from (the parent's, or for a deep branch of a deep branch an earlier one's), and are named with those lines' owners; a document version held only by versions made before sealing (section 6.5) belongs to no line and has no <verbatim|sheaf:> URI. On a deep branch, a document version held only by its copied versions names nothing on the branch's line: a resolver points to the URI of the line that holds it. Several object versions of the line may hold document version n: without a digest, the URI names the one listed for n in the <verbatim|history> of the line's head, or, without <verbatim|history>, the last object version of the line holding n (section 7.3). What it names can then change as the line grows, by a description or a notice, and copies with different heads may answer differently: a resolver uses the latest head among the confirmed copies that agree (section 6.5, and below), and reports a later head found only in unconfirmed copies as an unconfirmed extension, without using it; with no confirmed copy, it uses the latest head among the unconfirmed copies that agree, and reports the result as unconfirmed; if some unconfirmed copies disagree with the others, it lists them all and does not choose.
+    <item><strong|The version.> <verbatim|/v\<less\>n\<gtr\>> is a document version of the line (section 7.3, also on a branch), not an OCFL object version, except for an owner's key log. It names only object versions of the line: sealed versions (with a genesis record) whose <verbatim|object.json> has the line's owner and whose signatures hold. The versions of a deep branch up to its branch point belong to the lines they were copied from (the parent's, or for a deep branch of a deep branch an earlier one's), and are named with those lines' owners; a document version held only by versions made before sealing (section 6.5) belongs to no line and has no <verbatim|sheaf:> URI. On a deep branch, a document version held only by its copied versions names nothing on the branch's line: a resolver points to the URI of the line that holds it. Several object versions of the line may hold document version n: without a digest, the URI names the one listed for n in the <verbatim|history> of the line's head, or, without <verbatim|history>, the last object version of the line holding n (section 7.3). What it names can then change as the line grows, by a description or a notice, and copies with different heads may answer differently: a resolver uses the latest head among the copies it found whose signatures hold and that agree (section 6.5), and says where it found them, since a copy that stops early looks complete by itself.
 
-    <item><strong|The pin.> With a digest, the URI names exactly the object version whose inventory file has that digest. A resolver MUST check that digest, and that the version holds a genesis record whose name, by the algorithm of the name's last character, is the name, has the URI's name as <verbatim|name> and the line's owner as <verbatim|owner> in its <verbatim|object.json> (the owner part, or the originator), and holds document version n; it reports a mismatch as section 14 does. Citations of a fixed version SHOULD carry the digest.
+    <item><strong|The pin.> With a digest, the URI names exactly the object version whose inventory file has that digest. A resolver MUST check that digest, and that the version holds a genesis record whose name, by the algorithm of the name's last character, is the name, has the URI's name as <verbatim|name> and the line's owner as <verbatim|owner> in its <verbatim|object.json> (the owner part, or the originator), holds document version n, and is signed by that owner (section 13.2); it reports a mismatch as section 14 does. Citations of a fixed version SHOULD carry the digest.
 
-    <item><strong|The hint.> <verbatim|at> names an archive where a copy is expected, where a resolver looks first: its value is the archive's base URL, an <verbatim|https> URL ending with <verbatim|/>, percent-encoded in full (every character outside the unreserved characters of RFC 3986 is encoded, as <verbatim|encodeURIComponent> does) and decoded once: <verbatim|sheaf:\<less\>name\<gtr\>/v3?sha512=\<less\>digest\<gtr\>&at=https%3A%2F%2Fauthors.example.org%2F>. It is not part of the identity.
+    <item><strong|The hint.> <verbatim|at> names an archive where a copy is expected, where a resolver looks first: its value is the archive's base URL, an <verbatim|https> URL ending with <verbatim|/>, percent-encoded in full (every character outside the unreserved characters of RFC 3986 is encoded, as <verbatim|encodeURIComponent> does) and decoded once: <verbatim|sheaf:\<less\>name\<gtr\>/v3?sha512=\<less\>digest\<gtr\>&at=https%3A%2F%2Fauthors.example.org%2F>. It is a location (section 6.2), not part of the identity.
 
     <item><strong|Equality.> The canonical form of a <verbatim|sheaf:> URI has complete parts, lowercase where the case is folded, and, for <verbatim|:*>, the name made by algorithm 0, since all the names of a genesis record name the same work; it has no owner part when the owner is the originator (read from the genesis record, which any copy carries and the name certifies, section 6.5, so that deciding equality may need one copy of <verbatim|genesis.json>), and no <verbatim|at> and no unknown parameters. Two URIs name the same thing when their canonical forms are equal, byte for byte, and files that record a <verbatim|sheaf:> URI (for instance among the relations of <verbatim|datacite.json>) record its canonical form.
   </itemize>
 
-  <strong|Checks and confirmation.> A resolver checks every copy it finds: the name is a name of its <verbatim|genesis.json>, by the algorithm of its last character, the <verbatim|name> and <verbatim|owner> in <verbatim|object.json> are the line's, and, with a digest, the rest of the checks of a pin. A copy that passes them is the object version named by a URI with a digest, wherever it was found, since the pin fixes it. Without a digest, a copy shows only that someone published versions under that owner and name, which a named owner cannot prevent (section 6.5): a resolver MUST report such a copy as confirmed only when it reached it at a base URL of the archive that keeps the line (the archive named by <verbatim|archiveId> in the copy's <verbatim|object.json>), known independently of the URI and of indexes kept by others, as section 6.4 says, or when the owner is keyed and its signatures hold; confirmation reads <verbatim|archiveId> from the copy's own <verbatim|object.json>, never from an index entry. This confirms the archive that keeps the line, not the person or body its owner names, which owner proofs would show (#41); it MUST report every other copy (one found through <verbatim|at>, or through an index kept by a custodian) as unconfirmed, with where it was found. When confirmed copies of a line disagree (for a keyed owner, copies whose signatures hold), they are a fork (section 6.5): the resolver reports it and does not choose. Confirmed copies of the same named owner and name whose <verbatim|archiveId> differ are a conflict about which archive keeps the line, since a line has one archive identifier (section 6.5): the resolver reports it with the archives, and does not choose. An unconfirmed copy that disagrees with a confirmed one is reported as a warning, and does not stop the resolution.
+  <strong|Checks.> A resolver checks every copy it finds: the name is a name of its <verbatim|genesis.json>, by the algorithm of its last character, the <verbatim|name> and <verbatim|owner> in <verbatim|object.json> are the line's, the versions are signed by the owner, checked against its key log (section 13.2), and, with a digest, the rest of the checks of a pin. A copy that passes them is a copy of the line, wherever it was found; a copy whose signatures do not hold is not, and is reported as invalid, with where it was found, and never used. When copies of a line whose signatures hold disagree, they are a fork by its owner (section 6.5): the resolver reports it and does not choose.
 
-  <strong|Searching for a work.> A work is its genesis record, and its lines may be named by any of the 16 names the record gives (section 6.5: a branch is renamed after a clash). To find every line of a work (for <verbatim|sheaf:\<less\>name\<gtr\>:*>, or a search by work), a resolver: obtains the genesis record (from any entry or copy found under the name, checked against it); computes its 16 names, by every algorithm; looks each of them up in the indexes it knows; and keeps only the entries whose genesis record is, byte for byte, the one it obtained, discarding the others as collisions (removed entries without a genesis record are listed apart, as removed lines of those names; removed entries that kept it are grouped by the <verbatim|sealed> of the index, there being no copy, and marked removed); it groups the lines it keeps by their <verbatim|sealed>, read from the copies (<verbatim|object.json>), not from indexes kept by others, and lists different groups as different works (a genesis record reused in two archives), each marked confirmed or unconfirmed like lines, without choosing. The comparison is of bytes, so it does not rely on any hash being free of collisions. Resolving a line needs no search: <verbatim|sheaf:\<less\>name\<gtr\>> names the originator's line, always named by algorithm 0 (a clash when sealing draws a new nonce), and <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner id\<gtr\>> names exactly that line.
+  <strong|Searching for a work.> A work is its genesis record, and its lines may be named by any of the 16 names the record gives (section 6.5: a branch is renamed after a clash). To find every line of a work (for <verbatim|sheaf:\<less\>name\<gtr\>:*>, or a search by work), a resolver: obtains the genesis record (from any entry or copy found under the name, checked against it); computes its 16 names, by every algorithm; looks each of them up in the indexes it knows; and keeps only the entries whose genesis record is, byte for byte, the one it obtained, discarding the others as collisions (removed entries without a genesis record are listed apart, as removed lines of those names; removed entries that kept it are grouped by the <verbatim|sealed> of the index, there being no copy, and marked removed); it groups the lines it keeps by their <verbatim|sealed>, read from the copies (<verbatim|object.json>), not from indexes kept by others, and lists different groups as different works (a genesis record reused in two archives), without choosing. The comparison is of bytes, so it does not rely on any hash being free of collisions. Resolving a line needs no search: <verbatim|sheaf:\<less\>name\<gtr\>> names the originator's line, always named by algorithm 0 (a clash when sealing draws a new nonce), and <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> names exactly that line.
 
-  <strong|Short forms.> For people reading and typing them, the name and the owner identifier MAY be shortened to a prefix of at least 8 characters: <verbatim|sheaf:2kukpn74/v3>, <verbatim|sheaf:2kukpn74:xx2gb5hz/v3>. A part of 52 characters is complete; a shorter one is a prefix. A short name with <verbatim|:*> (<verbatim|sheaf:2kukpn74:*>) expands among names, whatever their owners, and is ambiguous when names of several genesis records match; once expanded, the work is searched for as above. A resolver expands a short form among the lines it knows of (from the indexes below, the archives and collections it reads, and its user's configuration), counting only the lines whose copies pass the checks above:
+  <strong|Short forms.> For people reading and typing them, the name and the owner name MAY be shortened to a prefix of at least 8 characters: <verbatim|sheaf:olqybey6/v3>, <verbatim|sheaf:olqybey6:iztwg6bj/v3>. A part of 52 characters is complete; a shorter one is a prefix. A short name with <verbatim|:*> (<verbatim|sheaf:olqybey6:*>) expands among names, whatever their owners, and is ambiguous when names of several genesis records match; once expanded, the work is searched for as above. A resolver expands a short form among the lines it knows of (from the indexes below, the archives and collections it reads, and its user's configuration), counting only the lines whose copies pass the checks above:
 
   <\itemize>
-    <item>the candidates are the lines whose name starts with the name part and whose owner identifier starts with the owner part; without an owner part, the lines of the originators. Each is confirmed or unconfirmed, as above: confirmed when a copy was reached through the archive that keeps the line, at a location known independently, or is signed by its keyed owner;
+    <item>the candidates are the lines whose name starts with the name part and whose owner name starts with the owner part; without an owner part, the lines of the originators;
 
-    <item>if there are confirmed candidates, all of the same owner and, for a named owner, kept by the same archive (the same <verbatim|archiveId>), the short form names the first of them in that owner's order: the line whose first object version of that owner (for the originator, the version that sealed it; for a shallow branch, its first version; for a deep branch, its first version after the branch point) has the earliest <verbatim|created> in its inventory, compared as instants. The unconfirmed candidates MUST NOT win: the resolver shows them beside its answer, as warnings;
+    <item>if all the candidates have the same owner, the short form names the first of them in that owner's order: the line whose first object version of that owner (for the originator, the version that sealed it; for a shallow branch, its first version; for a deep branch, its first version after the branch point) has the earliest <verbatim|created> in its inventory, compared as instants;
 
-    <item>if there is no confirmed candidate and exactly one unconfirmed one, the short form names it, and the resolver reports it as unconfirmed;
-
-    <item>otherwise (confirmed candidates of different owners, or of one named owner in different archives, two with the same <verbatim|created>, or several unconfirmed candidates and no confirmed one), the short form is ambiguous: the resolver MUST NOT choose one, and lists the candidates with their full forms, their originators and the archives that keep them.
+    <item>otherwise (candidates of different owners, or two with the same <verbatim|created>), the short form is ambiguous: the resolver MUST NOT choose one, and lists the candidates with their full forms and their originators.
   </itemize>
 
-  The order of an owner's lines is trusted only within one archive that keeps them, or under the owner's key. Anyone can write a line under a named owner's URI, with any <verbatim|created>, and search for a name with a given prefix (8 characters are 40 bits); such a line is unconfirmed, unless its maker also runs an archive the resolver knows, and then it is confirmed in another archive than the owner's lines, so the short form becomes ambiguous: it is seen, and cannot take the short form over. Another owner, confirmed in an archive of its own, can likewise at most make a short form ambiguous. A resolver knows only the lines it has seen, and confirms only those whose archives it knows, so two resolvers may expand a short form differently, and a short form that is unique today may become ambiguous later, while a full form never changes. Short forms are therefore for people (text, citations, a lookup typed by hand): pins, <verbatim|parent>, <verbatim|members.json> and every other file defined by this specification MUST use complete parts, never prefixes, a resolver SHOULD show the full form of what it resolved, and landing pages and citation metadata SHOULD give the full form, and MAY add a short one. A short form printed or kept where it cannot be corrected (a paper, a slide) SHOULD have at least 16 characters in each part (80 bits), which cannot be searched for.
+  Only an owner can sign its lines, so another owner can at most make a short form ambiguous, by making lines of its own whose names start with it (8 characters are 40 bits), and cannot take it over. A resolver knows only the lines it has seen, so two resolvers may expand a short form differently, and a short form that is unique today may become ambiguous later, while a full form never changes. Short forms are therefore for people (text, citations, a lookup typed by hand): pins, <verbatim|parent>, <verbatim|members.json> and every other file defined by this specification MUST use complete parts, never prefixes, a resolver SHOULD show the full form of what it resolved, and landing pages and citation metadata SHOULD give the full form, and MAY add a short one. A short form printed or kept where it cannot be corrected (a paper, a slide) SHOULD have at least 16 characters in each part (80 bits), which cannot be searched for.
 
-  <strong|Indexes.> To find objects by name, by owner or by inventory digest without knowing their archive, an archive SHOULD keep three indexes of its own objects next to its discovery document, declared there in <verbatim|indexes> (section 6.1), and a custodian or a resolver MAY keep the same files for the objects of many archives, at a base URL of its own, declared in <verbatim|\<less\>base URL\<gtr\>indexes.json>:
+  <strong|Indexes.> To find objects by name, by owner or by inventory digest without knowing where they are kept, an archive SHOULD keep three indexes of its own objects next to its discovery document, declared there in <verbatim|indexes> (section 6.1), and a custodian or a resolver MAY keep the same files for the objects of many archives, at a base URL of its own, declared in <verbatim|\<less\>base URL\<gtr\>indexes.json>:
 
   <\itemize>
-    <item><verbatim|names/\<less\>p\<gtr\>.json>, where <verbatim|\<less\>p\<gtr\>> is the first characters of a name: the objects whose names start with them, each entry with <verbatim|name>, <verbatim|originator> (from the genesis record), <verbatim|owner>, <verbatim|ownerId> and <verbatim|objectId>, and <verbatim|genesis>, the exact text of its <verbatim|genesis.json>, the string whose UTF-8 encoding is exactly the bytes of the file, so that a work can be searched for, and collisions removed, from the indexes alone (above); and <verbatim|sealed>, as in <verbatim|object.json>;
+    <item><verbatim|names/\<less\>p\<gtr\>.json>, where <verbatim|\<less\>p\<gtr\>> is the first characters of a name: the objects whose names start with them, each entry with <verbatim|name>, <verbatim|originator> (from the genesis record), <verbatim|owner> and <verbatim|id> (the object identifier in that storage root), <verbatim|label> if the archive gives one, and <verbatim|genesis>, the exact text of its <verbatim|genesis.json>, the string whose UTF-8 encoding is exactly the bytes of the file, so that a work can be searched for, and collisions removed, from the indexes alone (above); and <verbatim|sealed>, as in <verbatim|object.json>;
 
-    <item><verbatim|owners/\<less\>p\<gtr\>.json>, where <verbatim|\<less\>p\<gtr\>> is the first characters of an owner identifier: the owners whose identifiers start with them, each entry with <verbatim|ownerId>, <verbatim|owner> and <verbatim|names>, the names of that owner's objects in the storage root, so that the lines of an owner can be listed (in an index kept for several archives, one entry for each owner and archive); a takedown removes the name, and the entry once it lists none;
+    <item><verbatim|owners/\<less\>p\<gtr\>.json>, where <verbatim|\<less\>p\<gtr\>> is the first characters of an owner name: the owners whose names start with them, each entry with <verbatim|owner> and <verbatim|names>, the names of that owner's lines in the storage root (in an index kept for several archives, one entry for each owner and archive); a takedown removes the name, and the entry once it lists none;
 
-    <item><verbatim|sha512/\<less\>p\<gtr\>.json>, where <verbatim|\<less\>p\<gtr\>> is the first hexadecimal digits of an inventory digest: the sealed object versions whose inventories have digests starting with them, each entry with <verbatim|inventorySha512>, <verbatim|objectId> and <verbatim|version> (the object version), and <verbatim|status>, the object's.
+    <item><verbatim|sha512/\<less\>p\<gtr\>.json>, where <verbatim|\<less\>p\<gtr\>> is the first hexadecimal digits of an inventory digest: the sealed object versions whose inventories have digests starting with them, each entry with <verbatim|inventorySha512>, <verbatim|id> and <verbatim|version> (the object version), and <verbatim|status>, the object's.
   </itemize>
 
-  The length of <verbatim|\<less\>p\<gtr\>> is declared for each index, from 2 to 4 characters: 2 suits a small archive, while an archive of millions of versions declares 4, so that each file stays small. Each index file is a JSON object with <verbatim|format> (<verbatim|"opensheaf-index/0.1">), <verbatim|index> (<verbatim|names>, <verbatim|owners> or <verbatim|sha512>, the folder it is in) and <verbatim|entries>, every entry starting with the file's <verbatim|\<less\>p\<gtr\>>; the declaration (in <verbatim|indexes> of the discovery document, or in <verbatim|indexes.json>, a JSON object with <verbatim|format> and <verbatim|indexes>) maps each index kept to the length of its <verbatim|\<less\>p\<gtr\>>. An index kept for several archives adds to each entry <verbatim|archiveId> and <verbatim|archiveUrl>: the archive serving that copy and its base URL (for a mirror, the mirroring archive). An archive's indexes list every object of its storage root with a genesis record and every sealed version of it, each entry of <verbatim|names/> and <verbatim|sha512/> with <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>); a tombstoned object keeps its entries with <verbatim|status> <verbatim|removed>, so that a resolver can report it as section 11.3 asks; a removed entry of <verbatim|names/> keeps <verbatim|name>, <verbatim|ownerId>, <verbatim|objectId>, <verbatim|status> and <verbatim|sealed>, and MAY drop <verbatim|owner>, <verbatim|originator> and <verbatim|genesis>, so that a takedown can erase them (section 16). A file with no entries is omitted, so that, where the indexes are declared, a missing file means no entry. A resolver looks up a URI in <verbatim|names/> at the archives and indexes it knows, starting from <verbatim|at>, keeping the entries whose <verbatim|ownerId> matches the owner part, or, without an owner part, those whose <verbatim|owner> is their <verbatim|originator> (for a removed entry without them, whose <verbatim|ownerId> is the owner identifier of the originator read from any copy of the genesis record; when no copy of the genesis record is found, it is reported as a removed line of that name, owner unknown), or, for <verbatim|:*>, every entry found by the search for the work (above), each line checked and confirmed separately, then reads the history of the object it finds, at the path given by the layout of that archive's discovery document (section 6.4); it looks up a pin in <verbatim|sha512/>, and an owner in <verbatim|owners/> (two different owner URIs under one owner identifier are a collision: the resolver lists them and does not choose); at an archive that keeps no indexes, it MAY read <verbatim|objects> of the discovery document instead, which gives each object's <verbatim|name> and <verbatim|owner>, and fetches <verbatim|genesis.json> and <verbatim|object.json> from the objects for the search. Like the discovery document, indexes are maps, not witnesses: they are rewritten when objects change, and a resolver checks what it finds as above.
+  The length of <verbatim|\<less\>p\<gtr\>> is declared for each index, from 2 to 4 characters: 2 suits a small archive, while an archive of millions of versions declares 4, so that each file stays small. Each index file is a JSON object with <verbatim|format> (<verbatim|"opensheaf-index/0.1">), <verbatim|index> (<verbatim|names>, <verbatim|owners> or <verbatim|sha512>, the folder it is in) and <verbatim|entries>, every entry starting with the file's <verbatim|\<less\>p\<gtr\>>; the declaration (in <verbatim|indexes> of the discovery document, or in <verbatim|indexes.json>, a JSON object with <verbatim|format> and <verbatim|indexes>) maps each index kept to the length of its <verbatim|\<less\>p\<gtr\>>. An index kept for several archives adds to each entry <verbatim|archiveUrl>: the base URL of the archive serving that copy, a location (section 6.2). An archive's indexes list every object of its storage root with a genesis record and every sealed version of it, each entry of <verbatim|names/> and <verbatim|sha512/> with <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>); a tombstoned object keeps its entries with <verbatim|status> <verbatim|removed>, so that a resolver can report it as section 11.3 asks; a removed entry of <verbatim|names/> keeps <verbatim|name>, <verbatim|owner>, <verbatim|id>, <verbatim|status> and <verbatim|sealed>, and MAY drop <verbatim|originator> and <verbatim|genesis>. A file with no entries is omitted, so that, where the indexes are declared, a missing file means no entry. A resolver looks up a URI in <verbatim|names/> at the archives and indexes it knows, starting from <verbatim|at>, keeping the entries whose <verbatim|owner> matches the owner part, or, without an owner part, those whose <verbatim|owner> is their <verbatim|originator> (for a removed entry without <verbatim|originator>, whose <verbatim|owner> is the originator read from any copy of the genesis record; when no copy of the genesis record is found, it is reported as a removed line of that name, originator unknown), or, for <verbatim|:*>, every entry found by the search for the work (above), each line checked separately, then reads the history of the object it finds, at the path given by the layout of that archive's discovery document (section 6.4); it looks up a pin in <verbatim|sha512/>, and an owner in <verbatim|owners/>; at an archive that keeps no indexes, it MAY read <verbatim|objects> of the discovery document instead, which gives each object's <verbatim|name> and <verbatim|owner>, and fetches <verbatim|genesis.json> and <verbatim|object.json> from the objects for the search. Like the discovery document, indexes are maps, not witnesses: they are rewritten when objects change, and a resolver checks what it finds as above.
 
-  <strong|Gateways.> Browsers do not resolve <verbatim|sheaf:> URIs. A gateway is a web service that does it for them: it serves a URI at its base URL followed by the URI, unchanged, for instance <verbatim|https://opensheaf.org/sheaf:2kukpn74/v3?sha512=c07a...>, so that an absolute link and its URI are turned into each other by adding or removing the base URL (a relative link starting with <verbatim|sheaf:> is read as a <verbatim|sheaf:> URI, so gateway links are written in full). A gateway is a resolver like any other, and:
+  <strong|Gateways.> Browsers do not resolve <verbatim|sheaf:> URIs. A gateway is a web service that does it for them: it serves a URI at its base URL followed by the URI, unchanged, for instance <verbatim|https://opensheaf.org/sheaf:olqybey6/v3?sha512=c07a...> (provisionally; the domain is open, section 6.5), so that an absolute link and its URI are turned into each other by adding or removing the base URL (a relative link starting with <verbatim|sheaf:> is read as a <verbatim|sheaf:> URI, so gateway links are written in full). A gateway is a resolver like any other, and:
 
   <\itemize>
-    <item>it MUST answer with a real HTTP status: a page (200) showing what it resolved, or a temporary redirect (302, 303 or 307) to a copy; it MUST NOT redirect permanently (301 or 308), since copies move and are taken down, and it MAY cache its own result for a URI with a digest, but not for one without; it MUST redirect only to a copy at a base URL of the archive that keeps the line, confirmed as above (section 6.4, the mirrors listed in that archive's own discovery document included), never to a location given only by <verbatim|at> or by an index kept by others, and otherwise answers with a page that links to the copy and marks it unconfirmed; <verbatim|sheaf:\<less\>name\<gtr\>:*> shows the lines it knows;
+    <item>it MUST answer with a real HTTP status: a page (200) showing what it resolved, or a temporary redirect (302, 303 or 307) to a copy; it MUST NOT redirect permanently (301 or 308), since copies move and are taken down, and it MAY cache its own result for a URI with a digest, but not for one without; it MUST redirect only to a copy it has checked as above, and otherwise answers with a page; <verbatim|sheaf:\<less\>name\<gtr\>:*> shows the lines it knows;
 
-    <item>it MUST show whether what it resolved is confirmed or unconfirmed, and where it was found, and treats a copy found only through <verbatim|at>, for a URI without a digest, as unconfirmed;
+    <item>it MUST show where what it resolved was found, and that a URI without a digest resolves to the latest copy it found, which may not be the latest the owner made;
 
     <item>it MUST NOT serve the files of an archive from its own origin, but redirects or links to the archive (section 15);
 
@@ -373,7 +389,7 @@
 
   <subsection*|7.1 Common rules><label|71-common-rules>
 
-  Every object MUST be a valid OCFL 1.1 object. Its inventories MUST use <verbatim|sha512> as digest algorithm. Every object version MUST contain, in its content, the files <verbatim|object.json> and <verbatim|datacite.json> at the top level, and, from the version that seals the object, <verbatim|genesis.json> (section 6.5); every version of a shallow branch, and every version of a branch from the version that moves its branch point, also holds <verbatim|parent.inventory.json> and <verbatim|parent.object.json> (section 10.5), unchanged until the branch point moves again; a deep branch of such a branch copies them with the versions it copies, but its own versions do not hold them until its own branch point moves. These are the identity files of the object; they are not files of the document's own (section 7.3), and the names <verbatim|genesis.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json> are reserved for them at the top level of the content. Every version directory MUST contain a copy of the inventory as of that version, with its checksum file (OCFL makes this a recommendation; OpenSheaf requires it, so that each version can be pinned and fetched on its own). Version directories MUST NOT be zero-padded (<verbatim|v1>, <verbatim|v2>, ..., not <verbatim|v001>), which OCFL allows. OCFL recommends that object identifiers be URIs; OpenSheaf identifiers are short names (section 6.3), so OCFL validators may warn about them.
+  Every object MUST be a valid OCFL 1.1 object. Its inventories MUST use <verbatim|sha512> as digest algorithm. Every object version MUST contain, in its content, the files <verbatim|object.json> and, except in an owner object (section 7.5), <verbatim|datacite.json> at the top level, and, from the version that seals the object, <verbatim|genesis.json> (section 6.5); every version of a shallow branch, and every version of a branch from the version that moves its branch point, also holds <verbatim|parent.inventory.json> and <verbatim|parent.object.json> (section 10.5), unchanged until the branch point moves again; a deep branch of such a branch copies them with the versions it copies, but its own versions do not hold them until its own branch point moves. These are the identity files of the object; they are not files of the document's own (section 7.3), and the names <verbatim|genesis.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json> are reserved for them at the top level of the content. Every version directory MUST contain a copy of the inventory as of that version, with its checksum file (OCFL makes this a recommendation; OpenSheaf requires it, so that each version can be pinned and fetched on its own). Version directories MUST NOT be zero-padded (<verbatim|v1>, <verbatim|v2>, ..., not <verbatim|v001>), which OCFL allows. OCFL recommends that object identifiers be URIs; with the proposal of section 6.5 they are <verbatim|sheaf:> URIs (section 6.3), except the identifiers of drafts, which are short names, about which OCFL validators may warn.
 
   Each version in the inventory MUST have a <verbatim|user> with a <verbatim|name>, and SHOULD have an <verbatim|address> (an ORCID iD, a <verbatim|mailto:> URI or another URI identifying the depositor), and MUST have a <verbatim|message> describing the change. The inventory is the record of deposits: the <verbatim|created> date and the <verbatim|user> of an object version are when and by whom it was deposited, and the deposit of a document version is that of the first object version holding it. They are not repeated in <verbatim|object.json>.
 
@@ -397,7 +413,7 @@
 
   <subsection*|7.3 Document versions><label|73-document-versions>
 
-  <strong|Numbering.> Document versions are numbered by the owner of the line (for an archive's own documents, the archive), from 1, without gaps, independently of any external numbering: a work whose versions 1, 3 and 4 are available on arXiv has document versions 1, 2 and 3. A branch (section 10.5) starts from the document version of its first branch point (for a deep branch, an own version that adds no files of the document's own keeps the number it holds; its first own version that adds files of the document's own takes the number after the highest document version in the object, the copied versions included, and goes last in <verbatim|history>, so that the branch's own work is its current version, and its later versions follow the rules of this section; a branch does not complete the versions it copies from its parent), and continues without gaps from it (provisionally: option (a) of the open question of section 10.5); an object version that moves the branch point is the branch's next document version (on a deep branch, the number after the highest in the object), and <verbatim|parent> keeps the parent's own number.
+  <strong|Numbering.> Document versions are numbered by the owner of the line, from 1, without gaps, independently of any external numbering: a work whose versions 1, 3 and 4 are available on arXiv has document versions 1, 2 and 3. A branch (section 10.5) starts from the document version of its first branch point (for a deep branch, an own version that adds no files of the document's own keeps the number it holds; its first own version that adds files of the document's own takes the number after the highest document version in the object, the copied versions included, and goes last in <verbatim|history>, so that the branch's own work is its current version, and its later versions follow the rules of this section; a branch does not complete the versions it copies from its parent), and continues without gaps from it (provisionally: option (a) of the open question of section 10.5); an object version that moves the branch point is the branch's next document version (on a deep branch, the number after the highest in the object), and <verbatim|parent> keeps the parent's own number.
 
   <strong|Identity versions.> An object version that seals an existing draft without adding files of the document's own adds only identity files (section 7.1), which are not files of the document's own: it keeps the document version it holds, and is otherwise treated as a description-only version. An object sealed by a version that also adds files of its own (for instance an object sealed at its first version) takes a new document version, as any new version does. External labels (arXiv's <verbatim|v3>) are recorded in <verbatim|external> (section 9), and presentations SHOULD show them with the document version.
 
@@ -420,6 +436,12 @@
   <subsection*|7.4 Collections><label|74-collections>
 
   A collection version contains <verbatim|datacite.json>, <verbatim|object.json>, <verbatim|members.json> (section 10), which states whether the collection is a catalogue or a selection, and the identity files of section 7.1. Its <verbatim|object.json> declares <verbatim|kind> <verbatim|collection>; its document version counts the changes of the member list, and it has none of the fields specific to documents (<verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|sourcesMissing>, <verbatim|renditions>, <verbatim|toolchain>, <verbatim|changes>, <verbatim|stage>, <verbatim|history>, <verbatim|notices>).
+
+  <subsection*|7.5 Owners><label|75-owners>
+
+  <os-alert|note|Note.|<strong|Proposal> (section 6.5).>
+
+  An owner object (kind <verbatim|owner>) holds the key log of an owner (section 6.5). Every version of it contains, at the top level of its content, <verbatim|genesis.json> (the owner's genesis record, kind <verbatim|owner>), <verbatim|keys.json> (section 6.5) and <verbatim|object.json> with <verbatim|format>, <verbatim|specification>, <verbatim|kind> <verbatim|owner>, <verbatim|name> and <verbatim|owner> (both the owner name) and <verbatim|status>; it has no <verbatim|datacite.json>, no document versions and none of the fields specific to documents, collections or lines (<verbatim|documentVersion>, <verbatim|sealed>, <verbatim|parent>). Its object versions are numbered as OCFL numbers them, and each later one MUST be signed by at least <verbatim|threshold> keys of the one before (section 13.2). An owner object is never withdrawn, branched or mirrored apart from the lines it signs; it is copied with them (section 6.5).
 
   <section*|8. Description: datacite.json><label|8-description-datacitejson>
 
@@ -496,16 +518,14 @@
 
     <item><verbatim|specification>: <verbatim|"0.1">;
 
-    <item><verbatim|kind>: <verbatim|document> or <verbatim|collection>;
-
-    <item><verbatim|archiveId>, the identifier of the archive that keeps the line, which MUST be the archive's own except in a mirror (the mirrored archive's, section 10.4) and in the versions a deep branch copies (those of the lines they belong to), and <verbatim|objectId>, the OCFL <verbatim|id> of the object;
+    <item><verbatim|kind>: <verbatim|document>, <verbatim|collection> or <verbatim|owner> (an owner object has only the fields of section 7.5);
 
     <item><verbatim|documentVersion>: a positive integer, equal to the <verbatim|version> of <verbatim|datacite.json>;
 
     <item><verbatim|status>: <verbatim|active> or <verbatim|withdrawn> (section 11).
   </itemize>
 
-  From the first version of its line (section 6.5: the version that seals it, or for a branch the first version after the branch point), an object MUST also contain <verbatim|name>, <verbatim|owner> and <verbatim|sealed> (the originator's sealing version, with <verbatim|archiveId>, <verbatim|objectId> and <verbatim|objectVersion>, section 6.5), and a branch <verbatim|parent> (section 10.5). The versions of a deep branch up to its branch point are those of the lines it copies (the parent's, or earlier ones'), and their <verbatim|object.json> files name those lines' archives and owners.
+  From the first version of its line (section 6.5: the version that seals it, or for a branch the first version after the branch point), an object MUST also contain <verbatim|name>, <verbatim|owner> (the owner name) and <verbatim|sealed> (the originator's sealing version, a pin with <verbatim|objectVersion> and <verbatim|inventorySha512>, section 6.5), and a branch <verbatim|parent> (section 10.5). The versions of a deep branch up to its branch point are those of the lines it copies (the parent's, or earlier ones'), and their <verbatim|object.json> files name those lines' owners. With the proposal of section 6.5, <verbatim|object.json> names no archive: lines belong to their owners, wherever they are kept (#52).
 
   A document MUST also have <verbatim|mainSource> (a logical path) and <verbatim|sourceFormat> (the media type of the main source), and SHOULD have <verbatim|renditions> (a list of objects with <verbatim|path>, a logical path, and <verbatim|mediaType>) and <verbatim|toolchain> (a list of tools with <verbatim|name>, <verbatim|version> and, optionally, <verbatim|packages>), enough to reproduce the renditions. A document version whose sources are not available instead has <verbatim|sourcesMissing>, a note (see below) saying why (for instance "arXiv keeps only the PDF of this version"), no <verbatim|mainSource> and <verbatim|sourceFormat>, and at least one rendition; a rendition is never presented as a source.
 
@@ -546,7 +566,7 @@
   Collections are of two kinds, which differ in how they treat the versions of their members.
 
   <\itemize>
-    <item>A <strong|catalogue> keeps objects whole and is impartial about their versions. Each member pins an object, with all its versions, and the collection may follow it as it grows, whoever adds the versions: the owner of the object decides what its versions are. An archive's main collection (its own documents) and the list of objects an archive mirrors (section 10.4) are catalogues.
+    <item>A <strong|catalogue> keeps objects whole and is impartial about their versions. Each member pins an object, with all its versions, and the collection may follow it as it grows, whoever adds the versions: the owner of the object decides what its versions are. The main collection of an archive's documents, and the list of lines an archive keeps copies of (section 10.4), are catalogues.
 
     <item>A <strong|selection> vets particular revisions: a journal its accepted version, a digest or a review journal the version it reviewed, a reading list the version it recommends. Each member pins a revision set, the document versions the curator vetted; earlier and later versions of the same document are not part of the selection, and the selection changes only by an explicit act of its curator, which is a new version of the selection. A selection may also keep its own copies of the revisions it vetted (section 10.5).
   </itemize>
@@ -565,44 +585,42 @@
     <item><verbatim|members>: a list, in the order in which the members are presented. This order is authoritative: presentations MUST present members in it.
   </itemize>
 
-  It MAY contain <verbatim|order>, the rule by which tools maintaining the collection place members: <verbatim|manual> (the default: tools append new members and never reorder), <verbatim|issued-desc> or <verbatim|issued-asc> (by the members' <verbatim|Issued> date, then their <verbatim|Available> date, members with neither last, ties broken by object identifier, so that the result is reproducible).
+  It MAY contain <verbatim|order>, the rule by which tools maintaining the collection place members: <verbatim|manual> (the default: tools append new members and never reorder), <verbatim|issued-desc> or <verbatim|issued-asc> (by the members' <verbatim|Issued> date, then their <verbatim|Available> date, members with neither last, ties broken by name and then owner name, so that the result is reproducible).
 
   Each member MUST have:
 
   <\itemize>
     <item><verbatim|kind>: <verbatim|document> or <verbatim|collection>;
 
-    <item><verbatim|archive>: the archive identifier of the member's archive;
+    <item><verbatim|name> and <verbatim|owner>: its line (section 6.5), so that copies of it can be recognised, found by name (section 6.6) and checked against its owner's signatures wherever they are found;
 
-    <item><verbatim|archiveUrl>: the base URL of that archive when the collection version was made;
-
-    <item><verbatim|id>: the object identifier.
+    <item><verbatim|archiveUrl>: a base URL where a copy of the line was found when the collection version was made, a location (section 6.2).
   </itemize>
 
-  Each member MAY have <verbatim|mirrors> (base URLs of archives holding a mirror of the object, section 10.4), <verbatim|name> and <verbatim|owner> (its line, section 6.5, so that copies of it can be recognised, and found by name (section 6.6), after its archive disappears), <verbatim|doi> (the version DOI), <verbatim|conceptDoi> and <verbatim|cite>, a cached citation (<verbatim|title>, <verbatim|creators> as a list of names, <verbatim|year>, and <verbatim|issued>, the member's <verbatim|Issued> date) so that the collection stays readable, and can be ordered, without resolving its members, also if they become unavailable. <verbatim|cite> is not authoritative.
+  Each member MAY have <verbatim|mirrors> (further locations: base URLs of archives holding copies of the line, section 10.4), <verbatim|doi> (the version DOI), <verbatim|conceptDoi> and <verbatim|cite>, a cached citation (<verbatim|title>, <verbatim|creators> as a list of names, <verbatim|year>, and <verbatim|issued>, the member's <verbatim|Issued> date) so that the collection stays readable, and can be ordered, without resolving its members, also if they become unavailable. <verbatim|cite> is not authoritative.
 
   <strong|Members of a catalogue> MUST have <verbatim|version>, the pinned object version, and <verbatim|inventorySha512>, the SHA-512 digest of that version's inventory file. Since the inventory of an object version lists every earlier version, the pin fixes the object with all its versions up to it. A member MAY have <verbatim|follow>, <verbatim|"latest">: a curation setting, not a floating reference. A followed member pins the head of the object when the collection version was made; a member without <verbatim|follow> keeps the version its curator pinned, which MAY be earlier than the head, until the curator changes it. A tool maintaining the collection reads the member archive's discovery document (or its feed); when the followed object has a new head, the tool writes a new collection version pinning it, whatever the new head holds (a new document version, a description, a notice, a withdrawal): a catalogue does not judge the versions of its members. A withdrawn member stays, and presentations show the withdrawal. Presentations show the current version of each member, read from the history of the pinned version (section 7.3).
 
-  <strong|Members of a selection> MUST have <verbatim|revisions>: a non-empty list of the revisions vetted, in the order of the document's history, each with <verbatim|documentVersion>, <verbatim|version> (the object version vetted, which holds that document version: when several do, the last of them when the revision was vetted, which is its entry in the history, section 7.3) and <verbatim|inventorySha512> (the digest of its inventory file). They MUST NOT have <verbatim|version>, <verbatim|inventorySha512> or <verbatim|follow> themselves. The revision presented as the selection's is the last of the list. A revision pins the object version that was vetted: descriptions and notices added later by the document's archive are not vetted by the selection, and presentations that show them SHOULD say where they come from; a revision keeps its pin in later versions of the selection. If the document is withdrawn in its archive, the revisions stay vetted, and presentations show the withdrawal as section 11.1 asks, saying that it comes from the member's archive. Tools MUST NOT change revision sets on their own: adding a revision (for instance a corrected version, accepted after review), removing one, or adding or removing a member is a new version of the selection, made by its curator, recorded in the inventory (who and when) with a message saying what was decided. A revision set MAY hold several revisions of the same document, for instance a version accepted and its later correction.
+  <strong|Members of a selection> MUST have <verbatim|revisions>: a non-empty list of the revisions vetted, in the order of the document's history, each with <verbatim|documentVersion>, <verbatim|version> (the object version vetted, which holds that document version: when several do, the last of them when the revision was vetted, which is its entry in the history, section 7.3) and <verbatim|inventorySha512> (the digest of its inventory file). They MUST NOT have <verbatim|version>, <verbatim|inventorySha512> or <verbatim|follow> themselves. The revision presented as the selection's is the last of the list. A revision pins the object version that was vetted: descriptions and notices added later by the document's owner are not vetted by the selection, and presentations that show them SHOULD say where they come from; a revision keeps its pin in later versions of the selection. If the document is withdrawn by its owner, the revisions stay vetted, and presentations show the withdrawal as section 11.1 asks, saying that it comes from the member's owner. Tools MUST NOT change revision sets on their own: adding a revision (for instance a corrected version, accepted after review), removing one, or adding or removing a member is a new version of the selection, made by its curator, recorded in the inventory (who and when) with a message saying what was decided. A revision set MAY hold several revisions of the same document, for instance a version accepted and its later correction.
 
   Every member is pinned: a collection version states exactly which object versions it contains, whole objects up to a version in a catalogue, revisions in a selection. A collection version therefore fixes everything it contains, also across archives; since a pin fixes an inventory, which fixes all its files, collections are hash trees. Pins cannot form cycles.
 
   <subsection*|10.3 Members of other archives><label|103-members-of-other-archives>
 
-  A member may belong to another archive. Nothing is copied: the member is resolved as in section 6.4. A reference (a pin without a copy) needs no permission. Copies are of two kinds: mirrors (section 10.4), which are the same line, and branches (section 10.5), which are lines of other owners; accepted copies are shallow branches.
+  A member may be kept in another archive. Nothing is copied: the member is resolved as in section 6.4. A reference (a pin without a copy) needs no permission. Copies are of two kinds: mirrors (section 10.4), which are the same line, and branches (section 10.5), which are lines of other owners; accepted copies are shallow branches.
 
   <subsection*|10.4 Mirrors><label|104-mirrors>
 
-  An archive MAY mirror an object of another archive: copy the whole object, every version with its inventories and files, byte for byte, into its own storage root, under the same identifier (only if no object of its own has it), at the path given by its own layout. A mirror is the same object, not a new one: it also copies the object's witnesses (section 13.2); its <verbatim|object.json> files keep naming the original archive, and the discovery document lists it with <verbatim|mirrorOf>, the identifier of the original archive (section 6.1). A mirror is brought up to date only by copying the new versions of the original, which is possible because OCFL objects only grow; it MUST NOT be changed otherwise. Mirroring is allowed only if the licences of all the versions copied allow redistribution. A catalogue MAY list a mirror of a member in the member's <verbatim|mirrors>. An archive that mirrors another archive entirely SHOULD be listed in the <verbatim|mirrors> of that archive's discovery document, with the agreement of its owner.
+  An archive MAY keep a copy of a line written elsewhere, a mirror: the whole object, every version with its inventories, files and witnesses, byte for byte, in its own storage root, at the path its layout gives the object's identifier (section 6.3), together with the key logs its signatures name (section 6.5). A mirror is the same line, not a new one: its versions are its owner's, checked by its owner's signatures, and nothing in its files names the archive that keeps it, so no mark of a mirror is needed (<verbatim|mirrorOf> is withdrawn, #52). A mirror is brought up to date only by copying the new versions of the line, with the new versions of the key logs they name, which is possible because OCFL objects only grow; it MUST NOT be changed otherwise, and an archive MUST NOT add to it a version its owner has not signed (section 6.5). Mirroring is allowed only if the licences of all the versions copied allow redistribution. A catalogue MAY list a location of a copy in the member's <verbatim|mirrors>. An archive that keeps a copy of another archive entirely SHOULD be listed in the <verbatim|mirrors> of that archive's discovery document, with the agreement of those who keep it.
 
-  Mirrors serve preservation and access (an institution keeping copies of its members' archives, an independent storage site): they are impartial, like catalogues, and carry every version.
+  Mirrors serve preservation and access (an institution keeping copies of its members' lines, an independent storage site): they are impartial, like catalogues, and carry every version.
 
   <subsection*|10.5 Branches and accepted copies><label|105-branches-and-accepted-copies>
 
-  A branch is a line of another owner continuing an object from one of its versions, the branch point: a co-author carrying the work on, a journal keeping the version it vetted and correcting it afterwards. Its genesis record is the object's, so it has the parent's name (section 6.5), or, after a clash, another name of the same genesis record; it copies <verbatim|sealed> from its parent. From its first version after the branch point, its <verbatim|object.json> records its own <verbatim|owner> and <verbatim|parent>: the <verbatim|owner>, <verbatim|name>, <verbatim|archiveId>, <verbatim|objectId>, <verbatim|objectVersion> (the branch point), <verbatim|documentVersion> and <verbatim|inventorySha512> of the parent version, and SHOULD record the <verbatim|url> of that object version, an absolute URL (<verbatim|\<less\>storage root URL\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/>, with <verbatim|\<less\>path\<gtr\>> the object's path in the layout of the parent's storage root, section 5), so that it can be resolved (section 6.4). Its <verbatim|datacite.json> describes it with the branch owner (for a selection, its archive) as <verbatim|publisher> and keeps the relations of the parent version; the first version of a shallow branch, and every version that moves its branch point, SHOULD link the parent version with <verbatim|IsIdenticalTo>: its DOI if it has one, otherwise a <verbatim|URL> (the <verbatim|url> of <verbatim|parent>). A branch is deep or shallow.
+  A branch is a line of another owner continuing an object from one of its versions, the branch point: a co-author carrying the work on, a journal keeping the version it vetted and correcting it afterwards. Its genesis record is the object's, so it has the parent's name (section 6.5), or, after a clash, another name of the same genesis record; it copies <verbatim|sealed> from its parent. From its first version after the branch point, its <verbatim|object.json> records its own <verbatim|owner> and <verbatim|parent>: the <verbatim|owner>, <verbatim|name>, <verbatim|objectVersion> (the branch point), <verbatim|documentVersion> and <verbatim|inventorySha512> of the parent version, and SHOULD record the <verbatim|url> of that object version, an absolute URL (<verbatim|\<less\>storage root URL\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/>, with <verbatim|\<less\>path\<gtr\>> the object's path in the layout of the parent's storage root, section 5), so that it can be resolved (section 6.4). Its <verbatim|datacite.json> describes it with the branch owner (for a selection, the body behind it) as <verbatim|publisher> and keeps the relations of the parent version; the first version of a shallow branch, and every version that moves its branch point, SHOULD link the parent version with <verbatim|IsIdenticalTo>: its DOI if it has one, otherwise a <verbatim|URL> (the <verbatim|url> of <verbatim|parent>). A branch is deep or shallow.
 
   <\itemize>
-    <item>A <strong|deep branch> holds the parent's object versions up to the branch point, byte for byte, under the parent's object identifier (only if no object of its own archive has it), at the path given by its own layout, and continues them with versions of its own owner. Its common past with the parent is checked by the records of those versions in its inventories, which equal the parent's. It copies every earlier version, so it is allowed only if their licences allow redistribution, or with the agreement of their owners, recorded as <verbatim|agreement> in the <verbatim|object.json> of its first own version (section 9).
+    <item>A <strong|deep branch> holds the parent's object versions up to the branch point, byte for byte, under the identifier of the object it copies, which their inventories record (section 6.3; so it cannot be kept in a storage root that holds a copy of that object, an open question of section 6.5), at the path its layout gives that identifier, and continues them with versions of its own owner, which its owner signs, while the copied versions keep their owners' signatures (section 13.2). Its common past with the parent is checked by the records of those versions in its inventories, which equal the parent's. It copies every earlier version, so it is allowed only if their licences allow redistribution, or with the agreement of their owners, recorded as <verbatim|agreement> in the <verbatim|object.json> of its first own version (section 9).
 
     <item>A <strong|shallow branch> holds only the branch point. Its first object version holds exactly the files of the parent version (every file except <verbatim|datacite.json>, <verbatim|object.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json>, the genesis record included), byte for byte; <verbatim|parent.inventory.json>, a copy of the inventory of the parent version; and <verbatim|parent.object.json>, a copy of its <verbatim|object.json>. Its later versions are its owner's own, and keep <verbatim|genesis.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json> unchanged. A shallow branch of a shallow branch names its grandparent through <verbatim|parent.object.json>. It needs the right to redistribute only the parent version. This is the evidence #22 proposes for accepted copies.
   </itemize>
@@ -612,20 +630,22 @@
   <\itemize>
     <item>the name: a name of <verbatim|genesis.json>, by the algorithm of its last character;
 
-    <item>the parent pin: the digest of <verbatim|parent.inventory.json> equals <verbatim|inventorySha512> of <verbatim|parent>, its <verbatim|id> is the parent's <verbatim|objectId> and its <verbatim|head> the parent's <verbatim|objectVersion>;
+    <item>the parent pin: the digest of <verbatim|parent.inventory.json> equals <verbatim|inventorySha512> of <verbatim|parent>, and its <verbatim|head> is the parent's <verbatim|objectVersion>;
 
     <item>the files: every file of the head state of that inventory, except <verbatim|datacite.json>, <verbatim|object.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json>, is present at the same logical path with the same digest, no other file is present besides <verbatim|datacite.json>, <verbatim|object.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json>, and <verbatim|parent.object.json> has the digest of <verbatim|object.json> in that state;
 
-    <item>the parent: the fields of <verbatim|parent> equal the <verbatim|owner>, <verbatim|name>, <verbatim|archiveId>, <verbatim|objectId> and <verbatim|documentVersion> of <verbatim|parent.object.json>; <verbatim|parent.name> is a name of this genesis record, by the algorithm of its last character, and is the branch's own <verbatim|name> unless the branch was renamed after a clash (section 6.5), <verbatim|sealed> equals that of <verbatim|parent.object.json>, the branch's <verbatim|owner> differs from the parent's, and the parent's owner is the <verbatim|originator> of the genesis record, or <verbatim|parent.object.json> declares a <verbatim|parent> of its own (the parent is itself a branch);
+    <item>the parent: the fields of <verbatim|parent> equal the <verbatim|owner>, <verbatim|name> and <verbatim|documentVersion> of <verbatim|parent.object.json>; <verbatim|parent.name> is a name of this genesis record, by the algorithm of its last character, and is the branch's own <verbatim|name> unless the branch was renamed after a clash (section 6.5), <verbatim|sealed> equals that of <verbatim|parent.object.json>, the branch's <verbatim|owner> differs from the parent's, and the parent's owner is the <verbatim|originator> of the genesis record, or <verbatim|parent.object.json> declares a <verbatim|parent> of its own (the parent is itself a branch);
 
-    <item>the genesis record: <verbatim|genesis.json> is in the head state of that inventory with the same digest.
+    <item>the genesis record: <verbatim|genesis.json> is in the head state of that inventory with the same digest;
+
+    <item>the parent's signature: the parent owner's signature files of the parent version, kept in <verbatim|parent/\<less\>w\<gtr\>/> (section 13.2), hold against the parent owner's key log kept in the storage root (section 6.5).
   </itemize>
 
-  Consistency is all that these prove: anyone can make a parent inventory that agrees with itself. They do not prove that the parent version is the one its archive keeps. For that a verifier resolves the parent (section 6.4), which confirms the archive that keeps the parent's line, not the person or body its owner names (section 6.6); or, when the parent's owner is keyed, checks its signature of the parent version, which the branch SHOULD keep among its witnesses (section 13.2); or relies on other witnesses (timestamps, external records).
+  Since every owner signs its versions (section 6.5), this evidence is complete: the parent pin and the files show that the branch is consistent, and the parent owner's signature, checked against its key log, shows that the parent version is that owner's, without access to wherever the parent's line is kept. A branch MUST therefore keep the parent owner's signature files of each of its branch points, and the storage root its key log (section 13.2). Without them, or when they do not hold, the branch shows only that someone made a parent inventory that agrees with itself.
 
-  <strong|Moving the branch point.> A branch MAY take a later version of its parent's line as a new branch point: a journal that vets the authors' corrected version. The new parent has the same <verbatim|owner>, <verbatim|name>, <verbatim|archiveId> and <verbatim|objectId> as the previous one, a higher object version, and a document version later than the previous branch point's in the history of the new parent version (its <verbatim|parent.object.json>, section 7.3; without <verbatim|history>, a higher number), not merely a higher number (a parent version that only changes the description, such as a DOI added, is not a new branch point); a branch point never moves back, and is never dropped. The object version that moves it is the one whose <verbatim|parent> differs from the previous version's; it holds exactly the files of the new parent version, as the first version of a shallow branch does, with new copies of <verbatim|parent.inventory.json> and <verbatim|parent.object.json>, and is checked like that first version (this drops the files of the branch's own notes, such as the files of its notices, which section 7.3 keeps in every later version: how a move keeps them is open, section 6.5), and also for continuity: the new parent inventory continues the previous one when both have the same <verbatim|id>, every entry of <verbatim|versions> in the previous one is equal, as a JSON value, to the entry of the same version in the new one, and every digest of those entries is in the manifest of the new one. This shows, from the branch alone, that the corrected version continues the version first vetted. A deep branch moves its branch point in the same way; the checks of a deep branch apply to its first branch point only, and for its first move the previous parent inventory is that of its first branch point, <verbatim|vk/inventory.json>. The branch stays one sequence of versions under one owner, numbered as section 7.3 says.
+  <strong|Moving the branch point.> A branch MAY take a later version of its parent's line as a new branch point: a journal that vets the authors' corrected version. The new parent has the same <verbatim|owner> and <verbatim|name> as the previous one, a higher object version, and a document version later than the previous branch point's in the history of the new parent version (its <verbatim|parent.object.json>, section 7.3; without <verbatim|history>, a higher number), not merely a higher number (a parent version that only changes the description, such as a DOI added, is not a new branch point); a branch point never moves back, and is never dropped. The object version that moves it is the one whose <verbatim|parent> differs from the previous version's; it holds exactly the files of the new parent version, as the first version of a shallow branch does, with new copies of <verbatim|parent.inventory.json> and <verbatim|parent.object.json>, and is checked like that first version (this drops the files of the branch's own notes, such as the files of its notices, which section 7.3 keeps in every later version: how a move keeps them is open, section 6.5), and also for continuity: the new parent inventory continues the previous one when both have the same <verbatim|id>, every entry of <verbatim|versions> in the previous one is equal, as a JSON value, to the entry of the same version in the new one, and every digest of those entries is in the manifest of the new one. This shows, from the branch alone, that the corrected version continues the version first vetted. A deep branch moves its branch point in the same way; the checks of a deep branch apply to its first branch point only, and for its first move the previous parent inventory is that of its first branch point, <verbatim|vk/inventory.json>. The branch stays one sequence of versions under one owner, numbered as section 7.3 says.
 
-  <strong|Accepted copies.> An accepted copy is a shallow branch kept by a selection from a revision it vetted. Its owner is a URI, named or keyed, for the selection or the body behind it (a journal, a review journal), and MUST differ between selections that keep copies of the same document, also in one archive, and MUST NOT be the originator (section 6.5): two selections are two owners, hence two lines. Its later document versions are acts of the selection's curator (a corrected version accepted, a notice, a withdrawal); the authors' later versions change nothing in it. The selection lists the accepted copy as its member, a member of its own archive; it MAY list the original revision set as well. A branch is not a mirror: it is another line, with its own inventories, and its own versions cannot stand for the parent in the resolution of a pin (section 6.4; a deep branch's copied versions, byte for byte the parent's, are copies like any other), so it is never listed in <verbatim|mirrors>.
+  <strong|Accepted copies.> An accepted copy is a shallow branch kept by a selection from a revision it vetted. Its owner is the owner of the selection (an owner with a key log, for the body behind it: a journal, a review journal), and MUST differ between selections that keep copies of the same document, also in one archive, and MUST NOT be the originator (section 6.5): two selections are two owners, hence two lines. Its later document versions are acts of the selection's curator (a corrected version accepted, a notice, a withdrawal); the authors' later versions change nothing in it. The selection lists the accepted copy as its member; it MAY list the original revision set as well. A branch is not a mirror: it is another line, with its own inventories, and its own versions cannot stand for the parent in the resolution of a pin (section 6.4; a deep branch's copied versions, byte for byte the parent's, are copies like any other), so it is never listed in <verbatim|mirrors>.
 
   A version that the selection makes itself, such as a journal's typeset version of record, is a later version of the selection's branch, with the selection as <verbatim|publisher>, the authors' agreement in <verbatim|object.json> (section 9), and relations to the authors' versions (sections 7.3 and 8.1). A branch carries versions of the same work: typesetting, copy-editing, corrections, notices. A derived work (a translation, an abridgement, a commentary or review, a collected edition) is a new object, with its own genesis record and a relation to its source (section 8.1).
 
@@ -647,7 +667,7 @@
 
   <subsection*|11.3 Tombstones><label|113-tombstones>
 
-  A tombstone records <verbatim|id>, <verbatim|kind>, <verbatim|lastVersion>, <verbatim|inventorySha512> of that version, <verbatim|date> and <verbatim|reason> (plain text, since the discovery document has no content files), and, for an object with a genesis record, its <verbatim|name>, <verbatim|ownerId> (section 6.6) and <verbatim|sealed>, which it MUST record, so that its line stays taken and its genesis record cannot be reused for another work (section 6.5); it MAY also record <verbatim|owner>, unless the takedown erases it (section 16). Identifiers of tombstoned objects MUST NOT be reused. Verifiers report a pin to a tombstoned object as "removed", not as a corruption. External copies (DOI records, snapshots) follow the rules of their services.
+  A tombstone records <verbatim|id>, <verbatim|kind>, <verbatim|lastVersion>, <verbatim|inventorySha512> of that version, <verbatim|date> and <verbatim|reason> (plain text, since the discovery document has no content files), and, for an object with a genesis record, its <verbatim|name>, <verbatim|owner> and <verbatim|sealed>, which it MUST record, so that its line stays taken in that archive and its genesis record cannot be reused there for another work (section 6.5). Identifiers of tombstoned objects MUST NOT be reused. Verifiers report a pin to a tombstoned object as "removed", not as a corruption. External copies (DOI records, snapshots) follow the rules of their services.
 
   Note: OCFL 1.1 has no way to remove files from an object short of deleting and rebuilding it. Physical deletion of files, and the flagging of lost or corrupted files, are accepted as in scope for OCFL version 2, with a tombstone or status recorded in the inventory. When that mechanism is published, a later version of this specification will adopt it for takedowns of single files.
 
@@ -679,37 +699,31 @@
 
   <subsection*|13.2 Authenticity and dates><label|132-authenticity-and-dates>
 
-  Digests show that files were not changed; they do not show who made them or when. An archive MAY provide, for each object version:
+  Digests show that files were not changed; they do not show who made them or when. With the proposal of section 6.5, every sealed object version is signed by the owner of its line, and MAY be timestamped and vouched for by others. Witness files are kept in the object's extension folder <verbatim|extensions/opensheaf-witnesses/>, so that they travel with the object when it is copied or mirrored. OCFL allows object extension folders, which are not part of any version; the extension name <verbatim|opensheaf-witnesses> is not yet registered with OCFL, so validators may warn about it. Witnesses can be added later, by the owner of the line or by others, and replaced when a proof is upgraded (an OpenTimestamps proof is completed once its attestation is confirmed); they are not covered by the inventory digests, and need not be, since each one is checked directly against the checksum file it names, which the pins fix.
+
+  <strong|Signature files.> An owner's signature of object version <verbatim|\<less\>version\<gtr\>> is a JSON file <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json> in the extension folder, one for each key that signs (<verbatim|\<less\>k\<gtr\>> the position of the key in <verbatim|keys> of the key-log version named, from 1), with:
 
   <\itemize>
-    <item><verbatim|\<less\>version\<gtr\>.inventory.json.sha512.sig>: a detached signature of the inventory checksum file of that version (<verbatim|\<less\>version\<gtr\>/inventory.json.sha512>), made with a key listed in <verbatim|keys> of the discovery document (each key with a <verbatim|type>, such as <verbatim|openpgp> or <verbatim|ssh>, and a <verbatim|url> or <verbatim|fingerprint>), or, for a line whose owner is keyed, with the owner's key (below);
+    <item><verbatim|format>: <verbatim|"opensheaf-signature/0.1">;
 
-    <item><verbatim|\<less\>version\<gtr\>.inventory.json.sha512.ots>: an OpenTimestamps proof of the same file.
+    <item><verbatim|signed>: the logical name of the file signed, <verbatim|\<less\>version\<gtr\>/inventory.json.sha512>, the inventory checksum file of that version;
+
+    <item><verbatim|owner>: the owner name;
+
+    <item><verbatim|key>: the <verbatim|did:key> of the key that signs, one of the <verbatim|keys> of the key-log version named;
+
+    <item><verbatim|keyLog>: that key-log version, as a <verbatim|sheaf:> URI with a digest, <verbatim|sheaf:\<less\>owner\<gtr\>/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>>, a pin of the owner object (section 6.6);
+
+    <item><verbatim|signature>: the Ed25519 signature (RFC 8032) of the bytes of the checksum file, 64 bytes in base64 (RFC 4648, with padding).
   </itemize>
 
-  These witness files SHOULD be kept in the object's extension folder <verbatim|extensions/opensheaf-witnesses/>, so that they travel with the object when it is copied or mirrored. OCFL allows object extension folders, which are not part of any version; the extension name <verbatim|opensheaf-witnesses> is not yet registered with OCFL, so validators may warn about it. An archive that does not modify object folders after a version is committed MAY instead keep them under <verbatim|witnesses/\<less\>object id\<gtr\>/>, next to the discovery document. Witnesses can be added later, by the owner of the line or by others, and replaced when a proof is upgraded (an OpenTimestamps proof is completed once its attestation is confirmed); they are not covered by the inventory digests, and need not be, since each one is checked directly against the checksum file it names, which the pins fix.
+  A signature is valid when the key log, checked from its first version (section 6.5), reaches the version named with that digest, the key is listed there and not revoked as section 6.5 says, and the signature verifies. A version is signed by its owner when at least <verbatim|threshold> of the keys of the key-log version named have valid signature files that name that same version. The versions of an owner's key log are signed in the same way, by the keys of the version before (by its own keys, for the first). The format of signature files, and their field names, are provisional (#55).
 
-  The versions of a line whose owner is keyed (section 6.5) MUST carry this signature, made with the owner's key, and its witnesses MUST be kept in the object's extension folder, so that they travel with the object:
+  <strong|Timestamps.> <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json.ots> MAY hold an OpenTimestamps proof of the signature file, and <verbatim|\<less\>version\<gtr\>/inventory.json.sha512.ots> of the checksum file. Tools SHOULD timestamp every signature when it is made, since a signature by a key revoked later is trusted only with a timestamp earlier than the revocation (section 6.5).
 
-  <\itemize>
-    <item>for a <verbatim|did:key> owner, the key MUST be an Ed25519 key, and the signature file holds the 64 bytes of the Ed25519 signature (RFC 8032) of the bytes of the checksum file;
+  <strong|Others' witnesses.> A signature by someone other than the owner (a third party vouching for a version) is <verbatim|\<less\>version\<gtr\>/witness-\<less\>label\<gtr\>.json>, where <verbatim|\<less\>label\<gtr\>> is chosen by whoever adds it and matches <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>, with the fields of a signature file, <verbatim|owner> and <verbatim|keyLog> naming the signer's own owner object, which the copy then also keeps (section 6.5). It is a witness, not a signature of the line.
 
-    <item>for an <verbatim|openpgp4fpr:> owner, the signature file is an OpenPGP detached signature (RFC 9580) of the same bytes, and the public key MUST be kept in the extension folder as <verbatim|keys/\<less\>fingerprint\<gtr\>.asc>, the fingerprint in lowercase hexadecimal.
-  </itemize>
-
-  Witness files are named as follows, all in the extension folder (or, except for keyed lines, under <verbatim|witnesses/\<less\>object id\<gtr\>/>):
-
-  <\itemize>
-    <item><verbatim|\<less\>version\<gtr\>.inventory.json.sha512.sig> is the signature by the owner of the line to which that object version belongs; in a deep branch, the versions up to the branch point belong to the parent's line, and the branch copies their witnesses with them;
-
-    <item><verbatim|keys/\<less\>fingerprint\<gtr\>.asc> is the OpenPGP public key of an <verbatim|openpgp4fpr:> owner;
-
-    <item>a signature by someone else (a third party vouching for a version) is <verbatim|\<less\>version\<gtr\>.inventory.json.sha512.\<less\>label\<gtr\>.sig>, where <verbatim|\<less\>label\<gtr\>> is chosen by whoever adds it and matches <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>, with <verbatim|\<less\>version\<gtr\>.inventory.json.sha512.\<less\>label\<gtr\>.json>, a JSON object with <verbatim|signer> (a URI) and, unless <verbatim|signer> is a <verbatim|did:key>, <verbatim|key> (an OpenPGP public key, ASCII-armoured); the signature has the form of an owner's: Ed25519 for a <verbatim|did:key> signer, OpenPGP otherwise;
-
-    <item>a branch keeps the witnesses of each of its branch points in the folder <verbatim|parent/\<less\>w\<gtr\>/> (except the first branch point of a deep branch, whose witnesses it copies with the parent's versions, as above), where <verbatim|\<less\>w\<gtr\>> is its own object version that took that branch point (the first version after it, or the version that moved it): the parent's checksum file <verbatim|\<less\>v\<gtr\>.inventory.json.sha512> (where <verbatim|\<less\>v\<gtr\>> is <verbatim|objectVersion> of that <verbatim|parent>), checked against <verbatim|parent.inventory.json> of <verbatim|\<less\>w\<gtr\>>; when the parent's owner is keyed, its signature <verbatim|\<less\>v\<gtr\>.inventory.json.sha512.sig> and, for an OpenPGP key, <verbatim|keys/\<less\>fingerprint\<gtr\>.asc>; and any other witness of the parent version, named as above (<verbatim|\<less\>v\<gtr\>.inventory.json.sha512.ots>, <verbatim|\<less\>v\<gtr\>.inventory.json.sha512.\<less\>label\<gtr\>.sig> with its <verbatim|.json>).
-  </itemize>
-
-  An OpenPGP signature MAY be made by a signing subkey bound to the key of the fingerprint in the key file kept.
+  <strong|Copies and branches.> A copy of an object copies its witnesses with it, and keeps the key logs its signatures name (section 6.5). In a deep branch, the versions up to the branch point belong to the parent's line, and the branch copies their witnesses with them. A branch keeps the witnesses of each of its branch points in the folder <verbatim|parent/\<less\>w\<gtr\>/> (except the first branch point of a deep branch, whose witnesses it copies with the parent's versions), where <verbatim|\<less\>w\<gtr\>> is its own object version that took that branch point (the first version after it, or the version that moved it): the parent's checksum file <verbatim|\<less\>v\<gtr\>.inventory.json.sha512> (where <verbatim|\<less\>v\<gtr\>> is <verbatim|objectVersion> of that <verbatim|parent>), checked against <verbatim|parent.inventory.json> of <verbatim|\<less\>w\<gtr\>>, the parent owner's signature files of <verbatim|\<less\>v\<gtr\>>, and any other witness of the parent version; and the storage root keeps the parent owner's key log up to the versions those signatures name (section 6.5).
 
   External deposits (appendix A) and software archive snapshots are further witnesses. Archives kept in git MAY also sign their commits or tags, but git hashes are not part of the integrity chain of this specification.
 
@@ -718,7 +732,7 @@
   A verifier checking an archive MUST:
 
   <\itemize>
-    <item>validate the discovery document, and every <verbatim|object.json> (<verbatim|parent.object.json> included), <verbatim|members.json> and <verbatim|genesis.json>, against the schemas of their declared versions (and the index files of section 6.6, if present), checking formats (dates, URIs) as assertions, which JSON Schema 2020-12 leaves optional;
+    <item>validate the discovery document, and every <verbatim|object.json> (<verbatim|parent.object.json> included), <verbatim|members.json>, <verbatim|genesis.json>, <verbatim|keys.json> and signature file, against the schemas of their declared versions (and the index files of section 6.6, if present), checking formats (dates, URIs) as assertions, which JSON Schema 2020-12 leaves optional;
 
     <item>validate the storage root and every object against OCFL 1.1 (with a standard OCFL validator or equivalent checks), and check that the storage root's <verbatim|ocfl_layout.json> names the layout given by <verbatim|storageLayout>, that its configuration does not change the parameters of section 5, and that every object is at the path that layout gives;
 
@@ -732,13 +746,13 @@
 
     <item>for the head of each collection, resolve each member (each revision, in a selection) as in section 6.4 and check its pin, and for earlier collection versions check the pins of members of the archive itself (resolving the members of other archives for every earlier collection version is OPTIONAL); for a revision, check that the pinned object version holds the stated document version; for a member with <verbatim|name> and <verbatim|owner>, check them against the <verbatim|object.json> of the pinned version; check that no pin names an object version without a genesis record (section 6.5); report each as verified, mismatch (a copy was found and does not match), unavailable (no copy found) or removed (tombstoned);
 
-    <item>for each mirror (<verbatim|mirrorOf>), check that <verbatim|mirrorOf> differs from the archive's own <verbatim|archiveId> and that the <verbatim|object.json> files of the versions of the mirrored line name that archive (for a mirror of a deep branch, the versions after its branch point; those before name the archive of the line each belongs to); for every other object, that the versions of its line name the archive's own <verbatim|archiveId> (for a deep branch, its versions after the branch point; those before are checked as the lines they belong to, each naming the archive and owner of its own line, the parent's or an earlier one's);
+    <item>for each owner object (section 7.5), that its first version holds a genesis record of kind <verbatim|owner> whose name is the owner name, and that every version is signed by at least <verbatim|threshold> keys of the version before it (of its own, for the first), reporting a fork of a key log; for every object, that the storage root holds the key logs of the owners that signed its versions, up to the versions their signatures name (section 6.5), and that every sealed object version is signed by the owner of its line (section 13.2), a signature by a key revoked later counting only with an earlier timestamp;
 
-    <item>for each object with a genesis record (section 6.5): that <verbatim|genesis.json> is the same in every object version from the first that holds it, that <verbatim|name> is its digest by the algorithm named in its last character, that its <verbatim|kind> is the <verbatim|kind> of <verbatim|object.json>, that <verbatim|owner>, <verbatim|name>, <verbatim|sealed>, <verbatim|archiveId> and <verbatim|objectId> do not change from the first version of the line, that no two objects of the archive (mirrors included), nor an object and a tombstone, have the same <verbatim|name> and owner (owner identifier, for a tombstone) at their heads, that objects with the same genesis record have the same <verbatim|sealed>, and that an object one of whose names is a tombstone's name has the tombstone's <verbatim|sealed>, that a line without <verbatim|parent> is named by algorithm 0 and its <verbatim|sealed> names its own sealing version, that no two owners at the heads of the archive have the same owner identifier, that owners are written in the forms of section 6.5, that the discovery document lists the head's <verbatim|name> and <verbatim|owner>, that a line whose owner is not the originator declares a parent and that the originator's line declares none, and, for a keyed owner, the signature of every object version of the line;
+    <item>for each object with a genesis record (section 6.5): that <verbatim|genesis.json> is the same in every object version from the first that holds it, that <verbatim|name> is its digest by the algorithm named in its last character, that its <verbatim|kind> is the <verbatim|kind> of <verbatim|object.json>, that the identifier of the object is <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> of its first sealed version (for a deep branch, that of the object it copies; a draft sealed in place keeps its own, section 6.3), that <verbatim|owner>, <verbatim|name> and <verbatim|sealed> do not change from the first version of the line, that no two objects of the archive, nor an object and a tombstone, have the same <verbatim|name> and <verbatim|owner> at their heads, that objects with the same genesis record have the same <verbatim|sealed>, and that an object one of whose names is a tombstone's name has the tombstone's <verbatim|sealed>, that a line without <verbatim|parent> is named by algorithm 0 and its <verbatim|sealed> pins its own sealing version, that the discovery document lists the head's <verbatim|name> and <verbatim|owner>, and that a line whose owner is not the originator declares a parent and that the originator's line declares none;
 
-    <item>for each branch (section 10.5): for a deep branch, with first branch point <verbatim|vk>, that its own versions hold no <verbatim|parent.inventory.json> or <verbatim|parent.object.json> until one moves its branch point, that <verbatim|objectVersion> of its first <verbatim|parent> is <verbatim|vk>, that the inventory of <verbatim|vk> has the digest <verbatim|inventorySha512> of <verbatim|parent>, that <verbatim|owner>, <verbatim|name>, <verbatim|archiveId>, <verbatim|objectId> and <verbatim|documentVersion> of <verbatim|parent> equal those of the <verbatim|object.json> of <verbatim|vk>, that <verbatim|vk> holds the genesis record, and that this <verbatim|parent> first appears in <verbatim|v(k+1)>; for a shallow branch, the evidence of its first version, and that its later versions keep the identity files unchanged until a version that moves the branch point; for every branch, that its <verbatim|owner> differs from the <verbatim|owner> of <verbatim|parent>, that <verbatim|parent.name> is a name of its genesis record and its own <verbatim|name> unless it was renamed after a clash, that a renamed branch has an algorithm number greater than that of <verbatim|parent.name> (a failure otherwise), and that its owner is not the originator; reporting as a warning, not a failure, a rename that neither the objects nor the tombstones of the archive justify, or a number that is not the smallest free one, since the line that caused it may be kept elsewhere; that <verbatim|sealed> equals the parent's, and that the parent's owner is the <verbatim|originator> of the genesis record or the parent version's <verbatim|object.json> (<verbatim|parent.object.json>, or, for the first branch point <verbatim|vk> of a deep branch, <verbatim|vk/object.json>) declares a <verbatim|parent> of its own, and declares none when the parent's owner is the originator; for every version that moves the branch point, the same evidence, that the new parent has the same <verbatim|owner>, <verbatim|name>, <verbatim|archiveId> and <verbatim|objectId> as the previous one and a higher object version holding a document version later than the previous branch point's in the history of the new parent version, and the continuity of the two parent inventories (section 10.5); for each branch point, report the first of these verdicts that applies: inconsistent (a check fails, or the parent was resolved and does not match), confirmed (the parent was resolved, through a location known independently of the branch (section 6.4), and matches; or, for a keyed parent owner, its signature of the branch point holds), attested (one of these witnesses of the parent version holds: an OpenTimestamps proof of its checksum file, kept in <verbatim|parent/\<less\>w\<gtr\>/> (or, for the first branch point of a deep branch, with the copied versions), which proves only that the parent version existed by the date of the proof, reported with that date; a third party's signature with its sidecar, when the verifier's user trusts the signer (a signature by any other key is reported, and leaves the verdict unconfirmed, since the branch's owner can make keys of its own); an external record, such as a DOI deposit, whose files match the parent version, when the verifier's user trusts its depositor or the verifier reached it independently of the branch (others are reported, and leave the verdict unconfirmed); the signature of the branch's own owner does not count), unconfirmed (consistent, with nothing outside the branch); report as the branch's verdict the weakest of those of its branch points (inconsistent, unconfirmed, attested, confirmed, from the weakest); and report separately whether the parent was found, unavailable or removed (tombstoned), and whether it is withdrawn;
+    <item>for each branch (section 10.5): for a deep branch, with first branch point <verbatim|vk>, that its own versions hold no <verbatim|parent.inventory.json> or <verbatim|parent.object.json> until one moves its branch point, that <verbatim|objectVersion> of its first <verbatim|parent> is <verbatim|vk>, that the inventory of <verbatim|vk> has the digest <verbatim|inventorySha512> of <verbatim|parent>, that <verbatim|owner>, <verbatim|name> and <verbatim|documentVersion> of <verbatim|parent> equal those of the <verbatim|object.json> of <verbatim|vk>, that <verbatim|vk> holds the genesis record, and that this <verbatim|parent> first appears in <verbatim|v(k+1)>; for a shallow branch, the evidence of its first version, and that its later versions keep the identity files unchanged until a version that moves the branch point; for every branch, that its <verbatim|owner> differs from the <verbatim|owner> of <verbatim|parent>, that <verbatim|parent.name> is a name of its genesis record and its own <verbatim|name> unless it was renamed after a clash, that a renamed branch has an algorithm number greater than that of <verbatim|parent.name> (a failure otherwise), and that its owner is not the originator; reporting as a warning, not a failure, a rename that neither the objects nor the tombstones of the archive justify, or a number that is not the smallest free one, since the line that caused it may be kept elsewhere; that <verbatim|sealed> equals the parent's, and that the parent's owner is the <verbatim|originator> of the genesis record or the parent version's <verbatim|object.json> (<verbatim|parent.object.json>, or, for the first branch point <verbatim|vk> of a deep branch, <verbatim|vk/object.json>) declares a <verbatim|parent> of its own, and declares none when the parent's owner is the originator; for every version that moves the branch point, the same evidence, that the new parent has the same <verbatim|owner> and <verbatim|name> as the previous one and a higher object version holding a document version later than the previous branch point's in the history of the new parent version, and the continuity of the two parent inventories (section 10.5); for each branch point, report the first of these verdicts that applies: inconsistent (a check fails, or the parent was resolved and does not match), confirmed (the parent owner's signature of the branch point holds, against its key log, section 13.2), unconfirmed (consistent, without a parent signature that holds, which section 10.5 does not allow); report as the branch's verdict the weakest of those of its branch points (inconsistent, unconfirmed, confirmed, from the weakest); and report separately whether the parent was found, unavailable or removed (tombstoned), and whether it is withdrawn;
 
-    <item>where several copies of a line are known (mirrors, members, branches' parents), that they agree (section 6.5); two that do not are a fork of the line, reported with the owner's signatures when it is keyed, and with whether each copy is confirmed and by which archive (section 6.6).
+    <item>where several copies of a line are known (mirrors, members, branches' parents), that they agree (section 6.5); two whose signatures hold and that do not agree are a fork of the line by its owner, reported with where each copy was found (section 6.6).
   </itemize>
 
   A verifier SHOULD check the witnesses it finds, the indexes the archive declares (section 6.6: every entry agrees with the objects and starts with its file's prefix, every object with a genesis record and every sealed version is listed, and tombstoned objects are listed as <verbatim|removed> in <verbatim|names/> and <verbatim|sha512/>), the requirements of the profiles the archive declares, and those of the extensions it knows; it SHOULD report the extensions it does not know, which do not make an archive fail verification. It MUST NOT treat the presentation as authoritative. It SHOULD limit the depth and size of the collections it follows, and report when it stops.
@@ -756,13 +770,15 @@
 
     <item><strong|Weak hashes.> SHA-1 (as in most git repositories) and MD5 are not used for integrity: MD5 appears only for comparison with external services.
 
-    <item><strong|Branches and owners (proposal).> The evidence a shallow branch carries can be forged consistently: only a resolved parent, a keyed parent owner's signature or other witnesses show that the parent existed. <verbatim|parent.inventory.json> and <verbatim|parent.object.json> are untrusted input, checked like inventories from other archives. A named owner is only asserted: anyone can write a line under someone's ORCID iD, and only the archive serving it, or keys, distinguish the two. A compromised key lets its holder write forks of a keyed line; rotation and revocation are open (section 6.5, #13).
+    <item><strong|Branches and owners (proposal).> The evidence a shallow branch carries, and the parent's signatures it keeps, are untrusted input, checked like inventories from other archives. Every line is signed by its owner, so no archive can add to another owner's line: a version it makes is its own branch, or invalid (section 6.5).
 
-    <item><strong|First deposit wins (proposal).> An archive refuses a mirror whose line is taken, an object sealed outside it whose line is taken when it is deposited, an object whose genesis record it holds with another <verbatim|sealed>, and an owner whose identifier is another owner's (section 6.5), so a forged copy deposited first gets the genuine one refused. A branch whose line is taken is renamed instead: for any object or tombstone in its archive, confirmed or not, and for the owner's confirmed lines elsewhere, never for index entries alone, so forged index entries cannot force renames. A branch point is moved onto an existing branch only under the conditions of section 6.5 (the owner's own branch of the same parent line, a later branch point, in the archive that keeps it), so that a forged branch is never continued as the owner's line; for a named owner, an archive that accepts deposits from more than one depositor binds each named owner URI of the lines it keeps to the depositors it has checked can use it (section 6.5), so that no depositor continues another's genuine line or opens one under another's URI. Archives that accept objects of others (custodians, repositories with many depositors) SHOULD check that a copy is confirmed (section 6.6) before depositing it, and resolve a refusal by checking which copy is (#39).
+    <item><strong|Keys (proposal).> A stolen key lets its holder sign versions of the owner's lines, and new versions of its key log if the threshold is 1, racing the owner; a threshold above 1 prevents that, and a fork of a key log is detected as any fork. A revoked key's signatures are trusted only with a timestamp earlier than the revocation, since a thief can name an old version of the key log (section 6.5). A copy that withholds the later versions of a key log hides a revocation: readers SHOULD use the longest key log they find, and tools SHOULD timestamp signatures when they make them. Losing every key of an owner cannot be recovered, so tools create a spare key, or give an owner several people's keys with a threshold.
 
-    <item><strong|Short forms (proposal).> Anyone can publish a line under a named owner's URI whose name starts with a given short form, dated as they like; resolvers therefore order only confirmed lines, reached through the archive that keeps them or signed by the owner's key, and show unconfirmed ones as warnings (section 6.6). Another owner can make a short form ambiguous, but not take it over; files record only complete names, and printed short forms are long enough (16 characters) not to be searched for.
+    <item><strong|First deposit wins (proposal).> An archive refuses an object sealed outside it whose line is taken when it is deposited, and an object whose genesis record it holds with another <verbatim|sealed> (section 6.5), so a genesis record reused for another work and deposited first gets the other refused there, and its owner seals it anew. Lines cannot be written under another owner, since only signatures decide whose a version is.
 
-    <item><strong|Resolving without a digest (proposal).> A named owner's line can be forked by anyone, so a copy found through an <verbatim|at> hint, an index kept by others or a gateway is only a copy: resolvers and gateways report it as unconfirmed unless it was reached through the archive that keeps the line or is signed by a keyed owner (section 6.6). With no confirmed copy, the latest head among agreeing unconfirmed copies is used, so a party that copies a line and adds versions (a false notice or withdrawal) is shown, marked unconfirmed, until a confirmed copy is found. A gateway that fetches URLs given in links guards against requests to private addresses and against large responses, does not serve archives' files from its own origin, and redirects only, and only temporarily, to confirmed archives, so that a link through it cannot send readers to a location of an attacker's choice.
+    <item><strong|Short forms (proposal).> Another owner can make lines whose names start with a given short form, and so make it ambiguous, but cannot take it over, since only an owner signs its lines (section 6.6); files record only complete names, and printed short forms are long enough (16 characters) not to be searched for.
+
+    <item><strong|Resolving without a digest (proposal).> A copy found anywhere is checked by its owner's signatures, so it cannot be forged; but a copy that stops at an earlier version looks complete by itself, so a resolver uses the latest head among the copies it found, and says where it found them (section 6.6). A gateway that fetches URLs given in links guards against requests to private addresses and against large responses, does not serve archives' files from its own origin, and redirects only, and only temporarily, to copies it has checked, so that a link through it cannot send readers to a forged copy.
 
     <item><strong|Mutable maps.> The discovery document, the indexes and presentation files can be changed by whoever controls the server; their statements are only trusted after checking them against the storage root and the pins.
   </itemize>
@@ -772,11 +788,11 @@
   <\itemize>
     <item><strong|Documents.> Each document carries the licence chosen by its authors in <verbatim|rightsList>. "All rights reserved" is allowed: deposit grants readers access, not reuse.
 
-    <item><strong|Metadata.> <verbatim|datacite.json>, <verbatim|object.json>, <verbatim|members.json>, inventories and the discovery document (and, with the proposal of section 6.5, <verbatim|genesis.json>, <verbatim|parent.inventory.json>, <verbatim|parent.object.json> and the index files) are placed under CC0, so that they can be harvested and mirrored freely.
+    <item><strong|Metadata.> <verbatim|datacite.json>, <verbatim|object.json>, <verbatim|members.json>, inventories and the discovery document (and, with the proposal of section 6.5, <verbatim|genesis.json>, <verbatim|keys.json>, signature files, <verbatim|parent.inventory.json>, <verbatim|parent.object.json> and the index files) are placed under CC0, so that they can be harvested and mirrored freely.
 
-    <item><strong|Personal data.> Archives record only the personal data needed to describe and cite the work (names, identifiers, affiliations) and the depositor of each version. The depositor is recorded in the inventory (section 7.1). Agreement records are minimal (section 9). A request to erase personal data from an immutable history is handled by a takedown (section 11.2); with the proposal of section 6.5, the tombstone and the indexes then keep, of the owner, only the owner identifier (with the name and <verbatim|sealed>), not the owner's URI. An owner identifier is a digest of a URI that can often be guessed (an ORCID iD), so it is a pseudonym, not an erasure.
+    <item><strong|Personal data.> Archives record only the personal data needed to describe and cite the work (names, identifiers, affiliations) and the depositor of each version. The depositor is recorded in the inventory (section 7.1). Agreement records are minimal (section 9). A request to erase personal data from an immutable history is handled by a takedown (section 11.2); with the proposal of section 6.5, the tombstone and the indexes then keep the name, the owner name and <verbatim|sealed>, which identify no person by themselves.
 
-    <item><strong|Owners (proposal).> The <verbatim|originator> of a genesis record, and the <verbatim|owner> and <verbatim|parent> of every version, are copied into every mirror and branch and can never be removed from them. An owner who must stay anonymous, such as the referee of a report (#29), SHOULD be named by a URI that does not identify them, for instance a <verbatim|did:key> made for that purpose; the <verbatim|user> of the inventory and <verbatim|by> of an <verbatim|agreement> MUST then not identify them either, since they are copied too.
+    <item><strong|Owners (proposal).> The <verbatim|originator> of a genesis record, and the <verbatim|owner> and <verbatim|parent> of every version, are owner names, copied into every copy and branch and never removable from them. An owner name is the digest of a genesis record holding a random nonce, so it identifies no one by itself; an owner is tied to a person or an institution only through its optional <verbatim|keeper> and the keeper's confirmation (section 6.5), which the keeper can withdraw. An owner who must stay anonymous, such as the referee of a report (#29), SHOULD use an owner made for that purpose, without <verbatim|keeper>; the <verbatim|user> of the inventory and <verbatim|by> of an <verbatim|agreement> MUST then not identify them either, since they are copied too.
   </itemize>
 
   <section*|17. Changelog><label|17-changelog>
@@ -845,6 +861,8 @@
     <item>**0.1 (draft), 16 November 2026, proposal aligned with the hashed layout (branch <verbatim|proposal/identity>):** the <verbatim|url> of a branch's <verbatim|parent> and the copies of a deep branch use the object's path in the layout; index entries are resolved through the layout of the archive they name; appendix F notes that a name used as identifier sits under the hash of that identifier; section 5 names <verbatim|parent.url> in place of the <verbatim|record> of an accepted copy; the git companion keeps the indexes (its sections 2, 4.1, 5.1 and 9) and calls its git branches working branches.
 
     <item>**0.1 (draft), 16 November 2026, proposal (branch <verbatim|proposal/identity>):** open questions of section 6.5 point to #52 (one storage root per archive held, archives named from genesis records).
+
+    <item>**0.1 (draft), 17 November 2026, proposal revised (branch <verbatim|proposal/owners>, on <verbatim|proposal/identity>; #55, #52):** owners are keyed identities, objects of kind <verbatim|owner> named by their genesis records, whose versions are their key logs (<verbatim|keys.json>: keys, threshold, revoked keys, an optional keeper), each version signed by the threshold of the keys of the one before; every sealed version of a line is signed by its owner, in signature files naming the key-log version they rely on, with timestamps for keys revoked later; key logs travel with the objects they sign; a line is its signed versions, wherever stored, and an archive cannot add to another owner's line; an owner moving to another archive continues its lines; named owners, owner identifiers, archive identifiers, <verbatim|archiveId>, <verbatim|mirrorOf>, <verbatim|keys> of the discovery document and the depositor binding are withdrawn; archives are hosts, found at their base URLs, locations being hints; object identifiers are lines (<verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>>), in a new default layout <verbatim|\<less\>owner\<gtr\>/\<less\>name\<gtr\>> (or the hashed layout), with readable labels in the discovery document; <verbatim|sealed> is a pin of the originator's sealing version; collection members name lines; a branch keeps its parent owner's signatures, so its evidence is complete; verdicts, resolution, short forms, indexes, gateways, security and privacy follow; #14 and #53 are settled; the examples recomputed.
   </itemize>
 
   <section*|Appendix A. Zenodo binding (normative for archives declaring the profile <verbatim|zenodo>)><label|appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo>
@@ -914,6 +932,10 @@
 
     <item><hlink|opensheaf-genesis-0.1.schema.json|https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json> for <verbatim|genesis.json> (proposal, section 6.5);
 
+    <item><hlink|opensheaf-keys-0.1.schema.json|https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json> for <verbatim|keys.json> (proposal, section 6.5);
+
+    <item><hlink|opensheaf-signature-0.1.schema.json|https://opensheaf.org/schemas/opensheaf-signature-0.1.schema.json> for signature files (proposal, section 13.2);
+
     <item><hlink|opensheaf-index-0.1.schema.json|https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json> for the index files (proposal, section 6.6).
   </itemize>
 
@@ -921,9 +943,9 @@
 
   <section*|Appendix E. Examples (non-normative)><label|appendix-e-examples-non-normative>
 
-  The values below come from the first archive, except the names and owners added by the proposal of section 6.5, which are placeholders. Digests are shortened, and the DOIs and ORCID iDs are placeholders (with valid check digits).
+  The values below come from the first archive, except the names, owners, keys and signatures added by the proposal of section 6.5, which are placeholders, except the names of the authors' owner and paper, which are the real digests of the genesis records shown. Digests are shortened, and the DOIs and ORCID iDs are placeholders (with valid check digits).
 
-  A discovery document:
+  A discovery document. The archive hosts one owner, whose owner object holds its key log, and the owner's document and catalogue; the labels give the website readable URLs:
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -933,33 +955,43 @@
 
     \ \ "specification": "0.1",
 
-    \ \ "archiveId": "tag:opensheaf.org,2026:mgubi",
-
     \ \ "name": "Papers of Massimiliano Gubinelli",
 
     \ \ "contact": "https://orcid.org/0000-0000-0000-0001",
 
     \ \ "storageRoot": "ocfl/",
 
-    \ \ "storageLayout": "0002-flat-direct-storage-layout",
+    \ \ "storageLayout": "opensheaf-owner-name-storage-layout",
 
-    \ \ "mainCollection": "collection-papers",
+    \ \ "mainCollection": "sheaf:fm4ddd465aicnysuetzldaep3xiiv3ls43umjofzcgjityhq6ota:zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a",
 
     \ \ "profiles": ["zenodo", "texmacs", "website"],
 
+    \ \ "owners": ["zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a"],
+
     \ \ "objects": [
 
-    \ \ \ \ { "id": "fractional-phi42-mass-gap", "kind": "document", "head": "v1",
+    \ \ \ \ { "id": "sheaf:zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a:zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a", "kind": "owner", "head": "v1",
+
+    \ \ \ \ \ \ "inventorySha512": "e3b7...", "status": "active",
+
+    \ \ \ \ \ \ "name": "zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a", "owner": "zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a" },
+
+    \ \ \ \ { "id": "sheaf:72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq:zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a", "kind": "document", "head": "v1",
 
     \ \ \ \ \ \ "inventorySha512": "9a0c...", "status": "active",
 
-    \ \ \ \ \ \ "name": "jkh5ucuizmlf7syxkcmuapddpay35v7my27yyb2tkksao22mr4ja", "owner": "tag:opensheaf.org,2026:mgubi" },
+    \ \ \ \ \ \ "name": "72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq", "owner": "zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a",
 
-    \ \ \ \ { "id": "collection-papers", "kind": "collection", "head": "v1",
+    \ \ \ \ \ \ "label": "fractional-phi42-mass-gap" },
+
+    \ \ \ \ { "id": "sheaf:fm4ddd465aicnysuetzldaep3xiiv3ls43umjofzcgjityhq6ota:zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a", "kind": "collection", "head": "v1",
 
     \ \ \ \ \ \ "inventorySha512": "51be...", "status": "active",
 
-    \ \ \ \ \ \ "name": "ubbut3szmkugays3x25opjxhare2ts3nw6bp6oa7cbbcevsckg7a", "owner": "tag:opensheaf.org,2026:mgubi" }
+    \ \ \ \ \ \ "name": "fm4ddd465aicnysuetzldaep3xiiv3ls43umjofzcgjityhq6ota", "owner": "zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a",
+
+    \ \ \ \ \ \ "label": "papers" }
 
     \ \ ]
 
@@ -967,7 +999,25 @@
   </verbatim-code>
   </html-div-class>
 
-  An <verbatim|object.json> of a document version (its content also holds <verbatim|genesis.json>, section 6.5):
+  The storage root of this archive, in the owner-name layout (section 5):
+
+  <\verbatim-code>
+    ocfl/
+
+    \ \ 0=ocfl_1.1
+
+    \ \ ocfl_layout.json
+
+    \ \ zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a/
+
+    \ \ \ \ zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a/ \ \ \ the owner object: its key log
+
+    \ \ \ \ 72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq/ \ \ \ the document
+
+    \ \ \ \ fm4ddd465aicnysuetzldaep3xiiv3ls43umjofzcgjityhq6ota/ \ \ \ the catalogue
+  </verbatim-code>
+
+  An <verbatim|object.json> of a document version (its content also holds <verbatim|genesis.json>, section 6.5, and its extension folder the owner's signature files, section 13.2):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -979,15 +1029,11 @@
 
     \ \ "kind": "document",
 
-    \ \ "archiveId": "tag:opensheaf.org,2026:mgubi",
+    \ \ "name": "72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq",
 
-    \ \ "objectId": "fractional-phi42-mass-gap",
+    \ \ "owner": "zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a",
 
-    \ \ "name": "jkh5ucuizmlf7syxkcmuapddpay35v7my27yyb2tkksao22mr4ja",
-
-    \ \ "owner": "tag:opensheaf.org,2026:mgubi",
-
-    \ \ "sealed": { "archiveId": "tag:opensheaf.org,2026:mgubi", "objectId": "fractional-phi42-mass-gap", "objectVersion": "v1" },
+    \ \ "sealed": { "objectVersion": "v1", "inventorySha512": "9a0c..." },
 
     \ \ "documentVersion": 1,
 
@@ -1117,11 +1163,11 @@
 
     \ \ \ \ { "kind": "document",
 
-    \ \ \ \ \ \ "archive": "tag:opensheaf.org,2026:mgubi",
+    \ \ \ \ \ \ "name": "72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq",
+
+    \ \ \ \ \ \ "owner": "zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a",
 
     \ \ \ \ \ \ "archiveUrl": "https://mgubi.org/papers/",
-
-    \ \ \ \ \ \ "id": "fractional-phi42-mass-gap",
 
     \ \ \ \ \ \ "version": "v3",
 
@@ -1139,7 +1185,7 @@
   </verbatim-code>
   </html-div-class>
 
-  A <verbatim|members.json> of a selection: an issue of a journal, with a paper vetted in its version 2 and, after a correction accepted by the editors, its version 3; and a member that is itself a collection, vetted in one version:
+  A <verbatim|members.json> of a selection: an issue of a journal, with a paper vetted in its version 2 and, after a correction accepted by the editors, its version 3; and a member that is itself a collection, vetted in one version (the seminar's names are shortened here):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1153,11 +1199,11 @@
 
     \ \ \ \ { "kind": "document",
 
-    \ \ \ \ \ \ "archive": "tag:example.org,2026:authors",
+    \ \ \ \ \ \ "name": "olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda",
+
+    \ \ \ \ \ \ "owner": "dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba",
 
     \ \ \ \ \ \ "archiveUrl": "https://authors.example.org/",
-
-    \ \ \ \ \ \ "id": "network-discrimination",
 
     \ \ \ \ \ \ "revisions": [
 
@@ -1169,11 +1215,11 @@
 
     \ \ \ \ { "kind": "collection",
 
-    \ \ \ \ \ \ "archive": "tag:example.org,2026:seminar",
+    \ \ \ \ \ \ "name": "q3vx...",
+
+    \ \ \ \ \ \ "owner": "m7ka...",
 
     \ \ \ \ \ \ "archiveUrl": "https://seminar.example.org/",
-
-    \ \ \ \ \ \ "id": "collection-seminar-2026",
 
     \ \ \ \ \ \ "revisions": [ { "documentVersion": 3, "version": "v3", "inventorySha512": "7d21..." } ] }
 
@@ -1183,7 +1229,43 @@
   </verbatim-code>
   </html-div-class>
 
-  A genesis record (proposal, section 6.5), written when the authors' paper was sealed; its name is <verbatim|2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq> (the SHA-256 of <verbatim|opensheaf-name-0>, a line feed and the bytes as shown, with a final line feed); a branch named by algorithm 1 after a clash (section 6.5) would be <verbatim|74xzytlubklklsrjlmnermj4iixalc7665dcot3vbjmuqqxv2tib>:
+  The genesis record of the authors' owner (proposal, section 6.5); its name, the owner name, is <verbatim|dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba>:
+
+  <\html-div-class|language-json>
+  <\verbatim-code>
+    {
+
+    \ \ "format": "opensheaf-genesis/0.1",
+
+    \ \ "kind": "owner",
+
+    \ \ "created": "2026-03-01T17:40:00Z",
+
+    \ \ "nonce": "a41d07c3e9b25f8d61c0e4b7f2a39d58"
+
+    }
+  </verbatim-code>
+  </html-div-class>
+
+  The <verbatim|keys.json> of the second version of that owner's key log, which added a spare key and names the keeper; it is signed by the key of the first version:
+
+  <\html-div-class|language-json>
+  <\verbatim-code>
+    {
+
+    \ \ "keys": [ "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+
+    \ \ \ \ \ \ \ \ \ \ \ \ "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH" ],
+
+    \ \ "threshold": 1,
+
+    \ \ "keeper": [ "https://orcid.org/0000-0002-1234-5677" ]
+
+    }
+  </verbatim-code>
+  </html-div-class>
+
+  The genesis record of the authors' paper, written when it was sealed; its name is <verbatim|olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda> (the SHA-256 of <verbatim|opensheaf-name-0>, a line feed and the bytes as shown, with a final line feed); a branch named by algorithm 1 after a clash (section 6.5) would be <verbatim|cig66c5wfrbz23tylm5xjrca2ub74svojbm7nrrl7k7ri72yow4r>:
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1195,7 +1277,7 @@
 
     \ \ "created": "2026-03-02T09:14:00Z",
 
-    \ \ "originator": "https://orcid.org/0000-0002-1234-5677",
+    \ \ "originator": "dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba",
 
     \ \ "nonce": "5f2c8e1a9b7d4036c2e1f08a7b6d5c43"
 
@@ -1203,7 +1285,29 @@
   </verbatim-code>
   </html-div-class>
 
-  The <verbatim|object.json> of the first version of the journal's accepted copy of that paper, a shallow branch from the authors' document version 3, the corrected version the editors accepted (proposal, section 10.5; with the selection above, the journal would rather start from version 2 and move its branch point to version 3). With the proposal, the selection lists this accepted copy as its member, a member of its own archive, and MAY keep the authors' revision set as well. Its content also holds <verbatim|genesis.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json>; since its owner is keyed, its extension folder holds the signature <verbatim|v1.inventory.json.sha512.sig>, made with that key (section 13.2):
+  The signature file <verbatim|v4/signature-1.json> of the authors' object version <verbatim|v4>, which the journal vetted, in the extension folder <verbatim|extensions/opensheaf-witnesses/> of the paper (section 13.2):
+
+  <\html-div-class|language-json>
+  <\verbatim-code>
+    {
+
+    \ \ "format": "opensheaf-signature/0.1",
+
+    \ \ "signed": "v4/inventory.json.sha512",
+
+    \ \ "owner": "dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba",
+
+    \ \ "key": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+
+    \ \ "keyLog": "sheaf:dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba/v2?sha512=8b3d...",
+
+    \ \ "signature": "q4T0...=="
+
+    }
+  </verbatim-code>
+  </html-div-class>
+
+  The <verbatim|object.json> of the first version of the journal's accepted copy of that paper, a shallow branch from the authors' document version 3, the corrected version the editors accepted (proposal, section 10.5; with the selection above, the journal would rather start from version 2 and move its branch point to version 3). The journal's owner name is <verbatim|iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a>. With the proposal, the selection lists this accepted copy as its member and MAY keep the authors' revision set as well. Its content also holds <verbatim|genesis.json>, <verbatim|parent.inventory.json> and <verbatim|parent.object.json>; its extension folder holds the journal's signature files of <verbatim|v1> and, in <verbatim|parent/v1/>, the authors' signature files of their <verbatim|v4>; and the journal's storage root keeps both owners' key logs (sections 6.5 and 13.2):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1215,25 +1319,17 @@
 
     \ \ "kind": "document",
 
-    \ \ "archiveId": "tag:example.org,2026:journal",
+    \ \ "name": "olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda",
 
-    \ \ "objectId": "network-discrimination",
+    \ \ "owner": "iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a",
 
-    \ \ "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
-
-    \ \ "owner": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
-
-    \ \ "sealed": { "archiveId": "tag:example.org,2026:authors", "objectId": "network-discrimination", "objectVersion": "v1" },
+    \ \ "sealed": { "objectVersion": "v1", "inventorySha512": "1d4a..." },
 
     \ \ "parent": {
 
-    \ \ \ \ "owner": "https://orcid.org/0000-0002-1234-5677",
+    \ \ \ \ "owner": "dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba",
 
-    \ \ \ \ "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
-
-    \ \ \ \ "archiveId": "tag:example.org,2026:authors",
-
-    \ \ \ \ "objectId": "network-discrimination",
+    \ \ \ \ "name": "olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda",
 
     \ \ \ \ "objectVersion": "v4",
 
@@ -1241,7 +1337,7 @@
 
     \ \ \ \ "inventorySha512": "c07a...",
 
-    \ \ \ \ "url": "https://authors.example.org/ocfl/network-discrimination/v4/"
+    \ \ \ \ "url": "https://authors.example.org/ocfl/dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba/olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda/v4/"
 
     \ \ },
 
@@ -1261,37 +1357,41 @@
   </verbatim-code>
   </html-div-class>
 
-  URIs of this paper (proposal, section 6.6). The authors' ORCID iD is the originator, and the journal's owner identifier, the digest of its <verbatim|did:key> URI, is <verbatim|xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda>:
+  URIs of this paper (proposal, section 6.6). The authors' owner is the originator:
 
   <\verbatim-code>
-    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3
+    sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda/v3
 
     \ \ \ \ document version 3 of the authors' line
 
-    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq/v3?sha512=c07a...
+    sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda/v3?sha512=c07a...
 
     \ \ \ \ the authors' object version v4, which the journal vetted
 
-    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda/v3
+    sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda:iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a/v3
 
     \ \ \ \ document version 3 of the journal's line, its accepted copy
 
-    sheaf:2kukpn74/v3
+    sheaf:olqybey6/v3
 
-    sheaf:2kukpn74:xx2gb5hz/v3
+    sheaf:olqybey6:iztwg6bj/v3
 
     \ \ \ \ the same two, in short form
 
-    sheaf:2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq:*
+    sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda:*
 
     \ \ \ \ the paper as a whole: the authors' line, the journal's and any other
 
-    https://opensheaf.org/sheaf:2kukpn74/v3
+    sheaf:dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba
 
-    \ \ \ \ the short form of the first, through a gateway
+    \ \ \ \ the authors' owner, its key log
+
+    https://opensheaf.org/sheaf:olqybey6/v3
+
+    \ \ \ \ the short form of the first, through a gateway (provisional domain)
   </verbatim-code>
 
-  The entry of the journal's archive for this object, in its index <verbatim|names/2k.json> (its archive declares prefixes of 2 characters):
+  The entry of the journal's archive for this object, in its index <verbatim|names/ol.json> (its archive declares prefixes of 2 characters):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1303,19 +1403,19 @@
 
     \ \ "entries": [
 
-    \ \ \ \ { "name": "2kukpn74khhbxkdxxtbcbrtnuwhhssdbjezh5r4ggnyesxwn5pqq",
+    \ \ \ \ { "name": "olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda",
 
-    \ \ \ \ \ \ "originator": "https://orcid.org/0000-0002-1234-5677",
+    \ \ \ \ \ \ "originator": "dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba",
 
-    \ \ \ \ \ \ "owner": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+    \ \ \ \ \ \ "owner": "iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a",
 
-    \ \ \ \ \ \ "ownerId": "xx2gb5hzspt376vk22zvn2eyim6neidybevwgceje76333ifsxda",
+    \ \ \ \ \ \ "id": "sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda:iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a",
 
-    \ \ \ \ \ \ "objectId": "network-discrimination", "status": "active",
+    \ \ \ \ \ \ "status": "active",
 
-    \ \ \ \ \ \ "sealed": { "archiveId": "tag:example.org,2026:authors", "objectId": "network-discrimination", "objectVersion": "v1" },
+    \ \ \ \ \ \ "sealed": { "objectVersion": "v1", "inventorySha512": "1d4a..." },
 
-    \ \ \ \ \ \ "genesis": "{\\n \ \\"format\\": \\"opensheaf-genesis/0.1\\",\\n \ \\"kind\\": \\"document\\",\\n \ \\"created\\": \\"2026-03-02T09:14:00Z\\",\\n \ \\"originator\\": \\"https://orcid.org/0000-0002-1234-5677\\",\\n \ \\"nonce\\": \\"5f2c8e1a9b7d4036c2e1f08a7b6d5c43\\"\\n}\\n" }
+    \ \ \ \ \ \ "genesis": "{\\n \ \\"format\\": \\"opensheaf-genesis/0.1\\",\\n \ \\"kind\\": \\"document\\",\\n \ \\"created\\": \\"2026-03-02T09:14:00Z\\",\\n \ \\"originator\\": \\"dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba\\",\\n \ \\"nonce\\": \\"5f2c8e1a9b7d4036c2e1f08a7b6d5c43\\"\\n}\\n" }
 
     \ \ ]
 
@@ -1328,7 +1428,7 @@
   <\itemize>
     <item><strong|Why OCFL.> It is a published, versioned specification for exactly this problem (versioned objects as plain files with digests), with independent validators, used by research libraries. OpenSheaf adds only discovery and collections.
 
-    <item><strong|Why the flat-direct layout, and a hashed layout for large archives.> Paths stay readable and resolvable by rule over plain HTTP; the cost is short identifiers without <verbatim|/>. One folder holding every object becomes impractical at large sizes, mostly in git, where every deposit rewrites a tree listing every object, and in the web views of forges, which show at most about a thousand entries of a folder; object storage, which has no real folders, gains nothing. So a large archive may spread its objects over folders named by the hash of their identifiers (<verbatim|0003-hash-and-id-n-tuple-storage-layout>), which keeps the identifier as the name of the object's folder and the path computable by rule (a browser computes SHA-256 natively); an object whose identifier is its name (section 6.5, proposal) is placed in the same way, under the hash of that identifier, which has nothing to do with the digest that made the name; its parameters are fixed so that every client computes the same paths, and the layout is chosen once, since changing it changes every URL into the storage root (though no pin). The layout of Fedora (<verbatim|0004-hashed-n-tuple-storage-layout>) was not chosen, since it names the object's folder by the hash alone.
+    <item><strong|Why identifiers from lines, an owner-name layout, and a hashed layout for large archives (proposal).> Identifiers chosen by each archive clash as soon as one archive keeps copies of another's objects; identifiers made from lines, (name, owner), never clash, so one storage root holds the lines its owners write and copies of others' side by side (#52). The owner-name layout keeps paths resolvable by rule over plain HTTP, and gives each owner one folder, with its key log, so that an owner moves, or is mirrored, by copying a folder; the cost is that paths and identifiers are no longer readable, so readable names become labels, which are not permanent. One folder holding every owner, or every line of one owner, becomes impractical at large sizes, mostly in git, where every deposit rewrites a tree listing every entry, and in the web views of forges, which show at most about a thousand entries of a folder; object storage, which has no real folders, gains nothing. So a large archive may spread its objects over folders named by the hash of their identifiers (<verbatim|0003-hash-and-id-n-tuple-storage-layout>), a registered OCFL extension that keeps paths computable from the identifier.
 
     <item><strong|Why a discovery document.> Static web servers cannot list folders; one small file makes an archive discoverable, and its statements are checked against the storage root.
 
@@ -1336,11 +1436,15 @@
 
     <item><strong|Why catalogues and selections.> Keeping and vetting are different acts. An archive (an author's, an institution's, a storage site) keeps what its members deposit, every version, without judging them: following an object as it grows is its job. A selection (a journal, a digest, a review journal) vouches for particular revisions: a later version by the authors has not been vetted, so it cannot enter the selection by itself, and a change of what is vetted is an editorial act that the selection's own history records. Pinning whole objects in one case and revision sets in the other makes the difference explicit and checkable.
 
-    <item><strong|Why mirrors and accepted copies differ.> A mirror copies a whole object and stays the same object, owned by its original archive, so it can only grow by the original's versions. An accepted copy takes one vetted revision into the selection's own archive, where it continues under the selection's responsibility (corrections, notices, withdrawal); OCFL cannot hold part of an object, so a copy of one revision is another object: with the proposal of section 6.5, a shallow branch of the same name.
+    <item><strong|Why mirrors and accepted copies differ.> A mirror copies a whole line and stays the same line, signed by its owner, so it can only grow by the owner's versions. An accepted copy takes one vetted revision into a line of the selection's owner, where it continues under the selection's responsibility (corrections, notices, withdrawal); OCFL cannot hold part of an object, so a copy of one revision is another object: with the proposal of section 6.5, a shallow branch of the same name.
 
-    <item><strong|Why the owner is part of the identity (proposal).> A name alone cannot say whose history is the right one: anyone may copy a genesis record. With (owner, name), copying is no forgery: a copy under another owner is a branch, declared as such, and each owner answers for one line only. Location stays out of the identity, so an object can be kept anywhere.
+    <item><strong|Why the owner is part of the identity (proposal).> A name alone cannot say whose history is the right one: anyone may copy a genesis record. With (name, owner), copying is no forgery: a copy under another owner is a branch, declared as such, and each owner answers for its own lines. Location stays out of the identity, so a line can be kept anywhere.
 
-    <item><strong|Why deep and shallow branches (proposal).> A co-author continuing the work needs its whole past, and can check it by digests; a journal needs only the version it vetted, and may not be allowed to copy the others. A shallow branch carries the parent's inventory and <verbatim|object.json>, so that its consistency can be checked after the parent has gone; that the parent version is the one its archive keeps needs the parent, reached through that archive, its owner's signature or other witnesses; that the owner named is the person it claims needs owner proofs (#41).
+    <item><strong|Why owners are keyed identities with key logs (proposal).> An owner asserted by a name (an ORCID iD, an archive's identifier) cannot prevent others from writing under it, only be confirmed through the archive that serves it; an owner that signs makes every version checkable anywhere, also after its archives have gone, and makes it impossible for an archive to modify another owner's line, since a version it makes is its own branch (#55). A key alone cannot change, so an owner is named by a genesis record and keeps its keys in a log, each version signed by the keys of the one before, as Radicle's identity documents and The Update Framework do: keys rotate, are revoked and are shared with a threshold, while the owner name stays. Who answers for an owner is a separate, optional link, confirmed by the keeper (#41).
+
+    <item><strong|Why archives have no identity (proposal).> Once owners sign their lines, an archive only hosts them: a name for it would identify no authority, and would tie lines to places. An archive is found at its base URL, and every location is a hint, since what is found there is checked by pins and signatures (#52).
+
+    <item><strong|Why deep and shallow branches (proposal).> A co-author continuing the work needs its whole past, and can check it by digests; a journal needs only the version it vetted, and may not be allowed to copy the others. A shallow branch carries the parent's inventory and <verbatim|object.json>, so that its consistency can be checked after the parent has gone; the parent owner's signature, which the branch keeps with the owner's key log, shows that the parent version is that owner's; who answers for an owner is said by its optional keeper link (section 6.5, #41).
 
     <item><strong|Why separate document and object versions.> Readers and DOI services see versions of the work; the storage keeps every change, including corrections of the description.
 

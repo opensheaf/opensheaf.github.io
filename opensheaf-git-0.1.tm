@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf archives in git>
 
-  <notes-abstract|Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 16 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
+  <notes-abstract|Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 17 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
 
   <os-alert|warning|Warning.|<strong|Draft for discussion.> This document is a first draft. Its open questions are listed in section 13; none of them is settled.>
 
@@ -263,6 +263,8 @@
 
   Mirroring an object of another archive is copying its files and checking them against a pin; it does not need, and SHOULD NOT use, a merge of the other archive's repository.
 
+  Under the revised identity proposal of the specification (branch <verbatim|proposal/owners>, sections 6.5 and 10.4), a mirror is a copy of a line, kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder <verbatim|extensions/opensheaf-witnesses/>, and <verbatim|witnesses/> is not used. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification).
+
   A public repository SHOULD be archived by <hlink|Software Heritage|https://www.softwareheritage.org/>, which keeps dated snapshots of it named by SWHIDs. A snapshot is a witness that the archive held these files at that date, as other external copies are (section 13.2 of the specification); its identifiers are git hashes, not part of the integrity of the archive. Together with the history of the published branch, snapshots also witness the successive states of the discovery document.
 
   <section*|12. Security and privacy><label|12-security-and-privacy>
@@ -293,6 +295,8 @@
     <item><strong|0.1 (draft), 16 November 2026, revision:> the hashed storage layout of the specification: the append-only rules (section 5.1) and the takedown (section 9) use the object's path in the layout, with the folders of the hash; large archives in git should use the hashed layout (section 8).
 
     <item>**0.1 (draft), 16 November 2026, proposal (branch <verbatim|proposal/identity> of the specification):** the indexes of the identity proposal (<verbatim|indexes.json>, <verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>) are archive files: stored byte for byte (section 4.1), rewritten at every deposit and takedown (sections 5.1 and 9); git branches other than the published branch are called working branches (section 6.2), not drafts, which the proposal defines as objects without a genesis record, and a sealed version is not rebuilt once shared.
+
+    <item>**0.1 (draft), 17 November 2026, proposal (branch <verbatim|proposal/owners> of the specification):** copies of lines carry the key logs of their signers, witnesses are kept only in objects' extension folders, and an owner moves by copying its folder (section 11).
   </itemize>
 
 </body>

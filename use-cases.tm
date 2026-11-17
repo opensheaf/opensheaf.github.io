@@ -121,7 +121,7 @@
 
   <subsection*|Co-authors in different archives><label|co-authors-in-different-archives>
 
-  Two co-authors each keep an archive; their joint paper is deposited once, in one of them. The other lists it in a collection of her own archive (for instance "papers with my students") as a member of another archive. In an <strong|catalogue> with <verbatim|follow>, each time she updates the collection (<verbatim|osheaf collect>) it pins the head of her co-author's object, its newest object version; nothing is copied, and no permission is needed. Her member entry can list in <verbatim|mirrors> the archives that mirror the paper (section 10.2), so that readers still reach it when her co-author's archive is down. If she wants the paper in her archive too, and the licences of all its versions allow redistribution, she can <strong|mirror> it: a byte-for-byte copy of the whole object, which stays the co-author's object (<verbatim|mirrorOf>).
+  Two co-authors each keep an archive; their joint paper is deposited once, in one of them. The other lists it in a collection of her own archive (for instance "papers with my students") as a member of another archive. In an <strong|catalogue> with <verbatim|follow>, each time she updates the collection (<verbatim|osheaf collect>) it pins the head of her co-author's object, its newest object version; nothing is copied, and no permission is needed. Her member entry can list in <verbatim|mirrors> the archives that mirror the paper (section 10.2), so that readers still reach it when her co-author's archive is down. If she wants the paper in her archive too, and the licences of all its versions allow redistribution, she can <strong|mirror> it: a byte-for-byte copy of the whole object, which stays the co-author's object (<verbatim|mirrorOf>). Under the identity proposal (sections 6.5 and 10.4, not yet agreed), the mirror is simply a copy of the co-author's line, kept in her storage root beside her own lines: its versions are checked by the co-author's signatures, with the co-author's key log kept beside it, and no <verbatim|mirrorOf> is needed.
 
   <subsection*|A research group, a seminar, lecture notes><label|a-research-group-a-seminar-lecture-notes>
 
@@ -136,7 +136,7 @@
   <\itemize>
     <item>Members may deposit directly in the institution's archive, whose main collection is a catalogue of its documents, perhaps with one catalogue per department.
 
-    <item>Or members keep their own archives, and the institution <strong|mirrors> their documents: each mirror is a whole copy, every version, kept up to date by copying new versions, and listed with <verbatim|mirrorOf> in the institution's discovery document. Mirroring is allowed only when the licences of all the versions copied allow redistribution (section 10.4). Many papers imported from arXiv carry arXiv's default licence, which does not; the institution then only references them, or asks the authors to deposit openly licensed versions.
+    <item>Or members keep their own archives, and the institution <strong|mirrors> their documents: each mirror is a whole copy, every version, kept up to date by copying new versions, and listed with <verbatim|mirrorOf> in the institution's discovery document (under the identity proposal, a copy of each member's lines, checked by the members' signatures, with no <verbatim|mirrorOf>). Mirroring is allowed only when the licences of all the versions copied allow redistribution (section 10.4). Many papers imported from arXiv carry arXiv's default licence, which does not; the institution then only references them, or asks the authors to deposit openly licensed versions.
 
     <item>The institution is impartial: it keeps what its members deposit. It does not vet versions; that is what selections do.
   </itemize>
@@ -204,6 +204,8 @@
   <subsection*|An archive that moves><label|an-archive-that-moves>
 
   An author moves her archive to a new domain. Its archive identifier (a <verbatim|tag:> URI) does not change. Collections recorded the base URL of the time (<verbatim|archiveUrl>): readers still reach the archive through HTTP redirects from the old address, which she should keep as long as she can, or through the mirrors listed in member entries; curators update <verbatim|archiveUrl> in a new version of their collections. Pins stay valid, because they fix bytes, not addresses.
+
+  <os-alert|note|Note.|Under the identity proposal (sections 6.2 and 6.5, not yet agreed), an archive has no identifier: it is found at its address, and every address is a hint, since what is found there is checked by pins and signatures. Moving an archive is copying its files; collections, indexes and resolvers learn the new address over time. An author can also move without the archive: as an owner, with her key log, she copies her lines to another archive and continues them there, as the same lines.>
 
   <section*|Selections><label|selections>
 
