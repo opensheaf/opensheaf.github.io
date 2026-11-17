@@ -227,18 +227,21 @@ Anyone can copy a genesis record, so the name alone cannot say whose history
 is the right one. That is why the owner is part of the identity: a copy
 continued by another owner is a <dfn>branch</dfn>, which declares the version
 it starts from, and an archive cannot pass its own changes off as another
-owner's, since it cannot sign for it. A **deep** branch copies all earlier
-versions and continues them (a co-author carrying the work on). A
-**shallow** branch keeps only the version it starts from, with the parent's
-inventory, `object.json` and signatures as evidence, and adds its own
-versions (a journal keeping the version it vetted, then its corrections). An
-accepted copy is a shallow branch kept by a selection's owner.
+owner's, since it cannot sign for it. A branch is a new object: it keeps
+only the version it starts from, with the parent's inventory, `object.json`,
+signatures and the part of the parent owner's key log they need as evidence,
+and adds its own versions (a journal keeping the version it vetted, then its
+corrections; a co-author carrying the work on). It cannot continue the
+parent's object, whose inventories record the parent's identifier. A
+co-author who wants the whole past at hand keeps a copy of the parent's line
+beside the branch, as a separate object; in git the files they share are
+stored once. An accepted copy is a branch kept by a selection's owner.
 
-A shallow branch can be checked without its parent: the genesis record gives
-the name, the copied inventory gives the parent pin, the files match that
+A branch can be checked without its parent: the genesis record gives the
+name, the copied inventory gives the parent pin, the files match that
 inventory, the copied `object.json` says whose version it was, and the parent
-owner's signature, checked against its key log, shows that the version is
-that owner's.
+owner's signature, checked against the copied part of its key log, shows that
+the version is that owner's.
 
 ## Can documents be linked in richer ways (a short account and its full proof)?
 

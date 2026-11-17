@@ -261,9 +261,10 @@ members:
 
 > [!NOTE]
 > Under the identity proposal (section 10.5, not yet agreed), an accepted copy
-> is a shallow branch: it keeps the document version of the revision it copies
-> (the authors' version 3, say), and keeps the authors' `object.json` as
-> `parent.object.json`. A correction the journal makes itself is the journal's
+> is a branch: it keeps the document version of the revision it copies
+> (the authors' version 3, say), and keeps as evidence the authors'
+> `object.json`, their signatures and the part of their key log those need
+> (`parent.object.json`, `parent.signatures/`, `parent.keylog/`). A correction the journal makes itself is the journal's
 > own version 4 (provisionally: option (a) of the numbering on branches); when
 > the editors later vet the authors' corrected version, the copy moves its
 > branch point to it, with the same evidence, as the journal's next version.

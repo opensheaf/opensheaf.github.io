@@ -382,10 +382,12 @@ members:
     </div>
     <div class="os-alert os-note">
       <font class="os-alert-label">Note.</font> Under the identity proposal (section 10.5, not
-      yet agreed), an accepted copy is a shallow branch: it keeps the document
-      version of the revision it copies (the authors' version 3, say), and
-      keeps the authors' <tt class="verbatim">object.json</tt> as <tt class="verbatim">parent.object.json</tt>.
-      A correction the journal makes itself is the journal's own version 4
+      yet agreed), an accepted copy is a branch: it keeps the document version
+      of the revision it copies (the authors' version 3, say), and keeps as
+      evidence the authors' <tt class="verbatim">object.json</tt>, their signatures and
+      the part of their key log those need (<tt class="verbatim">parent.object.json</tt>,
+      <tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.keylog/</tt>). A
+      correction the journal makes itself is the journal's own version 4
       (provisionally: option (a) of the numbering on branches); when the
       editors later vet the authors' corrected version, the copy moves its
       branch point to it, with the same evidence, as the journal's next

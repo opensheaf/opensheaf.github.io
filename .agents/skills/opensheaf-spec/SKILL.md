@@ -91,7 +91,7 @@ only what its two standards leave open:
 - **Accepted copy** (10.5): on `main`, a selection's own document holding
   exactly the files of one vetted revision (not `datacite.json` and
   `object.json`), with the source and its pin in `external`; a new object,
-  never a mirror. In the proposal, a shallow branch kept by the selection
+  never a mirror. In the proposal, a branch kept by the selection
   (below); still never a mirror.
 - **Withdrawal** (11.1): a description-only version with `status`
   `withdrawn`; the content stays. **Takedown** (11.2): the object is deleted
@@ -146,8 +146,8 @@ their revision comments) before touching any of this.
   moving to another archive copies its key log and continues its lines (not
   a branch); a branch happens only when the owner changes.
 - **Identifiers and labels** (6.3, 5): an object's OCFL `id` is its first
-  line, `sheaf:<name>:<owner>` (a deep branch keeps the copied object's;
-  a draft has a chosen short id); default layout
+  line, `sheaf:<name>:<owner>`, for branches too (a draft has a chosen
+  short id); default layout
   `opensheaf-owner-name-storage-layout` (`<owner>/<name>/`, drafts in
   `drafts/<id>/`; the key log at `<owner>/<owner>/`), or `0003` for large
   archives. Readable `label`s in the discovery document, not permanent.
@@ -165,12 +165,13 @@ their revision comments) before touching any of this.
   before a version first leaves the owner's hands.
 - **Branches** (10.5): lines of other owners with the same genesis record,
   declaring `parent` (`owner`, `name`, `objectVersion`, `documentVersion`,
-  `inventorySha512`, `url`). **Deep**: copies the earlier versions, under
-  the copied object's identifier. **Shallow**: the branch point plus
-  `parent.inventory.json`, `parent.object.json` and the parent owner's
-  signatures in `parent/<w>/` (required), so its evidence is complete.
-  Branch points move only forward; accepted copies are shallow branches of
-  the selection's owner. Verdicts: inconsistent, unconfirmed, confirmed.
+  `inventorySha512`, `url`). No deep branches: a branch is a new object
+  holding the branch point plus, as content, `parent.inventory.json`,
+  `parent.object.json`, `parent.signatures/` and `parent.keylog/`
+  (required), so its evidence is complete; the parent's history, if
+  wanted, is a copy of the parent's line beside it (OCFL inventories fix
+  their object's id). Branch points move only forward; accepted copies are
+  branches of the selection's owner. Verdicts: inconsistent, unconfirmed, confirmed.
 - **`sheaf:` URIs** (6.6): `sheaf:<name>`, `sheaf:<name>:<owner>`,
   `sheaf:<name>:*`, `/v<n>`, `?sha512=` (a pin), `at=` (a hint),
   `sheaf:<owner>` (a key log). Copies count only if signatures hold; a
@@ -193,9 +194,9 @@ their revision comments) before touching any of this.
 - (Proposal) owner objects: `genesis.json`, `keys.json`, `object.json`
   (no `datacite.json`).
 - (Proposal) identity files: `genesis.json` in every sealed version, and
-  `parent.inventory.json` and `parent.object.json` in every version of a
-  shallow branch, and of a deep branch from a version that moves its
-  branch point; these names are reserved.
+  `parent.inventory.json`, `parent.object.json`, `parent.signatures/` and
+  `parent.keylog/` in every version of a branch; these names are
+  reserved.
 - `datacite.json` (8): MUST `titles`, `creators`, `publicationYear`,
   `types`, `version` (the document version as a string), `publisher`;
   SHOULD abstract, subjects, dates, `rightsList`, `relatedIdentifiers`.
