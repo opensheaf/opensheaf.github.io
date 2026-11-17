@@ -601,9 +601,9 @@ history of an OpenSheaf object is linear and checkable without them.
    the document versions, the description-only versions, the SHA-512
    inventories, and the names of the proposal.
 4. **Key logs in practice.** Create an owner with two keys and a threshold
-   of 1, sign versions, rotate a key and revoke another, then verify every
-   version from a copy of the archive without its site, and measure what a
-   verifier replays.
+   of 1, sign versions, retire a key and end the owner with a successor,
+   then verify every version from a copy of the archive without its site,
+   and measure what a verifier replays.
 
 ## 7. Open questions
 

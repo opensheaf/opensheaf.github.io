@@ -11,8 +11,8 @@ rewritten several times; each version closed the holes found in the one before
 and opened others. This paper records the attempts, the attacks that defeated
 them, and the principles that came out of it, so that the next change of these
 rules does not repeat them. Where it describes the rules, it describes those
-of PR #30 after the commit that reads a line from its signed head (section
-3.8); the specification is right where they differ.*
+of PR #30 after the commit in which an exposed key ends its owner (section
+3.9); the specification is right where they differ.*
 
 ## 1. What keys are for
 
@@ -362,6 +362,46 @@ The outcomes are those the rules already aimed at; what changed is that one
 rule now gives them, instead of a status for every version traced through
 every revocation, fork, branch point and mirror.
 
+### 3.9 Giving up on backdating: an exposed key ends the owner
+
+The twelfth review found the signed head sound, but its gaps were the same as
+ever: a forger naming a made-up key-log version still produced versions shown
+as possibly the owner's; a thief who could fork the key log could also revoke,
+on its side, every key the owner had at the fork point, and the rule that made
+a key revoked on any side count as revoked for adding then froze the owner's
+lines everywhere; a thief's version could still enter lawfully before a
+revocation reached an archive. Each was fixable, and each fix would have been
+another exception.
+
+Stepping back, the rules protect against four people: a forger with no key,
+stopped completely by signatures; a host changing objects, stopped by digests
+and signatures; a thief holding a current key, who is the owner until found
+out, which no rule can prevent; and a thief holding an old key, retired or
+revoked, who signs new versions naming an old key-log version, as if made back
+then. Almost all the machinery of sections 3.1 to 3.8 (revocation and `since`,
+unconfirmed and unchecked, the tail, forks for adding, fork resolution, most
+of the timestamps extension) served the fourth case, and the fourth case
+cannot be solved without trusted time: every round only moved its edge.
+
+The editor chose Radicle's answer. A key is an identity; a compromised key
+means a new one. An owner whose key may have been exposed ends: a last version
+of its key log, signed as usual, says `ended` and names an optional
+`successor`; a fork of the key log has the same effect from the fork point.
+The owner's signatures stay good, since the core cannot date them; readers
+trust its history only as far as other evidence goes (copies held earlier, the
+pins of collections, timestamps); archives add nothing more to its lines; and
+its work continues under the successor, by branches. Retiring a key still
+changes nothing. `revoked`, `since`, the tail, the signed head as a term, the
+rules on forks for adding and their resolution are gone, and the timestamps
+extension only gives dates that readers may weigh. A version is signed by its
+own signatures or by a later signed version that extends it, which keeps the
+one good idea of section 3.8.
+
+The price is plain: after a key leaks, the old identity's later history cannot
+be trusted by the format alone, and the owner moves on under a new name. What
+the format still guarantees is the first three cases, which is what keys were
+for (section 1).
+
 ## 4. What we learnt
 
 ### 4.1 Never remove on evidence an attacker can shape
@@ -396,17 +436,14 @@ limit, a threshold "governing" earlier keys) produced cascades.
 ### 4.5 The irreducible limit
 
 Without time or a public order, whoever holds `threshold` keys of an old
-key-log version can fork the owner's key log at that version, and suspend
-revocations made after it. The core can only limit the damage: the past is
-never erased, keys added on a side do not count, and the fork is reported. The
-defences are outside the core's signatures: the timestamps extension adopted
-from the first key-log version, or a threshold of 2 or more from the first
-version (1 with a spare key protects against loss; 2 of 3 also against theft).
-When a fork cannot be resolved, or a listed timestamp authority is
-compromised, the owner replaces its identity by a new one. The extension only
-fixes how the past is read: archives add only what the core accepts, so an
-owner whose good keys all came after a fork point cannot add again, with or
-without it. The specification now says this plainly instead of implying more.
+key-log version can sign new versions naming it, or fork the key log there,
+and nothing in signatures tells them from the owner's. Sections 3.1 to 3.8
+tried to limit the damage inside the core; section 3.9 stopped trying. An
+owner whose key may have been exposed ends, and a fork ends it too; the
+defences that make this rarer are outside the core's signatures: a threshold
+of 2 or more from the first key-log version (1 with a spare key protects
+against loss; 2 of 3 also against theft), and timestamps, which let readers
+tell which versions came before an exposure.
 
 ### 4.6 Rewrite, do not patch
 
@@ -416,37 +453,35 @@ each exception interacted with the others. The seventh round rewrote sections
 words; the ninth removed four mechanisms outright. The audits found fewer and
 subtler problems after each rewrite, and more after each patch. The eleventh
 went further, replacing the per-version statuses by one rule, the signed head
-(section 3.8).
+(section 3.8), and the twelfth removed the problem the rules had been circling,
+by ending an owner whose key may have been exposed (section 3.9).
 
 ## 5. The rules as they stand
 
-After the commit that reads lines from their signed head, the rules of PR #30
+After the commit in which an exposed key ends its owner, the rules of PR #30
 are, in short:
 
 - a signature is good if it verifies under the key-log version it names, the
-  key being listed there and not revoked; later key-log versions never take it
-  away;
-- a copy of a line is read from its signed head, its latest version signed
-  with good signatures: that version and every version before it are the line,
-  the versions after it the tail (kept, shown, never relied on), anything else
-  not a version (section 13.2);
-- a retired key changes nothing; a revoked key's signatures are no longer
-  good, except in the key log up to the revoking version and where the
-  timestamps extension dates them before `since` and the revocation; a line
-  falls back, and comes back with one good signature;
-- the core never resolves a key-log fork: keys of the fork point stay good,
-  keys added after it are unchecked, revocations after it wait;
-- archives add a version only if the core alone puts it in the line, a key
-  revoked on any side of an unresolved fork counting as revoked for adding;
-  mirrors stop at the signed head; nothing is dropped, set aside or deleted on
-  the strength of signatures;
+  key being listed there; it stays good for ever, whatever later versions of
+  the key log, an end or a fork say;
+- a version of a line is signed by `threshold` good signatures naming one
+  key-log version, or by a later signed version that extends it; readers use
+  the latest signed version; an unchecked version waits for its key log;
+  anything else is not a version (section 13.2);
+- a retired key changes nothing; an owner whose key may have been exposed
+  ends, with an optional successor, and a fork of its key log has the same
+  effect: signatures stay good, archives add nothing more to its lines,
+  readers trust its history as far as other evidence goes, and the successor
+  continues by branches;
+- archives add only signed versions; mirrors stop at the latest signed
+  version; nothing is dropped, set aside or deleted on the strength of
+  signatures;
 - signature files are `signature-<k>.json`, one for each key, so that readers
-  over plain HTTP can find them;
-- the timestamps extension, declared from the first key-log version, makes
-  good the dated signatures of revoked keys and resolves forks by time, for
-  readers that know it, without ever destroying anything or letting a version
-  into an archive; anyone may stamp any signature file, and the earliest stamp
-  wins.
+  over plain HTTP can find them; a file whose `object`, `version` or inventory
+  digest are not those of its folder is invalid;
+- the timestamps extension gives dates that readers may weigh, for instance
+  for an ended owner's versions; it changes no status, resolves no fork and
+  lets nothing into an archive.
 
 ## 6. How others handle it
 
@@ -505,14 +540,18 @@ proposal.
   version or a threshold of 2 or more (#55).
 - Whether a witness or transparency log should become an extension, beside
   timestamps (#55).
-- How a new owner that replaces a forked one is announced and recognised,
-  beyond "through its keeper" (#55).
+- How a successor is announced and recognised, beyond `successor` and the
+  keeper, and how two successors named on two sides of a fork are settled
+  (#55).
+- Whether owners should survive the exposure of a key after all, with
+  revocation dated by trusted time or a transparency log, as an extension
+  (#55).
 - How the branch rules meet merging between lines: numbering on branches,
   moving a branch point while keeping a branch's own files, and how the
   originator takes in another line's work
   ([#57](https://github.com/opensheaf/opensheaf.github.io/issues/57)).
-- Whether core-only verifiers, which cannot resolve forks, should report a
-  forked owner more prominently than other states.
+- Whether verifiers should report an ended or forked owner more prominently
+  than other states.
 
 ## 8. Pointers
 
