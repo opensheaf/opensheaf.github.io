@@ -1,6 +1,6 @@
 # Radicle and OpenSheaf
 
-*Working paper, draft of 16 November 2026. Non-normative: ideas and positions,
+*Working paper, draft of 17 November 2026. Non-normative: ideas and positions,
 not decisions. Radicle is a peer-to-peer network for collaboration on git
 repositories: repositories named by a digest, peers named by keys, each peer
 writing only its own branch of a repository, and seed nodes that replicate
@@ -13,7 +13,12 @@ of many archives, private archives (issue
 [#29](https://github.com/opensheaf/opensheaf.github.io/issues/29)). This paper
 describes Radicle, sets its concepts against those of OpenSheaf, describes
 three ways to use it, from a transport for archives kept in git to a source of
-designs, and proposes experiments.*
+designs, and proposes experiments. Several of these designs were adopted in
+the proposal of [PR #56](https://github.com/opensheaf/opensheaf.github.io/pull/56) (issues
+[#55](https://github.com/opensheaf/opensheaf.github.io/issues/55) and
+[#52](https://github.com/opensheaf/opensheaf.github.io/issues/52)): owners as
+keyed identities with key logs, archives as hosts, storage keyed by lines,
+and branches as new objects.*
 
 ## 1. The question
 
@@ -24,6 +29,15 @@ digest, keys as identities, one writer per branch, signed references, and
 nodes that replicate by policy. Several of them are the answers that PR #30
 proposes for OpenSheaf, reached independently, and Radicle has run them since
 2024 on a public network.
+
+The comparison has since shaped the proposal. [PR #56](https://github.com/opensheaf/opensheaf.github.io/pull/56), which revises PR
+#30 and, like it, is not agreed, makes an owner a keyed identity with a key
+log, as a Radicle node is an identity made of a key; makes archives hosts with
+no identity of their own, as Radicle's identity document says who and never
+where; stores each line at `<owner>/<name>/`, as Radicle stores a repository
+by its RID with a namespace per peer; and makes every branch a new object, as
+a Radicle fork is a namespace of its own. Where this paper says "the
+proposal", it means PR #30 as revised by PR #56.
 
 Two readings are possible. In the first, Radicle is a **transport**: an
 archive kept in git ([OpenSheaf archives in git](../opensheaf-git-0.1.md)) is
@@ -68,11 +82,13 @@ addresses and alias. A connection was meant to be authenticated by the key
 2.7). Nothing ties a key to a person: no name, ORCID iD or e-mail address is
 attached, and readers trust a key they got from a source they trust. A person
 with several machines either copies the secret key between them, or appears
-as several identities. These are the open questions of keyed owners in PR
-#30: rotation and several keys (issues #13 and #20), and tying a key to a
-person (issue [#41](https://github.com/opensheaf/opensheaf.github.io/issues/41)).
-Radicle shows that an identity made of a key alone works in daily use, with
-`ssh-agent` doing the signing; it does not yet answer those questions.
+as several identities. Radicle shows that an identity made of a key alone
+works in daily use, with `ssh-agent` doing the signing; it does not answer
+rotation, several keys or the tie to a person. The proposal answers them with
+the key log of an owner (rotation, several keys, a threshold; #55, question 1)
+and an optional two-way link between an owner and its keeper, confirmed on the
+keeper's ORCID record or web domain (#55, question 5; issue
+[#41](https://github.com/opensheaf/opensheaf.github.io/issues/41)).
 
 ### 2.2 Repositories and their identity
 
@@ -223,28 +239,28 @@ collision attacks by default; that is the only defence.
 
 ## 3. How the concepts meet
 
-The middle column uses the terms of the specification, and of the proposal of
-PR #30 where marked; the proposal is not agreed.
+The middle column uses the terms of the specification, and of the proposal
+(PR #30 as revised by PR #56) where marked; the proposal is not agreed.
 
 | Radicle | OpenSheaf | Remarks |
 |---|---|---|
-| Node ID, an Ed25519 key as `did:key` | keyed owner, `did:key:` Ed25519 (PR #30) | a named owner (archive identifier, ORCID iD) has no counterpart in Radicle |
-| repository, named by its RID | object, with a self-certifying name (PR #30) | RID: SHA-1 of the first identity document; name: SHA-256 of a seed and `genesis.json` |
-| first identity document | genesis record `genesis.json` (PR #30) | both fix the name; Radicle's document then changes, signed by the delegates |
+| Node ID, an Ed25519 key as `did:key` | owner: a keyed identity named by the digest of its genesis record, whose key log lists `did:key:` Ed25519 keys (proposal) | the key is not the owner: keys change in the key log, the owner's name stays; Radicle has no rotation |
+| repository, named by its RID | work, with a self-certifying name; each line (name, owner) an object (proposal) | RID: SHA-1 of the first identity document; name: SHA-256 of a seed and `genesis.json` |
+| first identity document | genesis record `genesis.json` of a work, and of an owner (proposal) | both fix the name; Radicle's document then changes, signed by the delegates, as an owner's key log does |
 | `payload` of the identity document | `datacite.json`, `object.json` | Radicle's description is minimal (name, description, default branch) |
-| delegates and threshold | owner of a line, single writer | several owners with a quorum: open, issue #53 |
-| peer namespace, "sole owner and writer" | line (owner, name), single writer (PR #30) | the closest match of all |
-| fork of a peer, then a patch | deep branch (PR #30) | in Radicle, merging into the canonical branch is the delegates' act |
-| canonical default branch, by threshold | the origin line, the originator's (PR #30) | OpenSheaf has one origin, no vote |
+| delegates and threshold | `keys` and `threshold` of an owner's key log (proposal) | one threshold governs both key changes and every version of the owner's lines, as Radicle's governs delegates and the canonical branch |
+| peer namespace, "sole owner and writer" | line (name, owner), single writer, stored at `<owner>/<name>/` (proposal) | the closest match of all |
+| fork of a peer, then a patch | branch: a new object starting at the parent's version, with its evidence; the parent's history, if kept, a copy of its line beside it (proposal) | a fork is a namespace of its own, the parent's replicated beside it; merging into the canonical branch is the delegates' act |
+| canonical default branch, by threshold | the origin line, the originator's (proposal) | OpenSheaf has one origin, no vote |
 | commit on a branch | object version | a commit fixes its history byte for byte; a pin fixes it through inventories (issue [#46](https://github.com/opensheaf/opensheaf.github.io/issues/46)) |
 | tags (not canonical yet) | document versions, numbered | Radicle has no notion of a version of the work |
-| signed references `rad/sigrefs` | witnesses: signatures of inventory checksum files (section 13.2); every version signed by a keyed owner (PR #30) | Radicle signs a state of all branches; OpenSheaf signs each version |
+| signed references `rad/sigrefs` | a signature file for every object version, naming the key-log version it relies on (proposal) | Radicle signs a state of all branches; OpenSheaf signs each version |
 | collaborative objects (issues, patches) | none in the core; comments and reviews are objects of their own, companion documents (issue [#28](https://github.com/opensheaf/opensheaf.github.io/issues/28)) | Radicle keeps the discussion inside the repository; OpenSheaf keeps statements in their authors' objects |
-| seed node | mirror (section 10.4), custodian (issue #13) | a seed keeps every namespace of a repository; a mirror keeps one object, the same object |
-| seeding policy (`allow`, `block`) | the decision to mirror, limited by licences | a seed needs no licence check; a mirror needs every version's licence to allow redistribution |
+| seed node | mirror: a copy of a line with its owner's key log (proposal); custodian (issues #13, #39) | a seed keeps every namespace of a repository; a mirror keeps one line |
+| seeding policy (`allow`, `block`) | the decision to mirror, limited by licences; custody policies (issue [#54](https://github.com/opensheaf/opensheaf.github.io/issues/54)) | a seed needs no licence check; a mirror needs every version's licence to allow redistribution |
 | inventory announcement | `objects` of the discovery document `opensheaf.json` | pushed by gossip in Radicle; read by pull in OpenSheaf |
 | refs announcement | the feed of an archive (`feed`) | announcement is a function OpenSheaf leaves to others ([positioning](positioning.md)) |
-| routing table | indexes `names/`, `owners/`, resolvers, gateways (PR #30, issue [#20](https://github.com/opensheaf/opensheaf.github.io/issues/20)) | Radicle's is built by every node from gossip |
+| routing table | indexes `names/`, `owners/`, resolvers, gateways (proposal, issue [#20](https://github.com/opensheaf/opensheaf.github.io/issues/20)) | Radicle's is built by every node from gossip |
 | `radicle-httpd` and the web interface | the archive itself, static files | OpenSheaf is read with nothing but HTTP |
 | private repository, allow list | private archives (issue #29) | both rest on not giving the files away; neither encrypts |
 | deletion: stop seeding, delete the repository | withdrawal (a new version), takedown and tombstone (section 11) | Radicle records no withdrawal and keeps no tombstone |
@@ -252,9 +268,9 @@ PR #30 where marked; the proposal is not agreed.
 
 The match is close where both systems answer the same question: who may
 write what, and how a reader knows it. A Radicle peer namespace is a line of
-PR #30: one writer, named by a key, under a name that does not depend on
-where the copy is kept, and copies that agree or fork. The RID is a
-self-certifying name derived from a first record, as the name of PR #30 is
+the proposal: one writer, an identity made of keys, under a name that does not
+depend on where the copy is kept, and copies that agree or fork. The RID is a
+self-certifying name derived from a first record, as the name of a work is
 derived from `genesis.json`. Seeds are custodians.
 
 The match breaks where OpenSheaf is about documents rather than code:
@@ -283,63 +299,51 @@ The match breaks where OpenSheaf is about documents rather than code:
   without the software that made them (requirements 9 and 10 of the [git
   paper](git-as-implementation.md#2-what-opensheaf-needs)).
 
-### The identity of an archive
+### Owners and archives
 
-A Radicle repository is the unit that is named, written by its delegates and
-replicated; in OpenSheaf that unit is the archive. Its identity is named in
-two ways, neither of which is Radicle's.
+A Radicle node is an identity, a key, and a repository is stored by its RID
+with a namespace per peer; nothing in a repository says where it is kept. The
+proposal took the same separation.
 
 **Today** (section 6.2 of the specification), an archive is named by an
 archive identifier, a URI that does not change when the archive moves. It
 SHOULD be a `tag:` URI (RFC 4151), built from a domain or e-mail address the
 owner controlled at the time, a date and a name, such as
 `tag:opensheaf.org,2026:mgubi`; a DOI or another persistent URI MAY be used
-instead. It is separate from the base URL, which may change, and is carried
-by the discovery document. Uniqueness is a rule ("Two different archives MUST
-NOT use the same archive identifier") that nothing checks: anyone can claim
-any `tag:`.
+instead. Uniqueness is a rule ("Two different archives MUST NOT use the same
+archive identifier") that nothing checks: anyone can claim any `tag:`. The
+archive is also the writer of its objects.
 
-**The proposal** of issue
-[#52](https://github.com/opensheaf/opensheaf.github.io/issues/52), which
-builds on PR #30 and is not agreed, names an archive as PR #30 names objects:
+**In the proposal** (#55, #52, PR #56):
 
-- a **genesis record** written when the archive is created (originator,
-  date, a random nonce, kind `archive`), kept in the archive's root so that it
-  travels with every copy;
-- a **name** made by the same function as object names, the SHA-256 digest of
-  the seed `opensheaf-name-<k>` and the record, 52 characters of base32;
-- an **owner**, named (an archive identifier, an ORCID iD, a web address) or
-  keyed (`did:key:`): the archive is a line one level up, (owner, archive
-  name), with a single writer;
-- the **right to write** belongs to the owner, not to a site: moving an
-  archive is handing that right to another site holding the same files, and
-  for a keyed owner the right is checkable by signatures;
-- **holdings**: a site keeps one storage root per archive it holds, keyed by
-  the archive's name, at most one of them writable, so that copies of other
-  archives are kept apart and their identifiers never clash with its own.
+- an **owner** is a keyed identity (a person, a group, an institution), named
+  by the digest of its own genesis record, whose versions are its **key log**:
+  each version lists the owner's keys and a threshold, and is signed by the
+  threshold of the keys before it, so keys rotate while the name stays;
+- every version of an owner's lines is signed, and the key logs travel with
+  the objects they sign, so any copy can be checked without its archive;
+- an **archive** is a host, with no identity of its own: it keeps the lines of
+  many owners, and copies of others, in one storage root at
+  `<owner>/<name>/`, and is found at its base URL, a hint like every location;
+- an owner that moves to another archive copies its key log there and
+  continues its lines; only a change of owner makes a branch.
 
-The name would replace `tag:` URIs and ARKs as archive identifiers, and
-settle in one direction the question of issue
-[#14](https://github.com/opensheaf/opensheaf.github.io/issues/14), how to
-write an archive, an object and a pinned version as one URI; in PR #30 the
-form is `sheaf:<name>[:<owner id>]...`.
-
-| | Radicle repository | OpenSheaf archive, today | OpenSheaf archive, issue #52 |
+| | Radicle | OpenSheaf today | the proposal |
 |---|---|---|---|
-| name | SHA-1 of the first identity document | a `tag:` URI, chosen | SHA-256 of the genesis record |
-| uniqueness | no nonce: one owner describing two repositories alike gets one RID (section 2.9) | a rule, not checked | a random nonce; clashes handled (issue #44) |
-| who writes | delegates, with a threshold | the archive's keeper | one owner per line; several owners are issue #53 |
-| authority | keys only | asserted by whoever controls the domain | a named owner (asserted) or a keyed owner (signed) |
-| moving | any node holding the data serves it | a new base URL, the same identifier | any site holding the root; the write right moves with the owner |
+| who writes | a node, its key | the archive | an owner, its key log |
+| name of the writer | the Node ID, the key itself | the archive identifier, a chosen `tag:` | the digest of the owner's genesis record |
+| rotation of keys | none: a new key is a new identity | not applicable | a new version of the key log |
+| several people | delegates and a threshold, per repository | the archive's own rules | the threshold of the owner's key log |
+| storage | one repository per RID, a namespace per peer | one storage root per archive, chosen identifiers | one storage root per archive, `<owner>/<name>/` |
+| where | announcements, never in the identity document | the base URL, and the archive identifier for the archive | locations are unsigned hints |
+| uniqueness of names | no nonce (section 2.9) | a rule, not checked | a random nonce; signatures decide reuse |
 
-The step from `tag:` to the proposal is the step Radicle took: the name
-stops being a claim and becomes self-certifying, since anyone can check that
-a genesis record gives that name. In both, the digest fixes only *which*
-archive or repository is meant; *who answers for it* comes from the owner, or
-the delegates, and can be checked only when they have keys. Radicle has only
-keyed owners; the proposal keeps named owners as well, whose authority is
-asserted, so that an archive can start without keys and an institution can
-answer for it by its name.
+What the proposal took from Radicle: the writer is an identity made of keys,
+not a place; storage is keyed by digests, so copies from anywhere sit side by
+side; the identity says who, never where; a fork is a namespace of its own.
+What it does differently: keys rotate through a key log rather than being the
+identity; names are SHA-256 digests of records with a nonce; and everything
+is plain files on a static website.
 
 ## 4. Three ways to use Radicle
 
@@ -386,14 +390,14 @@ collection is a repository whose `members.json` names RIDs and commits.
   - Only the default branch is canonical; document versions would need
     tags, which are not.
   - The identity document is Radicle's, not `genesis.json`: the names would
-    differ from those of PR #30, and an object could not move to a plain
+    differ from those of the proposal, and an object could not move to a plain
     archive without a second name (the problem of issue #20, two names for
     one object).
   - The transport is being replaced by an incompatible one (section 2.7):
     building on it now means following a moving protocol.
 
 This design is not recommended. It would trade the format's independence for
-features that PR #30 already specifies in plain files.
+features that the proposal specifies in plain files.
 
 ### 4.3 Radicle as a source of designs
 
@@ -407,31 +411,37 @@ namespace named by its key, and only that peer writes there: Alice's branches
 are under `refs/namespaces/<alice>/`, Bob's under `refs/namespaces/<bob>/`.
 The files are stored once and shared by all namespaces.
 
-**In OpenSheaf.** PR #30 gives each line (owner, name) one writer. Take a
-paper by A: co-author B continues it (a deep branch), and journal J keeps the
-version it vetted (a shallow branch). Today these are three OCFL objects, and
-an archive or a custodian keeping all three stores the same files three
-times. Radicle suggests grouping the lines of one work, one folder per owner:
+**In OpenSheaf.** Adopted by the proposal (#52, PR #56). The OCFL identifier
+of an object is its line, (name, owner), and the default layout stores it at
+`<owner>/<name>/`:
 
 ```
-ocfl/<name>/<owner A>/v1, v2 ...
-ocfl/<name>/<owner B>/v1, v2, v3 ...
-ocfl/<name>/<owner J>/v1 ...
+ocfl/
+  <owner A>/
+    <owner A>/      A's key log, the owner object
+    <name 1>/       A's line of work 1
+  <owner B>/
+    <owner B>/
+    <name 1>/       B's branch of work 1
 ```
 
-A reader then finds every line of a work in one place, and the forks are
-visible. This bears on custodians holding many lines (issue
-[#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)).
+Two lines never share an identifier, so an archive keeps its owners' lines and
+the copies it holds in one storage root without clashes, as a Radicle
+repository keeps every peer's namespace. One folder holds everything an owner
+has in the archive, its key log included, so an owner moving to another
+archive copies one folder. Large archives use the hashed layout instead.
 
-The saving of space needs no new layout where the archive is kept in git:
-git stores each file once, by its digest, across the whole repository, so
-the three objects share their files already
-([OpenSheaf archives in git](../opensheaf-git-0.1.md), and the [git
-paper](git-as-implementation.md)). Only on plain file systems and static
-hosts would the files be stored several times; there, OCFL objects are
-self-contained and do not share files, so sharing would need an OCFL
-extension. What remains of the idea is the grouping: a layout, or an index,
-that places the lines of one name together.
+The grouping is by owner rather than by work, as in Radicle by peer rather
+than by branch. The saving of space needs nothing more where the archive is
+kept in git, which stores each file once across the repository; on plain file
+systems, files shared by a branch and its parent are stored twice.
+
+Every branch is a new object (PR #56). A deep branch, holding the parent's
+earlier versions byte for byte, would carry the parent's OCFL identifier in
+those versions' inventories, and so could not be the branch owner's object;
+keeping the parent's history means keeping a copy of the parent's line beside
+the branch, as a Radicle fork keeps its own namespace and the parent's is
+replicated beside it.
 
 #### Delegates and a threshold
 
@@ -442,18 +452,18 @@ or removing a delegate, also needs the signatures of 2 current delegates. The
 name of the repository is the digest of the first document, so it does not
 change.
 
-**In OpenSheaf.** PR #30 gives each line a single owner, and leaves open how
-several people answer for one line. With one owner, the other authors of a
-paper keep branches of their own. With delegates, the line is owned by a
-group: `genesis.json` lists the keys of A, B and C with a threshold of 2; a
-version belongs to the line only if 2 of them signed it; adding D, or
-replacing a lost key, is a signed change by 2 of the current owners.
+**In OpenSheaf.** Adopted by the proposal, one level up: the keys and the
+threshold belong to an owner's key log, not to each line (#55, question 1;
+issue [#53](https://github.com/opensheaf/opensheaf.github.io/issues/53),
+closed). Co-authors who want to own their work together create one owner
+whose key log lists their keys, with a threshold, for instance 2 of 3; every
+version of their lines, and every change of their keys, then needs that many
+signatures. Adding a co-author, or replacing a lost key, is a new version of
+the key log. A person sets a threshold of 1, with a spare key kept apart.
 
-The cost is that a verifier must replay every change of the owners since the
-genesis record to know who may sign a given version, and that only keyed
-owners can take part: an ORCID iD asserted as owner signs nothing. The
-question is left for later, in issue
-[#53](https://github.com/opensheaf/opensheaf.github.io/issues/53).
+The cost is that a verifier replays the owner's key log to know which keys
+were valid when a version was signed; the key log is small and linear, and
+travels with the objects it signs.
 
 #### Signed references: not needed
 
@@ -467,13 +477,13 @@ Radicle signs its references because git references are mutable: a branch
 can be moved to any commit, rewritten or deleted, and a peer has many of
 them, so only the peer's signature says which state is its own. An OpenSheaf
 object only grows: each version's inventory fixes every version before it,
-and a line has one writer (PR #30). Of two copies of an object, either one
+and a line has one writer (the proposal). Of two copies of an object, either one
 is a prefix of the other, and the longer is simply more recent, or they
 diverge, which is a fork and is detected without any signature. The
 discovery document says nothing that cannot be checked: it is "a map, not a
 witness" (section 6.1), and every head and digest it states is verified
 against the storage root. Who made a version is answered for each version,
-by the owner's signature in PR #30 or by witnesses (section 13.2), not by
+by its owner's signature in the proposal, or by witnesses (section 13.2), not by
 signing the map.
 
 What linearity does not give is freshness: a copy that stops at an older
@@ -496,7 +506,7 @@ paper](positioning.md#5-federated-and-distributed-systems)).
 node keeps everything it hears of; a selective one keeps what its operator
 lists.
 
-**In OpenSheaf.** Today a mirror is decided object by object (`mirrorOf`).
+**In OpenSheaf.** Today a mirror is decided object by object.
 Custodians (issues #13 and #39) would be institutions that keep copies of
 others' work. A custodian could publish its policy in its discovery document,
 as standing rules:
@@ -548,25 +558,31 @@ at rest, or never leave their keeper.
 Radicle is the nearest working system to what OpenSheaf proposes for names
 and owners: a name derived from a first record, keys as owners, one writer
 per line, signed states, copies kept by whoever chooses. That it works on a
-public network is evidence that the design of PR #30 is practicable. It is
+public network is evidence that the design of the proposal is practicable. It is
 also evidence of the costs: a protocol whose nodes must run, a storage that
 users must not touch, SHA-1, and a transport that had to be replaced after two
 years.
 
-On names, Radicle supports the choices of PR #30 by what it lacks (section
-2.9). A RID made from a first document without a nonce repeats when the same
-owner describes two repositories alike; a collision, accidental or crafted,
-merges two repositories with nothing to detect it. PR #30 draws a random
-nonce for every genesis record, uses SHA-256, has archives refuse a genesis
-record reused for another work, compares the bytes of genesis records when
-two share a name, and keeps further names, by algorithm number, for a clash
-(issue [#44](https://github.com/opensheaf/opensheaf.github.io/issues/44)).
+On names, Radicle supports the choices of the proposal by what it lacks
+(section 2.9). A RID made from a first document without a nonce repeats when
+the same owner describes two repositories alike; a collision, accidental or
+crafted, merges two repositories with nothing to detect it. The proposal draws
+a random nonce for every genesis record, uses SHA-256, accepts a genesis
+record already held only when the originator's signatures or a branch's
+parent evidence hold, and keeps further names, by algorithm number, for a
+clash (issue [#44](https://github.com/opensheaf/opensheaf.github.io/issues/44)).
+
+On owners, the proposal follows Radicle where it works and departs from it
+where it falls short (section 3, "Owners and archives"): an identity made of
+keys, storage keyed by digests, identities that say who and never where, forks
+as namespaces of their own; but keys that rotate through a key log, and plain
+files on a static website.
 
 OpenSheaf should not be built on Radicle (section 4.2). An archive kept in git
 may be published on Radicle as one more copy (section 4.1). The designs of
-section 4.3 deserve to be weighed in the discussions they touch: delegates
-and thresholds in issue #53, custody policies in issue #54, announcements for
-indexes in issue #20, encryption for private archives in issue #29. One is not
+section 4.3 have been weighed: a namespace per owner and delegates with a
+threshold were adopted (PR #56); custody policies are issue #54, announcements
+for indexes issue #20, encryption for private archives issue #29. One is not
 needed: Radicle signs its references because they are mutable, while the
 history of an OpenSheaf object is linear and checkable without them.
 
@@ -583,10 +599,11 @@ history of an OpenSheaf object is linear and checkable without them.
 3. **One object as a repository.** Make one document a Radicle repository
    (section 4.2), one commit per object version, and measure what is lost:
    the document versions, the description-only versions, the SHA-512
-   inventories, and the name of PR #30.
-4. **Delegates for a line.** Write the rules of PR #30 for a line with two
-   owners and a threshold, as Radicle's identity document does, and see what
-   a verifier must replay.
+   inventories, and the names of the proposal.
+4. **Key logs in practice.** Create an owner with two keys and a threshold
+   of 1, sign versions, rotate a key and revoke another, then verify every
+   version from a copy of the archive without its site, and measure what a
+   verifier replays.
 
 ## 7. Open questions
 
@@ -595,12 +612,13 @@ history of an OpenSheaf object is linear and checkable without them.
 - Will Radicle adopt SHA-256 repositories when git does?
 - Should the deployment note recommend Radicle, or only mention it, as one
   way to keep copies of an archive in git?
-- Is a quorum of keys the right model for co-authors in PR #30, or should a
-  line keep one writer and co-authors keep lines of their own? (Issue #53.)
+- Is one threshold, for key changes and for publishing alike, enough, or will
+  owners want a separate threshold for each (#55)?
 
 ## References
 
 - Radicle: <https://radicle.xyz> (now also <https://radicle.dev>).
+- The proposal: PR #30, as revised by PR #56; issues #52 and #55.
 - Radicle Protocol Guide: <https://radicle.dev/guides/protocol>.
 - Radicle Seeder Guide: <https://radicle.dev/guides/seeder>.
 - Radicle 1.0.0, 10 September 2024:
