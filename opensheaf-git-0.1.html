@@ -324,11 +324,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       its checksum file by those of the new version; 3. files added in an
       object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt> folder; a file
       there, once published, is never replaced or removed (section 13.2 of the
-      specification), except with its object by a takedown: signature files
-      and timestamps are made of the bytes of others, and a completed
-      timestamp proof is a new file beside the pending one; 4. the replacement
-      of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced or removed
-      among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
+      specification), except with its object by a takedown: timestamps are
+      made of the bytes of signature files, which a copy may already hold, and
+      a completed timestamp proof is a new file beside the pending one; 4. the
+      replacement of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced
+      or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
       <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
       at every deposit and takedown (section 6.6 of the specification,
       proposal); 5. at the creation of the storage root, its own files (<tt
@@ -635,15 +635,18 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       update of the indexes if the archive keeps them (the object's entries
       kept with <tt class="verbatim">status</tt> <tt class="verbatim">removed</tt>, its name
       removed from <tt class="verbatim">owners/</tt>, section 6.6 of the specification,
-      proposal), as in section 5.1, items 4 and 6; 2. rewrite the history of
-      every branch of the repository to remove the object's files from every
-      commit (for instance with <tt class="verbatim">git filter-repo &ndash;invert-paths
-      &ndash;path ocfl/&lt;path&gt;/</tt>, with the object's path in the
-      layout); 3. force-push the rewritten branches, and delete tags that
-      point to commits holding the files; 4. ask the host to remove what it
-      keeps of the old history (on GitHub, cached views and the references of
-      pull requests are removed on request to its support; forks are separate
-      repositories, which it does not change).
+      proposal), as in section 5.1, items 4 and 6; owner objects whose key
+      logs other objects of the archive need are not removed with the line,
+      and an owner object is taken down only for itself (section 11.2 of the
+      specification); 2. rewrite the history of every branch of the repository
+      to remove the object's files from every commit (for instance with <tt
+      class="verbatim">git filter-repo &ndash;invert-paths &ndash;path
+      ocfl/&lt;path&gt;/</tt>, with the object's path in the layout); 3.
+      force-push the rewritten branches, and delete tags that point to commits
+      holding the files; 4. ask the host to remove what it keeps of the old
+      history (on GitHub, cached views and the references of pull requests are
+      removed on request to its support; forks are separate repositories,
+      which it does not change).
     </p>
     <p>
       This is the only rewrite of the published branch allowed. The commit of
@@ -880,6 +883,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
           of the specification):** the key logs of a branch's parents' owners
           are owner objects beside it, not content of the branch (section 11).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal (fifth audit of the
+          specification):</strong> a takedown leaves in place the owner
+          objects that other objects need (section 9); the wording of witness
+          files in section 5.1 clarified.
         </p>
       </li>
     </ul>

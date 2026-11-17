@@ -259,9 +259,10 @@
       <li>
         <p>
           <dfn>Key log</dfn>: the versions of an owner object, each listing
-          the owner's keys and the threshold of signatures it requires; the
-          first is signed by its own keys, which its genesis record fixes, and
-          each later one by the keys of the one before (section 6.5).
+          the owner's keys, the threshold of signatures it requires and the
+          keys it has revoked; the first is signed by its own keys, which its
+          genesis record fixes, and each later one by the keys of the one
+          before (section 6.5).
         </p>
       </li>
       <li>
@@ -273,10 +274,21 @@
       </li>
       <li>
         <p>
-          <dfn>Unconfirmed</dfn>: the status of a signature that verifies but
-          that the rules on later key-log versions do not let count, and of a
-          version signed only with the help of such signatures: kept, copied
-          and shown, not invalid, but not relied on (section 6.5).
+          <dfn>Unconfirmed</dfn>: the status of a signature that cannot be
+          relied on yet although nothing shows it false: one by a key that its
+          owner has revoked, one naming a key-log version after the point
+          where the key log forks, or one whose key log is not available up to
+          the version it names; and of a version signed only with the help of
+          such signatures: kept and shown where it is found, not invalid, but
+          not relied on (sections 6.5 and 13.2).
+        </p>
+      </li>
+      <li>
+        <p>
+          <dfn>Revoked key</dfn>: a key that its owner lists in <tt class="verbatim">revoked</tt>
+          of its key log, because it may have been exposed; unlike a key
+          merely removed (retired), it makes its signatures unconfirmed,
+          whenever they were made (section 6.5).
         </p>
       </li>
       <li>
@@ -473,10 +485,10 @@
           extension acts on signatures only within the status of unconfirmed
           (section 6.5), for readers that know it and for owners that adopt
           it: it MAY confirm a signature or a version that this specification
-          leaves unconfirmed, and MAY leave unconfirmed one that this
-          specification would let count; it never makes invalid what this
-          specification accepts, nor makes count what this specification
-          rejects as invalid.
+          leaves unconfirmed (one by a revoked key, one on a side of a fork of
+          a key log); it never leaves unconfirmed what this specification lets
+          count, never makes invalid what this specification accepts, and
+          never makes count what this specification rejects as invalid.
         </p>
       </li>
     </ul>
@@ -895,6 +907,14 @@
       </li>
       <li>
         <p>
+          <tt class="verbatim">revoked</tt>, OPTIONAL: the keys the owner has revoked
+          (below), in the same form as <tt class="verbatim">keys</tt>; a key listed here
+          is never listed in <tt class="verbatim">keys</tt> of this version or of a
+          later one, and every later version lists it here too;
+        </p>
+      </li>
+      <li>
+        <p>
           <tt class="verbatim">extensions</tt>, OPTIONAL: the data of extensions
           concerning the key log (section 4), keyed by the names of the
           extensions, for instance the declaration of the <a href="opensheaf-timestamps-0.1.html">timestamps
@@ -910,110 +930,153 @@
     </ul>
     <p>
       The first version of the key log holds the genesis record and the first
-      <tt class="verbatim">keys.json</tt>, whose <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt>
-      MUST be exactly those of the genesis record (it MAY add <tt class="verbatim">keeper</tt>
-      and <tt class="verbatim">extensions</tt>). Its authority comes from the genesis
-      record, whose digest is the owner name: no one can make another first
-      version under that name without changing the keys it lists, and so the
-      name. It is signed, like every version, by <tt class="verbatim">threshold</tt> of
-      those keys, which binds the rest of it; its signatures name the first
-      version itself in <tt class="verbatim">keyLog</tt>. **Every later version vN+1
-      MUST be signed by at least <tt class="verbatim">threshold</tt> distinct keys of
-      vN, its signatures naming vN in <tt class="verbatim">keyLog</tt>.** A new key is
-      added, an old one removed (which is how a key is revoked), or a
-      threshold or the data of an extension changed, by a new version; the
-      owner name never changes. Tools SHOULD create two keys when an owner is
-      created, one of them kept apart (on a hardware token, for instance), or
-      give the owner the keys of several people with a threshold; losing every
-      key of the latest version cannot be recovered. The field names of <tt
-      class="verbatim">keys.json</tt> are provisional (#55).
+      <tt class="verbatim">keys.json</tt>, whose <tt class="verbatim">keys</tt> (compared as a
+      set: the same keys, in any order) and <tt class="verbatim">threshold</tt> MUST be
+      exactly those of the genesis record (it MAY add <tt class="verbatim">keeper</tt>
+      and <tt class="verbatim">extensions</tt>, and has no <tt class="verbatim">revoked</tt>). Its
+      authority comes from the genesis record, whose digest is the owner name:
+      no one can make another first version under that name without changing
+      the keys it lists, and so the name. It is signed, like every version, by
+      <tt class="verbatim">threshold</tt> of those keys, which binds the rest of it; its
+      signatures name the first version itself in <tt class="verbatim">keyLog</tt>.
+      **Every later version vN+1 MUST be signed by at least <tt class="verbatim">threshold</tt>
+      distinct keys of vN, its signatures naming vN in <tt class="verbatim">keyLog</tt>.**
+      A key is added, retired or revoked (below), or the threshold or the data
+      of an extension changed, by a new version; the owner name never changes.
+      Tools SHOULD create two keys when an owner is created, one of them kept
+      apart (on a hardware token, for instance), or give the owner the keys of
+      several people with a threshold; losing every key of the latest version
+      cannot be recovered. The field names of <tt class="verbatim">keys.json</tt> are
+      provisional (#55).
     </p>
     <p>
       <strong>Signing.</strong> Every sealed object version of a line MUST be
-      signed by its owner: a version is signed when at least <tt class="verbatim">threshold</tt>
-      valid signature files of its owner (section 13.2), from distinct keys,
-      name one version of the owner's key log, the <tt class="verbatim">threshold</tt>
-      being that version's. Other signature files of the version (naming other
+      signed by its owner. Each signature file of the owner names one version
+      of the owner's key log, in <tt class="verbatim">keyLog</tt>, and SHOULD name the
+      latest one known to its signer. A version is <strong>signed</strong>
+      when at least <tt class="verbatim">threshold</tt> signature files of its owner
+      that count (below), from distinct keys, name one version of the owner's
+      key log, the <tt class="verbatim">threshold</tt> being that version's; throughout
+      this specification, the signatures of a version <strong>hold</strong>
+      when it is signed. Other signature files of the version (naming other
       key-log versions, stray, malformed or invalid) are ignored and reported,
       never fatal, so that a host cannot break a version by adding a file. A
-      key signs a given object version at most once. A signature SHOULD name
-      the latest version of the key log at the time it is made. One naming an
-      older version vk, while vL is the latest version known to the reader,
-      counts only if its key is listed in <tt class="verbatim">keys</tt> of vL and of
-      every version between, no version after vk has raised the threshold, and
-      no version after vk has changed extension data that the reader knows to
-      govern signatures (the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> says when its
-      declaration does); otherwise it is unconfirmed, since nothing in the
-      core shows whether it was made before the change or after it (the <a
-      href="opensheaf-timestamps-0.1.html">timestamps extension</a> can confirm it). A key removed and later
-      added again leaves the signatures it made while absent unconfirmed in
-      the same way. When the key log is forked after vk (below), the reader
-      knows several latest versions, one on each side, and the signature
-      counts only if the rule holds on every side. A signature never counts
-      for a version of a key log under an older version of it: vN+1 is signed
-      under vN only.
+      key signs a given object version at most once. <strong>A signature
+      counts when it is valid under the key-log version it names</strong>
+      (section 13.2: the key log, checked from its first version, reaches that
+      version, the key is listed in its <tt class="verbatim">keys</tt>, and the
+      signature verifies), unless it is unconfirmed (below). It is judged
+      against that version alone: later versions of the key log never take it
+      away. A key that is retired, a threshold that is raised, or extension
+      data that is changed, by a later version, change only what can be signed
+      from then on; every version signed before stays signed, and is never
+      signed again. The versions of the key log follow the same rule: vN+1
+      names vN, and is checked against vN alone.
     </p>
     <p>
-      <strong>Unconfirmed is not invalid.</strong> A signature that verifies
-      (section 13.2) but that the rules above do not let count is
-      <strong>unconfirmed</strong>; a version that has <tt class="verbatim">threshold</tt>
-      counting signatures from one key-log version is signed, one that reaches
+      <strong>Retiring and revoking a key.</strong> An owner
+      <strong>retires</strong> a key it no longer uses (a replaced laptop, a
+      member who leaves the group) by leaving it out of <tt class="verbatim">keys</tt>
+      in a new version of its key log; the signatures the key made stay valid,
+      and count. An owner <strong>revokes</strong> a key that may have been
+      exposed (stolen, leaked, copied) by listing it in <tt class="verbatim">revoked</tt>
+      in a new version. Nothing in the core dates a signature, so the
+      signatures made by a revoked key before its revocation cannot be told
+      apart from those that whoever holds it makes afterwards, naming a
+      key-log version in which it was still listed: every signature by a key
+      listed in <tt class="verbatim">revoked</tt> of any version of the key log known to
+      the reader is therefore unconfirmed, whenever it was made, unless an
+      extension shows that it was made before the revocation (the <a href="opensheaf-timestamps-0.1.html">timestamps
+      extension</a>, section 4). Revocation does not touch the versions of the
+      key log up to the one that revokes: by signing that version, the owner's
+      current keys confirm the history it extends, and a different version
+      that the revoked key signs is a fork (below). <strong>A key that may
+      have been exposed MUST be revoked, not merely retired</strong>: a
+      retired key that someone else holds can still make signatures that
+      count, naming a version of the key log in which it was listed. Revoking
+      is therefore the costly case, kept for keys that are lost to others;
+      retiring costs nothing.
+    </p>
+    <p>
+      <strong>Unconfirmed is not invalid.</strong> A signature is
+      <strong>unconfirmed</strong> when it is valid but cannot be relied on
+      yet: its key is revoked (above), the version of the key log it names is
+      after the fork point of a fork of the key log (below), or the key log is
+      not available to the reader up to the version it names, so that it
+      cannot be checked (section 13.2). A version that has <tt class="verbatim">threshold</tt>
+      counting signatures from one key-log version is signed; one that reaches
       <tt class="verbatim">threshold</tt> only if its unconfirmed signatures are counted
-      too is unconfirmed, and one that does not reach it even so is not
-      signed, and invalid. An unconfirmed version is kept, copied with its
-      object and shown, with its status; it is not deleted, nor reported as
+      too is unconfirmed; one that does not reach it even so is not signed,
+      and invalid (section 13.2). An unconfirmed version is kept and shown
+      where it is found, with its status; it is not deleted, nor reported as
       invalid, and later evidence may confirm it (an extension, section 4; the
-      end of a fork). But it is not relied on: it does not count as signed for
-      a pin, a resolution, a collection member, a branch point or the signing
-      of a later key-log version, until it is confirmed. One <tt class="verbatim">threshold</tt>
-      governs both the key log and every line of the owner, as in Radicle,
-      where the threshold of an identity document also decides its canonical
-      branch: a person uses a threshold of 1 with a spare key; a group raises
-      it, and then also governs together what it publishes. A second
-      threshold, for lines alone, can be added later if needed.
+      key log found; the end of a fork). But it is not relied on: it does not
+      count as signed for a pin, a resolution, a collection member, a branch
+      point or the signing of a later key-log version; it never makes a fork
+      of a line, never takes a line's identifier from a signed history
+      (below), and mirrors and custodians do not copy it until it is
+      confirmed, so that a copy of a line stops at its last signed version.
+      One <tt class="verbatim">threshold</tt> governs both the key log and every line of
+      the owner, as in Radicle, where the threshold of an identity document
+      also decides its canonical branch: a person uses a threshold of 1 with a
+      spare key; a group raises it, and then also governs together what it
+      publishes. A second threshold, for lines alone, can be added later if
+      needed.
     </p>
     <p>
       <strong>Forks of a key log.</strong> Two different valid versions of a
-      key log with the same number are a fork of the owner. The core does not
-      resolve it: the fork is reported, readers see the conflict, and
-      signatures naming key-log versions after the fork point are unconfirmed,
-      until the owner resolves it by other means (for instance a new owner,
-      announced through its keeper). A key once removed can make such a fork
-      at any later time, since it can still sign a different version of the
-      key log it was listed in; owners who want forks resolved by time adopt
-      the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>, which resolves them by time (its
-      section 7), and SHOULD adopt it from the first version of their key log,
-      before any key is removed.
+      key log with the same number are a fork of the owner; there may be more
+      than two sides. The core does not resolve it: the fork is reported,
+      readers see the conflict, and signatures naming key-log versions after
+      the fork point, on any side, are unconfirmed, until the owner resolves
+      it by other means (for instance a new owner, announced through its
+      keeper). Signatures naming the fork point or an earlier version are not
+      affected, except those of keys revoked on any side. Any <tt class="verbatim">threshold</tt>
+      keys of a version can fork the key log after it, also after they are
+      retired or revoked, since they can still sign a different next version:
+      with a threshold of 1, a single stolen key can do it, and every
+      signature the owner made after the fork point becomes unconfirmed.
+      Owners who want to survive the loss of one key SHOULD use a threshold of
+      2 or more, with keys kept apart; owners who want forks resolved by time
+      adopt the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>, which resolves them by time
+      (its section 7), from the first version of their key log. An archive
+      keeps one owner object for each owner (section 5): when it holds one
+      side of a fork, it keeps that side, and a copy whose signatures name
+      versions of another side is kept with it, those signatures being
+      reported as unconfirmed, on a side of a fork.
     </p>
     <p>
       <strong>Key logs travel with the objects they sign.</strong> A copy of
-      an object, in any archive, MUST include the key log of every owner whose
-      signature it carries, up to the latest version of that key log known to
-      whoever makes the copy (at least up to the versions those signatures
+      an object, in any archive, MUST include the key logs of the owners whose
+      signatures make it valid, up to the latest version of each key log known
+      to whoever makes the copy (at least up to the versions those signatures
       name), as copies of those owner objects in the same storage root (at
       their paths, section 5): the owner of its line (the originator's for an
       originator's line, the branch owner's for a branch) and, for a branch,
       the owner of each parent whose signatures its evidence holds, in <tt
       class="verbatim">parent.signatures/</tt> and at every level of <tt class="verbatim">parent.chain/</tt>
-      (section 10.5). Key logs are never copied into an object's content: a
-      key log checks itself from its owner name (below), so a copy kept as
-      content would add no trust, would be frozen at the time it was made, and
-      would be repeated in every branch and at every level of every chain. A
-      takedown of a line leaves these owner objects in place (section 11.2).
-      Whoever copies new versions of an object also copies the new versions of
-      the key logs it knows. The key log checks itself: its first version's
-      genesis record has the owner name as its name and lists its first keys,
-      and each later version is signed by the keys of the one before; so a
-      copy of it from any source is as good as the original, and a reader
-      checks a line without trusting any host, also after the archives that
-      served it have gone. Of two valid copies of a key log, either one
-      extends the other, and readers use the longer, or they fork, and the
-      rule on forks above applies; the longest copy is never chosen across a
-      fork. No one can prove offline that a key log is complete: a copy that
-      stops early may hide a later version, such as one that removes a key, so
-      the freshness of a key log is only as good as the copies a reader has
-      seen. Since the latest version decides which signatures count, readers
-      use the latest version they know.
+      (section 10.5); an owner object taken down in that archive (section
+      11.2) is the exception, its tombstone standing in its place. The key
+      logs of third parties whose witnesses a copy keeps (section 13.2) MAY be
+      copied in the same way. Key logs are never copied into an object's
+      content: a key log checks itself from its owner name (below), so a copy
+      kept as content would add no trust, would be frozen at the time it was
+      made, and would be repeated in every branch and at every level of every
+      chain. A takedown of a line leaves these owner objects in place (section
+      11.2). Whoever copies new versions of an object also copies the new
+      versions of the key logs it knows. The key log checks itself: its first
+      version's genesis record has the owner name as its name and lists its
+      first keys, and each later version is signed by the keys of the one
+      before; so a copy of it from any source is as good as the original, and
+      a reader checks a line without trusting any host, also after the
+      archives that served it have gone. Of two valid copies of a key log,
+      either one extends the other, and readers use the longer, or they fork,
+      and the rule on forks above applies; the longest copy is never chosen
+      across a fork. No one can prove offline that a key log is complete: a
+      copy that stops early may hide a later version, such as one that revokes
+      a key, so the freshness of a key log is only as good as the copies a
+      reader has seen. Since a later version may revoke a key, readers use the
+      latest version they know.
     </p>
     <p>
       <strong>Keepers (optional).</strong> An owner MAY name, in <tt class="verbatim">keeper</tt>
@@ -1041,15 +1104,16 @@
       the owner-name layout; sections 5 and 6.3), in the same format as any
       object (OCFL versions, <tt class="verbatim">object.json</tt>, <tt class="verbatim">datacite.json</tt>)
       but without a genesis record. It is never signed and never pinned, and
-      it is never copied out of its archive: mirrors, custodians, collections,
-      indexes and <tt class="verbatim">sheaf:</tt> URIs never take drafts. It is the
-      only object that MAY be rewritten or deleted: the rule that versions are
-      fixed, and the tombstones of section 11.3, do not apply to it. The
-      discovery document MAY list drafts apart, as unfinished work on which
-      nothing may rely, or not at all (section 6.1, #29). The format says
-      nothing about where a draft's content came from: a tool may read any
-      object and recreate its files in a draft, as far as their licences
-      allow.
+      it belongs to its archive alone: mirrors, custodians, collections,
+      indexes and <tt class="verbatim">sheaf:</tt> URIs never take drafts, and only the
+      archive itself keeps them, also when it moves to another site (section
+      6.2). It is the only object that MAY be rewritten or deleted: the rule
+      that versions are fixed, and the tombstones of section 11.3, do not
+      apply to it. The discovery document MAY list drafts apart, as unfinished
+      work on which nothing may rely, or not at all (section 6.1, #29). The
+      format says nothing about where a draft's content came from: a tool may
+      read any object and recreate its files in a draft, as far as their
+      licences allow.
     </p>
     <p>
       <strong>One writer per line.</strong> The object versions of a line form
@@ -1060,17 +1124,20 @@
       copies of a line can be compared from their inventories alone: two
       copies whose heads are <tt class="verbatim">vk</tt> and <tt class="verbatim">vm</tt>, with k
       not greater than m, agree when <tt class="verbatim">vk/inventory.json</tt> is the
-      same file, byte for byte, in both. Two copies whose signatures hold and
-      that do not agree are a fork of the line, made by its owner, and
-      attributable to it. A version whose signatures do not hold is not a
-      version of the line, wherever it is found: <strong>an archive MUST NOT
-      add to a line a version that its owner has not signed</strong>, and
-      another archive that continues a line is a branch, under its own owner
-      (section 10.5). Since a line is linear and each version fixes those
-      before it, a copy that stops at an earlier version is simply older; no
-      signed list of an owner's lines is needed, and none is defined: an
-      archive's discovery document lists what it holds, without guaranteeing
-      that an owner has no lines elsewhere.
+      same file, byte for byte, in both. Two copies whose versions are signed
+      and that do not agree are a fork of the line, made by its owner, and
+      attributable to it. Unconfirmed versions never make a fork: a copy that
+      departs from a signed history only by unconfirmed versions (made, for
+      instance, with a revoked key) is reported as unconfirmed, and does not
+      take the line's place. A version that is neither signed nor unconfirmed
+      is not a version of the line, wherever it is found: <strong>an archive
+      MUST NOT add to a line a version that its owner has not signed</strong>,
+      and another archive that continues a line is a branch, under its own
+      owner (section 10.5). Since a line is linear and each version fixes
+      those before it, a copy that stops at an earlier version is simply
+      older; no signed list of an owner's lines is needed, and none is
+      defined: an archive's discovery document lists what it holds, without
+      guaranteeing that an owner has no lines elsewhere.
     </p>
     <p>
       <strong>Archives and owners.</strong> An archive decides which owners it
@@ -1159,8 +1226,9 @@
       <li>
         <p>
           a copy of a line whose identifier is taken in a storage root by a
-          different history of the same line is a fork (above), and cannot be
-          kept there beside it;
+          different signed history of the same line is a fork (above), and
+          cannot be kept there beside it; a copy that differs only by
+          unconfirmed versions is kept up to its last signed version;
         </p>
       </li>
       <li>
@@ -1425,13 +1493,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <tt class="verbatim">object.json</tt> are the line's, the versions are signed by
       the owner, checked against its key log (section 13.2), and, with a
       digest, the rest of the checks of a pin. A copy that passes them is a
-      copy of the line, wherever it was found; a copy whose signatures do not
-      hold is not, and is reported as invalid, with where it was found, and
-      never used; a copy whose versions are unconfirmed (section 6.5) is
-      reported as unconfirmed, with where it was found, and is not used for a
-      pin or a resolution until confirmed. When copies of a line whose
-      signatures hold disagree, they are a fork by its owner (section 6.5):
-      the resolver reports it and does not choose.
+      copy of the line, wherever it was found; a copy whose versions are not
+      signed is not, and is reported as invalid (or unsigned, section 13.2),
+      with where it was found, and never used; a copy whose versions are
+      unconfirmed (section 6.5) is reported as unconfirmed, with where it was
+      found, and is not used for a pin or a resolution until confirmed. When
+      copies of a line whose versions are signed disagree, they are a fork by
+      its owner (section 6.5): the resolver reports it and does not choose;
+      unconfirmed versions never make a fork.
     </p>
     <p>
       <strong>Searching for a work.</strong> A work is its genesis record, and
@@ -1858,22 +1927,26 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <tt class="verbatim">object.json</tt> with <tt class="verbatim">format</tt>, <tt class="verbatim">specification</tt>,
       <tt class="verbatim">kind</tt> <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt> and <tt
       class="verbatim">owner</tt> (both the owner name) and <tt class="verbatim">status</tt>,
-      always <tt class="verbatim">active</tt>; it has no <tt class="verbatim">datacite.json</tt>,
+      always <tt class="verbatim">active</tt>, and MAY have <tt class="verbatim">extensions</tt>
+      (section 4; an extension concerning the key log records its data in <tt
+      class="verbatim">keys.json</tt> instead); it has no <tt class="verbatim">datacite.json</tt>,
       no document versions and none of the fields specific to documents,
       collections or lines (<tt class="verbatim">documentVersion</tt>, <tt class="verbatim">parent</tt>),
       nor <tt class="verbatim">withdrawal</tt>, <tt class="verbatim">licence</tt>, <tt class="verbatim">agreement</tt>
       or <tt class="verbatim">external</tt>. Its object versions are numbered as OCFL
       numbers them, and each later one MUST be signed by at least <tt class="verbatim">threshold</tt>
       keys of the one before (section 13.2). An owner object is never
-      withdrawn, branched or mirrored apart from the lines it signs; it is
-      copied with them (section 6.5).
+      withdrawn or branched. It is copied with the lines it signs (section
+      6.5), and MAY be copied, or mirrored, on its own: when its owner moves
+      (section 6.5), or to keep a fresher copy of its key log.
     </p>
     <h2 id="auto-20"><a id="8-description-datacitejson"></a>8. Description: datacite.json<span style="margin-left: 1em"></span></h2>
     <p>
-      Every object version MUST contain <tt class="verbatim">datacite.json</tt>, a JSON
-      object with the DataCite 4.7 properties in the form of the <tt class="verbatim">attributes</tt>
-      of a DOI in the DataCite REST API. It is the authoritative description
-      of the object version. It MUST contain:
+      Every object version, except in an owner object (section 7.5), MUST
+      contain <tt class="verbatim">datacite.json</tt>, a JSON object with the DataCite
+      4.7 properties in the form of the <tt class="verbatim">attributes</tt> of a DOI in
+      the DataCite REST API. It is the authoritative description of the object
+      version. It MUST contain:
     </p>
     <ul>
       <li>
@@ -2409,10 +2482,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
     <h3 id="auto-27"><a id="104-mirrors"></a>10.4 Mirrors<span style="margin-left: 1em"></span></h3>
     <p>
       An archive MAY keep a copy of a line written elsewhere, a mirror: the
-      whole object, every version with its inventories, files and witnesses,
+      whole object, every signed version with its inventories, files and
+      witnesses (an unconfirmed version once it is confirmed, section 6.5),
       byte for byte, in its own storage root, at the path its layout gives the
       object's identifier (section 6.3), together with the key logs of its
-      signers, up to the latest versions known (section 6.5). A mirror is the
+      owners, up to the latest versions known (section 6.5). A mirror is the
       same line, not a new one: its versions are its owner's, checked by its
       owner's signatures, and nothing in its files names the archive that
       keeps it, so no mark of a mirror is needed (<tt class="verbatim">mirrorOf</tt> is
@@ -2599,7 +2673,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           class="verbatim">owner</tt>, kept beside the branch (section 6.5), is a valid
           key log (section 6.5), and includes the version the signatures name,
           with the digest in their <tt class="verbatim">keyLog</tt>; its later versions
-          known are checked under section 6.5;
+          known are checked under section 6.5, for revoked keys and forks; a
+          key log that is not available leaves the parent's signatures
+          unconfirmed (section 13.2), which is reported, and is not a failure
+          of this check;
         </p>
       </li>
       <li>
@@ -2607,8 +2684,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           the parent's signature: at least <tt class="verbatim">threshold</tt> signature
           files in <tt class="verbatim">parent.signatures/</tt>, of distinct keys of
           that key-log version, naming it, sign the parent version (section
-          13.2), under the rules of section 6.5 on later key-log versions and
-          removed keys (other signature files are ignored);
+          13.2), under the rules of section 6.5 (a signature by a revoked key,
+          or naming a key-log version after a fork point, is unconfirmed;
+          other signature files are ignored); missing or invalid signatures of
+          the parent are a failure of this check;
         </p>
       </li>
       <li>
@@ -2632,9 +2711,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       its parent is a branch, at each of its branch points, and its copies
       MUST carry the key logs of its parents' owners (section 6.5); a copy
       without one of them leaves the signatures that need it unconfirmed, and
-      the verdict of the branch point with them (section 14). Without them, or
-      when they do not hold, the branch shows only that someone made a parent
-      inventory that agrees with itself.
+      the verdict of the branch point with them (section 14). Without <tt
+      class="verbatim">parent.signatures/</tt>, or when its signatures are invalid, the
+      branch shows only that someone made a parent inventory that agrees with
+      itself, and is inconsistent (section 14).
     </p>
     <p>
       <strong>Moving the branch point.</strong> A branch MAY take a later
@@ -2736,14 +2816,20 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       are CC0 metadata (section 16) under pseudonymous owner names, and every
       line, branch and copy that those owners signed, in that archive and in
       others, needs them to be checked. An archive MUST keep an owner object
-      as long as it keeps an object that carries a signature of that owner,
-      and MAY keep it after. An owner object is taken down only for itself: at
-      its owner's request, by a statement signed by the owner's keys, or by
-      law. Its line then gets a tombstone like any other (section 11.3); the
-      signatures of that owner in the objects the archive still keeps cannot
-      be checked there, so they, and the versions and branch points that rely
-      on them, are unconfirmed, not inconsistent (sections 6.5 and 13.2),
-      until the key log is found elsewhere.
+      as long as it keeps an object whose signatures need it (section 6.5),
+      except when the owner object is itself taken down, and MAY keep it
+      after. An owner object is taken down only for itself: at its owner's
+      request, by a statement signed by the owner's keys, or by law. Its line
+      then gets a tombstone like any other (section 11.3); the signatures of
+      that owner in the objects the archive still keeps cannot be checked
+      there, so they, and the versions and branch points that rely on them,
+      are unconfirmed, not inconsistent (sections 6.5 and 13.2), until the key
+      log is found elsewhere. The rule that a copy carries its owners' key
+      logs (section 6.5), and the checks of section 14, then accept the
+      tombstone in place of the owner object. An owner object restored later,
+      with the same genesis record and a key log whose versions extend the
+      version the tombstone pins, is the same line returning, not a reuse of
+      its identifier (section 11.3).
     </p>
     <h3 id="auto-33"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
     <p>
@@ -2756,13 +2842,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       of the work), which it MUST record, so that its line stays taken in that
       archive and a genesis record is compared with it whatever the algorithm
       of its lines' names (section 6.5). Drafts leave no tombstone.
-      Identifiers of tombstoned objects MUST NOT be reused. Verifiers report a
-      pin to a tombstoned object as &quot;removed&quot;, not as a corruption.
-      A tombstone is not signed, so a host can add one falsely: a resolver
-      that meets a tombstone keeps looking at other locations and indexes;
-      when it finds a valid copy elsewhere, it reports the copy as found, and
-      the tombstone beside it. External copies (DOI records, snapshots) follow
-      the rules of their services.
+      Identifiers of tombstoned objects MUST NOT be reused, except by the same
+      line returning (an owner object restored, section 11.2). Verifiers
+      report a pin to a tombstoned object as &quot;removed&quot;, not as a
+      corruption. A tombstone is not signed, so a host can add one falsely: a
+      resolver that meets a tombstone keeps looking at other locations and
+      indexes; when it finds a valid copy elsewhere, it reports the copy as
+      found, and the tombstone beside it. External copies (DOI records,
+      snapshots) follow the rules of their services.
     </p>
     <p>
       Note: OCFL 1.1 has no way to remove files from an object short of
@@ -2944,33 +3031,62 @@ keylog &lt;the value of keyLog&gt;</pre>
       verifies the signature.
     </p>
     <p>
-      A signature is valid when the file's name matches the digest of its key,
-      the key log, checked from its first version (section 6.5), reaches the
-      version named with that digest, the key is listed there, and the
-      signature verifies; it counts when, in addition, the rules of section
-      6.5 on later key-log versions allow it, and is otherwise unconfirmed,
-      not invalid (section 6.5). A version is signed by its owner when at
-      least <tt class="verbatim">threshold</tt> distinct keys of one key-log version
-      have valid signature files that count naming that version, and
-      unconfirmed when it reaches <tt class="verbatim">threshold</tt> only with
-      unconfirmed ones (section 6.5); other signature files, stray or
-      malformed, are ignored and reported, never fatal. The versions of an
-      owner's key log are signed in the same way, <tt class="verbatim">object</tt> being
-      the owner object, by the keys of the version before (for the first, by
-      its own keys, which its genesis record fixes). Signature files, and the
-      witnesses kept beside them, are never re-serialised or replaced once
-      made, here or in <tt class="verbatim">parent.signatures/</tt>, since witnesses
-      such as timestamps may be made of their bytes.
+      A signature file of the owner is checked against the key-log version it
+      names, and is in one of these states:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>invalid</strong>: it is malformed, or its name does not
+          match the digest of its key, or the key log, checked from its first
+          version (section 6.5), reaches the version named with that digest,
+          and the key is not listed in its <tt class="verbatim">keys</tt>, or the
+          signature does not verify;
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>valid</strong>: the key log reaches the version named, the
+          key is listed there, and the signature verifies; a valid signature
+          <strong>counts</strong> unless it is unconfirmed;
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>unconfirmed</strong>: it is valid, but its key is revoked in
+          a version of the key log known to the reader, or the version it
+          names is after the fork point of a fork of the key log (section
+          6.5); or the key log is not available to the reader up to the
+          version it names, so that it cannot be checked, and is neither valid
+          nor invalid.
+        </p>
+      </li>
+    </ul>
+    <p>
+      A version is <strong>signed</strong> by its owner when at least <tt
+      class="verbatim">threshold</tt> distinct keys of one key-log version have
+      signature files naming that version that count;
+      <strong>unconfirmed</strong> when it reaches <tt class="verbatim">threshold</tt>
+      only if unconfirmed ones are counted too; and otherwise not signed:
+      <strong>unsigned</strong> when it has no signature file of its owner,
+      <strong>invalid</strong> otherwise (section 6.5). Other signature files,
+      stray or malformed, are ignored and reported, never fatal. The versions
+      of an owner's key log are signed in the same way, <tt class="verbatim">object</tt>
+      being the owner object, by the keys of the version before (for the
+      first, by its own keys, which its genesis record fixes). Signature
+      files, and the witnesses kept beside them, are never re-serialised or
+      replaced once made, here or in <tt class="verbatim">parent.signatures/</tt>, since
+      witnesses such as timestamps may be made of their bytes.
     </p>
     <p>
       <strong>Timestamps.</strong> A timestamp shows that a signature existed
       by a date. The core defines none: RFC 3161 tokens and OpenTimestamps
       proofs of signature files MAY be kept beside them, as defined by the <a
       href="opensheaf-timestamps-0.1.html">timestamps extension</a>, which an owner adopts in its key log,
-      and which uses them to resolve forks of key logs and to confirm
-      signatures that section 6.5 leaves unconfirmed after a key is removed. A
-      verifier that does not know the extension ignores these files, as it
-      ignores any witness it does not know.
+      and which uses them to resolve forks of key logs and to confirm the
+      signatures that a revoked key made before its revocation, which section
+      6.5 leaves unconfirmed. A verifier that does not know the extension
+      ignores these files, as it ignores any witness it does not know.
     </p>
     <p>
       <strong>Others' witnesses.</strong> A signature by someone other than
@@ -2979,20 +3095,20 @@ keylog &lt;the value of keyLog&gt;</pre>
       matches <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>, with the fields and
       the signed message of a signature file, <tt class="verbatim">signer</tt> and <tt
       class="verbatim">keyLog</tt> naming the signer's own owner object, which MUST NOT
-      be the line's owner, which the copy then also keeps (section 6.5). It is
-      a witness, not a signature of the line.
+      be the line's owner, and whose key log the copy MAY keep beside it
+      (section 6.5). It is a witness, not a signature of the line.
     </p>
     <p>
       <strong>Copies and branches.</strong> A copy of an object copies its
-      witnesses with it, and keeps the key logs of its signers up to the
-      latest versions known (section 6.5). A branch holds the evidence of each
-      branch point, the parent owner's signatures and its key log up to the
-      latest version known, in its content (section 10.5), not among its
-      witnesses; the branch's own versions are signed by the branch's owner
-      like any line. Witnesses of the parent's signatures (such as timestamp
-      proofs) are kept beside them in <tt class="verbatim">parent.signatures/</tt>, and
-      other witnesses of a parent version (a third party's signature) MAY be
-      kept with them.
+      witnesses with it, and keeps the key logs of its owners up to the latest
+      versions known (section 6.5). A branch holds the evidence of each branch
+      point, the parent owner's signatures, in its content (section 10.5), not
+      among its witnesses, and its copies carry the key logs of its parents'
+      owners as owner objects beside it (section 6.5); the branch's own
+      versions are signed by the branch's owner like any line. Witnesses of
+      the parent's signatures (such as timestamp proofs) are kept beside them
+      in <tt class="verbatim">parent.signatures/</tt>, and other witnesses of a parent
+      version (a third party's signature) MAY be kept with them.
     </p>
     <p>
       External deposits (appendix A) and software archive snapshots are
@@ -3045,7 +3161,7 @@ keylog &lt;the value of keyLog&gt;</pre>
           including that <tt class="verbatim">datacite.json</tt> and <tt class="verbatim">object.json</tt>
           agree on the document version and on the date of a withdrawal, and
           that <tt class="verbatim">Available</tt>, for a version first made public by
-          the archive, is the date of its deposit (section 7.1);
+          the archive, is the date of its deposit (section 8);
         </p>
       </li>
       <li>
@@ -3083,36 +3199,42 @@ keylog &lt;the value of keyLog&gt;</pre>
           collection version is OPTIONAL); for a revision, check that the
           pinned object version holds the stated document version; check the
           <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> of each member
-          against the <tt class="verbatim">object.json</tt> of the pinned version; check
+          against the <tt class="verbatim">object.json</tt> of the pinned version, and
+          that the pinned version is signed by its owner (section 13.2); check
           that no pin names a draft (section 6.5); report each as verified,
-          mismatch (a copy was found and does not match), unavailable (no copy
-          found) or removed (tombstoned);
+          mismatch (a copy was found and does not match), unconfirmed (the
+          pinned version is unconfirmed), unsigned (its signatures are missing
+          or invalid), unavailable (no copy found) or removed (tombstoned);
         </p>
       </li>
       <li>
         <p>
           for each owner object (section 7.5), that its first version holds a
           genesis record of kind <tt class="verbatim">owner</tt> whose name is the owner
-          name and whose <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt>
+          name and whose <tt class="verbatim">keys</tt> (as a set) and <tt class="verbatim">threshold</tt>
           are those of its first <tt class="verbatim">keys.json</tt>, that every <tt
           class="verbatim">threshold</tt> (in the genesis record and in each <tt class="verbatim">keys.json</tt>)
-          is at most the number of keys, that every signature file's name
-          matches the digest of its key, and that every version is signed by
-          at least <tt class="verbatim">threshold</tt> keys of the version before it (of
-          its own, for the first), reporting a fork of a key log; for every
-          object, that the storage root holds the key logs of the owners that
-          signed its versions, at least up to the versions their signatures
-          name (section 6.5), reporting when a later version of a key log is
-          known elsewhere, and that every sealed object version is signed by
-          the owner of its line (section 13.2): at least <tt class="verbatim">threshold</tt>
-          valid signature files of the owner naming one key-log version, the
-          signed message rebuilt from them, a signature naming an older
-          key-log version counting only under the rules of section 6.5
-          (otherwise reported as unconfirmed, and a version that is signed
-          only with it reported as unconfirmed, not invalid), and other
-          signature files, stray or malformed, reported, never fatal; and that
-          forks of key logs are reported, not resolved (the <a href="opensheaf-timestamps-0.1.html">timestamps
-          extension</a> resolves them by time);
+          is at most the number of keys, that no key of <tt class="verbatim">revoked</tt>
+          is in <tt class="verbatim">keys</tt> of that version or of a later one and
+          that every later version keeps it in <tt class="verbatim">revoked</tt>, that
+          every signature file's name matches the digest of its key, and that
+          every version is signed by at least <tt class="verbatim">threshold</tt> keys
+          of the version before it (of its own, for the first), naming it,
+          reporting a fork of a key log; for every object, that the storage
+          root holds the key logs of the owners whose signatures make it valid
+          (section 6.5), or the tombstones of those taken down (section 11.2),
+          at least up to the versions their signatures name, reporting when a
+          later version of a key log is known elsewhere, and that every sealed
+          object version is signed by the owner of its line (section 13.2): at
+          least <tt class="verbatim">threshold</tt> valid signature files of the owner
+          naming one key-log version, the signed message rebuilt from them, a
+          signature by a revoked key, naming a key-log version after a fork
+          point, or whose key log is missing reported as unconfirmed (and a
+          version that is signed only with it reported as unconfirmed, not
+          invalid), a version without signature files of its owner reported as
+          unsigned, and other signature files, stray or malformed, reported,
+          never fatal; and that forks of key logs are reported, not resolved
+          (the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> resolves them by time);
         </p>
       </li>
       <li>
@@ -3167,13 +3289,15 @@ keylog &lt;the value of keyLog&gt;</pre>
           than the previous branch point's in the history of the new parent
           version, and the continuity of the two parent inventories (section
           10.5); for each branch point, report the first of these verdicts
-          that applies: inconsistent (a check fails, or the parent was
-          resolved and does not match), confirmed (the parent owner's
-          signature of the branch point holds, against its key log, section
-          13.2), unconfirmed (consistent, but the parent owner's signature of
-          the branch point is unconfirmed or missing, which section 10.5 does
-          not allow); report as the branch's verdict the weakest of those of
-          its branch points (inconsistent, unconfirmed, confirmed, from the
+          that applies: inconsistent (a check fails, including missing or
+          invalid signatures of the parent, or the parent was resolved and
+          does not match), confirmed (the parent version is signed by its
+          owner, against its key log, section 13.2), unconfirmed (consistent,
+          but the parent version is unconfirmed: its signatures reach <tt
+          class="verbatim">threshold</tt> only with unconfirmed ones, or the parent
+          owner's key log is not available beside the branch, which is not a
+          failed check); report as the branch's verdict the weakest of those
+          of its branch points (inconsistent, unconfirmed, confirmed, from the
           weakest); and report separately whether the parent was found,
           unavailable or removed (tombstoned), and whether it is withdrawn;
         </p>
@@ -3182,8 +3306,9 @@ keylog &lt;the value of keyLog&gt;</pre>
         <p>
           where several copies of a line are known (mirrors, members,
           branches' parents), that they agree (section 6.5); two whose
-          signatures hold and that do not agree are a fork of the line by its
-          owner, reported with where each copy was found (section 6.6).
+          versions are signed and that do not agree are a fork of the line by
+          its owner (unconfirmed versions never make one), reported with where
+          each copy was found (section 6.6).
         </p>
       </li>
     </ul>
@@ -3242,40 +3367,47 @@ keylog &lt;the value of keyLog&gt;</pre>
       <li>
         <p>
           <strong>Branches and owners (proposal).</strong> The evidence a
-          branch carries, the parent's signatures and key log included, is
-          untrusted input, checked like inventories from other archives. Every
-          line is signed by its owner, so no archive can add to another
-          owner's line: a version it makes is its own branch, or invalid
-          (section 6.5).
+          branch carries, the parent's signatures included, and the key logs
+          of its parents' owners beside it, are untrusted input, checked like
+          inventories from other archives. Every line is signed by its owner,
+          so no archive can add to another owner's line: a version it makes is
+          its own branch, or invalid (section 6.5).
         </p>
       </li>
       <li>
         <p>
           <strong>Keys (proposal).</strong> An owner name is the digest of a
           genesis record that lists the owner's first keys, so no one can
-          write another first version of a key log under it. A stolen key lets
-          its holder sign versions of the owner's lines, and new versions of
-          its key log if the threshold is 1, racing the owner; a threshold
-          above 1 prevents that. This is the limit of the core: a key once
-          removed can still sign a different version of a key log it was
-          listed in, and so fork the key log at any later time; the core
-          reports the fork and does not resolve it, and signatures after the
-          fork point are unconfirmed, so the owner's identity is in doubt
-          until it acts. Owners who want forks resolved by time adopt the <a
-          href="opensheaf-timestamps-0.1.html">timestamps extension</a>, and SHOULD adopt it from the first
+          write another first version of a key log under it. A signature
+          counts if it is valid under the key-log version it names, and keeps
+          counting: retiring a key, raising a threshold or changing extension
+          data never undoes what was signed, so owners rotate keys without
+          signing anything again, and need not know where their lines are
+          kept. The cost is revocation: a key that may have been exposed MUST
+          be revoked, not retired, since a retired key in someone else's hands
+          still makes signatures that count, naming a version in which it was
+          listed; once a key is revoked, all its signatures are unconfirmed,
+          those its owner made before as well, unless the <a href="opensheaf-timestamps-0.1.html">timestamps
+          extension</a> dates them before the revocation. A stolen key lets
+          its holder sign versions of the owner's lines until it is revoked,
+          and, if the threshold is 1, new versions of its key log, forking it:
+          the core reports the fork and does not resolve it, and every
+          signature naming a version after the fork point is unconfirmed, on
+          every side, so the owner's identity is in doubt from that point
+          until it acts. A threshold of 2 or more, with keys kept apart,
+          prevents a single stolen key from doing this; owners who want forks
+          resolved by time adopt the timestamps extension from the first
           version of their key log. A signature binds the object, the version,
           its inventory and the key-log version it relies on (section 13.2),
           so none can be swapped; signature files of other owners, naming
           other key-log versions, stray or malformed, are ignored, so a host
-          cannot break a version by adding files. A signature naming an older
-          key-log version counts only while its key is still listed and the
-          threshold has not been raised; otherwise it is unconfirmed in the
-          core. A copy that withholds the later versions of a key log hides a
-          removal: copies carry the key logs up to the latest versions their
-          makers know, readers use the longest of copies that extend one
-          another, and no one can prove offline that a key log is complete.
-          Losing every key of an owner cannot be recovered, so tools create a
-          spare key, or give an owner several people's keys with a threshold.
+          cannot break a version by adding files. A copy that withholds the
+          later versions of a key log hides a revocation: copies carry the key
+          logs up to the latest versions their makers know, readers use the
+          longest of copies that extend one another, and no one can prove
+          offline that a key log is complete. Losing every key of an owner
+          cannot be recovered, so tools create a spare key, or give an owner
+          several people's keys with a threshold.
         </p>
       </li>
       <li>
@@ -4029,6 +4161,37 @@ keylog &lt;the value of keyLog&gt;</pre>
           (section 11.2).
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised after a
+          fifth audit:</strong> retiring and revoking keys (section 6.5), at
+          the request of the editor, in place of the rule that left
+          unconfirmed a signature naming an older key-log version once its key
+          was removed or the threshold raised: a signature counts when it is
+          valid under the key-log version it names, and keeps counting, so
+          that retiring a key, raising a threshold or changing extension data
+          never undoes what was signed and nothing is signed again; <tt class="verbatim">revoked</tt>
+          added to <tt class="verbatim">keys.json</tt> for keys that may have been
+          exposed, whose signatures are all unconfirmed unless an extension
+          dates them before the revocation, a revoked key never being listed
+          again; versions of the key log follow the same rule, so a change of
+          keys no longer unconfirms itself; invalid, valid, unconfirmed and
+          unsigned defined in section 13.2, a missing key log making
+          signatures unconfirmed, missing or invalid signatures of a parent
+          making a branch point inconsistent; &quot;signatures hold&quot;
+          defined as signed, and unconfirmed versions never make a fork, never
+          take a line's place and are not copied into mirrors; forks of key
+          logs: their damage stated, more than two sides, a threshold of 2 or
+          more recommended, an archive keeping the side it holds; owner
+          objects taken down are exempt from the rule that copies carry key
+          logs, and may return; the key logs of third parties' witnesses are
+          optional; owner objects may be copied on their own and may have <tt
+          class="verbatim">extensions</tt>, and have no <tt class="verbatim">datacite.json</tt>
+          (section 8); members' pinned versions checked for signatures; keys
+          of the first version compared as a set; drafts stay with their
+          archive when it moves; an example of revocation in appendix E.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4516,9 +4679,10 @@ ocfl/
     <p>
       The <tt class="verbatim">keys.json</tt> of the second version of that owner's key
       log, which added a spare key, names the keeper, and adopts the <a href="opensheaf-timestamps-0.1.html">timestamps
-      extension</a>, declaring that every version of the key log is
-      timestamped and listing one RFC 3161 authority it trusts (a placeholder
-      fingerprint); it is signed by the key of the first version:
+      extension</a>, declaring that every version of the key log and of the
+      owner's lines is timestamped (so that its signatures can be dated if a
+      key is ever revoked) and listing one RFC 3161 authority it trusts (a
+      placeholder fingerprint); it is signed by the key of the first version:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4531,7 +4695,33 @@ ocfl/
   &quot;keeper&quot;: [ &quot;https://orcid.org/0000-0002-1234-5677&quot; ],
   &quot;extensions&quot;: {
     &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
-      &quot;timestamps&quot;: &quot;keylog&quot;,
+      &quot;timestamps&quot;: &quot;all&quot;,
+      &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <p>
+      The <tt class="verbatim">keys.json</tt> of the third version of that key log,
+      after the laptop holding the first key was stolen: the first key is
+      revoked, not merely retired, so that its signatures are unconfirmed
+      unless their timestamps date them before this version, and a new key is
+      added; it is signed by the spare key, listed in the second version:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
+  &quot;keys&quot;: [ &quot;did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH&quot;,
+            &quot;did:key:z6MkkzcafBKREGQ7zSkJJ6NRdrP67SVt8EbyAsqffEdwcAZ2&quot; ],
+  &quot;threshold&quot;: 1,
+  &quot;revoked&quot;: [ &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot; ],
+  &quot;keeper&quot;: [ &quot;https://orcid.org/0000-0002-1234-5677&quot; ],
+  &quot;extensions&quot;: {
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
+      &quot;timestamps&quot;: &quot;all&quot;,
       &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
     }
   }
@@ -4761,10 +4951,11 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           (#55). A key alone cannot change, so an owner is named by a genesis
           record and keeps its keys in a log, each version signed by the keys
           of the one before, as Radicle's identity documents and The Update
-          Framework do: keys rotate, are removed and are shared with a
-          threshold, while the owner name stays. One threshold governs both
-          the key log and the owner's lines, as in Radicle. Who answers for an
-          owner is a separate, optional link, confirmed by the keeper (#41).
+          Framework do: keys rotate, are retired or revoked, and are shared
+          with a threshold, while the owner name stays. One threshold governs
+          both the key log and the owner's lines, as in Radicle. Who answers
+          for an owner is a separate, optional link, confirmed by the keeper
+          (#41).
         </p>
       </li>
       <li>
@@ -4784,33 +4975,34 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           under a published owner name; listing the first keys in the record
           makes the name a commitment to them, as Radicle's repository
           identifier commits to its first delegates. A signature of a checksum
-          file alone could be paired with any key-log version, and an old
-          version would revive removed keys; signing a message that names the
-          object, the version, the inventory and the key-log version closes
-          the first; the second is closed by counting a signature under an
-          older key-log version only while its key is still listed and the
-          threshold has not been raised since, and leaving it unconfirmed
-          otherwise (section 6.5), unless the <a href="opensheaf-timestamps-0.1.html">timestamps
-          extension</a> dates it. Key logs are carried in full, up to the
-          latest version known, because a truncated log hides revocations; a
-          branch carries the chain of its parents' evidence, because a check
-          one level deep lets a chain of branches pass a reused genesis
-          record.
+          file alone could be paired with any key-log version; signing a
+          message that names the object, the version, the inventory and the
+          key-log version closes that. A signature is then judged against the
+          version it names alone, so that retiring keys never undoes what was
+          signed: an owner cannot find every copy of its lines to sign them
+          again, and need not. A key that may be in other hands is revoked
+          instead, which leaves all its signatures unconfirmed, unless the <a
+          href="opensheaf-timestamps-0.1.html">timestamps extension</a> dates them before the revocation
+          (section 6.5): the cost of a lost key falls on the owner who lost
+          it, and only then. Key logs are carried in full, up to the latest
+          version known, because a truncated log hides revocations; a branch
+          carries the chain of its parents' evidence, because a check one
+          level deep lets a chain of branches pass a reused genesis record.
         </p>
       </li>
       <li>
         <p>
           <strong>Why timestamps are an extension (proposal).</strong> A
-          single researcher who never removes a key needs no timestamp: every
-          signature names the latest key-log version, and its key stays
-          listed. A journal or an institution may want every version dated,
-          and dated by a provider it can name. The core therefore stops where
-          signatures stop: a fork of a key log is reported and not resolved,
-          and a signature made under a key removed since is unconfirmed. The
-          <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> adds the evidence that resolves
-          both, for the owners who declare it, and keeps the trade-offs of its
-          kinds (an RFC 3161 authority's clock and keys, or OpenTimestamps'
-          pending period and Bitcoin) out of the core.
+          single researcher who never loses a key to others needs no
+          timestamp: retiring keys leaves every signature counting. A journal
+          or an institution may want every version dated, and dated by a
+          provider it can name. The core therefore stops where signatures
+          stop: a fork of a key log is reported and not resolved, and the
+          signatures of a revoked key are unconfirmed. The <a href="opensheaf-timestamps-0.1.html">timestamps
+          extension</a> adds the evidence that resolves both, for the owners
+          who declare it, and keeps the trade-offs of its kinds (an RFC 3161
+          authority's clock and keys, or OpenTimestamps' pending period and
+          Bitcoin) out of the core.
         </p>
       </li>
       <li>

@@ -499,7 +499,7 @@
         }
       },
       "then": {
-        "$comment": "proposal (section 7.5): an owner object records only format, specification, kind, name, owner and status",
+        "$comment": "proposal (section 7.5): an owner object records only format, specification, kind, name, owner and status, and optionally extensions",
         "required": [
           "name",
           "owner"

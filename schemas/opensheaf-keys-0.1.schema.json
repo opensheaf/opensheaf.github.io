@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json",
   "title": "OpenSheaf key log version (keys.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys is checked by verifiers.",
+  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys, that no revoked key is listed in keys, and that every later version keeps the revoked keys, are checked by verifiers.",
   "type": "object",
   "required": [
     "format",
@@ -24,6 +24,15 @@
     "threshold": {
       "type": "integer",
       "minimum": 1
+    },
+    "revoked": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/didKey"
+      },
+      "$comment": "optional (section 6.5): keys the owner has revoked because they may have been exposed; their signatures are unconfirmed unless an extension dates them before the revocation"
     },
     "keeper": {
       "type": "array",

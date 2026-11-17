@@ -21,7 +21,7 @@ Archives list what they keep in <dfn>catalogues</dfn>, which pin objects whole
 and may follow them as they grow; selections are the other kind of collection
 of section 10, which pins revision sets and changes only by an act of its
 curator. Copies are of two kinds too: a <dfn>mirror</dfn> copies a whole line,
-with the key log of its owner (an archive keeping another owner's work), an
+with the key logs of its signers (an archive keeping another owner's work), an
 <dfn>accepted copy</dfn> is a branch: a new line of the selection's owner,
 starting from one vetted revision. Collections and copies only concern
 documents kept in OpenSheaf archives: a paper that exists only on arXiv or on
@@ -251,22 +251,21 @@ particular version of each paper.
   evidence of the authors' version (their inventory, `object.json` and
   signatures, and, if the authors' version is itself a branch, the evidence of
   its own parents; section 10.5), and the authors' key log beside it, as their
-  owner object. It keeps
-  the document version of the revision it copies (the authors' version 3,
-  say). Only the copied revision needs a licence allowing redistribution; a
-  paper whose first preprint was under a restrictive licence can be accepted
-  in a later, openly licensed version. Later versions of the accepted copy
-  (corrections, notices, a withdrawal) are the editors' acts, signed by the
-  journal; the authors cannot change them. A journal will usually adopt the
-  [timestamps extension](opensheaf-timestamps-0.1.md) in its key log, from its
-  first version, with `all`, so that every version it signs is dated, by an
-  RFC 3161 authority it trusts or by OpenTimestamps, and forks of its key log
-  are resolved by time. A correction
-  the journal makes itself is its own version 4 (provisionally: the numbering
-  on branches is open); when the editors later vet the authors' corrected
+  owner object. It keeps the document version of the revision it copies (the
+  authors' version 3, say). Only the copied revision needs a licence allowing
+  redistribution; a paper whose first preprint was under a restrictive licence
+  can be accepted in a later, openly licensed version. Later versions of the
+  accepted copy (corrections, notices, a withdrawal) are the editors' acts,
+  signed by the journal; the authors cannot change them. A journal will
+  usually adopt the [timestamps extension](opensheaf-timestamps-0.1.md) in its
+  key log, from its first version, with `all`, so that every version it signs
+  is dated, by an RFC 3161 authority it trusts or by OpenTimestamps, and forks
+  of its key log are resolved by time. A correction the journal makes itself
+  is its own version 4 (provisionally: the numbering on branches is an open
+  question of section 10.5); when the editors later vet the authors' corrected
   version, the copy moves its branch point to it, with the same evidence, as
   the journal's next version (the journal's own files are then dropped; how a
-  move keeps them is open, section 6.5).
+  move keeps them is an open question of section 6.5).
 
 ```sh
 # keep an accepted copy of the version the editors vetted; --version names
@@ -445,13 +444,13 @@ reports themselves, even if this is not customary today).
   description-only version, when the version is made public.
 - **Priority without disclosure.** The authors can timestamp the signature of
   each object version: they adopt the timestamps extension in their key log,
-  listing an RFC 3161 time-stamping authority they trust, or use
-  [OpenTimestamps](https://opentimestamps.org/) alone, or both. The signature file
-  holds only digests, which reveal nothing of the content, and the timestamp
-  later shows that exactly these files existed at that date. The authors'
-  signatures, which every version carries (section 13.2), show who made them.
-  Since a line is the same wherever it is copied, the proof still holds when
-  the line is later made public.
+  with `timestamps` `all`, listing an RFC 3161 time-stamping authority they
+  trust, or use [OpenTimestamps](https://opentimestamps.org/) alone, or both.
+  The signature file holds only digests, which reveal nothing of the content,
+  and the timestamp later shows that exactly these files existed at that date.
+  The authors' signatures, which every version carries (section 13.2), show
+  who made them. Since a line is the same wherever it is copied, the proof
+  still holds when the line is later made public.
 - **The submission.** The authors send the journal their line (a copy, with
   their key log, kept by the journal as a mirror: byte for byte, still the
   authors' line, checked by their signatures), or a small collection pinning
@@ -560,14 +559,13 @@ was done, not only of what was handed in.
   Until the work is examined the archive is usually private (issue #29). Work
   in progress is a draft (section 6.5), which may be rewritten; handing it in
   seals it: sealing makes a new, fixed object, the line, from the draft.
-- **Dates.** A timestamp of the signature of each version (section 13.2)
-  shows that this revision existed by that date, which is what a deadline
-  asks; the student's signature shows whose it is. Timestamps come from the
-  timestamps extension; an institution may adopt it, and ask its students to
-  adopt it in their key logs from the first version (adopting it later leaves
-  earlier signatures without a timestamp unconfirmed), while a single
-  researcher may not need it. When the institution keeps
-  a mirror of the work at each submission (if the licence allows; copying by
+- **Dates.** A timestamp of the signature of each version (section 13.2) shows
+  that this revision existed by that date, which is what a deadline asks; the
+  student's signature shows whose it is. Timestamps come from the timestamps
+  extension; an institution may adopt it, and ask its students to adopt it in
+  their key logs from the first version, with `all`, so that every version is
+  dated; a single researcher may not need it. When the institution keeps a
+  mirror of the work at each submission (if the licence allows; copying by
   agreement is open, #39), the mirror is also its receipt.
 - **Comments.** The supervisors' comments are documents (`Text`, with a
   `resourceType` such as "Supervisor's comments"), each with `Reviews`
@@ -592,12 +590,12 @@ was done, not only of what was handed in.
   student's part in it, and a record the student can show later, checkable by
   anyone they give it to.
 - **What is published.** Usually only the final version, as the thesis in the
-  institution's repository (an accepted copy, section 10.5) or in the
-  student's own archive, made public. The rest of the record, with marks and
-  comments, is personal data (section 16) and stays private, still verifiable
-  by those who have it. When the institution's retention period ends, the
-  record is deleted by a takedown (section 11.2); its tombstones show that it
-  existed, and the student's own copy is not affected.
+  institution's repository (a branch of the institution's owner, section 10.5)
+  or in the student's own archive, made public. The rest of the record, with
+  marks and comments, is personal data (section 16) and stays private, still
+  verifiable by those who have it. When the institution's retention period
+  ends, the record is deleted by a takedown (section 11.2); its tombstones
+  show that it existed, and the student's own copy is not affected.
 
 ### A digest, a reading list, a curated bibliography
 
@@ -646,7 +644,7 @@ journal is a selection of the journal's own documents, or of accepted copies.
 | the authors add a notice or a description | it is followed, like any new version | not vetted; presentations may show it, saying where it comes from |
 | the authors withdraw the document | it is followed: the withdrawn document stays, with its notice | the vetted revisions stay, and presentations show the authors' withdrawal notice with the document (section 11.1); the curator decides what else (a notice of its own, a withdrawal of its accepted copy) |
 | the editors correct a vetted version | not applicable | a new revision in the set, or a new version of the accepted copy: the editors' act, in the selection's history |
-| a document is taken down (by law, or to erase personal data, section 16) | the object is deleted and a tombstone stays; verifiers report the member as removed, and resolvers keep looking past the tombstone and report copies found elsewhere, which the takedown does not reach (open, #33) | the same for the pinned revisions; an accepted copy is a line of the selection's owner, to which the takedown is applied separately; copies kept elsewhere are not reached (open, #33) |
+| a document is taken down (by law, or to erase personal data, section 16) | the object is deleted and a tombstone stays; verifiers report the member as removed, and resolvers keep looking past the tombstone and report copies found elsewhere, which the takedown does not reach (open, #33); the owners' key logs stay, since other objects need them (section 11.2) | the same for the pinned revisions; an accepted copy is a line of the selection's owner, to which the takedown is applied separately; copies kept elsewhere are not reached (open, #33) |
 | a document kept privately is made public | it can be a member once a copy of its line is public: the same line, so earlier pins stay valid (issue #29) | the same; published reports keep pointing to the versions they reviewed |
 | a referee agrees to be named | the report's owner (the journal) adds the referee to its creators by a description-only version, which is followed | the vetted revision keeps its pin; the version naming the referee is not vetted, unless a new document version is |
 | the member's archive moves | the pin stays valid; readers follow redirects, the other locations listed in member entries (`at`), or indexes | the same |

@@ -207,15 +207,18 @@ there.
 An owner is itself an object, named by its own genesis record, which lists its
 first keys, and whose versions are its <dfn>key log</dfn>: the list of its
 public keys and the number of them that must sign, each version signed by the
-keys of the one before. Keys can thus be added, replaced or removed while the
-owner stays the same; a group of co-authors can share one owner with a
-threshold, for instance two signatures out of three. Every version of every
-line is signed, and the key logs travel with the objects they sign, so a line
-can be checked from any copy, even when the archives that served it have gone.
-An owner may name who answers for it (an ORCID iD, an institution), which the
-keeper may confirm in a place only it controls; nothing requires it. Drafts
-are a sandbox: objects of a reserved owner, `draft`, kept by one archive,
-never signed, pinned or copied out of it, and free to be rewritten or deleted.
+keys of the one before. Keys can thus be added, retired or revoked while the
+owner stays the same, and what was signed stays signed: a retired key leaves
+its signatures counting, and only a key revoked because it may have been
+exposed leaves them unconfirmed, unless timestamps date them before the
+revocation; a group of co-authors can share one owner with a threshold, for
+instance two signatures out of three. Every version of every line is signed,
+and the key logs travel with the objects they sign, so a line can be checked
+from any copy, even when the archives that served it have gone. An owner may
+name who answers for it (an ORCID iD, an institution), which the keeper may
+confirm in a place only it controls; nothing requires it. Drafts are a
+sandbox: objects of a reserved owner, `draft`, kept by one archive, never
+signed, pinned or copied out of it, and free to be rewritten or deleted.
 Sealing makes a new object, the first version of the line; the draft's
 versions are not part of it.
 
@@ -238,9 +241,9 @@ content. An accepted copy is a branch kept by a selection's owner.
 A branch can be checked without its parent: the genesis record gives the name,
 the copied inventory gives the parent pin, the files match that inventory, the
 copied `object.json` says whose version it was, and the parent owner's
-signature, checked against the copied key log, shows that the version is that
-owner's; for a branch of a branch, the same holds for each parent in turn,
-back to the originator's line.
+signature, checked against the parent owner's key log, kept beside the branch
+as an owner object, shows that the version is that owner's; for a branch of a
+branch, the same holds for each parent in turn, back to the originator's line.
 
 ## Can documents be linked in richer ways (a short account and its proof)?
 
@@ -274,13 +277,16 @@ where they travel with the object: the owner's signature of every version,
 required, and timestamps and others' signatures, optional. Timestamps are
 defined by an extension, [OpenSheaf timestamps](opensheaf-timestamps-0.1.md):
 RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or
-both. An owner that wants its versions dated, a journal or an institution for
-instance, adopts it in its key log, from the first version (adopting it later
-leaves earlier signatures without a timestamp unconfirmed), and forks of its
-key log are then resolved by time; without it, the core reports such forks and does not resolve them. A
-single researcher who never removes a key may not need it. Witnesses need no
-digests of their own: a signature is checked against the version it names,
-which the pins fix, and a timestamp against the signature file it stamps.
+both. An owner that wants its signatures dated, a journal or an institution
+for instance, adopts it in its key log, from the first version, so that if it
+ever has to revoke a key (because it may have been stolen) the signatures that
+key made before can still count, and forks of its key log are resolved by
+time; without it, the core leaves the signatures of a revoked key unconfirmed,
+and reports forks without resolving them. A single researcher who never loses
+a key to others may not need it: retiring a key leaves its signatures
+counting. Witnesses need no digests of their own: a signature is checked
+against the version it names, which the pins fix, and a timestamp against the
+signature file it stamps.
 
 ## Why is the HTML version not part of the deposit?
 
@@ -294,9 +300,11 @@ To withdraw a document (for instance a retraction), make a new version with a
 withdrawal notice: the content and its history stay, and presentations show
 the notice. If content must be removed (by law, or for a breach of rights),
 the object is deleted and a tombstone is left in the discovery document, so
-that collections pinning it report it as removed rather than corrupt. OCFL
-version 2 is expected to add a native mechanism for deleting single files;
-OpenSheaf will adopt it when it is published.
+that collections pinning it report it as removed rather than corrupt. The
+owners' key logs stay, since other objects need them to be checked; an owner's
+key log is removed only for itself. OCFL version 2 is expected to add a native
+mechanism for deleting single files; OpenSheaf will adopt it when it is
+published.
 
 ## Can I use "All rights reserved"?
 

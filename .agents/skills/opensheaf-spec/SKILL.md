@@ -91,9 +91,11 @@ what its two standards leave open:
   allow redistribution (copying by agreement is open, #39).
 - **Accepted copy** (10.5): a branch kept by a selection's owner from a vetted
   revision; never a mirror.
-- **Withdrawal** (11.1): a description-only version with `status`
-  `withdrawn`; the content stays. **Takedown** (11.2): the object is deleted
-  and a **tombstone** stays in the discovery document (11.3).
+- **Withdrawal** (11.1): a description-only version with `status` `withdrawn`;
+  the content stays. **Takedown** (11.2): the object is deleted and a
+  **tombstone** stays in the discovery document (11.3); owner objects that
+  kept objects need stay, and an owner object is taken down only for itself,
+  leaving the signatures that need it unconfirmed (11.2).
 - **Witnesses** (13.2): in `extensions/opensheaf-witnesses/` of the object,
   not part of any version: the owner's signature files (required for every
   sealed version), others' `witness-<label>.json`, and timestamp proofs of
@@ -122,19 +124,25 @@ November 2026; read them before touching any of this.
   object of kind `owner`, named by its genesis record, which lists its first
   `keys` and `threshold` (the **owner name**, recorded in `originator`,
   `owner`, `parent.owner`, `sheaf:` URIs); an owner object is its own
-  originator, always `active`, never withdrawn, branched or mirrored apart
-  from the lines it signs. Its versions are its **key log**: `keys.json`
-  (`format`, `keys` as Ed25519 `did:key`, `threshold` at most the number of
-  keys; optional `keeper`, `https` URLs; `extensions`, the data of extensions
-  concerning the key log, keyed by URI, such as the timestamps declaration);
-  no `revoked`: a key is revoked by removing it from `keys`. The first
-  `keys.json` repeats the genesis record's keys and threshold and is signed by
-  them (`keyLog` naming itself); vN+1 is signed by `threshold` keys of vN
-  (`keyLog` naming vN). One `threshold` governs the key log and the lines (as
-  in Radicle). The optional **keeper** link (ORCID iD, domain) is confirmed by
-  the keeper (ORCID record, `/.well-known/opensheaf`). No named owners, no
-  owner identifiers. Anonymous owners (16): an owner made for the purpose,
-  without `keeper`.
+  originator, always `active`, never withdrawn or branched; copied with the
+  lines it signs, and MAY be copied or mirrored on its own (moving, fresher
+  key logs); MAY have `extensions`; no `datacite.json`. Its versions are its
+  **key log**: `keys.json` (`format`, `keys` as Ed25519 `did:key`, `threshold`
+  at most the number of keys; optional `keeper`, `https` URLs; `extensions`,
+  the data of extensions concerning the key log, keyed by URI, such as the
+  timestamps declaration); optional `revoked`, keys that may have been
+  exposed, never listed in `keys` again and kept in `revoked` by every later
+  version). A key is **retired** by leaving it out of `keys` (its signatures
+  keep counting) and **revoked** by listing it in `revoked` (all its
+  signatures unconfirmed, unless the timestamps extension dates them before
+  the revocation); a possibly exposed key MUST be revoked, not retired. The
+  first `keys.json` repeats the genesis record's keys (as a set) and threshold
+  and is signed by them (`keyLog` naming itself); vN+1 is signed by
+  `threshold` keys of vN (`keyLog` naming vN). One `threshold` governs the key
+  log and the lines (as in Radicle). The optional **keeper** link (ORCID iD,
+  domain) is confirmed by the keeper (ORCID record, `/.well-known/opensheaf`).
+  No named owners, no owner identifiers. Anonymous owners (16): an owner made
+  for the purpose, without `keeper`.
 - **Signing** (6.5, 13.2): every sealed version of a line is signed by its
   owner: at least `threshold` valid signature files of the owner naming one
   key-log version; other files (stray, other key-log versions, other owners)
@@ -145,52 +153,54 @@ November 2026; read them before touching any of this.
   line's owner, `key`, `keyLog` as a pin `sheaf:<owner>/v<n>?sha512=...`,
   `signature`), signing a defined five-line message binding object, version,
   inventory and key-log version. A key signs a version at most once; signature
-  files, and witnesses beside them, are never re-serialised. **Decision B**
-  (section 6.5, Signing): a signature naming an older key-log version counts
-  only while its key is still in `keys` of the latest known version and every
-  version between and the threshold has not been raised (nor extension data
-  governing signatures changed); otherwise it is unconfirmed in the core (the
-  timestamps extension can confirm it); under a fork of the key log, it counts
-  only if the rule holds on every side; never for a key-log version under an
-  older one. **Unconfirmed is not invalid** (6.5, terminology): an unconfirmed
-  signature or version is kept, copied and shown, but not relied on (pins,
-  resolution, members, branch points, later key-log versions) until confirmed;
-  a version below `threshold` even counting unconfirmed signatures is invalid.
-  An extension acts on signatures only within that status (section 4).
-  Witnesses are never replaced: a completed timestamp proof is a new file.
-  Third parties: `witness-<label>.json`, another owner's `keyLog`.
+  files, and witnesses beside them, are never re-serialised. **A signature
+  counts when it is valid under the key-log version it names** (section 6.5,
+  Signing; this replaced decision B), and keeps counting: retiring a key,
+  raising the threshold or changing extension data never undoes a signature,
+  and nothing is signed again; key-log versions follow the same rule (vN+1
+  checked against vN). Exceptions, all **unconfirmed**: a key revoked in any
+  known version, a key-log version after a fork point (on any side), a key log
+  not available up to the named version. **Unconfirmed is not invalid** (6.5,
+  13.2, terminology): an unconfirmed signature or version is kept and shown
+  where found, but not relied on (pins, resolution, members, branch points,
+  later key-log versions) until confirmed; it never makes a fork of a line,
+  never takes a line's place, and is not copied into mirrors. States of a
+  signature (13.2): invalid, valid (counts), unconfirmed; of a version: signed
+  (= "signatures hold"), unconfirmed, unsigned, invalid. An extension acts on
+  signatures only within that status (section 4). Witnesses are never
+  replaced: a completed timestamp proof is a new file. Third parties:
+  `witness-<label>.json`, another owner's `keyLog`.
 - **Timestamps: an extension, not the core.** The core (6.5, 13.2) defines no
   timestamps: a fork of a key log is reported, not resolved, and signatures
-  naming key-log versions after an unresolved fork point are unconfirmed; a
-  signature naming an older key-log version counts only while its key is still
-  listed and the threshold has not been raised (and no extension data
-  governing signatures changed), otherwise it is unconfirmed; a key removed
-  and re-added leaves its signatures while absent unconfirmed. Timestamp
-  proofs MAY sit beside signature files as witnesses; the core verifier
-  ignores what it does not know. Everything else is in
-  `opensheaf-timestamps-0.1.md` (URI
+  naming key-log versions after the fork point are unconfirmed; signatures of
+  a revoked key are unconfirmed. Timestamp proofs MAY sit beside signature
+  files as witnesses; the core verifier ignores what it does not know.
+  Everything else is in `opensheaf-timestamps-0.1.md` (URI
   `https://opensheaf.org/opensheaf-timestamps-0.1`): RFC 3161 `.tsr` and
-  OpenTimestamps `.ots` beside signature files, the owner's declaration in
-  `keys.json` under `extensions` (`timestamps`: `keylog`/`all`;
-  `timestampAuthorities`: SHA-256 fingerprints), checks at `genTime`, complete
-  proofs only (a completed proof is a new `.<n>.ots` file), re-stamping, the
-  declaration in force (latest known key-log version; during a fork, the last
-  shared version, against which both sides' stamps are checked), a removed
+  OpenTimestamps `.ots` files beside signature files, named
+  `signature-<k>.json.<d>.tsr|.ots` with `<d>` the first 16 base32 characters
+  of the SHA-256 of the timestamp file's own bytes (copies merge), the owner's
+  declaration in `keys.json` under `extensions` (`timestamps`: `keylog`/`all`,
+  `all` needed to date line signatures; `timestampAuthorities`: SHA-256
+  fingerprints), checks at `genTime`, complete proofs only (a completed proof
+  is a new file), re-stamping, the declaration in force (latest known key-log
+  version; during a fork, the last version all sides share), a removed
   authority's earlier tokens, dropping a declaration, the time of a version
-  (`threshold`-th earliest date) and ties (two hours for Bitcoin times), a
-  key-log version without a time leaving what it signs unconfirmed,
-  resolution of forks by the earlier time only when both sides are dated,
-  confirmation of signatures after changes of keys, missing stamps as
-  unconfirmed, branches with complete proofs; owners SHOULD adopt it from
-  their first key-log version. Its schema is
-  `schemas/opensheaf-timestamps-0.1.schema.json`.
-- **Key logs travel with the objects they sign** (6.5): a copy keeps the
-  signers' owner objects in its storage root, up to the latest key-log version
-  its maker knows; readers use the longest of copies that extend one another,
-  never across a fork; freshness cannot be proved offline. A line is its
-  signed versions, wherever stored; an archive MUST NOT add to a line a
-  version its owner did not sign. No signed list of an owner's lines exists
-  (lines are linear).
+  (`threshold`-th earliest date) and ties (two hours for Bitcoin times); it
+  confirms signatures of a revoked key dated before the time of the revoking
+  key-log version, and resolves forks (any number of sides) by the strictly
+  earliest time only when every side is dated; missing stamps never unconfirm
+  anything (undated versions are a warning); branches with complete proofs;
+  owners SHOULD adopt it from their first key-log version, with `all`. Its
+  schema is `schemas/opensheaf-timestamps-0.1.schema.json`.
+- **Key logs travel with the objects they sign** (6.5): a copy keeps the owner
+  objects of its line's owner and of its parents' owners in its storage root
+  (third parties' key logs MAY be kept; a tombstone stands in for an owner
+  object taken down), up to the latest key-log version its maker knows;
+  readers use the longest of copies that extend one another, never across a
+  fork; freshness cannot be proved offline. A line is its signed versions,
+  wherever stored; an archive MUST NOT add to a line a version its owner did
+  not sign. No signed list of an owner's lines exists (lines are linear).
 - **Archives** (6.1 to 6.4): hosts with no identity, found at their base URL;
   every location (`at` of members, a list of base URLs; `mirrors` of a
   discovery document; `at` of URIs) is a hint. They choose which owners they
@@ -229,14 +239,16 @@ November 2026; read them before touching any of this.
   declaring `parent` (`owner`, `name`, `objectVersion`, `documentVersion`,
   `inventorySha512`, `url`). No deep branches: a branch is a new object
   holding the branch point plus, as content, `parent.inventory.json`,
-  `parent.object.json`, `parent.signatures/` and, for a branch of a
-  branch, `parent.chain/` (the parent's own evidence, nested one level per
-  generation, back to the originator's line; finite, depth may be bounded), so
-  its evidence is complete with the parents' owners' key logs, which travel
-  beside it as owner objects (never as content); the parent's history, if wanted, is a copy of the
-  parent's line beside it (OCFL inventories fix their object's id). Branch
-  points move only forward; accepted copies are branches of the selection's
-  owner. Verdicts: inconsistent, unconfirmed, confirmed.
+  `parent.object.json`, `parent.signatures/` and, for a branch of a branch,
+  `parent.chain/` (the parent's own evidence, nested one level per generation,
+  back to the originator's line; finite, depth may be bounded), so its
+  evidence is complete with the parents' owners' key logs, which travel beside
+  it as owner objects (never as content); the parent's history, if wanted, is
+  a copy of the parent's line beside it (OCFL inventories fix their object's
+  id). Branch points move only forward; accepted copies are branches of the
+  selection's owner. Verdicts: inconsistent (a failed check, missing or
+  invalid parent signatures), unconfirmed (the parent version unconfirmed, or
+  its owner's key log missing), confirmed.
 - **`sheaf:` URIs** (6.6): `sheaf:<name>`, `sheaf:<name>:<owner>`,
   `sheaf:<name>:*`, `/v<n>`, `?sha512=` (a pin), `at=` (a hint),
   `sheaf:<owner>` (a key log; `sha512` after its object version). Copies count
@@ -292,13 +304,14 @@ assertions), the storage root and objects against OCFL, the discovery document
 against the storage root, the rules of sections 7 to 11 on every object
 version (document version numbering, `history`, notices kept), and resolves
 and checks the pins of the head of every collection, reporting each member as
-verified, mismatch, unavailable or removed. Over HTTP it cannot list folders,
-so completeness is checked only with the files. It also checks genesis records
-and names, key logs and every signature (the signed message, `threshold` valid
-signatures naming one key-log version, decision B for older ones, stray files
-reported), owners and lines, that no pin names a draft, the evidence, chain
-and verdict of every branch point, agreement among copies of a line, and the
-indexes the archive declares.
+verified, mismatch, unconfirmed, unsigned, unavailable or removed. Over HTTP
+it cannot list folders, so completeness is checked only with the files. It
+also checks genesis records and names, key logs and every signature (the
+signed message, `threshold` valid signatures naming one key-log version,
+revoked keys, forks and missing key logs making signatures unconfirmed, stray
+files reported), owners and lines, that no pin names a draft, the evidence,
+chain and verdict of every branch point, agreement among copies of a line, and
+the indexes the archive declares.
 
 ## Schemas
 
@@ -310,24 +323,25 @@ indexes the archive declares.
 `opensheaf-signature-0.1.schema.json` (signature files),
 `opensheaf-index-0.1.schema.json` (index files and `indexes.json`) and, for
 the timestamps extension, `opensheaf-timestamps-0.1.schema.json` (its
-declaration in `keys.json`, under `extensions`); JSON
-Schema 2020-12, CC0. They do not forbid additional properties (section 12). A
-change of a field in the text needs the same change in its schema, and the
-other way round.
+declaration in `keys.json`, under `extensions`); JSON Schema 2020-12, CC0.
+They do not forbid additional properties (section 12). A change of a field in
+the text needs the same change in its schema, and the other way round.
 
 ## Changing the specification
 
 - 0.1 is a draft: changes go into 0.1 itself, with a dated changelog entry
   (17) and the date in the heading updated; no compatibility rules for draft
-  names. The timestamps extension (`opensheaf-timestamps-0.1.md`) has its own
-  changelog and date, updated when it changes.
+  names. The timestamps extension (`opensheaf-timestamps-0.1.md`) and the git
+  companion (`opensheaf-git-0.1.md`) have their own changelogs and dates,
+  updated when they change.
 - A new field: in the text (where its file is defined), in the schema, in the
   verification rules (14) if it can be checked, in an example (appendix E) if
   it is common, and in the rationale (appendix F) if the choice is not
   obvious.
-- A renamed concept: every file of the repository (specification, schemas,
-  FAQ, use cases, README), including words split across wrapped lines; then
-  the tools and templates in other repositories follow.
+- A renamed concept: every file of the repository (specification, timestamps
+  extension, git companion, schemas, FAQ, use cases, README, AGENTS.md, this
+  skill), including words split across wrapped lines; then the tools and
+  templates in other repositories follow.
 - After a change, check the use cases and the FAQ against it: they are
   non-normative but must agree, and the "What happens when ..." table of the
   use cases summarises behaviour.

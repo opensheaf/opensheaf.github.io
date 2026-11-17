@@ -189,7 +189,8 @@ on GitHub, and archives made with them.
 
 ## Licence
 
-The text of the specification, of the FAQ and of the use cases is licensed under the
+The text of the specification, of its timestamps extension, of the git
+companion, of the FAQ and of the use cases is licensed under the
 [Creative Commons Attribution-ShareAlike 4.0 International licence](https://creativecommons.org/licenses/by-sa/4.0/)
 (CC BY-SA 4.0): it may be copied and adapted with attribution, and adapted
 versions must be shared under the same licence. The JSON Schemas in
