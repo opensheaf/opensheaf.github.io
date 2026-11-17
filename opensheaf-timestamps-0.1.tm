@@ -21,7 +21,7 @@
     <item><strong|Signatures after a change of keys are unconfirmed.> A signature naming an older key-log version counts in the core only while its key is still listed and the threshold has not been raised; otherwise the core cannot tell whether it was made before the change or after it.
   </itemize>
 
-  Timestamps answer both, by showing that a signature existed by a date. A single researcher who never removes a key needs none of this. A journal, an institution, or anyone who rotates keys may want it, and may want it from a provider it can name. So timestamps are an extension, which an owner adopts by declaring it in its key log, and SHOULD adopt from the first version of its key log, before any key is ever removed.
+  Timestamps answer both, by showing that a signature existed by a date. A single researcher who never removes a key needs none of this. A journal, an institution, or anyone who rotates keys may want it, and may want it from a provider it can name. So timestamps are an extension, which an owner adopts by declaring it in its key log, and SHOULD adopt from the first version of its key log, before any key is ever removed: adopting it later leaves unconfirmed every earlier signature that has no timestamp (section 7).
 
   <section*|2. Conventions><label|2-conventions>
 
@@ -39,7 +39,7 @@
     <item><strong|OpenTimestamps proofs> of the bytes of the same signature file: <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json.ots>, beside it.
   </itemize>
 
-  Both stamp the signature file as stored. Signature files and their timestamp files are never re-serialised or replaced once made (section 13.2 of the specification): a timestamp stamps their bytes. A timestamp MAY be supplemented later by another one of the same file (re-stamping), with another authority or with an OpenTimestamps proof, so that the evidence outlives the certificates of the first; the files are then named <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json.\<less\>n\<gtr\>.tsr> or <verbatim|.\<less\>n\<gtr\>.ots>, <verbatim|\<less\>n\<gtr\>> from 2.
+  Both stamp the signature file as stored. Signature files and their timestamp files are never re-serialised, replaced or removed once made (section 13.2 of the specification): a timestamp stamps their bytes, and a copy may already hold them. A timestamp MAY be supplemented later by another one of the same file (re-stamping), with another authority or with an OpenTimestamps proof, so that the evidence outlives the certificates of the first; the files are then named <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json.\<less\>n\<gtr\>.tsr> or <verbatim|.\<less\>n\<gtr\>.ots>, <verbatim|\<less\>n\<gtr\>> from 2, the smallest number not yet used for that kind. An OpenTimestamps proof is pending when made, and complete once a Bitcoin block attests it; the completed proof is written in the same way, as a new file <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json.\<less\>n\<gtr\>.ots>, beside the pending one, which stays unchanged.
 
   A timestamp of a version's checksum file MAY also be kept, as <verbatim|\<less\>version\<gtr\>/inventory.json.sha512.tsr> or <verbatim|.ots>; it dates the version, not a signature, and is not used by the rules below.
 
@@ -53,41 +53,47 @@
     <item><verbatim|timestampAuthorities>, OPTIONAL: the RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. Without any, only OpenTimestamps proofs meet the policy.
   </itemize>
 
-  The declaration is part of the key-log version, so it is signed with it, and changed only by a new version. <strong|The declaration in force> for any version is that of the latest version of the key log known to the reader, not that of the version a signature names: an owner that adopts the extension, tightens its policy, or changes its authorities does so for everything checked afterwards.
+  The data of the declaration validates against the schema of appendix A; anything else in <verbatim|keys.json> (a top-level <verbatim|timestamps> field, for instance) is not a declaration. The declaration is part of the key-log version, so it is signed with it, and changed only by a new version.
+
+  <strong|The declaration in force>, for every check of this extension, is that of the latest version of the key log known to the reader, not that of the version a signature names: an owner that adopts the extension, tightens its policy, or changes its authorities does so for everything checked afterwards. While the key log is forked, the declaration in force is that of the last version both sides share, for every check on either side, since the latest version known is not defined across a fork (section 7).
+
+  An owner MAY drop the declaration, by a later key-log version without it. That is a change of the declaration like any other (section 7): signatures naming earlier key-log versions then need a date earlier than the time of the version that drops it, and afterwards only the rules of the specification apply, so later forks are reported, not resolved.
 
   <section*|5. Checking a timestamp><label|5-checking-a-timestamp>
 
   A timestamp is <strong|valid> for a signature file when:
 
   <\itemize>
-    <item>for an RFC 3161 token: its message imprint is the SHA-512 digest of the file's bytes; its signing certificate, or the root of the chain it carries, has a fingerprint listed in <verbatim|timestampAuthorities> of the declaration in force; the chain was valid at the token's <verbatim|genTime>; and the token verifies. An authority that the owner stops trusting is removed from the list by a new key-log version: its tokens then count only if their <verbatim|genTime> is earlier than the time of that version (section 6);
+    <item>for an RFC 3161 token: its message imprint is the SHA-512 digest of the file's bytes; its signing certificate, or the root of the chain it carries, has a fingerprint listed in <verbatim|timestampAuthorities> of the declaration in force, or of an earlier declaration (below); the chain was valid at the token's <verbatim|genTime>, which means that every certificate from the signing certificate to the root was within its validity period at <verbatim|genTime>, that the signing certificate is for time stamping (RFC 3161, section 2.3), and that no revocation known to the reader dates from before <verbatim|genTime> (as <verbatim|openssl ts -verify> checks with <verbatim|-attime> set to <verbatim|genTime> and the root certificate whose fingerprint is listed, or that is the root of the listed signing certificate); and the token verifies. An authority that the owner stops trusting is removed from the list by a new key-log version: its tokens then count only if it was listed in a declaration of an earlier version, and their <verbatim|genTime> is earlier than the time of the version that removed it (section 6);
 
-    <item>for an OpenTimestamps proof: it is complete, attested in a Bitcoin block; an incomplete (pending) proof counts for nothing until it is completed.
+    <item>for an OpenTimestamps proof: it is complete, attested in a Bitcoin block; a pending proof counts for nothing, and its completed proof is a separate file (section 3).
   </itemize>
 
   The <strong|date> of a valid timestamp is the <verbatim|genTime> of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps proof reaches. The earliest valid timestamp of a signature file is its date.
 
   <section*|6. The time of a version><label|6-the-time-of-a-version>
 
-  The <strong|time> of a version (of a line or of a key log) is the <verbatim|threshold>-th earliest of the dates of its valid signature files from distinct keys naming one key-log version (section 6.5 of the specification), <verbatim|threshold> being that key-log version's. A version with fewer dated signatures has no time.
+  The <strong|time> of a version (of a line or of a key log) is the <verbatim|threshold>-th earliest of the dates of its valid signature files from distinct keys naming one key-log version (section 6.5 of the specification), <verbatim|threshold> being that key-log version's; when the signatures naming several key-log versions each reach their <verbatim|threshold>, the time is the earliest of the times so obtained. A version with fewer dated signatures has no time.
+
+  Under a declaration that covers it, a version without a time is unconfirmed (section 7). For a key-log version, this has consequences beyond itself: it cannot decide a fork, a signature that needs a date earlier than its time cannot be confirmed, and, being unconfirmed, it is not relied on (section 6.5 of the specification), so signatures naming it are unconfirmed too, and so the versions of the owner's lines they sign, until a valid timestamp of it is added. Owners therefore stamp each key-log version when they make it, with an RFC 3161 token where they cannot wait for an OpenTimestamps proof to complete.
 
   Two times are a <strong|tie> when they are equal, or when one of them is the time of a Bitcoin block and they are within two hours of each other, since block times are that uncertain. A tie is reported and decides nothing.
 
   <section*|7. What timestamps add to the core><label|7-what-timestamps-add-to-the-core>
 
-  Under a declaration, the following rules apply in addition to those of the specification. They only confirm or resolve what the core leaves unconfirmed or unresolved; they never make valid what the core rejects.
+  Under a declaration, the following rules apply in addition to those of the specification. They act only within the status of unconfirmed (sections 4 and 6.5 of the specification): they confirm or resolve what the core leaves unconfirmed or unresolved, or leave unconfirmed what the core would let count; they never make valid what the core rejects, nor invalid what it accepts.
 
-  <strong|Forks of a key log.> When two valid versions of a key log with the same number fork it (section 6.5 of the specification), and the declaration in force (in the last version both branches share) is <verbatim|keylog> or <verbatim|all>, the branch whose first differing version has the earlier time is the owner's, and the other is reported. If neither has a time, or the times are a tie, the fork stays unresolved, as in the core.
+  <strong|Forks of a key log.> When two valid versions of a key log with the same number fork it (section 6.5 of the specification), and the declaration in force (that of the last version both sides share, section 4) is <verbatim|keylog> or <verbatim|all>, the timestamps of both sides are checked against that declaration, never against a declaration of either side, so that a side cannot list an authority of its own. If the first differing versions of both sides have a time, and the times are not a tie, the side whose first differing version has the earlier time is the owner's, and the other is reported. Otherwise (one side or both without a time, or a tie) the fork stays unresolved, as in the core: a side never wins because the other's timestamps are missing, since a host can strip them from a copy.
 
-  <strong|Signatures after a change of keys.> A signature naming an older key-log version vk, which the core leaves unconfirmed because a later known version removed its key or raised the threshold, counts if its date is earlier than the time of the first key-log version after vk that made that change. The same holds for a key removed and later added again, for signatures made while it was absent. Since the declaration in force is that of the latest known version, a signature naming vk also needs such a date when a version after vk adopted the extension, tightened <verbatim|timestamps> or changed <verbatim|timestampAuthorities>. Where the version that made the change has no time, no such signature can be confirmed.
+  <strong|Signatures after a change of keys.> A signature naming an older key-log version vk, which the core leaves unconfirmed because a later known version removed its key or raised the threshold, counts if its date is earlier than the time of the first key-log version after vk that made that change. The same holds for a key removed and later added again, for signatures made while it was absent. Since the declaration in force is that of the latest known version, a signature naming vk also needs such a date when a version after vk adopted the extension, tightened <verbatim|timestamps> or changed <verbatim|timestampAuthorities>. Where the version that made the change has no time, no such signature can be confirmed. So an owner that adopts the extension after its first key-log version leaves unconfirmed every signature naming an earlier version that has no timestamp dated before the adopting version's time; owners adopt it from the first version (section 1), or timestamp their existing signatures before they adopt it.
 
-  <strong|Missing timestamps.> A version that the declaration in force covers, and that has no time in a given copy, is unconfirmed there, not invalid: a host can strip timestamp files from a copy, and anyone can add one later. A declaration decides forks and confirms signatures only through timestamps that are present and valid.
+  <strong|Missing timestamps.> A version that the declaration in force covers, and that has no time in a given copy, is unconfirmed there, not invalid: a host can strip timestamp files from a copy, and anyone can add one later. A declaration decides forks and confirms signatures only through timestamps that are present and valid; with <verbatim|keylog>, the versions of the owner's lines need no time of their own, only the key-log versions their signatures name.
 
   <section*|8. Copies and branches><label|8-copies-and-branches>
 
   Timestamp files are witnesses, kept in the object's extension folder, and travel with the object as its signature files do (sections 6.5 and 13.2 of the specification). A copy keeps them.
 
-  A branch keeps the evidence of its parent version as content (section 10.5 of the specification): <verbatim|parent.signatures/> holds the parent owner's signature files of the parent version with their timestamp files beside them, and <verbatim|parent.keylog/> holds, for each version of the parent owner's key log, its signature files with their timestamp files. Under a declaration of the parent's owner, a branch MUST NOT be taken from a parent version whose timestamps are still pending, and its evidence carries complete proofs only, since the files of a version, once made, never change.
+  A branch keeps the evidence of its parent version as content (section 10.5 of the specification): <verbatim|parent.signatures/> holds the parent owner's signature files of the parent version with their timestamp files beside them, under the same file names, without the <verbatim|\<less\>version\<gtr\>/> folder (<verbatim|parent.signatures/signature-\<less\>k\<gtr\>.json.tsr>), and <verbatim|parent.keylog/> holds, for each version of the parent owner's key log, its signature files with their timestamp files. Under a declaration of the parent's owner, a branch MUST NOT be taken from a parent version whose timestamps are still pending, and its evidence carries complete proofs only, since the files of a version, once made, never change. A branch whose evidence carries a pending proof is reported: the pending proof counts for nothing, and the verdict of the branch point is the one that the rest of its evidence gives.
 
   <section*|9. Verification><label|9-verification>
 
@@ -102,7 +108,7 @@
 
     <item>resolves forks of key logs, and confirms signatures after changes of keys, as section 7 says, reporting ties;
 
-    <item>checks the timestamp files inside <verbatim|parent.signatures/> and <verbatim|parent.keylog/> of every branch, and that none of them is pending.
+    <item>checks the timestamp files inside <verbatim|parent.signatures/> and <verbatim|parent.keylog/> of every branch, and reports those that are pending (section 8).
   </itemize>
 
   <section*|10. Guidance for tools><label|10-guidance-for-tools>
@@ -120,11 +126,13 @@
   <section*|11. Security considerations><label|11-security-considerations>
 
   <\itemize>
-    <item><strong|Trust.> An RFC 3161 token is immediate and checkable with common tools, but rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log keeps anyone else from dating with an authority of their own. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after a pending period of hours, and its date is uncertain by about as long.
+    <item><strong|Trust.> An RFC 3161 token is immediate and checkable with common tools, but rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log keeps anyone else from dating with an authority of their own. Its limits: removing an authority does not protect against one already compromised, since tokens it backdates before the version that removes it still count; and listing a root certificate trusts every authority that root certifies, now and later, so an owner that wants a single authority lists the fingerprint of its signing certificate, and lists the new one by a new key-log version when it is renewed. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after a pending period of hours, and its date is uncertain by about as long.
 
     <item><strong|Stripping.> A host can remove timestamp files from a copy; versions then become unconfirmed, not invalid, and a copy with the files restores them.
 
     <item><strong|Freshness.> A copy that withholds later versions of a key log also withholds later declarations; the declaration in force is only as recent as the key log a reader has seen.
+
+    <item><strong|Forks.> A side of a fork cannot bring its own authorities, nor win by stripping the other side's timestamps (section 7); a fork is resolved only when both sides are dated.
   </itemize>
 
   <section*|Appendix A. JSON Schema (normative)><label|appendix-a-json-schema-normative>
@@ -133,7 +141,7 @@
 
   <section*|Appendix B. Example (non-normative)><label|appendix-b-example-non-normative>
 
-  The <verbatim|keys.json> of a version of an owner's key log that adopts the extension, with one RFC 3161 authority (a placeholder fingerprint) and OpenTimestamps:
+  The <verbatim|keys.json> of the first version of an owner's key log, adopting the extension from the start (section 1), with one RFC 3161 authority (a placeholder fingerprint) and OpenTimestamps; its genesis record lists the same <verbatim|keys> and <verbatim|threshold>:
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -163,14 +171,16 @@
   </verbatim-code>
   </html-div-class>
 
-  The files of one signature of a key-log version, in the owner object's extension folder:
+  The files of one signature of that version, in the owner object's extension folder: an RFC 3161 token, a pending OpenTimestamps proof, and the completed proof written beside it later:
 
   <\verbatim-code>
-    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json
 
-    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.tsr
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.tsr
 
-    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.ots
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.ots
+
+    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.2.ots
   </verbatim-code>
 
   <section*|Appendix C. References><label|appendix-c-references>
@@ -189,6 +199,8 @@
 
   <\itemize>
     <item><strong|0.1 (draft), 17 November 2026:> first draft, moving the timestamp rules out of the identity proposal of the specification: RFC 3161 tokens and OpenTimestamps proofs of signature files, the owner's declaration in <verbatim|keys.json> under <verbatim|extensions> (<verbatim|timestamps>, <verbatim|timestampAuthorities>), checking at <verbatim|genTime> with listed authorities and complete proofs only, re-stamping, the time of a version and ties, resolution of key-log forks by time, confirmation of signatures after changes of keys, missing timestamps as unconfirmed, branches with complete proofs, guidance and security considerations.
+
+    <item><strong|0.1 (draft), 17 November 2026, revised after an audit:> completed OpenTimestamps proofs are new files (<verbatim|.\<less\>n\<gtr\>.ots>), never replacements; one definition of the declaration in force, that of the last shared version during a fork, against which both sides' timestamps are checked; a fork is resolved only when both sides are dated and not tied; a removed authority's earlier tokens are checked against the declaration that listed it; the validity of a chain at <verbatim|genTime> defined; the time of a version whose signatures name several key-log versions; the consequences of a key-log version without a time; the cost of adopting the extension late, and the example adopting it in the first version; dropping a declaration; the limits of removing authorities and of listing roots; the names in <verbatim|parent.signatures/>, and pending proofs in a branch's evidence reported.
   </itemize>
 
 </body>

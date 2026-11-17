@@ -321,16 +321,20 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       object of another archive); 2. a new version folder <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt>,
       where <tt class="verbatim">v&lt;N-1&gt;</tt> is the head of the object in C, with
       the replacement of the object's root <tt class="verbatim">inventory.json</tt> and
-      its checksum file by those of the new version; 3. files added, replaced
-      or removed in an object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
-      folder; 4. the replacement of <tt class="verbatim">opensheaf.json</tt>, and files
-      added, replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
-      <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
-      which are rewritten at every deposit and takedown (section 6.6 of the
-      specification, proposal); 5. at the creation of the storage root, its
-      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
-      the configuration of the layout extension, and the loose files allowed
-      by section 5 of the specification); 6. the removal of an object folder,
+      its checksum file by those of the new version; 3. files added in an
+      object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt> folder; a file
+      there, once published, is never replaced or removed (section 13.2 of the
+      specification), except with its object by a takedown: signature files
+      and timestamps are made of the bytes of others, and a completed
+      timestamp proof is a new file beside the pending one; 4. the replacement
+      of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced or removed
+      among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
+      <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
+      at every deposit and takedown (section 6.6 of the specification,
+      proposal); 5. at the creation of the storage root, its own files (<tt
+      class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
+      configuration of the layout extension, and the loose files allowed by
+      section 5 of the specification); 6. the removal of an object folder,
       with the folders above it that it leaves empty (an owner's folder, or
       folders of the hash), by a takedown (section 9); 7. the repair of a file
       whose bytes do not match the digest its inventory records (section 5.3);
@@ -859,6 +863,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           created and removed with their objects (section 5.1); <tt class="verbatim">indexes.json</tt>
           only in repositories serving indexes for several archives; sealing
           makes a new object from a draft.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
+          of the specification):** witness files are only added, never
+          replaced or removed, except with their object by a takedown (section
+          5.1).
         </p>
       </li>
     </ul>

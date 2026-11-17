@@ -259,9 +259,10 @@ possibly written with AI, stays online in the version reviewed.
 A signature or timestamp of an object version can only be made after the
 version is committed, so it cannot be part of that version: a signature of an
 inventory cannot be listed in the inventory it signs. Making a new version for
-each signature would mix evidence with changes of the work, and every upgrade
-of a timestamp proof (OpenTimestamps proofs are completed once their
-attestation is confirmed) would be another version.
+each signature would mix evidence with changes of the work, and every
+completion of a timestamp proof (an OpenTimestamps proof is completed once a
+Bitcoin block attests it) would be another version. Witnesses are never
+replaced: a completed proof is a new file beside the pending one.
 
 OCFL does not allow arbitrary files in an object folder; its `logs/` folder is
 meant for unstructured records of actions and is not covered by digests. The
@@ -273,8 +274,9 @@ required, and timestamps and others' signatures, optional. Timestamps are
 defined by an extension, [OpenSheaf timestamps](opensheaf-timestamps-0.1.md):
 RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or
 both. An owner that wants its versions dated, a journal or an institution for
-instance, adopts it in its key log, and forks of its key log are then resolved
-by time; without it, the core reports such forks and does not resolve them. A
+instance, adopts it in its key log, from the first version (adopting it later
+leaves earlier signatures without a timestamp unconfirmed), and forks of its
+key log are then resolved by time; without it, the core reports such forks and does not resolve them. A
 single researcher who never removes a key may not need it. Witnesses need no
 digests of their own: a signature is checked against the version it names,
 which the pins fix, and a timestamp against the signature file it stamps.

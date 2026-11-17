@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json",
   "title": "OpenSheaf key log version (keys.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branch proposal/owners; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys is checked by verifiers.",
+  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys is checked by verifiers.",
   "type": "object",
   "required": [
     "format",
@@ -37,9 +37,13 @@
     },
     "extensions": {
       "type": "object",
-      "$comment": "proposal (sections 4, 6.5): the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.1",
+      "$comment": "proposal (sections 4, 6.5): the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.1; each value is an object, validated by the schema of its extension",
       "propertyNames": {
-        "format": "uri"
+        "format": "uri",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "object"
       }
     }
   },

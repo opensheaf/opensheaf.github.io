@@ -259,8 +259,9 @@
       <li>
         <p>
           <dfn>Key log</dfn>: the versions of an owner object, each listing
-          the owner's keys and the threshold of signatures it requires, each
-          signed by the keys of the one before (section 6.5).
+          the owner's keys and the threshold of signatures it requires; the
+          first is signed by its own keys, which its genesis record fixes, and
+          each later one by the keys of the one before (section 6.5).
         </p>
       </li>
       <li>
@@ -268,6 +269,14 @@
           <dfn>Signature file</dfn>: a witness holding an owner's signature of
           an object version, naming the version of the owner's key log it
           relies on (section 13.2).
+        </p>
+      </li>
+      <li>
+        <p>
+          <dfn>Unconfirmed</dfn>: the status of a signature that verifies but
+          that the rules on later key-log versions do not let count, and of a
+          version signed only with the help of such signatures: kept, copied
+          and shown, not invalid, but not relied on (section 6.5).
         </p>
       </li>
       <li>
@@ -460,7 +469,14 @@
           extension that concerns an owner's key log records its data, in the
           same way, under <tt class="verbatim">extensions</tt> in <tt class="verbatim">keys.json</tt>
           (section 6.5), where the owner's signatures of the key-log version
-          fix it; the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> is one.
+          fix it; the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> is one. Such an
+          extension acts on signatures only within the status of unconfirmed
+          (section 6.5), for readers that know it and for owners that adopt
+          it: it MAY confirm a signature or a version that this specification
+          leaves unconfirmed, and MAY leave unconfirmed one that this
+          specification would let count; it never makes invalid what this
+          specification accepts, nor makes count what this specification
+          rejects as invalid.
         </p>
       </li>
     </ul>
@@ -527,9 +543,9 @@
       <li>
         <p>
           <strong>Witnesses</strong>, OPTIONAL except for the signatures that
-          section 13.2 requires: signatures and timestamp proofs of object
-          versions, in each object's extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
-          (section 13.2).
+          section 13.2 requires: signatures of object versions, and timestamp
+          proofs of signature files, in each object's extension folder <tt
+          class="verbatim">extensions/opensheaf-witnesses/</tt> (section 13.2).
         </p>
       </li>
       <li>
@@ -782,13 +798,13 @@
       the sections it changes (3 to 5, 6.1 to 6.4, 7, 8.1, 9, 10.2 to 10.6,
       11.3, 13.2, 14 to 16 and appendices D to F, with the FAQ, the use cases
       and the companion OpenSheaf archives in git), together with section 6.6,
-      are a proposal on the branch <tt class="verbatim">proposal/identity</tt>, revised
-      on the branch <tt class="verbatim">proposal/owners</tt>, not yet agreed. It builds
-      on the discussions of self-certifying names (#20), decentralised holding
-      and keys (#13), private and draft objects (#29) and the evidence of
-      accepted copies (#22); the revision follows #55 (owners are keyed
-      identities with a key log; archives host their lines) and #52 (archives
-      are hosts; identifiers from lines), which also settle #14 and #53.
+      are a proposal on the branch <tt class="verbatim">proposal/identity</tt> (PR #30),
+      not yet agreed. It builds on the discussions of self-certifying names
+      (#20), decentralised holding and keys (#13), private and draft objects
+      (#29) and the evidence of accepted copies (#22); the revision follows
+      #55 (owners are keyed identities with a key log; archives host their
+      lines) and #52 (archives are hosts; identifiers from lines), which also
+      settle #14 and #53.
     </div>
     <p>
       A work has a name, independent of any archive, and each history of it an
@@ -931,8 +947,25 @@
       core shows whether it was made before the change or after it (the <a
       href="opensheaf-timestamps-0.1.html">timestamps extension</a> can confirm it). A key removed and later
       added again leaves the signatures it made while absent unconfirmed in
-      the same way. A signature never counts for a version of a key log under
-      an older version of it: vN+1 is signed under vN only. One <tt class="verbatim">threshold</tt>
+      the same way. When the key log is forked after vk (below), the reader
+      knows several latest versions, one on each side, and the signature
+      counts only if the rule holds on every side. A signature never counts
+      for a version of a key log under an older version of it: vN+1 is signed
+      under vN only.
+    </p>
+    <p>
+      <strong>Unconfirmed is not invalid.</strong> A signature that verifies
+      (section 13.2) but that the rules above do not let count is
+      <strong>unconfirmed</strong>; a version that has <tt class="verbatim">threshold</tt>
+      counting signatures from one key-log version is signed, one that reaches
+      <tt class="verbatim">threshold</tt> only if its unconfirmed signatures are counted
+      too is unconfirmed, and one that does not reach it even so is not
+      signed, and invalid. An unconfirmed version is kept, copied with its
+      object and shown, with its status; it is not deleted, nor reported as
+      invalid, and later evidence may confirm it (an extension, section 4; the
+      end of a fork). But it is not relied on: it does not count as signed for
+      a pin, a resolution, a collection member, a branch point or the signing
+      of a later key-log version, until it is confirmed. One <tt class="verbatim">threshold</tt>
       governs both the key log and every line of the owner, as in Radicle,
       where the threshold of an identity document also decides its canonical
       branch: a person uses a threshold of 1 with a spare key; a group raises
@@ -948,9 +981,9 @@
       announced through its keeper). A key once removed can make such a fork
       at any later time, since it can still sign a different version of the
       key log it was listed in; owners who want forks resolved by time adopt
-      the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>, which resolves them by the
-      earliest timestamp, and SHOULD adopt it from the first version of their
-      key log, before any key is removed.
+      the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>, which resolves them by time (its
+      section 7), and SHOULD adopt it from the first version of their key log,
+      before any key is removed.
     </p>
     <p>
       <strong>Key logs travel with the objects they sign.</strong> A copy of
@@ -1388,9 +1421,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       digest, the rest of the checks of a pin. A copy that passes them is a
       copy of the line, wherever it was found; a copy whose signatures do not
       hold is not, and is reported as invalid, with where it was found, and
-      never used. When copies of a line whose signatures hold disagree, they
-      are a fork by its owner (section 6.5): the resolver reports it and does
-      not choose.
+      never used; a copy whose versions are unconfirmed (section 6.5) is
+      reported as unconfirmed, with where it was found, and is not used for a
+      pin or a resolution until confirmed. When copies of a line whose
+      signatures hold disagree, they are a fork by its owner (section 6.5):
+      the resolver reports it and does not choose.
     </p>
     <p>
       <strong>Searching for a work.</strong> A work is its genesis record, and
@@ -1618,21 +1653,21 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       at the top level, and, except in a draft, <tt class="verbatim">genesis.json</tt>
       (section 6.5); every version of a branch also holds the evidence of its
       current branch point, <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.keylog/</tt> and
-      <tt class="verbatim">parent.chain/</tt> (section 10.5), unchanged until the branch
-      point moves again. These are the identity files of the object; they are
-      not files of the document's own (section 7.3), and the names <tt class="verbatim">genesis.json</tt>,
-      <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures</tt>, <tt class="verbatim">parent.keylog</tt> and <tt
-      class="verbatim">parent.chain</tt> are reserved for them at the top level of the
-      content. Every version directory MUST contain a copy of the inventory as
-      of that version, with its checksum file (OCFL makes this a
-      recommendation; OpenSheaf requires it, so that each version can be
-      pinned and fetched on its own). Version directories MUST NOT be
-      zero-padded (<tt class="verbatim">v1</tt>, <tt class="verbatim">v2</tt>, &hellip;, not <tt
-      class="verbatim">v001</tt>), which OCFL allows. OCFL recommends that object
-      identifiers be URIs; with the proposal of section 6.5 they are <tt
-      class="verbatim">sheaf:</tt> URIs (section 6.3), drafts included.
+      <tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.keylog/</tt> and,
+      for a branch of a branch, <tt class="verbatim">parent.chain/</tt> (section 10.5),
+      unchanged until the branch point moves again. These are the identity
+      files of the object; they are not files of the document's own (section
+      7.3), and the names <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">parent.inventory.json</tt>,
+      <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures</tt>,
+      <tt class="verbatim">parent.keylog</tt> and <tt class="verbatim">parent.chain</tt> are
+      reserved for them at the top level of the content. Every version
+      directory MUST contain a copy of the inventory as of that version, with
+      its checksum file (OCFL makes this a recommendation; OpenSheaf requires
+      it, so that each version can be pinned and fetched on its own). Version
+      directories MUST NOT be zero-padded (<tt class="verbatim">v1</tt>, <tt class="verbatim">v2</tt>,
+      &hellip;, not <tt class="verbatim">v001</tt>), which OCFL allows. OCFL recommends
+      that object identifiers be URIs; with the proposal of section 6.5 they
+      are <tt class="verbatim">sheaf:</tt> URIs (section 6.3), drafts included.
     </p>
     <p>
       Each version in the inventory MUST have a <tt class="verbatim">user</tt> with a
@@ -2449,9 +2484,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <li>
         <p>
           <tt class="verbatim">parent.signatures/</tt>, the parent owner's signature
-          files of the parent version (section 13.2), as named in the parent's
-          extension folder, with the witnesses kept beside them (such as
-          timestamp proofs of the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>), if any;
+          files of the parent version (section 13.2), under their names in the
+          parent's extension folder without the <tt class="verbatim">&lt;version&gt;/</tt>
+          folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json</tt>),
+          with the witnesses kept beside them (such as timestamp proofs of the
+          <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>), if any;
         </p>
       </li>
       <li>
@@ -2804,11 +2841,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       extension folders, which are not part of any version; the extension name
       <tt class="verbatim">opensheaf-witnesses</tt> is not yet registered with OCFL, so
       validators may warn about it. Witnesses can be added later, by the owner
-      of the line or by others, and replaced when a proof is upgraded (an
-      OpenTimestamps proof is completed once its attestation is confirmed);
-      they are not covered by the inventory digests, and need not be, since a
-      signature is checked against the version it names, which the pins fix,
-      and a timestamp against the signature file it stamps.
+      of the line or by others, and are never replaced once made (a completed
+      timestamp proof is a new file beside the pending one, as the <a href="opensheaf-timestamps-0.1.html">timestamps
+      extension</a> says); they are not covered by the inventory digests, and
+      need not be, since a signature is checked against the version it names,
+      which the pins fix, and a timestamp against the signature file it
+      stamps.
     </p>
     <p>
       <strong>Signature files.</strong> An owner's signature of object version
@@ -2901,15 +2939,18 @@ keylog &lt;the value of keyLog&gt;</pre>
     <p>
       A signature is valid when the file's name matches the digest of its key,
       the key log, checked from its first version (section 6.5), reaches the
-      version named with that digest, the key is listed there, the rules of
-      section 6.5 on later key-log versions allow it, and the signature
-      verifies. A version is signed by its owner when at least <tt class="verbatim">threshold</tt>
-      distinct keys of one key-log version have valid signature files naming
-      that version (section 6.5); other signature files, stray or malformed,
-      are ignored and reported, never fatal. The versions of an owner's key
-      log are signed in the same way, <tt class="verbatim">object</tt> being the owner
-      object, by the keys of the version before (for the first, by its own
-      keys, which its genesis record fixes). Signature files, and the
+      version named with that digest, the key is listed there, and the
+      signature verifies; it counts when, in addition, the rules of section
+      6.5 on later key-log versions allow it, and is otherwise unconfirmed,
+      not invalid (section 6.5). A version is signed by its owner when at
+      least <tt class="verbatim">threshold</tt> distinct keys of one key-log version
+      have valid signature files that count naming that version, and
+      unconfirmed when it reaches <tt class="verbatim">threshold</tt> only with
+      unconfirmed ones (section 6.5); other signature files, stray or
+      malformed, are ignored and reported, never fatal. The versions of an
+      owner's key log are signed in the same way, <tt class="verbatim">object</tt> being
+      the owner object, by the keys of the version before (for the first, by
+      its own keys, which its genesis record fixes). Signature files, and the
       witnesses kept beside them, are never re-serialised or replaced once
       made, here or in <tt class="verbatim">parent.signatures/</tt>, since witnesses
       such as timestamps may be made of their bytes.
@@ -3060,9 +3101,10 @@ keylog &lt;the value of keyLog&gt;</pre>
           valid signature files of the owner naming one key-log version, the
           signed message rebuilt from them, a signature naming an older
           key-log version counting only under the rules of section 6.5
-          (otherwise reported as unconfirmed), and other signature files,
-          stray or malformed, reported, never fatal; and that forks of key
-          logs are reported, not resolved (the <a href="opensheaf-timestamps-0.1.html">timestamps
+          (otherwise reported as unconfirmed, and a version that is signed
+          only with it reported as unconfirmed, not invalid), and other
+          signature files, stray or malformed, reported, never fatal; and that
+          forks of key logs are reported, not resolved (the <a href="opensheaf-timestamps-0.1.html">timestamps
           extension</a> resolves them by time);
         </p>
       </li>
@@ -3119,12 +3161,13 @@ keylog &lt;the value of keyLog&gt;</pre>
           first of these verdicts that applies: inconsistent (a check fails,
           or the parent was resolved and does not match), confirmed (the
           parent owner's signature of the branch point holds, against its key
-          log, section 13.2), unconfirmed (consistent, without a parent
-          signature that holds, which section 10.5 does not allow); report as
-          the branch's verdict the weakest of those of its branch points
-          (inconsistent, unconfirmed, confirmed, from the weakest); and report
-          separately whether the parent was found, unavailable or removed
-          (tombstoned), and whether it is withdrawn;
+          log, section 13.2), unconfirmed (consistent, but the parent owner's
+          signature of the branch point is unconfirmed or missing, which
+          section 10.5 does not allow); report as the branch's verdict the
+          weakest of those of its branch points (inconsistent, unconfirmed,
+          confirmed, from the weakest); and report separately whether the
+          parent was found, unavailable or removed (tombstoned), and whether
+          it is withdrawn;
         </p>
       </li>
       <li>
@@ -3940,6 +3983,26 @@ keylog &lt;the value of keyLog&gt;</pre>
           files, authorities, <tt class="verbatim">genTime</tt>, re-stamping, pending
           proofs, the time of a version and ties are in the extension; section
           13.2 keeps timestamps as witnesses the core ignores.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised after a
+          fourth audit:</strong> unconfirmed defined, in section 6.5 and the
+          terminology, as a status distinct from invalid: an unconfirmed
+          signature or version is kept, copied and shown, but not relied on
+          (for pins, resolution, members, branch points and later key-log
+          versions) until confirmed, and sections 6.6, 13.2 and 14 use it so;
+          an extension concerning the key log acts on signatures only within
+          that status (section 4); under a fork of a key log, a signature
+          naming an older key-log version counts only if the rule holds on
+          every side; witnesses are never replaced (a completed timestamp
+          proof is a new file); the definition of a key log for its first
+          version, the evidence of a branch (<tt class="verbatim">parent.chain/</tt>
+          only for a branch of a branch, <tt class="verbatim">parent.signatures/</tt>
+          without the version folder) and the witnesses of section 5
+          corrected; mentions of the merged branch <tt class="verbatim">proposal/owners</tt>
+          removed.
         </p>
       </li>
     </ul>
@@ -4801,7 +4864,7 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           cannot be part of it (a signature of an inventory cannot be listed
           in that inventory). Putting each signature or timestamp in a new
           version would mix evidence with changes of the work, and every
-          upgrade of a timestamp proof would be a version. OCFL closes the
+          completion of a timestamp proof would be a version. OCFL closes the
           object folder to anything it does not define, and its <tt class="verbatim">logs/</tt>
           folder is meant for unstructured records of actions and is not
           covered by digests. Object extension folders are the place OCFL

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json",
   "title": "OpenSheaf genesis record (genesis.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branches proposal/identity and proposal/owners). Dedicated to the public domain under CC0 1.0.",
+  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity). Dedicated to the public domain under CC0 1.0.",
   "type": "object",
   "required": [
     "format",

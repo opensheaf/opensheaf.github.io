@@ -19,7 +19,8 @@ notes are for anyone, person or agent, changing it.
 - Edit only the Markdown sources: `README.md` (also the home page),
   `opensheaf-specification-0.1.md`, `FAQ.md`, `USE-CASES.md`,
   `opensheaf-git-0.1.md` (archives in git, a companion to the
-  specification); and the schemas in `schemas/`.
+  specification), `opensheaf-timestamps-0.1.md` (the timestamps extension);
+  and the schemas in `schemas/`.
 - Run `tools/build.py` after every change of a Markdown source, and commit
   the regenerated `.tm` and `.html` files with their sources. Never edit the
   `.tm` or `.html` files by hand. The build needs TeXmacs and its `notes` and
@@ -61,8 +62,9 @@ notes are for anyone, person or agent, changing it.
 - Use the terms of the specification consistently (see the spec skill):
   catalogue and selection, mirror and accepted copy, document version and
   object version, pin, revision.
-- Wrap Markdown paragraphs at about 78 columns, except in the specification
-  and in `opensheaf-git-0.1.md`, whose paragraphs are one line each.
+- Wrap Markdown paragraphs at about 78 columns, except in the specification,
+  `opensheaf-git-0.1.md` and `opensheaf-timestamps-0.1.md`, whose paragraphs
+  are one line each.
 
 ## Related repositories
 

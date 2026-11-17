@@ -150,9 +150,15 @@ November 2026; read them before touching any of this.
   only while its key is still in `keys` of the latest known version and every
   version between and the threshold has not been raised (nor extension data
   governing signatures changed); otherwise it is unconfirmed in the core (the
-  timestamps extension can confirm it); never for a key-log version under an
-  older one. Third parties:
-  `witness-<label>.json`, another owner's `keyLog`.
+  timestamps extension can confirm it); under a fork of the key log, it counts
+  only if the rule holds on every side; never for a key-log version under an
+  older one. **Unconfirmed is not invalid** (6.5, terminology): an unconfirmed
+  signature or version is kept, copied and shown, but not relied on (pins,
+  resolution, members, branch points, later key-log versions) until confirmed;
+  a version below `threshold` even counting unconfirmed signatures is invalid.
+  An extension acts on signatures only within that status (section 4).
+  Witnesses are never replaced: a completed timestamp proof is a new file.
+  Third parties: `witness-<label>.json`, another owner's `keyLog`.
 - **Timestamps: an extension, not the core.** The core (6.5, 13.2) defines no
   timestamps: a fork of a key log is reported, not resolved, and signatures
   naming key-log versions after an unresolved fork point are unconfirmed; a
@@ -167,9 +173,13 @@ November 2026; read them before touching any of this.
   OpenTimestamps `.ots` beside signature files, the owner's declaration in
   `keys.json` under `extensions` (`timestamps`: `keylog`/`all`;
   `timestampAuthorities`: SHA-256 fingerprints), checks at `genTime`, complete
-  proofs only, re-stamping, the policy in force (latest known key-log
-  version), the time of a version (`threshold`-th earliest date) and ties (two
-  hours for Bitcoin times), resolution of forks by the earlier time,
+  proofs only (a completed proof is a new `.<n>.ots` file), re-stamping, the
+  declaration in force (latest known key-log version; during a fork, the last
+  shared version, against which both sides' stamps are checked), a removed
+  authority's earlier tokens, dropping a declaration, the time of a version
+  (`threshold`-th earliest date) and ties (two hours for Bitcoin times), a
+  key-log version without a time leaving what it signs unconfirmed,
+  resolution of forks by the earlier time only when both sides are dated,
   confirmation of signatures after changes of keys, missing stamps as
   unconfirmed, branches with complete proofs; owners SHOULD adopt it from
   their first key-log version. Its schema is
@@ -297,8 +307,10 @@ indexes the archive declares.
 `opensheaf-collection-0.1.schema.json` (`members.json`),
 `opensheaf-genesis-0.1.schema.json` (`genesis.json`),
 `opensheaf-keys-0.1.schema.json` (`keys.json`),
-`opensheaf-signature-0.1.schema.json` (signature files) and
-`opensheaf-index-0.1.schema.json` (index files and `indexes.json`); JSON
+`opensheaf-signature-0.1.schema.json` (signature files),
+`opensheaf-index-0.1.schema.json` (index files and `indexes.json`) and, for
+the timestamps extension, `opensheaf-timestamps-0.1.schema.json` (its
+declaration in `keys.json`, under `extensions`); JSON
 Schema 2020-12, CC0. They do not forbid additional properties (section 12). A
 change of a field in the text needs the same change in its schema, and the
 other way round.
@@ -307,7 +319,8 @@ other way round.
 
 - 0.1 is a draft: changes go into 0.1 itself, with a dated changelog entry
   (17) and the date in the heading updated; no compatibility rules for draft
-  names.
+  names. The timestamps extension (`opensheaf-timestamps-0.1.md`) has its own
+  changelog and date, updated when it changes.
 - A new field: in the text (where its file is defined), in the schema, in the
   verification rules (14) if it can be checked, in an example (appendix E) if
   it is common, and in the rationale (appendix F) if the choice is not

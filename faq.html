@@ -315,8 +315,10 @@
       version is committed, so it cannot be part of that version: a signature
       of an inventory cannot be listed in the inventory it signs. Making a new
       version for each signature would mix evidence with changes of the work,
-      and every upgrade of a timestamp proof (OpenTimestamps proofs are
-      completed once their attestation is confirmed) would be another version.
+      and every completion of a timestamp proof (an OpenTimestamps proof is
+      completed once a Bitcoin block attests it) would be another version.
+      Witnesses are never replaced: a completed proof is a new file beside the
+      pending one.
     </p>
     <p>
       OCFL does not allow arbitrary files in an object folder; its <tt class="verbatim">logs/</tt>
@@ -330,12 +332,14 @@
       are defined by an extension, <a href="opensheaf-timestamps-0.1.html">OpenSheaf timestamps</a>: RFC 3161
       tokens from authorities the owner trusts, OpenTimestamps proofs, or
       both. An owner that wants its versions dated, a journal or an
-      institution for instance, adopts it in its key log, and forks of its key
-      log are then resolved by time; without it, the core reports such forks
-      and does not resolve them. A single researcher who never removes a key
-      may not need it. Witnesses need no digests of their own: a signature is
-      checked against the version it names, which the pins fix, and a
-      timestamp against the signature file it stamps.
+      institution for instance, adopts it in its key log, from the first
+      version (adopting it later leaves earlier signatures without a timestamp
+      unconfirmed), and forks of its key log are then resolved by time;
+      without it, the core reports such forks and does not resolve them. A
+      single researcher who never removes a key may not need it. Witnesses
+      need no digests of their own: a signature is checked against the version
+      it names, which the pins fix, and a timestamp against the signature file
+      it stamps.
     </p>
     <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>
