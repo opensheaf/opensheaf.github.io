@@ -122,22 +122,30 @@ their revision comments) before touching any of this.
   the last character's 4 spare bits hold k, from 0 to 15 (0, the default,
   gives `a` or `q`).
 - **Owner** (6.5, 7.5): a keyed identity (person, group, institution); an
-  object of kind `owner`, named by its genesis record (the **owner name**,
+  object of kind `owner`, named by its genesis record, which lists its
+  first `keys` and `threshold` (the **owner name**,
   recorded in `originator`, `owner`, `parent.owner`, `sheaf:` URIs). Its
   versions are its **key log**: `keys.json` (`keys`, Ed25519 `did:key`;
   `threshold`; optional `revoked` and `keeper`); each version signed by
-  `threshold` keys of the one before. No named owners, no owner
+  `threshold` keys of the one before; the first `keys.json` repeats the
+  genesis record's keys and threshold. No named owners, no owner
   identifiers. One `threshold` governs both the key log and the owner's
   lines (as in Radicle). The optional **keeper** link (ORCID iD, domain) is confirmed
   by the keeper (ORCID record, `/.well-known/opensheaf`), never required.
 - **Signing** (6.5, 13.2): every sealed version of a line is signed by its
   owner, `threshold` keys of the key-log version named, each in
-  `extensions/opensheaf-witnesses/<v>/signature-<k>.json` (`signed`,
-  `owner`, `key`, `keyLog` as a pin `sheaf:<owner>/v<n>?sha512=...`,
-  `signature`), with OpenTimestamps proofs; a revoked key counts only with a
-  timestamp before the revocation. Third parties: `witness-<label>.json`.
+  `extensions/opensheaf-witnesses/<v>/signature-<k>.json` (`<k>` from a
+  digest of the key; fields `object`, `version`, `inventorySha512`,
+  `signer`, `key`, `keyLog` as a pin `sheaf:<owner>/v<n>?sha512=...`,
+  `signature`), signing a defined five-line message binding object,
+  version, inventory and key-log version; all signatures of a version name
+  one key-log version, which MUST be the latest; an older one, or a key
+  revoked later, counts only with an earlier timestamp. Third parties:
+  `witness-<label>.json`.
 - **Key logs travel with the objects they sign** (6.5): a copy keeps the
-  signers' owner objects in its storage root, up to the versions named. A
+  signers' owner objects in its storage root, up to the latest key-log
+  version its maker knows; readers use the longest valid log; freshness
+  cannot be proved offline. A
   line is its signed versions, wherever stored; an archive MUST NOT add to
   a line a version its owner did not sign. No signed list of an owner's
   lines exists (lines are linear).
@@ -161,7 +169,9 @@ their revision comments) before touching any of this.
   parent's (refused if none up to 15); lines stay taken after a takedown.
   No `sealed`: an archive accepts an object whose genesis record it
   holds only if it is signed by the record's originator (the same line) or
-  carries parent evidence signed by its parent's owner (a branch). A work
+  carries a chain of parent evidence (`parent.chain/`) back to the
+  originator's line (a branch), compared by the algorithm-0 name, also
+  against tombstones' `genesisName`. A work
   is searched for under all 16 names, keeping byte-identical records and
   lines whose signatures hold. Aliases open (#44).
 - **Draft and sealing** (6.5): drafts are a sandbox owner `draft`, at

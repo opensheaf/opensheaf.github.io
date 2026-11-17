@@ -2,12 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-signature-0.1.schema.json",
   "title": "OpenSheaf signature file, version 0.1",
-  "$comment": "Proposal (section 13.2 of the specification, branch proposal/owners; format and field names provisional, #55). Dedicated to the public domain under CC0 1.0.",
+  "$comment": "Proposal (section 13.2 of the specification, branch proposal/owners; field names provisional; the signed message is defined in section 13.2, #55). Dedicated to the public domain under CC0 1.0.",
   "type": "object",
   "required": [
     "format",
-    "signed",
-    "owner",
+    "object",
+    "version",
+    "inventorySha512",
+    "signer",
     "key",
     "keyLog",
     "signature"
@@ -15,14 +17,6 @@
   "properties": {
     "format": {
       "const": "opensheaf-signature/0.1"
-    },
-    "signed": {
-      "type": "string",
-      "pattern": "^v[1-9][0-9]*/inventory\\.json\\.sha512$"
-    },
-    "owner": {
-      "type": "string",
-      "pattern": "^[a-z2-7]{52}$"
     },
     "key": {
       "type": "string",
@@ -37,6 +31,23 @@
       "type": "string",
       "pattern": "^[A-Za-z0-9+/]{86}==$",
       "$comment": "an Ed25519 signature (64 bytes) in base64"
+    },
+    "object": {
+      "type": "string",
+      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v[1-9][0-9]*$"
+    },
+    "inventorySha512": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    },
+    "signer": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{52}$",
+      "$comment": "the owner name of the signer"
     }
   }
 }

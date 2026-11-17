@@ -181,13 +181,22 @@
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
             "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+          },
+          "genesisName": {
+            "type": "string",
+            "pattern": "^[a-z2-7]{51}[aq]$",
+            "$comment": "proposal (section 11.3): the name of the genesis record by algorithm 0"
           }
         },
         "dependentRequired": {
           "name": [
-            "owner"
+            "owner",
+            "genesisName"
           ],
           "owner": [
+            "name"
+          ],
+          "genesisName": [
             "name"
           ]
         }

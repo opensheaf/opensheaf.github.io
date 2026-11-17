@@ -204,16 +204,16 @@ versions, wherever they are stored: the archive that keeps a copy is only
 where it lives, and an owner who moves to another archive continues its
 lines there.
 
-An owner is itself an object, named by its own genesis record, whose
-versions are its <dfn>key log</dfn>: the list of its public keys and the
-number of them that must sign, each version signed by the keys of the one
-before. Keys can thus be added, replaced or revoked while the owner stays the
-same; a group of co-authors can share one owner with a threshold, for
-instance two signatures out of three. Every version of every line is signed,
-and the key logs travel with the objects they sign, so a line can be checked
-from any copy, even when the archives that served it have gone. An owner may
-name who answers for it (an ORCID iD, an institution), which the keeper
-confirms in a place only it controls; nothing requires it. Drafts are a
+An owner is itself an object, named by its own genesis record, which lists its
+first keys, and whose versions are its <dfn>key log</dfn>: the list of its
+public keys and the number of them that must sign, each version signed by the
+keys of the one before. Keys can thus be added, replaced or revoked while the
+owner stays the same; a group of co-authors can share one owner with a
+threshold, for instance two signatures out of three. Every version of every
+line is signed, and the key logs travel with the objects they sign, so a line
+can be checked from any copy, even when the archives that served it have gone.
+An owner may name who answers for it (an ORCID iD, an institution), which the
+keeper confirms in a place only it controls; nothing requires it. Drafts are a
 sandbox: objects of a reserved owner, `draft`, kept by one archive, never
 signed, pinned or copied out of it, and free to be rewritten or deleted.
 Sealing makes a new object, the first version of the line; the draft's

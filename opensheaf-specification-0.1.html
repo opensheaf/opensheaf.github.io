@@ -793,14 +793,17 @@
       the owner of the first line) and <tt class="verbatim">nonce</tt> (at least 128
       bits from a cryptographically secure random generator, in lowercase
       hexadecimal). The genesis record of an owner (below) has <tt class="verbatim">kind</tt>
-      <tt class="verbatim">owner</tt> and no <tt class="verbatim">originator</tt>. The genesis
-      record MUST be part of every later object version of the object and of
-      its branches, byte for byte. It contains neither its own name nor the
-      object identifier, so that the name does not depend on itself. It MUST
-      be written in UTF-8 without a byte order mark (section 2), and SHOULD
-      have LF line ends; since the name is the digest of its bytes as stored,
-      tools MUST NOT rewrite or re-serialise it, and need no canonical form to
-      check it.
+      <tt class="verbatim">owner</tt>, no <tt class="verbatim">originator</tt>, and the owner's
+      first <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt> (as in <tt
+      class="verbatim">keys.json</tt>, below), so that the owner name fixes the keys
+      that can first sign for it; an owner object is its own originator. The
+      genesis record MUST be part of every later object version of the object
+      and of its branches, byte for byte. It contains neither its own name nor
+      the object identifier, so that the name does not depend on itself. It
+      MUST be written in UTF-8 without a byte order mark (section 2), and
+      SHOULD have LF line ends; since the name is the digest of its bytes as
+      stored, tools MUST NOT rewrite or re-serialise it, and need no canonical
+      form to check it.
     </p>
     <p>
       <strong>Name.</strong> The name of a work, or of an owner, is the
@@ -865,50 +868,68 @@
     </ul>
     <p>
       The first version of the key log holds the genesis record and the first
-      <tt class="verbatim">keys.json</tt>; it is signed by <tt class="verbatim">threshold</tt> of
-      its own keys. **Every later version MUST be signed by at least <tt
-      class="verbatim">threshold</tt> distinct keys of the version before it.** A new
-      key is added, an old one removed, or a threshold changed, by a new
-      version; the owner name never changes. Tools SHOULD create two keys when
-      an owner is created, one of them kept apart (on a hardware token, for
-      instance), or give the owner the keys of several people with a
-      threshold; losing every key of the latest version cannot be recovered.
-      The field names of <tt class="verbatim">keys.json</tt> are provisional (#55).
+      <tt class="verbatim">keys.json</tt>, whose <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt>
+      MUST be exactly those of the genesis record (it MAY add <tt class="verbatim">keeper</tt>).
+      Its authority comes from the genesis record, whose digest is the owner
+      name: no one can make another first version under that name without
+      changing the keys it lists, and so the name; it is signed, like every
+      version, by <tt class="verbatim">threshold</tt> of those keys, which binds the
+      rest of it (<tt class="verbatim">keeper</tt>). **Every later version MUST be
+      signed by at least <tt class="verbatim">threshold</tt> distinct keys of the
+      version before it.** A new key is added, an old one removed, or a
+      threshold changed, by a new version; the owner name never changes. Tools
+      SHOULD create two keys when an owner is created, one of them kept apart
+      (on a hardware token, for instance), or give the owner the keys of
+      several people with a threshold; losing every key of the latest version
+      cannot be recovered. The field names of <tt class="verbatim">keys.json</tt> are
+      provisional (#55).
     </p>
     <p>
       <strong>Signing.</strong> Every sealed object version of a line MUST be
       signed by its owner: by at least <tt class="verbatim">threshold</tt> distinct keys
       of the version of the owner's key log that the signatures name, each in
       a signature file (section 13.2) that names that key-log version with its
-      pin. A signature SHOULD name the latest version of the key log its
-      signer knows. A key listed in <tt class="verbatim">revoked</tt> of a version of
-      the key log is not trusted for signatures naming that version or a later
-      one; a signature by it naming an earlier version is trusted only with a
-      timestamp proof (section 13.2) of a date earlier than the <tt class="verbatim">created</tt>
-      date, in the key log's inventory, of the first version that revokes it,
-      since anyone holding a stolen key can name an old version. Two different
-      versions of a key log with the same number are a fork of the owner,
-      reported as any fork. One <tt class="verbatim">threshold</tt> governs both the key
-      log and every line of the owner, as in Radicle, where the threshold of
-      an identity document also decides its canonical branch: a person uses a
-      threshold of 1 with a spare key; a group raises it, and then also
-      governs together what it publishes. A second threshold, for lines alone,
-      can be added later if needed.
+      pin; all the signatures of one object version MUST name the same key-log
+      version. A signature MUST name the latest version of the key log at the
+      time it is made: naming an older version would revive keys removed
+      since, or a lower threshold. A verifier therefore accepts a signature
+      naming a key-log version that is not the latest it knows only with a
+      timestamp proof (section 13.2) of the signature file, dated before the
+      <tt class="verbatim">created</tt> date, in the key log's inventory, of the next
+      version of the key log; without one, it reports the signature as
+      unconfirmed, does not count it for the version signed, and never accepts
+      it for a version of a key log, which is signed under the version just
+      before it. A key listed in <tt class="verbatim">revoked</tt> is not trusted at all
+      for signatures naming the version that revokes it or a later one, and a
+      signature by it naming an earlier version is subject to the same rule.
+      Two different versions of a key log with the same number are a fork of
+      the owner, reported as any fork. One <tt class="verbatim">threshold</tt> governs
+      both the key log and every line of the owner, as in Radicle, where the
+      threshold of an identity document also decides its canonical branch: a
+      person uses a threshold of 1 with a spare key; a group raises it, and
+      then also governs together what it publishes. A second threshold, for
+      lines alone, can be added later if needed.
     </p>
     <p>
       <strong>Key logs travel with the objects they sign.</strong> A copy of
       an object, in any archive, MUST include the key log of every owner that
-      signed one of its versions, up to the key-log versions its signatures
-      name, as copies of those owner objects in the same storage root (at
-      their paths, section 5): the originator's for an originator's line, the
-      branch owner's for a branch, whose parent version carries the part of
-      the parent owner's key log it needs in its own content (section 10.5). A
-      mirror copies new versions of a key log with the object versions signed
-      under them. The key log checks itself: its first version's genesis
-      record has the owner name as its name, and each later version is signed
-      by the keys of the one before; so a copy of it from any source is as
-      good as the original, and a reader checks a line without trusting any
-      host, also after the archives that served it have gone.
+      signed one of its versions, up to the latest version of that key log
+      known to whoever makes the copy (at least up to the versions its
+      signatures name), as copies of those owner objects in the same storage
+      root (at their paths, section 5): the originator's for an originator's
+      line, the branch owner's for a branch, whose parent version carries the
+      parent owner's key log in its own content (section 10.5). Whoever copies
+      new versions of an object also copies the new versions of the key logs
+      it knows. The key log checks itself: its first version's genesis record
+      has the owner name as its name and lists its first keys, and each later
+      version is signed by the keys of the one before; so a copy of it from
+      any source is as good as the original, and a reader checks a line
+      without trusting any host, also after the archives that served it have
+      gone. Since a key log is linear, of two valid copies the longer is the
+      more recent: readers use the longest valid key log they find. No one can
+      prove offline that a key log is complete: a copy that stops early may
+      hide a later version, such as one that revokes a key, so the freshness
+      of a key log is only as good as the copies a reader has seen.
     </p>
     <p>
       <strong>Keepers (optional).</strong> An owner MAY name, in <tt class="verbatim">keeper</tt>
@@ -1073,19 +1094,22 @@
       <strong>Refusals.</strong> One genesis record names one work and its
       originator. The first version of the originator's line MUST be signed by
       the originator named in the genesis record, and every other line of the
-      record is a branch, whose evidence is signed by its parent's owner
-      (section 10.5). Someone who reuses a genesis record for another work
-      therefore cannot make a valid line of it: the originator's signature
-      cannot be made by anyone else, and a branch needs a parent signed by its
-      owner. Only the originator can reuse its own record, and a second
-      history it signs under it is a fork of its line, detected and
-      attributable to it. When an object is created or deposited, an archive
-      that holds an object (or a tombstone) with the same genesis record
-      accepts it only if it is signed by the genesis record's originator (the
-      same line) or carries parent evidence signed by its parent's owner (a
-      branch), and otherwise refuses it. A tool MUST NOT copy a genesis record
-      into an object that is not a copy or a branch of the work it was written
-      for, nor reuse a nonce.
+      record is a branch, whose evidence carries the chain of its parents back
+      to a version of the originator's line, each signed by its owner (section
+      10.5). Someone who reuses a genesis record for another work therefore
+      cannot make a valid line of it: the originator's signature cannot be
+      made by anyone else, and a branch needs a chain of signed parents ending
+      in the originator's line. Only the originator can reuse its own record,
+      and a second history it signs under it is a fork of its line, detected
+      and attributable to it. When an object is created or deposited, an
+      archive that holds an object (or a tombstone) with the same genesis
+      record (compared by its name by algorithm 0, which objects' genesis
+      records and tombstones give) accepts it only if it is signed by the
+      genesis record's originator (the same line) or carries a chain of parent
+      evidence that holds back to the originator's line (a branch), and
+      otherwise refuses it. A tool MUST NOT copy a genesis record into an
+      object that is not a copy or a branch of the work it was written for,
+      nor reuse a nonce.
     </p>
     <p>
       <strong>Existing objects.</strong> This draft assumes that every sealed
@@ -1226,7 +1250,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
         <p>
           <strong>The owner.</strong> Without an owner part, a URI names the
           line of the originator, the owner named by <tt class="verbatim">originator</tt>
-          in the genesis record, which every copy of the object and of its
+          in the genesis record (for an owner, the owner itself: <tt class="verbatim">sheaf:&lt;owner&gt;</tt>
+          names its key log), which every copy of the object and of its
           branches carries. If a resolver finds several genesis records under
           one name (with the same originator or not), the URI is ambiguous: it
           lists them with their originators and does not choose. It does not
@@ -1272,9 +1297,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           name, by the algorithm of the name's last character, is the name,
           has the URI's name as <tt class="verbatim">name</tt> and the line's owner as
           <tt class="verbatim">owner</tt> in its <tt class="verbatim">object.json</tt> (the owner
-          part, or the originator), holds document version n, and is signed by
-          that owner (section 13.2); it reports a mismatch as section 14 does.
-          Citations of a fixed version SHOULD carry the digest.
+          part, or the originator), holds document version n (for a version of
+          a key log, is object version n), and is signed by that owner
+          (section 13.2); it reports a mismatch as section 14 does. Citations
+          of a fixed version SHOULD carry the digest.
         </p>
       </li>
       <li>
@@ -1331,10 +1357,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       record are listed apart, as removed lines of those names, and removed
       entries that kept it are marked removed); and it keeps only the lines
       whose signatures hold: the originator's line signed by the originator
-      its genesis record names, and branches whose parent evidence is signed
-      by their parents' owners (section 10.5). Since no one else can make the
-      originator's signature, the lines kept are lines of one work, and a
-      genesis record reused for another work yields no valid line. The
+      its genesis record names, and branches whose chains of parent evidence
+      hold back to the originator's line (section 10.5). Since no one else can
+      make the originator's signature, the lines kept are lines of one work,
+      and a genesis record reused for another work yields no valid line. The
       comparison is of bytes, so it does not rely on any hash being free of
       collisions. Resolving a line needs no search: <tt class="verbatim">sheaf:&lt;name&gt;</tt>
       names the originator's line, always named by algorithm 0 (a clash when
@@ -1344,9 +1370,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
     <p>
       <strong>Short forms.</strong> For people reading and typing them, the
       name and the owner name MAY be shortened to a prefix of at least 8
-      characters: <tt class="verbatim">sheaf:olqybey6/v3</tt>, <tt class="verbatim">sheaf:olqybey6:iztwg6bj/v3</tt>.
+      characters: <tt class="verbatim">sheaf:lvfmiq2z/v3</tt>, <tt class="verbatim">sheaf:lvfmiq2z:iztwg6bj/v3</tt>.
       A part of 52 characters is complete; a shorter one is a prefix. A short
-      name with <tt class="verbatim">:*</tt> (<tt class="verbatim">sheaf:olqybey6:*</tt>) expands
+      name with <tt class="verbatim">:*</tt> (<tt class="verbatim">sheaf:lvfmiq2z:*</tt>) expands
       among names, whatever their owners, and is ambiguous when names of
       several genesis records match; once expanded, the work is searched for
       as above. A resolver expands a short form among the lines it knows of
@@ -1411,13 +1437,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           <tt class="verbatim">names/&lt;p&gt;.json</tt>, where <tt class="verbatim">&lt;p&gt;</tt>
           is the first characters of a name: the objects whose names start
           with them, each entry with <tt class="verbatim">name</tt>, <tt class="verbatim">originator</tt>
-          (from the genesis record), <tt class="verbatim">owner</tt> and <tt class="verbatim">id</tt>
-          (the object identifier in that storage root), <tt class="verbatim">label</tt>
-          if the archive gives one, and <tt class="verbatim">genesis</tt>, the exact
-          text of its <tt class="verbatim">genesis.json</tt>, the string whose UTF-8
-          encoding is exactly the bytes of the file, so that a work can be
-          searched for, and collisions removed, from the indexes alone
-          (above);
+          (from the genesis record; for an owner object, its own name), <tt
+          class="verbatim">owner</tt> and <tt class="verbatim">id</tt> (the object identifier in
+          that storage root), <tt class="verbatim">label</tt> if the archive gives one,
+          and <tt class="verbatim">genesis</tt>, the exact text of its <tt class="verbatim">genesis.json</tt>,
+          the string whose UTF-8 encoding is exactly the bytes of the file, so
+          that a work can be searched for, and collisions removed, from the
+          indexes alone (above);
         </p>
       </li>
       <li>
@@ -1488,7 +1514,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
     <p>
       <strong>Gateways.</strong> Browsers do not resolve <tt class="verbatim">sheaf:</tt>
       URIs. A gateway is a web service that does it for them: it serves a URI
-      at its base URL followed by the URI, unchanged, for instance <tt class="verbatim">https://opensheaf.org/sheaf:olqybey6/v3?sha512=c07a&hellip;</tt>
+      at its base URL followed by the URI, unchanged, for instance <tt class="verbatim">https://opensheaf.org/sheaf:lvfmiq2z/v3?sha512=c07a&hellip;</tt>
       (provisionally; the domain is open, section 6.5), so that an absolute
       link and its URI are turned into each other by adding or removing the
       base URL (a relative link starting with <tt class="verbatim">sheaf:</tt> is read
@@ -1544,20 +1570,21 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       at the top level, and, except in a draft, <tt class="verbatim">genesis.json</tt>
       (section 6.5); every version of a branch also holds the evidence of its
       current branch point, <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.keylog/</tt>
-      (section 10.5), unchanged until the branch point moves again. These are
-      the identity files of the object; they are not files of the document's
-      own (section 7.3), and the names <tt class="verbatim">genesis.json</tt>, <tt
-      class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures</tt> and <tt class="verbatim">parent.keylog</tt> are
-      reserved for them at the top level of the content. Every version
-      directory MUST contain a copy of the inventory as of that version, with
-      its checksum file (OCFL makes this a recommendation; OpenSheaf requires
-      it, so that each version can be pinned and fetched on its own). Version
-      directories MUST NOT be zero-padded (<tt class="verbatim">v1</tt>, <tt class="verbatim">v2</tt>,
-      &hellip;, not <tt class="verbatim">v001</tt>), which OCFL allows. OCFL recommends
-      that object identifiers be URIs; with the proposal of section 6.5 they
-      are <tt class="verbatim">sheaf:</tt> URIs (section 6.3), drafts included.
+      <tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.keylog/</tt> and
+      <tt class="verbatim">parent.chain/</tt> (section 10.5), unchanged until the branch
+      point moves again. These are the identity files of the object; they are
+      not files of the document's own (section 7.3), and the names <tt class="verbatim">genesis.json</tt>,
+      <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
+      <tt class="verbatim">parent.signatures</tt>, <tt class="verbatim">parent.keylog</tt> and <tt
+      class="verbatim">parent.chain</tt> are reserved for them at the top level of the
+      content. Every version directory MUST contain a copy of the inventory as
+      of that version, with its checksum file (OCFL makes this a
+      recommendation; OpenSheaf requires it, so that each version can be
+      pinned and fetched on its own). Version directories MUST NOT be
+      zero-padded (<tt class="verbatim">v1</tt>, <tt class="verbatim">v2</tt>, &hellip;, not <tt
+      class="verbatim">v001</tt>), which OCFL allows. OCFL recommends that object
+      identifiers be URIs; with the proposal of section 6.5 they are <tt
+      class="verbatim">sheaf:</tt> URIs (section 6.3), drafts included.
     </p>
     <p>
       Each version in the inventory MUST have a <tt class="verbatim">user</tt> with a
@@ -2345,10 +2372,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       Its first object version holds exactly the files of the parent version
       (every file except <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>
       and the parent version's own evidence, <tt class="verbatim">parent.inventory.json</tt>,
-      <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>
-      and <tt class="verbatim">parent.keylog/</tt>; the genesis record included), byte
-      for byte, and the evidence of the parent version, as plain files of its
-      content:
+      <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
+      <tt class="verbatim">parent.keylog/</tt> and <tt class="verbatim">parent.chain/</tt>; the
+      genesis record included), byte for byte, and the evidence of the parent
+      version, as plain files of its content (the field and folder names below
+      are provisional, #55):
     </p>
     <ul>
       <li>
@@ -2371,11 +2399,21 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
       <li>
         <p>
-          <tt class="verbatim">parent.keylog/</tt>, the part of the parent owner's key
-          log those signatures need: for each version of it up to the one they
-          name, <tt class="verbatim">v&lt;n&gt;/inventory.json</tt>, <tt class="verbatim">v&lt;n&gt;/keys.json</tt>
-          and its signature files, and <tt class="verbatim">v1/genesis.json</tt> (the
-          names under <tt class="verbatim">parent.keylog/</tt> are provisional, #55).
+          <tt class="verbatim">parent.keylog/</tt>, the parent owner's key log, from its
+          first version up to the latest the branch owner knows when it takes
+          the branch point (at least up to the one the signatures name): for
+          each version, <tt class="verbatim">v&lt;n&gt;/inventory.json</tt>, <tt class="verbatim">v&lt;n&gt;/keys.json</tt>
+          and its signature files, and <tt class="verbatim">v1/genesis.json</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">parent.chain/</tt>, when the parent is itself a branch:
+          the parent version's own evidence (its <tt class="verbatim">parent.inventory.json</tt>,
+          <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
+          <tt class="verbatim">parent.keylog/</tt> and <tt class="verbatim">parent.chain/</tt>),
+          byte for byte, so that the branch carries the chain of its parents
+          back to a version of the originator's line.
         </p>
       </li>
     </ul>
@@ -2384,9 +2422,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       and signatures, and never conflict with the parent's identifier. Its
       later versions are its owner's own, and keep the identity files
       unchanged until the branch point moves. A branch of a branch names its
-      grandparent through <tt class="verbatim">parent.object.json</tt>. It needs the
-      right to redistribute only the parent version. This is the evidence #22
-      proposes for accepted copies, completed by the parent owner's signature.
+      grandparent through <tt class="verbatim">parent.object.json</tt>, and carries its
+      evidence in <tt class="verbatim">parent.chain/</tt>: the evidence is
+      self-contained, as key logs are, so that a branch can be checked back to
+      the originator's line after every archive of its parents has gone; a
+      chain grows by one set of evidence files for each level, which is small
+      beside the files of a version. It needs the right to redistribute only
+      the parent version. This is the evidence #22 proposes for accepted
+      copies, completed by the parent owner's signature.
     </p>
     <p>
       <strong>Keeping the parent's history.</strong> A branch holds no earlier
@@ -2427,12 +2470,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           the files: every file of the head state of that inventory, except
           <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt> and the
           parent's own evidence (<tt class="verbatim">parent.inventory.json</tt>, <tt
-          class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>
-          and <tt class="verbatim">parent.keylog/</tt>), is present at the same logical
-          path with the same digest, no other file is present besides <tt
-          class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt> and the
-          branch's evidence, and <tt class="verbatim">parent.object.json</tt> has the
-          digest of <tt class="verbatim">object.json</tt> in that state;
+          class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
+          <tt class="verbatim">parent.keylog/</tt> and <tt class="verbatim">parent.chain/</tt>),
+          is present at the same logical path with the same digest, no other
+          file is present besides <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>
+          and the branch's evidence, and <tt class="verbatim">parent.object.json</tt>
+          has the digest of <tt class="verbatim">object.json</tt> in that state;
         </p>
       </li>
       <li>
@@ -2470,9 +2513,19 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
         <p>
           the parent's signature: at least <tt class="verbatim">threshold</tt> signature
           files in <tt class="verbatim">parent.signatures/</tt>, of distinct keys of
-          that key-log version, sign the checksum of <tt class="verbatim">parent.inventory.json</tt>
-          (section 13.2), a key revoked later counting only with an earlier
-          timestamp.
+          that key-log version, all naming it, sign the parent version
+          (section 13.2), as section 6.5 says of keys revoked or replaced
+          later;
+        </p>
+      </li>
+      <li>
+        <p>
+          the chain: when <tt class="verbatim">parent.object.json</tt> declares a <tt
+          class="verbatim">parent</tt>, <tt class="verbatim">parent.chain/</tt> holds the parent
+          version's evidence, each file with the digest that <tt class="verbatim">parent.inventory.json</tt>
+          records for it, and that evidence passes the same checks, level by
+          level, until a parent whose owner is the <tt class="verbatim">originator</tt>
+          of the genesis record and that declares no parent.
         </p>
       </li>
     </ul>
@@ -2482,10 +2535,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       consistent, and the parent owner's signature, checked against its key
       log, shows that the parent version is that owner's, without access to
       wherever the parent's line is kept. A branch MUST therefore hold <tt
-      class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.keylog/</tt> at
-      each of its branch points. Without them, or when they do not hold, the
-      branch shows only that someone made a parent inventory that agrees with
-      itself.
+      class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.keylog/</tt>, and
+      <tt class="verbatim">parent.chain/</tt> when its parent is a branch, at each of
+      its branch points. Without them, or when they do not hold, the branch
+      shows only that someone made a parent inventory that agrees with itself.
     </p>
     <p>
       <strong>Moving the branch point.</strong> A branch MAY take a later
@@ -2502,18 +2555,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       previous version's; it holds exactly the files of the new parent
       version, as the first version of a branch does, with new evidence (<tt
       class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.keylog/</tt>),
-      and is checked like that first version (this drops the files of the
-      branch's own notes, such as the files of its notices, which section 7.3
-      keeps in every later version: how a move keeps them is open, section
-      6.5), and also for continuity: the new parent inventory continues the
-      previous one when both have the same <tt class="verbatim">id</tt>, every entry of
-      <tt class="verbatim">versions</tt> in the previous one is equal, as a JSON value,
-      to the entry of the same version in the new one, and every digest of
-      those entries is in the manifest of the new one. This shows, from the
-      branch alone, that the corrected version continues the version first
-      vetted. The branch stays one sequence of versions under one owner,
-      numbered as section 7.3 says.
+      <tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.keylog/</tt> and
+      <tt class="verbatim">parent.chain/</tt>), and is checked like that first version
+      (this drops the files of the branch's own notes, such as the files of
+      its notices, which section 7.3 keeps in every later version: how a move
+      keeps them is open, section 6.5), and also for continuity: the new
+      parent inventory continues the previous one when both have the same <tt
+      class="verbatim">id</tt>, every entry of <tt class="verbatim">versions</tt> in the previous
+      one is equal, as a JSON value, to the entry of the same version in the
+      new one, and every digest of those entries is in the manifest of the new
+      one. This shows, from the branch alone, that the corrected version
+      continues the version first vetted. The branch stays one sequence of
+      versions under one owner, numbered as section 7.3 says.
     </p>
     <p>
       <strong>Accepted copies.</strong> An accepted copy is a branch kept by a
@@ -2586,12 +2639,15 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <tt class="verbatim">inventorySha512</tt> of that version, <tt class="verbatim">date</tt>
       and <tt class="verbatim">reason</tt> (plain text, since the discovery document has
       no content files), and, for an object with a genesis record, its <tt
-      class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, which it MUST record, so
-      that its line stays taken in that archive (section 6.5). Drafts leave no
-      tombstone. Identifiers of tombstoned objects MUST NOT be reused.
-      Verifiers report a pin to a tombstoned object as &quot;removed&quot;,
-      not as a corruption. External copies (DOI records, snapshots) follow the
-      rules of their services.
+      class="verbatim">name</tt>, <tt class="verbatim">owner</tt> and <tt class="verbatim">genesisName</tt>
+      (the name of its genesis record by algorithm 0, the same for every line
+      of the work), which it MUST record, so that its line stays taken in that
+      archive and a genesis record is compared with it whatever the algorithm
+      of its lines' names (section 6.5). Drafts leave no tombstone.
+      Identifiers of tombstoned objects MUST NOT be reused. Verifiers report a
+      pin to a tombstoned object as &quot;removed&quot;, not as a corruption.
+      External copies (DOI records, snapshots) follow the rules of their
+      services.
     </p>
     <p>
       Note: OCFL 1.1 has no way to remove files from an object short of
@@ -2686,9 +2742,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
     <p>
       <strong>Signature files.</strong> An owner's signature of object version
       <tt class="verbatim">&lt;version&gt;</tt> is a JSON file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>
-      in the extension folder, one for each key that signs (<tt class="verbatim">&lt;k&gt;</tt>
-      the position of the key in <tt class="verbatim">keys</tt> of the key-log version
-      named, from 1), with:
+      in the extension folder, one for each key that signs, where <tt class="verbatim">&lt;k&gt;</tt>
+      is the first 16 characters of the lowercase base32 (RFC 4648, without
+      padding) SHA-256 digest of the key's <tt class="verbatim">did:key</tt> URI, as
+      UTF-8, so that file names never collide after keys rotate. It has:
     </p>
     <ul>
       <li>
@@ -2698,14 +2755,25 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
       <li>
         <p>
-          <tt class="verbatim">signed</tt>: the logical name of the file signed, <tt
-          class="verbatim">&lt;version&gt;/inventory.json.sha512</tt>, the inventory
-          checksum file of that version;
+          <tt class="verbatim">object</tt>: the identifier of the object, <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>
+          (section 6.3);
         </p>
       </li>
       <li>
         <p>
-          <tt class="verbatim">owner</tt>: the owner name;
+          <tt class="verbatim">version</tt>: the object version signed, <tt class="verbatim">&lt;version&gt;</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">inventorySha512</tt>: the SHA-512 digest of that
+          version's inventory file, as its checksum file states it;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">signer</tt>: the owner name of the signer: the line's
+          owner, for the owner's signature;
         </p>
       </li>
       <li>
@@ -2724,37 +2792,65 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <li>
         <p>
           <tt class="verbatim">signature</tt>: the Ed25519 signature (RFC 8032) of the
-          bytes of the checksum file, 64 bytes in base64 (RFC 4648, with
-          padding).
+          signed message, 64 bytes in base64 (RFC 4648, with padding).
         </p>
       </li>
     </ul>
     <p>
+      <strong>The signed message.</strong> What is signed is not a file but
+      the message made of these five lines, each ended by a line feed (LF, <tt
+      class="verbatim">0x0A</tt>), in UTF-8, with no other characters, spaces or blank
+      lines:
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+opensheaf-signature/0.1
+object &lt;the value of object&gt;
+version &lt;the value of version&gt;
+inventory &lt;the value of inventorySha512&gt;
+keylog &lt;the value of keyLog&gt;</pre>
+    </div>
+    <p>
+      The first line separates these signatures from any other use of the key;
+      the others bind the signature to one object, one version, its inventory,
+      and the key-log version that says which keys may sign, so that none of
+      them can be changed, nor the signature moved to another object or
+      another key-log version, without breaking it. A verifier rebuilds the
+      message from the fields of the signature file, checks that <tt class="verbatim">object</tt>,
+      <tt class="verbatim">version</tt> and <tt class="verbatim">inventorySha512</tt> are those of
+      the version it checks (the digest also in its checksum file), and
+      verifies the signature.
+    </p>
+    <p>
       A signature is valid when the key log, checked from its first version
       (section 6.5), reaches the version named with that digest, the key is
-      listed there and not revoked as section 6.5 says, and the signature
-      verifies. A version is signed by its owner when at least <tt class="verbatim">threshold</tt>
-      of the keys of the key-log version named have valid signature files that
-      name that same version. The versions of an owner's key log are signed in
-      the same way, by the keys of the version before (by its own keys, for
-      the first). The format of signature files, and their field names, are
+      listed there, the rules of section 6.5 on later key-log versions and
+      revoked keys allow it, and the signature verifies. A version is signed
+      by its owner when at least <tt class="verbatim">threshold</tt> distinct keys of
+      the key-log version named have valid signature files, all naming that
+      same version. The versions of an owner's key log are signed in the same
+      way, <tt class="verbatim">object</tt> being the owner object, by the keys of the
+      version before (for the first, by its own keys, which its genesis record
+      fixes). The format of signature files, and their field names, are
       provisional (#55).
     </p>
     <p>
       <strong>Timestamps.</strong> <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.ots</tt>
       MAY hold an OpenTimestamps proof of the signature file, and <tt class="verbatim">&lt;version&gt;/inventory.json.sha512.ots</tt>
       of the checksum file. Tools SHOULD timestamp every signature when it is
-      made, since a signature by a key revoked later is trusted only with a
-      timestamp earlier than the revocation (section 6.5).
+      made, since a signature naming a key-log version that is no longer the
+      latest, or by a key revoked later, is trusted only with a timestamp
+      earlier than the next version of the key log (section 6.5).
     </p>
     <p>
       <strong>Others' witnesses.</strong> A signature by someone other than
       the owner (a third party vouching for a version) is <tt class="verbatim">&lt;version&gt;/witness-&lt;label&gt;.json</tt>,
       where <tt class="verbatim">&lt;label&gt;</tt> is chosen by whoever adds it and
-      matches <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>, with the fields of a
-      signature file, <tt class="verbatim">owner</tt> and <tt class="verbatim">keyLog</tt> naming
-      the signer's own owner object, which the copy then also keeps (section
-      6.5). It is a witness, not a signature of the line.
+      matches <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>, with the fields and
+      the signed message of a signature file, <tt class="verbatim">signer</tt> and <tt
+      class="verbatim">keyLog</tt> naming the signer's own owner object, which the copy
+      then also keeps (section 6.5). It is a witness, not a signature of the
+      line.
     </p>
     <p>
       <strong>Copies and branches.</strong> A copy of an object copies its
@@ -2863,14 +2959,19 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
         <p>
           for each owner object (section 7.5), that its first version holds a
           genesis record of kind <tt class="verbatim">owner</tt> whose name is the owner
-          name, and that every version is signed by at least <tt class="verbatim">threshold</tt>
-          keys of the version before it (of its own, for the first), reporting
-          a fork of a key log; for every object, that the storage root holds
-          the key logs of the owners that signed its versions, up to the
-          versions their signatures name (section 6.5), and that every sealed
-          object version is signed by the owner of its line (section 13.2), a
-          signature by a key revoked later counting only with an earlier
-          timestamp;
+          name and whose <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt>
+          are those of its first <tt class="verbatim">keys.json</tt>, and that every
+          version is signed by at least <tt class="verbatim">threshold</tt> keys of the
+          version before it (of its own, for the first), reporting a fork of a
+          key log; for every object, that the storage root holds the key logs
+          of the owners that signed its versions, at least up to the versions
+          their signatures name (section 6.5), reporting when a later version
+          of a key log is known elsewhere, and that every sealed object
+          version is signed by the owner of its line (section 13.2): all its
+          signatures naming one key-log version, the signed message rebuilt
+          from the signature files, and a signature naming a key-log version
+          that is not the latest known, or by a key revoked later, counting
+          only with an earlier timestamp (otherwise reported as unconfirmed);
         </p>
       </li>
       <li>
@@ -2884,51 +2985,53 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           between versions, that no two objects of the archive, nor an object
           and a tombstone, have the same <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>,
           that a line without <tt class="verbatim">parent</tt> is named by algorithm 0,
-          is owned by the originator its genesis record names and is signed by
-          it from its first version, that objects with the same genesis record
-          are that line and branches whose parent evidence is signed by their
-          parents' owners, that the discovery document lists the head's <tt
-          class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, and that a line whose
-          owner is not the originator declares a parent and that the
-          originator's line declares none; and that drafts are only at <tt
-          class="verbatim">draft/&lt;id&gt;/</tt>, unlisted in <tt class="verbatim">objects</tt>
-          and in the indexes;
+          is owned by the originator its genesis record names (an owner object
+          by itself) and is signed by it from its first version, that objects
+          with the same genesis record (compared by its algorithm-0 name, also
+          against tombstones' <tt class="verbatim">genesisName</tt>) are that line and
+          branches whose chains of parent evidence hold back to it, that the
+          discovery document lists the head's <tt class="verbatim">name</tt> and <tt
+          class="verbatim">owner</tt>, and that a line whose owner is not the originator
+          declares a parent and that the originator's line declares none; and
+          that drafts are only at <tt class="verbatim">draft/&lt;id&gt;/</tt>, unlisted
+          in <tt class="verbatim">objects</tt> and in the indexes;
         </p>
       </li>
       <li>
         <p>
           for each branch (section 10.5): the evidence of its first version,
-          including the parent owner's key log and signature, and that its
-          later versions keep the identity files unchanged until a version
-          that moves the branch point; for every branch, that its <tt class="verbatim">owner</tt>
-          differs from the <tt class="verbatim">owner</tt> of <tt class="verbatim">parent</tt>,
-          that <tt class="verbatim">parent.name</tt> is a name of its genesis record and
-          its own <tt class="verbatim">name</tt> unless it was renamed after a clash,
-          that a renamed branch has an algorithm number greater than that of
-          <tt class="verbatim">parent.name</tt> (a failure otherwise), and that its
-          owner is not the originator; reporting as a warning, not a failure,
-          a rename that neither the objects nor the tombstones of the archive
-          justify, or a number that is not the smallest free one, since the
-          line that caused it may be kept elsewhere; that the parent's owner
-          is the <tt class="verbatim">originator</tt> of the genesis record or the
-          parent version's <tt class="verbatim">object.json</tt> (<tt class="verbatim">parent.object.json</tt>)
-          declares a <tt class="verbatim">parent</tt> of its own, and declares none when
-          the parent's owner is the originator; for every version that moves
-          the branch point, the same evidence, that the new parent has the
-          same <tt class="verbatim">owner</tt> and <tt class="verbatim">name</tt> as the previous
-          one and a higher object version holding a document version later
-          than the previous branch point's in the history of the new parent
-          version, and the continuity of the two parent inventories (section
-          10.5); for each branch point, report the first of these verdicts
-          that applies: inconsistent (a check fails, or the parent was
-          resolved and does not match), confirmed (the parent owner's
-          signature of the branch point holds, against its key log, section
-          13.2), unconfirmed (consistent, without a parent signature that
-          holds, which section 10.5 does not allow); report as the branch's
-          verdict the weakest of those of its branch points (inconsistent,
-          unconfirmed, confirmed, from the weakest); and report separately
-          whether the parent was found, unavailable or removed (tombstoned),
-          and whether it is withdrawn;
+          including the parent owner's key log and signature and, for a branch
+          of a branch, the chain of <tt class="verbatim">parent.chain/</tt> back to the
+          originator's line, and that its later versions keep the identity
+          files unchanged until a version that moves the branch point; for
+          every branch, that its <tt class="verbatim">owner</tt> differs from the <tt
+          class="verbatim">owner</tt> of <tt class="verbatim">parent</tt>, that <tt class="verbatim">parent.name</tt>
+          is a name of its genesis record and its own <tt class="verbatim">name</tt>
+          unless it was renamed after a clash, that a renamed branch has an
+          algorithm number greater than that of <tt class="verbatim">parent.name</tt> (a
+          failure otherwise), and that its owner is not the originator;
+          reporting as a warning, not a failure, a rename that neither the
+          objects nor the tombstones of the archive justify, or a number that
+          is not the smallest free one, since the line that caused it may be
+          kept elsewhere; that the parent's owner is the <tt class="verbatim">originator</tt>
+          of the genesis record or the parent version's <tt class="verbatim">object.json</tt>
+          (<tt class="verbatim">parent.object.json</tt>) declares a <tt class="verbatim">parent</tt>
+          of its own, and declares none when the parent's owner is the
+          originator; for every version that moves the branch point, the same
+          evidence, that the new parent has the same <tt class="verbatim">owner</tt> and
+          <tt class="verbatim">name</tt> as the previous one and a higher object version
+          holding a document version later than the previous branch point's in
+          the history of the new parent version, and the continuity of the two
+          parent inventories (section 10.5); for each branch point, report the
+          first of these verdicts that applies: inconsistent (a check fails,
+          or the parent was resolved and does not match), confirmed (the
+          parent owner's signature of the branch point holds, against its key
+          log, section 13.2), unconfirmed (consistent, without a parent
+          signature that holds, which section 10.5 does not allow); report as
+          the branch's verdict the weakest of those of its branch points
+          (inconsistent, unconfirmed, confirmed, from the weakest); and report
+          separately whether the parent was found, unavailable or removed
+          (tombstoned), and whether it is withdrawn;
         </p>
       </li>
       <li>
@@ -3004,28 +3107,39 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
       <li>
         <p>
-          <strong>Keys (proposal).</strong> A stolen key lets its holder sign
-          versions of the owner's lines, and new versions of its key log if
-          the threshold is 1, racing the owner; a threshold above 1 prevents
-          that, and a fork of a key log is detected as any fork. A revoked
-          key's signatures are trusted only with a timestamp earlier than the
-          revocation, since a thief can name an old version of the key log
-          (section 6.5). A copy that withholds the later versions of a key log
-          hides a revocation: readers SHOULD use the longest key log they
-          find, and tools SHOULD timestamp signatures when they make them.
-          Losing every key of an owner cannot be recovered, so tools create a
-          spare key, or give an owner several people's keys with a threshold.
+          <strong>Keys (proposal).</strong> An owner name is the digest of a
+          genesis record that lists the owner's first keys, so no one can
+          write another first version of a key log under it. A stolen key lets
+          its holder sign versions of the owner's lines, and new versions of
+          its key log if the threshold is 1, racing the owner; a threshold
+          above 1 prevents that, and a fork of a key log is detected as any
+          fork. A signature binds the object, the version, its inventory and
+          the key-log version it relies on (section 13.2), so none can be
+          swapped. A signature MUST name the latest key-log version: one
+          naming an older version, which could revive a removed key or a lower
+          threshold, or made by a key revoked later, is trusted only with a
+          timestamp earlier than the next key-log version (section 6.5). A
+          copy that withholds the later versions of a key log hides a
+          revocation: copies carry the key logs up to the latest version their
+          makers know, readers use the longest key log they find, and tools
+          SHOULD timestamp signatures when they make them; still, no one can
+          prove offline that a key log is complete. Losing every key of an
+          owner cannot be recovered, so tools create a spare key, or give an
+          owner several people's keys with a threshold.
         </p>
       </li>
       <li>
         <p>
           <strong>Reused genesis records (proposal).</strong> A genesis record
           names its originator, whose signature no one else can make, so
-          reusing it for another work gives no valid line; an archive accepts
-          an object whose genesis record it holds only when it is signed by
-          that originator or carries parent evidence signed by its parent's
-          owner (section 6.5). Lines cannot be written under another owner,
-          since only signatures decide whose a version is.
+          reusing it for another work gives no valid line; a branch carries
+          the chain of its parents' evidence back to the originator's line, so
+          a chain of branches cannot escape the check; an archive accepts an
+          object whose genesis record it holds (compared by its algorithm-0
+          name, also against tombstones) only when it is signed by that
+          originator or carries a chain of parent evidence that holds (section
+          6.5). Lines cannot be written under another owner, since only
+          signatures decide whose a version is.
         </p>
       </li>
       <li>
@@ -3623,6 +3737,27 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           FAQ and the companion on git describe the proposal throughout.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised after an
+          audit (security):</strong> an owner's genesis record lists its first
+          <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt>, which the first
+          <tt class="verbatim">keys.json</tt> repeats, so that an owner name fixes its
+          first keys; signatures sign a defined message binding the object,
+          the version, the inventory digest and the key-log version (<tt
+          class="verbatim">object</tt>, <tt class="verbatim">version</tt>, <tt class="verbatim">inventorySha512</tt>,
+          <tt class="verbatim">signer</tt> replace <tt class="verbatim">signed</tt> and <tt class="verbatim">owner</tt>
+          in signature files), and signature files are named by a digest of
+          their key; all signatures of a version name one key-log version,
+          which MUST be the latest, an older one counting only with an earlier
+          timestamp; copies carry key logs up to the latest version known,
+          readers use the longest, and freshness cannot be proved offline; a
+          branch carries the chain of its parents' evidence (<tt class="verbatim">parent.chain/</tt>)
+          back to the originator's line; owner objects are their own
+          originators (URIs, pins, indexes); tombstones keep <tt class="verbatim">genesisName</tt>,
+          the algorithm-0 name of the genesis record.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4065,8 +4200,8 @@ ocfl/
   &quot;type&quot;: &quot;selection&quot;,
   &quot;members&quot;: [
     { &quot;kind&quot;: &quot;document&quot;,
-      &quot;name&quot;: &quot;olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda&quot;,
-      &quot;owner&quot;: &quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba&quot;,
+      &quot;name&quot;: &quot;lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q&quot;,
+      &quot;owner&quot;: &quot;unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q&quot;,
       &quot;at&quot;: [ &quot;https://authors.example.org/&quot;, &quot;https://mirror.example.net/authors/&quot; ],
       &quot;revisions&quot;: [
         { &quot;documentVersion&quot;: 2, &quot;version&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;4f1e&hellip;&quot; },
@@ -4082,8 +4217,9 @@ ocfl/
       </div>
     </div>
     <p>
-      The genesis record of the authors' owner (proposal, section 6.5); its
-      name, the owner name, is <tt class="verbatim">dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba</tt>:
+      The genesis record of the authors' owner (proposal, section 6.5), which
+      lists its first key, so that the first <tt class="verbatim">keys.json</tt> of its
+      key log must list the same; its name, the owner name, is <tt class="verbatim">unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q</tt>:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4092,7 +4228,9 @@ ocfl/
   &quot;format&quot;: &quot;opensheaf-genesis/0.1&quot;,
   &quot;kind&quot;: &quot;owner&quot;,
   &quot;created&quot;: &quot;2026-03-01T17:40:00Z&quot;,
-  &quot;nonce&quot;: &quot;a41d07c3e9b25f8d61c0e4b7f2a39d58&quot;
+  &quot;nonce&quot;: &quot;a41d07c3e9b25f8d61c0e4b7f2a39d58&quot;,
+  &quot;keys&quot;: [ &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot; ],
+  &quot;threshold&quot;: 1
 }</pre>
       </div>
     </div>
@@ -4114,10 +4252,10 @@ ocfl/
     </div>
     <p>
       The genesis record of the authors' paper, written when it was sealed;
-      its name is <tt class="verbatim">olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda</tt>
+      its name is <tt class="verbatim">lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q</tt>
       (the SHA-256 of <tt class="verbatim">opensheaf-name-0</tt>, a line feed and the
       bytes as shown, with a final line feed); a branch named by algorithm 1
-      after a clash (section 6.5) would be <tt class="verbatim">cig66c5wfrbz23tylm5xjrca2ub74svojbm7nrrl7k7ri72yow4r</tt>:
+      after a clash (section 6.5) would be <tt class="verbatim">tafstt7lc4s5ui6lfi7mj52vhdp3kbv5djqfaxprvlkyd57utnvb</tt>:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4126,26 +4264,28 @@ ocfl/
   &quot;format&quot;: &quot;opensheaf-genesis/0.1&quot;,
   &quot;kind&quot;: &quot;document&quot;,
   &quot;created&quot;: &quot;2026-03-02T09:14:00Z&quot;,
-  &quot;originator&quot;: &quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba&quot;,
+  &quot;originator&quot;: &quot;unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q&quot;,
   &quot;nonce&quot;: &quot;5f2c8e1a9b7d4036c2e1f08a7b6d5c43&quot;
 }</pre>
       </div>
     </div>
     <p>
-      The signature file <tt class="verbatim">v4/signature-1.json</tt> of the authors'
-      object version <tt class="verbatim">v4</tt>, which the journal vetted, in the
-      extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt> of the
-      paper (section 13.2):
+      The signature file <tt class="verbatim">v4/signature-qvi7ibhm7zsahqx6.json</tt> of
+      the authors' object version <tt class="verbatim">v4</tt> (its name from the digest
+      of the key), which the journal vetted, in the extension folder <tt
+      class="verbatim">extensions/opensheaf-witnesses/</tt> of the paper (section 13.2):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 {
   &quot;format&quot;: &quot;opensheaf-signature/0.1&quot;,
-  &quot;signed&quot;: &quot;v4/inventory.json.sha512&quot;,
-  &quot;owner&quot;: &quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba&quot;,
+  &quot;object&quot;: &quot;sheaf:lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q:unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q&quot;,
+  &quot;version&quot;: &quot;v4&quot;,
+  &quot;inventorySha512&quot;: &quot;c07a&hellip;&quot;,
+  &quot;signer&quot;: &quot;unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q&quot;,
   &quot;key&quot;: &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
-  &quot;keyLog&quot;: &quot;sheaf:dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba/v2?sha512=8b3d&hellip;&quot;,
+  &quot;keyLog&quot;: &quot;sheaf:unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q/v2?sha512=8b3d&hellip;&quot;,
   &quot;signature&quot;: &quot;q4T0&hellip;==&quot;
 }</pre>
       </div>
@@ -4175,15 +4315,15 @@ ocfl/
   &quot;format&quot;: &quot;opensheaf-object/0.1&quot;,
   &quot;specification&quot;: &quot;0.1&quot;,
   &quot;kind&quot;: &quot;document&quot;,
-  &quot;name&quot;: &quot;olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda&quot;,
+  &quot;name&quot;: &quot;lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q&quot;,
   &quot;owner&quot;: &quot;iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a&quot;,
   &quot;parent&quot;: {
-    &quot;owner&quot;: &quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba&quot;,
-    &quot;name&quot;: &quot;olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda&quot;,
+    &quot;owner&quot;: &quot;unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q&quot;,
+    &quot;name&quot;: &quot;lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q&quot;,
     &quot;objectVersion&quot;: &quot;v4&quot;,
     &quot;documentVersion&quot;: 3,
     &quot;inventorySha512&quot;: &quot;c07a&hellip;&quot;,
-    &quot;url&quot;: &quot;https://authors.example.org/ocfl/dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba/olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda/v4/&quot;
+    &quot;url&quot;: &quot;https://authors.example.org/ocfl/unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q/lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q/v4/&quot;
   },
   &quot;documentVersion&quot;: 3,
   &quot;mainSource&quot;: &quot;paper.tex&quot;,
@@ -4200,25 +4340,25 @@ ocfl/
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
-sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda/v3
+sheaf:lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q/v3
     document version 3 of the authors' line
-sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda/v3?sha512=c07a&hellip;
+sheaf:lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q/v3?sha512=c07a&hellip;
     the authors' object version v4, which the journal vetted
-sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda:iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a/v3
+sheaf:lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q:iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a/v3
     document version 3 of the journal's line, its accepted copy
-sheaf:olqybey6/v3
-sheaf:olqybey6:iztwg6bj/v3
+sheaf:lvfmiq2z/v3
+sheaf:lvfmiq2z:iztwg6bj/v3
     the same two, in short form
-sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda:*
+sheaf:lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q:*
     the paper as a whole: the authors' line, the journal's and any other
-sheaf:dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba
+sheaf:unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q
     the authors' owner, its key log
-https://opensheaf.org/sheaf:olqybey6/v3
+https://opensheaf.org/sheaf:lvfmiq2z/v3
     the short form of the first, through a gateway (provisional domain)</pre>
     </div>
     <p>
       The entry of the journal's archive for this object, in its index <tt
-      class="verbatim">names/ol.json</tt> (its archive declares prefixes of 2
+      class="verbatim">names/lv.json</tt> (its archive declares prefixes of 2
       characters):
     </p>
     <div class="language-json">
@@ -4228,12 +4368,12 @@ https://opensheaf.org/sheaf:olqybey6/v3
   &quot;format&quot;: &quot;opensheaf-index/0.1&quot;,
   &quot;index&quot;: &quot;names&quot;,
   &quot;entries&quot;: [
-    { &quot;name&quot;: &quot;olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda&quot;,
-      &quot;originator&quot;: &quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba&quot;,
+    { &quot;name&quot;: &quot;lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q&quot;,
+      &quot;originator&quot;: &quot;unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q&quot;,
       &quot;owner&quot;: &quot;iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a&quot;,
-      &quot;id&quot;: &quot;sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda:iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a&quot;,
+      &quot;id&quot;: &quot;sheaf:lvfmiq2zpc7wqv7yv4idzsnrc7aiil4od442w3qj4nxl2h6vbr4q:iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a&quot;,
       &quot;status&quot;: &quot;active&quot;,
-      &quot;genesis&quot;: &quot;{\n  \&quot;format\&quot;: \&quot;opensheaf-genesis/0.1\&quot;,\n  \&quot;kind\&quot;: \&quot;document\&quot;,\n  \&quot;created\&quot;: \&quot;2026-03-02T09:14:00Z\&quot;,\n  \&quot;originator\&quot;: \&quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba\&quot;,\n  \&quot;nonce\&quot;: \&quot;5f2c8e1a9b7d4036c2e1f08a7b6d5c43\&quot;\n}\n&quot; }
+      &quot;genesis&quot;: &quot;{\n  \&quot;format\&quot;: \&quot;opensheaf-genesis/0.1\&quot;,\n  \&quot;kind\&quot;: \&quot;document\&quot;,\n  \&quot;created\&quot;: \&quot;2026-03-02T09:14:00Z\&quot;,\n  \&quot;originator\&quot;: \&quot;unt5dq6qcfvpkn7xewskmh7s7iuzxoubbcqrf3odk57sk6xoap7q\&quot;,\n  \&quot;nonce\&quot;: \&quot;5f2c8e1a9b7d4036c2e1f08a7b6d5c43\&quot;\n}\n&quot; }
   ]
 }</pre>
       </div>
@@ -4346,6 +4486,25 @@ https://opensheaf.org/sheaf:olqybey6/v3
           would identify no authority, and would tie lines to places. An
           archive is found at its base URL, and every location is a hint,
           since what is found there is checked by pins and signatures (#52).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why owner names fix the first keys, and signatures bind the
+          key log (proposal).</strong> If an owner's genesis record held only
+          a nonce, anyone could write a first key-log version of their own
+          under a published owner name; listing the first keys in the record
+          makes the name a commitment to them, as Radicle's repository
+          identifier commits to its first delegates. A signature of a checksum
+          file alone could be paired with any key-log version, and an old
+          version would revive removed keys; signing a message that names the
+          object, the version, the inventory and the key-log version, and
+          requiring the latest key-log version unless a timestamp shows
+          otherwise, closes both. Key logs are carried in full, up to the
+          latest version known, because a truncated log hides revocations; a
+          branch carries the chain of its parents' evidence, because a check
+          one level deep lets a chain of branches pass a reused genesis
+          record.
         </p>
       </li>
       <li>
