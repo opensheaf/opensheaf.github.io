@@ -47,7 +47,10 @@ archive, [mgubi.org/papers](https://mgubi.org/papers/), is one).
   lists her keys (one for daily use, a spare kept apart), and every version
   she deposits is signed with her daily key (threshold 1). Each paper is one
   of her lines, at `<owner>/<name>/`, with a label (`kpz-uniqueness`) for the
-  website.
+  website. When she replaces a laptop that is wiped and safe, she retires its
+  key by a new version of her key log, and nothing else changes; if a laptop
+  is stolen with its key, she ends her owner, naming a new one as successor,
+  and continues her papers as branches under it (section 6.5).
 - Work not yet shared can be a **draft** (section 6.5), kept by her archive
   under the reserved owner `draft`: unsigned, never copied, and free to be
   rewritten. When she first shares a paper, sealing makes its line.
@@ -261,8 +264,9 @@ particular version of each paper.
   cannot change them. A journal will usually adopt the [timestamps
   extension](opensheaf-timestamps-0.1.md) in its key log, from its first
   version, so that every version it signs is dated, by an RFC 3161 authority
-  it trusts or by OpenTimestamps, and forks of its key log are resolved by
-  time. A correction the journal makes itself is its own version 4
+  it trusts or by OpenTimestamps, so that if it ever ends after losing a key
+  to others, readers can tell which versions came before. A correction the
+  journal makes itself is its own version 4
   (provisionally: the numbering on branches is an open question of section
   10.5, #57); when the editors later vet the authors' corrected version, the
   copy moves its branch point to it, with the same evidence, as the journal's

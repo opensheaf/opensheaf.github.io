@@ -255,28 +255,28 @@
       An owner is itself an object, named by its own genesis record, which
       lists its first keys, and whose versions are its <dfn>key log</dfn>: the
       list of its public keys and the number of them that must sign, each
-      version signed by the keys of the one before. Keys can thus be added,
-      retired or revoked while the owner stays the same, and what was signed
-      stays signed: a retired key leaves its signatures good, and only a key
-      revoked because it may have been exposed makes them no longer good. A
-      line is read from its <dfn>signed head</dfn>, its latest version signed
-      with good keys, which vouches for every version before it, so a line
-      whose latest version only the revoked key signed falls back until its
-      owner signs it again with a good key, once for the line, never once for
-      each version, or until timestamps (the extension) date the signatures
-      before the revocation; a threshold binds only the signatures naming its
-      version, so owners choose it at the start (1 with a spare key against
-      loss, 2 of 3 keys against theft); a group of co-authors can share one
-      owner with a threshold, for instance two signatures out of three. Every
-      version of every line is signed, and the key logs travel with the
-      objects they sign, so a line can be checked from any copy, even when the
-      archives that served it have gone. An owner may name who answers for it
-      (an ORCID iD, an institution), which the keeper may confirm in a place
-      only it controls; nothing requires it. Drafts are a sandbox: objects of
-      a reserved owner, <tt class="verbatim">draft</tt>, kept by one archive, never
-      signed, pinned or copied out of it, and free to be rewritten or deleted.
-      Sealing makes a new object, the first version of the line; the draft's
-      versions are not part of it.
+      version signed by the keys of the one before. Keys can thus be added or
+      retired while the owner stays the same, and what was signed stays
+      signed: a signature that verifies against the key-log version it names
+      is good for ever. A version signed with good keys vouches for every
+      version before it, since its inventory fixes them. A threshold binds
+      only the signatures naming its version, so owners choose it at the start
+      (1 with a spare key against loss, 2 of 3 keys against theft); a group of
+      co-authors can share one owner with a threshold, for instance two
+      signatures out of three. If a key may have been exposed, the owner
+      <dfn>ends</dfn>: a last version of its key log says so and names a
+      successor, which continues the work by branches; the old signatures stay
+      good, but readers trust them only as far as other evidence goes, since
+      nothing tells the owner's signatures from a thief's, and archives add
+      nothing more to its lines. Every version of every line is signed, and
+      the key logs travel with the objects they sign, so a line can be checked
+      from any copy, even when the archives that served it have gone. An owner
+      may name who answers for it (an ORCID iD, an institution), which the
+      keeper may confirm in a place only it controls; nothing requires it.
+      Drafts are a sandbox: objects of a reserved owner, <tt class="verbatim">draft</tt>,
+      kept by one archive, never signed, pinned or copied out of it, and free
+      to be rewritten or deleted. Sealing makes a new object, the first
+      version of the line; the draft's versions are not part of it.
     </p>
     <p>
       Anyone can copy a genesis record, so the name alone cannot say whose
@@ -346,22 +346,14 @@
       tokens from authorities the owner trusts, OpenTimestamps proofs, or
       both. An owner that wants its signatures dated, a journal or an
       institution for instance, adopts it in its key log, from the first
-      version, so that if it ever has to revoke a key (because it may have
-      been stolen) the signatures that key made before the revocation, and
-      before the time the owner gives as <tt class="verbatim">since</tt>, can still
-      count, and forks of its key log are resolved by time, which also lets a
-      revocation take effect against a thief who forks the key log; without
-      it, the signatures of a revoked key are no longer good, and a line whose
-      signed head only that key signed waits for its owner's next signature,
-      and the core reports forks without resolving them, a revocation made on
-      one side of a fork not applying until it is resolved, so that whoever
-      holds a revoked key can suspend its revocation by forking the key log at
-      a version that lists it. A single researcher who never loses a key to
-      others may not need it: retiring a key leaves its signatures good.
-      Anyone holding a copy may add timestamps later; the earliest is what
-      counts. Witnesses are not covered by the inventory digests, and need not
-      be: a signature is checked against the version it names, which the pins
-      fix, and a timestamp against the signature file it stamps.
+      version, so that if it ever ends because a key may have been stolen,
+      readers can tell which of its versions were signed before. The extension
+      changes no status: dates are evidence that readers weigh. A single
+      researcher may not need it. Anyone holding a copy may add timestamps
+      later; the earliest is what counts. Witnesses are not covered by the
+      inventory digests, and need not be: a signature is checked against the
+      version it names, which the pins fix, and a timestamp against the
+      signature file it stamps.
     </p>
     <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>

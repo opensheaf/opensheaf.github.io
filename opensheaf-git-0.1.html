@@ -129,8 +129,8 @@
       RFC 8174) when, and only when, they appear in all capitals. Terms of the
       specification (archive, storage root, discovery document, object, object
       version, pin, mirror, witness, takedown, tombstone, owner, owner object,
-      key log, draft, signed head, tail, not a version, fork) keep their
-      meaning.
+      key log, draft, signed version, not a version, ended owner, fork) keep
+      their meaning.
     </p>
     <ul>
       <li>
@@ -361,25 +361,20 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       changes MAY be made in one commit.
     </p>
     <p>
-      <strong>Only versions of the line are added.</strong> Every object
-      version added by items 1 and 2, other than a draft's, MUST be in its
-      line once added, under the core alone (sections 6.5 and 13.2 of the
-      specification): signed with good signatures of its line's owner, against
-      the key log of the owner object kept at its path, which the same commit
-      adds or extends if needed, or extended by a version so signed that the
-      same commit adds. Forks of key logs are those whose evidence is in the
-      commit's tree: while one is not resolved, a key revoked on any side
-      counts as revoked, and keys first listed after the fork point do not
-      count. Nothing that only an extension decides (a fork resolved by time,
-      a timestamp) lets a version in. A version of a key log added is signed
-      with good signatures of keys of the version before. Since nothing is
-      removed from the published branch afterwards and OCFL cannot skip a
-      version, a version let in that is not in the line would hold its number
-      for good, and the owner's own version of that number could never be
-      added to this archive. Versions already published stay, whatever their
-      status: a version that falls into the tail later (its key revoked, a
-      fork of the key log) is kept and shown with its status (section 6.5 of
-      the specification).
+      <strong>Only signed versions are added.</strong> Every object version
+      added by items 1 and 2, other than a draft's, MUST be signed once added
+      (sections 6.5 and 13.2 of the specification): signed with good
+      signatures of its line's owner, against the key log of the owner object
+      kept at its path, which the same commit adds or extends if needed, or
+      extended by a version so signed that the same commit adds; and none is
+      added to the lines of an owner that has ended, or whose key log is
+      forked, as the commit's tree shows (by <tt class="verbatim">ended</tt>, or by the
+      evidence of a fork). A version of a key log added is signed with good
+      signatures of keys of the version before. Since nothing is removed from
+      the published branch afterwards and OCFL cannot skip a version, a
+      version let in that is not signed would hold its number for good, and
+      the owner's own version of that number could never be added to this
+      archive. Versions already published stay, whatever happens later.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -498,12 +493,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       checks of section 10 have passed on it. The version MUST already be
       signed by its line's owner, with the owner's own keys, before the pull
       request is merged: a contributor proposes versions of its own lines, or
-      copies of other owners' lines up to their signed heads, and continues
-      another owner's line only by a branch under its own owner (section 10.5
-      of the specification). The object version is created (its <tt class="verbatim">created</tt>
-      date in the inventory) before it is published. (When a version becomes
-      public, and how this is recorded, is discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue
-      #29</a>.)
+      copies of other owners' lines up to their latest signed versions, and
+      continues another owner's line only by a branch under its own owner
+      (section 10.5 of the specification). The object version is created (its
+      <tt class="verbatim">created</tt> date in the inventory) before it is published.
+      (When a version becomes public, and how this is recorded, is discussed
+      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
     </p>
     <h2 id="auto-18"><a id="7-publishing"></a>7. Publishing<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-19"><a id="71-what-is-served"></a>7.1 What is served<span style="margin-left: 1em"></span></h3>
@@ -718,26 +713,23 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       </li>
       <li>
         <p>
-          <strong>additions in the line</strong>: every object version added,
-          other than a draft's, is in its line under the core once added, as
-          section 5.1 says, against key logs that are owner objects at their
-          paths in the commit's tree, and forks of key logs judged from the
-          evidence in that tree; an added version that is unsigned, invalid or
-          in the tail (its signatures revoked or unchecked: a revoked key, a
-          key-log version not found, a key added after the point of a fork),
-          and an added signature file of the owner that is invalid, are
-          failures, unless a version in the line added in the same commit
-          extends that version, so that a pull request adding them cannot
-          pass;
+          <strong>signed additions</strong>: every object version added, other
+          than a draft's, is signed once added, as section 5.1 says, against
+          key logs that are owner objects at their paths in the commit's tree;
+          an added version that is not signed (unsigned, invalid, or
+          unchecked: a key-log version not found), a version added to the
+          lines of an ended or forked owner, and an added signature file of
+          the owner that is invalid, are failures, unless a signed version
+          added in the same commit extends that version, so that a pull
+          request adding them cannot pass;
         </p>
       </li>
       <li>
         <p>
           <strong>reported, never failing</strong>: versions already published
-          that are now in the tail, versions already published that are not
-          versions of their line (a breach of section 5.1 that cannot be
-          undone), files that are not witnesses, forks of lines and of key
-          logs (section 6.5 of the specification);
+          that are not signed (a breach of section 5.1 that cannot be undone),
+          files that are not witnesses, ended owners, forks of lines and of
+          key logs (section 6.5 of the specification);
         </p>
       </li>
       <li>
@@ -777,12 +769,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       path of its identifier, with the owner objects of every owner whose
       signatures it carries (its own, and for a branch its parents' owners) at
       their own paths; signatures are in each object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>.
-      Copying a line is copying those object folders, up to the signed head of
-      the line (section 5.1); an owner moving to another archive copies its
-      folder of the owner-name layout (section 5 of the specification). A
-      branch holds the evidence of its parent version as content files
-      (section 10.5 of the specification), so it never shares an object folder
-      with a copy of its parent's line.
+      Copying a line is copying those object folders, up to the latest signed
+      version of the line (section 5.1); an owner moving to another archive
+      copies its folder of the owner-name layout (section 5 of the
+      specification). A branch holds the evidence of its parent version as
+      content files (section 10.5 of the specification), so it never shares an
+      object folder with a copy of its parent's line.
     </p>
     <p>
       A public repository SHOULD be archived by <a href="https://www.softwareheritage.org/">Software
@@ -835,8 +827,8 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       <li>
         <p>
           <strong>Pull requests</strong> are checked before they are merged
-          (section 10): a version that is not in its line under the core
-          cannot pass, and once merged nothing can remove it (section 5.1).
+          (section 10): a version that is not signed cannot pass, and once
+          merged nothing can remove it (section 5.1).
         </p>
       </li>
     </ul>
@@ -895,19 +887,18 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           among them, are only added, never replaced or removed except with
           their object by a takedown, and the evidence of forks of key logs is
           kept among them (item 3); several versions of an object may be added
-          in one commit (item 2); only versions that the core alone puts in
-          their line are added, a copy stopping at its signed head, with forks
-          of key logs judged from the evidence in the commit's tree and keys
-          revoked on any side of an unresolved fork counting as revoked
-          (section 5.1), and the check of section 10 fails a commit or pull
-          request that adds any other, or an invalid signature file of the
-          owner, while what was published before is only reported; two signed
-          versions of one number are a fork, never redone by a merge, and only
-          drafts are redone (section 6.3); contributors propose their own
-          lines, or copies of others' signed lines (section 6.3); takedowns
-          leave in place the owner objects that other objects need (section
-          9); private keys are never committed (section 12). Setting aside
-          versions and removing files, tried during the day, were withdrawn.
+          in one commit (item 2); only signed versions are added, a copy
+          stopping at its latest signed version, and none to the lines of an
+          ended or forked owner (section 5.1), and the check of section 10
+          fails a commit or pull request that adds any other, or an invalid
+          signature file of the owner, while what was published before is only
+          reported; two signed versions of one number are a fork, never redone
+          by a merge, and only drafts are redone (section 6.3); contributors
+          propose their own lines, or copies of others' signed lines (section
+          6.3); takedowns leave in place the owner objects that other objects
+          need (section 9); private keys are never committed (section 12).
+          Setting aside versions, removing files, revocation and the tail,
+          tried during the day, were withdrawn.
         </p>
       </li>
     </ul>

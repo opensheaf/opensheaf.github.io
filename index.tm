@@ -86,7 +86,7 @@
 
     <item><hlink|<verbatim|opensheaf-git-0.1.md>|opensheaf-git-0.1.tm>: OpenSheaf archives in git, a companion to the specification: how to keep, publish and copy an archive in a git repository without changing its bytes.
 
-    <item><hlink|<verbatim|opensheaf-timestamps-0.1.md>|opensheaf-timestamps-0.1.tm>: OpenSheaf timestamps, an extension to the identity proposal: how an owner dates its signatures (RFC 3161, OpenTimestamps), declares it in its key log, and so confirms the signatures a key made before its revocation and resolves forks of its key log by time.
+    <item><hlink|<verbatim|opensheaf-timestamps-0.1.md>|opensheaf-timestamps-0.1.tm>: OpenSheaf timestamps, an extension to the identity proposal: how an owner dates its signatures (RFC 3161, OpenTimestamps) and declares it in its key log, so that readers can tell which versions existed by a date, for instance before a key was exposed and the owner ended.
 
     <item><hlink|<verbatim|README.md>|https://github.com/opensheaf/opensheaf.github.io/blob/main/README.md>: this text, also the home page of the site.
 
