@@ -184,7 +184,9 @@ November 2026; read them before touching any of this.
   of the fork point keep counting; keys added or revoked on the sides are
   ignored; whoever holds old keys can still fork. An archive adds a version to
   a line only after checking it against the key log (signed, or unconfirmed
-  for a revoked key or a fork). An extension acts only within the unconfirmed
+  for a revoked key or a fork); a version found not to be one after it was
+  added may be set aside by truncating the object, its evidence kept under
+  `fork/`. An extension acts only within the unconfirmed
   status, and may resolve a fork, applying the owner's side's revocations
   (section 4). Third parties: `witness-<label>.json`, another owner's
   `keyLog`.
@@ -195,8 +197,9 @@ November 2026; read them before touching any of this.
   `signature-<k>.json.<d>.tsr|.ots` with `<d>` the first 16 base32 characters
   of the SHA-256 of the timestamp file's own bytes (copies merge); the owner's
   declaration in `keys.json` under `extensions` (`timestamps`: `true`;
-  `timestampAuthorities`: SHA-256 fingerprints, an authority once listed stays
-  trusted); checks at `genTime`, complete proofs only; the declaration in
+  `timestampAuthorities`: SHA-256 fingerprints, cumulative over the key log,
+  an authority once listed stays trusted); timestamps of signature files
+  only; checks at `genTime`, complete proofs only; the declaration in
   force (latest known key-log version; a fork is always judged under that of
   the last version all sides share); the time of a version (`threshold`-th
   earliest date) and ties (two hours for Bitcoin times). It confirms a revoked

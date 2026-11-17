@@ -43,8 +43,6 @@
 
   Both kinds stamp the signature file as stored. Signature files and their timestamp files are never re-serialised, replaced or removed once made (section 13.2 of the specification): a timestamp stamps their bytes, and a copy may already hold them. An OpenTimestamps proof is pending when made, and complete once a Bitcoin block attests it; the completed proof is a new file, named from its own bytes, beside the pending one, which stays unchanged. A signature file MAY be stamped again later, by anyone holding a copy, when an algorithm that its timestamps rely on weakens.
 
-  A timestamp of a version's checksum file MAY also be kept, as <verbatim|\<less\>version\<gtr\>/inventory.json.sha512.\<less\>d\<gtr\>.tsr> or <verbatim|.\<less\>d\<gtr\>.ots>; it dates the version, not a signature, and is not used by the rules below.
-
   <section*|4. The owner's declaration><label|4-the-owners-declaration>
 
   An owner adopts this extension in its key log: a version of the key log holds, in its <verbatim|keys.json>, under <verbatim|extensions> (section 6.5 of the specification), an entry keyed by <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>, an object with:
@@ -52,7 +50,7 @@
   <\itemize>
     <item><verbatim|timestamps>, REQUIRED: <verbatim|true>: the owner timestamps every signature it makes, of its key log and of its lines;
 
-    <item><verbatim|timestampAuthorities>, OPTIONAL: the RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. Without any, only OpenTimestamps proofs are used.
+    <item><verbatim|timestampAuthorities>, OPTIONAL: RFC 3161 time-stamping authorities the owner adds to those it trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The list is cumulative: the authorities trusted are those listed in any version of the key log up to the declaration in force, and a later version cannot remove one, since an authority once listed stays trusted for its tokens (section 11); a version need repeat none. Without any, only OpenTimestamps proofs are used.
   </itemize>
 
   The declaration validates against the schema of appendix A; anything else in <verbatim|keys.json> is not a declaration. It is part of the key-log version, signed with it, and changed only by a new version.
@@ -64,7 +62,7 @@
   A timestamp is <strong|valid> for a signature file when:
 
   <\itemize>
-    <item>for an RFC 3161 token: its message imprint is the SHA-512 digest of the file's bytes; its signing certificate, or the root of the chain it carries, has a fingerprint listed in <verbatim|timestampAuthorities> of the declaration in force or of an earlier version of the key log; the chain was valid at the token's <verbatim|genTime>, which means that every certificate from the signing certificate to the root was within its validity period at <verbatim|genTime>, that the signing certificate is for time stamping (RFC 3161, section 2.3), and that no revocation known to the reader dates from before <verbatim|genTime> (as <verbatim|openssl ts -verify> checks with <verbatim|-attime> set to <verbatim|genTime> and the root certificate whose fingerprint is listed, or that is the root of the listed signing certificate); and the token verifies;
+    <item>for an RFC 3161 token: its message imprint is the SHA-512 digest of the file's bytes; its signing certificate, or the root of the chain it carries, has a fingerprint listed in <verbatim|timestampAuthorities> of the declaration in force or of an earlier version of the key log (section 4); the chain was valid at the token's <verbatim|genTime>, which means that every certificate from the signing certificate to the root was within its validity period at <verbatim|genTime>, that the signing certificate is for time stamping (RFC 3161, section 2.3), and that no revocation known to the reader dates from before <verbatim|genTime> (as <verbatim|openssl ts -verify> checks with <verbatim|-attime> set to <verbatim|genTime> and the root certificate whose fingerprint is listed, or that is the root of the listed signing certificate); and the token verifies;
 
     <item>for an OpenTimestamps proof: it is complete, attested in a Bitcoin block; a pending proof counts for nothing, and its completed proof is a separate file (section 3).
   </itemize>
@@ -126,7 +124,7 @@
   <section*|11. Security considerations><label|11-security-considerations>
 
   <\itemize>
-    <item><strong|Trust.> An RFC 3161 token is immediate and checkable with common tools, but rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log keeps anyone else from dating with an authority of their own. An authority once listed stays trusted for its tokens, since a compromised one can backdate them anyway; and listing a root certificate trusts every authority that root certifies, so an owner that wants a single authority lists the fingerprint of its signing certificate. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after a pending period of hours, and its date is uncertain by about as long.
+    <item><strong|Trust.> An RFC 3161 token is immediate and checkable with common tools, but rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log keeps anyone else from dating with an authority of their own. An authority once listed stays trusted for its tokens, since a compromised one can backdate them anyway: no later version removes it, and an owner whose authority is compromised can only stop stamping with it, and revoke the keys whose signatures it may have dated falsely; and listing a root certificate trusts every authority that root certifies, so an owner that wants a single authority lists the fingerprint of its signing certificate. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after a pending period of hours, and its date is uncertain by about as long.
 
     <item><strong|Stripping.> A host can remove timestamp files from a copy; the signatures they confirmed are then unconfirmed again, and a fork unresolved, until a copy with the files restores them, and nothing that the core lets count is lost. A host that removes the earliest timestamps of a revoking key-log version and keeps later ones moves its time later; <verbatim|since>, signed by the owner, bounds what this can confirm, and readers merge the timestamp files of every copy they see (section 9).
 
@@ -215,6 +213,8 @@
 
   <\itemize>
     <item><strong|0.1 (draft), 17 November 2026, simplified after a seventh audit:> <verbatim|timestamps> is <verbatim|true> (no <verbatim|keylog> or <verbatim|all>); a fork is always judged under the declaration of the last version all sides share, and resolving it makes the owner's side the key log, its revocations applying, the one exception the specification allows; the earliest known <verbatim|since> of a key on the owner's side applies; an authority once listed stays trusted for its tokens (no clause on removed authorities); re-stamping only when an algorithm weakens, by anyone holding a copy; timestamp files kept in the evidence of forks; adopting the extension late cannot resolve forks at earlier versions; sections 4, 7 and 11 shortened.
+
+    <item><strong|0.1 (draft), 17 November 2026, loose ends of the seventh audit:> timestamps are of signature files only (no timestamps of checksum files); <verbatim|timestampAuthorities> is cumulative, and a later version cannot remove an authority.
   </itemize>
 
 </body>

@@ -100,9 +100,10 @@ Let C be a published commit and C' the next one on the published branch. Between
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
 6. the removal of an object folder, with the folders above it that it leaves empty (an owner's folder, or folders of the hash), by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3);
-8. any change inside the folder of a draft (section 6.5 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal, with the creation of the `draft/` folder and its removal when it is left empty: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
+8. any change inside the folder of a draft (section 6.5 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal, with the creation of the `draft/` folder and its removal when it is left empty: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive;
+9. setting aside versions that are not versions of their line (section 6.5 of the specification, "One writer per line"): the removal of the version folders `ocfl/<path>/v<k>/` to the head of the object, the replacement of the object's root `inventory.json` and its checksum file by those of `v<k-1>/`, byte for byte, and the move of the inventory, checksum file, signature files and timestamp files of `v<k>` to `extensions/opensheaf-witnesses/fork/`, all in one commit; it never changes a version kept.
 
-No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
+No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair or by setting aside (item 9). Several changes MAY be made in one commit.
 
 The published branch MUST NOT be rewritten, except for a takedown (section 9). Repositories SHOULD use the protection of their host to refuse force-pushes to the published branch and its deletion (on GitHub: a branch protection rule or a ruleset).
 
@@ -213,7 +214,7 @@ A repository is checked, besides the verification of section 14 of the specifica
 
 - **attributes**: `git check-attr` reports `text`, `filter`, `ident`, `working-tree-encoding`, `export-subst` and `merge` unset on every archive file (section 4.1);
 - **no pointers, links or submodules** among the archive files: no Git LFS pointer, symbolic link or submodule (sections 3 and 4.2);
-- **append-only**: between each published commit and the next, only the changes of section 5.1 (for a pull request: between its base and its head); a change to a file of an existing version folder is accepted only as a repair, when the new bytes have the digest its inventory records and the old bytes did not;
+- **append-only**: between each published commit and the next, only the changes of section 5.1 (for a pull request: between its base and its head); a change to a file of an existing version folder is accepted only as a repair, when the new bytes have the digest its inventory records and the old bytes did not, and the removal of version folders only as a setting aside (item 9 of section 5.1), when the root inventory becomes that of the last version kept and the first version removed is found among the evidence of forks;
 - **portable names**: the content paths of section 4.3 (a warning, not an error);
 - **the deployment**: after a deployment, the served discovery document, and the files it names, have the digests of the commit.
 
@@ -259,3 +260,4 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 - **0.1 (draft), 17 November 2026, proposal (fifth audit of the specification):** a takedown leaves in place the owner objects that other objects need (section 9); the wording of witness files in section 5.1 clarified.
 - **0.1 (draft), 17 November 2026, proposal (sixth audit of the specification):** a copy of a line drops its unconfirmed versions after its last signed version when a signed history departs from them (section 5.1, item 9); the evidence of forks of a key log is kept as witness files of the owner object (item 3).
 - **0.1 (draft), 17 November 2026, proposal (seventh audit of the specification):** a copy never drops versions because of a fork (item 9 of section 5.1 removed); the evidence of forks, of lines and of key logs, is kept as witness files (item 3).
+- **0.1 (draft), 17 November 2026, proposal (loose ends of the seventh audit of the specification):** setting aside versions that are not versions of their line, by truncating the object (section 5.1, item 9, and the append-only check of section 10).

@@ -19,7 +19,7 @@
         "type": "string",
         "pattern": "^[0-9a-f]{64}$"
       },
-      "$comment": "SHA-256 fingerprints of the signing or root certificates of trusted RFC 3161 authorities"
+      "$comment": "SHA-256 fingerprints of the signing or root certificates of RFC 3161 authorities added to those trusted; cumulative over the versions of the key log, never removed"
     }
   }
 }

@@ -343,12 +343,19 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       layout), including its removal, with the creation of the <tt class="verbatim">draft/</tt>
       folder and its removal when it is left empty: drafts are the only
       objects that may be rewritten or deleted, and are never copied out of
-      the archive.
+      the archive; 9. setting aside versions that are not versions of their
+      line (section 6.5 of the specification, &quot;One writer per
+      line&quot;): the removal of the version folders <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;k&gt;/</tt>
+      to the head of the object, the replacement of the object's root <tt
+      class="verbatim">inventory.json</tt> and its checksum file by those of <tt class="verbatim">v&lt;k-1&gt;/</tt>,
+      byte for byte, and the move of the inventory, checksum file, signature
+      files and timestamp files of <tt class="verbatim">v&lt;k&gt;</tt> to <tt class="verbatim">extensions/opensheaf-witnesses/fork/</tt>,
+      all in one commit; it never changes a version kept.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
-      folder is changed, renamed or removed, except by a repair. Several
-      changes MAY be made in one commit.
+      folder is changed, renamed or removed, except by a repair or by setting
+      aside (item 9). Several changes MAY be made in one commit.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -685,7 +692,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           next, only the changes of section 5.1 (for a pull request: between
           its base and its head); a change to a file of an existing version
           folder is accepted only as a repair, when the new bytes have the
-          digest its inventory records and the old bytes did not;
+          digest its inventory records and the old bytes did not, and the
+          removal of version folders only as a setting aside (item 9 of
+          section 5.1), when the root inventory becomes that of the last
+          version kept and the first version removed is found among the
+          evidence of forks;
         </p>
       </li>
       <li>
@@ -908,6 +919,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           the specification):</strong> a copy never drops versions because of
           a fork (item 9 of section 5.1 removed); the evidence of forks, of
           lines and of key logs, is kept as witness files (item 3).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal (loose ends of the
+          seventh audit of the specification):</strong> setting aside versions
+          that are not versions of their line, by truncating the object
+          (section 5.1, item 9, and the append-only check of section 10).
         </p>
       </li>
     </ul>

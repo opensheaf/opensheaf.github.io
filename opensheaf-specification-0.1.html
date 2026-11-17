@@ -1131,9 +1131,18 @@
       a revoked key or a fork of the key log (section 13.2): a version whose
       key log is not available is never added, and an archive that continues
       another owner's line makes a branch, under its own owner (section 10.5).
-      A version found invalid after it was added (by an archive that did not
-      check it) MAY be set aside, with the versions after it, as evidence of a
-      fork.
+      A version found to be not a version of the line (section 13.2) after it
+      was added, by an archive that did not check it, MAY be <strong>set
+      aside</strong>, with the versions after it, since OCFL keeps every
+      version it records and versions cannot otherwise be added after it: the
+      archive truncates the object, removing their version folders and
+      replacing the root inventory and its checksum file by those of the last
+      version before them, byte for byte, and moves the inventory, checksum
+      file and signature files of the first version set aside, with their
+      timestamp files, to <tt class="verbatim">extensions/opensheaf-witnesses/fork/</tt>
+      (below), so that what was removed can be checked. The versions kept are
+      not changed; besides a takedown (section 11.2), this is the only removal
+      of a version of a sealed object.
     </p>
     <p>
       <strong>Archives and owners.</strong> An archive decides which owners it
@@ -4265,6 +4274,15 @@ keylog &lt;the value of keyLog&gt;</pre>
           resolving a fork applies the owner's side's revocations, the one
           exception of section 4; a host can plant a junk signature file
           (section 15).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal (loose ends of the
+          seventh audit):</strong> setting aside a version found to be not a
+          version of the line, after it was added, defined as a truncation of
+          the object, the first version set aside kept as evidence under <tt
+          class="verbatim">extensions/opensheaf-witnesses/fork/</tt> (section 6.5).
         </p>
       </li>
     </ul>
