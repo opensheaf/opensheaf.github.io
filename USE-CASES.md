@@ -248,9 +248,10 @@ particular version of each paper.
   (an owner with keys of its own), a new object holding every file of that
   version except its `datacite.json`, its `object.json` and the version's own
   evidence if it is itself a branch (`parent.*`), byte for byte, with the
-  evidence of the authors' version (their inventory, `object.json`, signatures
-  and key log up to the latest version known, and, if the authors' version is
-  itself a branch, the evidence of its own parents; section 10.5). It keeps
+  evidence of the authors' version (their inventory, `object.json` and
+  signatures, and, if the authors' version is itself a branch, the evidence of
+  its own parents; section 10.5), and the authors' key log beside it, as their
+  owner object. It keeps
   the document version of the revision it copies (the authors' version 3,
   say). Only the copied revision needs a licence allowing redistribution; a
   paper whose first preprint was under a restrictive licence can be accepted

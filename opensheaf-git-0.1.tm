@@ -261,7 +261,7 @@
 
   Mirroring a line kept elsewhere is copying its files and checking them against a pin; it does not need, and SHOULD NOT use, a merge of the other archive's repository.
 
-  A mirror is a copy of a line (sections 6.5 and 10.4 of the specification), kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder <verbatim|extensions/opensheaf-witnesses/>. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification). A branch holds the evidence of its parent version as content files (section 10.5 of the specification), so it never shares an object folder with a copy of its parent's line.
+  A mirror is a copy of a line (sections 6.5 and 10.4 of the specification), kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder <verbatim|extensions/opensheaf-witnesses/>. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification). A branch holds the evidence of its parent version as content files (section 10.5 of the specification), so it never shares an object folder with a copy of its parent's line; the key logs of its parents' owners are owner objects beside it, at their own paths, like those of the owners that signed its own versions.
 
   A public repository SHOULD be archived by <hlink|Software Heritage|https://www.softwareheritage.org/>, which keeps dated snapshots of it named by SWHIDs. A snapshot is a witness that the archive held these files at that date, as other external copies are (section 13.2 of the specification); its identifiers are git hashes, not part of the integrity of the archive. Together with the history of the published branch, snapshots also witness the successive states of the discovery document.
 
@@ -299,6 +299,8 @@
     <item>**0.1 (draft), 17 November 2026, proposal (branch <verbatim|proposal/identity> of the specification):** two signed versions with the same number are a fork, never redone by a merge (section 6); owner folders created and removed with their objects (section 5.1); <verbatim|indexes.json> only in repositories serving indexes for several archives; sealing makes a new object from a draft.
 
     <item>**0.1 (draft), 17 November 2026, proposal (branch <verbatim|proposal/identity> of the specification):** witness files are only added, never replaced or removed, except with their object by a takedown (section 5.1).
+
+    <item>**0.1 (draft), 17 November 2026, proposal (branch <verbatim|proposal/identity> of the specification):** the key logs of a branch's parents' owners are owner objects beside it, not content of the branch (section 11).
   </itemize>
 
 </body>

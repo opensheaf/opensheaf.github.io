@@ -987,27 +987,32 @@
     </p>
     <p>
       <strong>Key logs travel with the objects they sign.</strong> A copy of
-      an object, in any archive, MUST include the key log of every owner that
-      signed one of its versions, up to the latest version of that key log
-      known to whoever makes the copy (at least up to the versions its
-      signatures name), as copies of those owner objects in the same storage
-      root (at their paths, section 5): the originator's for an originator's
-      line, the branch owner's for a branch, whose parent version carries the
-      parent owner's key log, up to the latest version known, in its own
-      content (section 10.5). Whoever copies new versions of an object also
-      copies the new versions of the key logs it knows. The key log checks
-      itself: its first version's genesis record has the owner name as its
-      name and lists its first keys, and each later version is signed by the
-      keys of the one before; so a copy of it from any source is as good as
-      the original, and a reader checks a line without trusting any host, also
-      after the archives that served it have gone. Of two valid copies of a
-      key log, either one extends the other, and readers use the longer, or
-      they fork, and the rule on forks above applies; the longest copy is
-      never chosen across a fork. No one can prove offline that a key log is
-      complete: a copy that stops early may hide a later version, such as one
-      that removes a key, so the freshness of a key log is only as good as the
-      copies a reader has seen. Since the latest version decides which
-      signatures count, readers use the latest version they know.
+      an object, in any archive, MUST include the key log of every owner whose
+      signature it carries, up to the latest version of that key log known to
+      whoever makes the copy (at least up to the versions those signatures
+      name), as copies of those owner objects in the same storage root (at
+      their paths, section 5): the owner of its line (the originator's for an
+      originator's line, the branch owner's for a branch) and, for a branch,
+      the owner of each parent whose signatures its evidence holds, in <tt
+      class="verbatim">parent.signatures/</tt> and at every level of <tt class="verbatim">parent.chain/</tt>
+      (section 10.5). Key logs are never copied into an object's content: a
+      key log checks itself from its owner name (below), so a copy kept as
+      content would add no trust, would be frozen at the time it was made, and
+      would be repeated in every branch and at every level of every chain.
+      Whoever copies new versions of an object also copies the new versions of
+      the key logs it knows. The key log checks itself: its first version's
+      genesis record has the owner name as its name and lists its first keys,
+      and each later version is signed by the keys of the one before; so a
+      copy of it from any source is as good as the original, and a reader
+      checks a line without trusting any host, also after the archives that
+      served it have gone. Of two valid copies of a key log, either one
+      extends the other, and readers use the longer, or they fork, and the
+      rule on forks above applies; the longest copy is never chosen across a
+      fork. No one can prove offline that a key log is complete: a copy that
+      stops early may hide a later version, such as one that removes a key, so
+      the freshness of a key log is only as good as the copies a reader has
+      seen. Since the latest version decides which signatures count, readers
+      use the latest version they know.
     </p>
     <p>
       <strong>Keepers (optional).</strong> An owner MAY name, in <tt class="verbatim">keeper</tt>
@@ -1653,13 +1658,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       at the top level, and, except in a draft, <tt class="verbatim">genesis.json</tt>
       (section 6.5); every version of a branch also holds the evidence of its
       current branch point, <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.keylog/</tt> and,
-      for a branch of a branch, <tt class="verbatim">parent.chain/</tt> (section 10.5),
-      unchanged until the branch point moves again. These are the identity
-      files of the object; they are not files of the document's own (section
-      7.3), and the names <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">parent.inventory.json</tt>,
-      <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures</tt>,
-      <tt class="verbatim">parent.keylog</tt> and <tt class="verbatim">parent.chain</tt> are
+      <tt class="verbatim">parent.signatures/</tt> and, for a branch of a branch, <tt
+      class="verbatim">parent.chain/</tt> (section 10.5), unchanged until the branch
+      point moves again. These are the identity files of the object; they are
+      not files of the document's own (section 7.3), and the names <tt class="verbatim">genesis.json</tt>,
+      <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
+      <tt class="verbatim">parent.signatures</tt> and <tt class="verbatim">parent.chain</tt> are
       reserved for them at the top level of the content. Every version
       directory MUST contain a copy of the inventory as of that version, with
       its checksum file (OCFL makes this a recommendation; OpenSheaf requires
@@ -1719,9 +1723,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           <tt class="verbatim">datacite.json</tt> (section 8) and <tt class="verbatim">object.json</tt>
           (section 9), and the identity files of section 7.1 (<tt class="verbatim">genesis.json</tt>,
           and, in a branch, its evidence: <tt class="verbatim">parent.inventory.json</tt>,
-          <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
-          <tt class="verbatim">parent.keylog/</tt> and, for a branch of a branch, <tt
-          class="verbatim">parent.chain/</tt>).
+          <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>
+          and, for a branch of a branch, <tt class="verbatim">parent.chain/</tt>).
         </p>
       </li>
     </ul>
@@ -2462,12 +2465,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       Its first object version holds exactly the files of the parent version
       (every file except <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>
       and the parent version's own evidence, <tt class="verbatim">parent.inventory.json</tt>,
-      <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
-      <tt class="verbatim">parent.keylog/</tt> and <tt class="verbatim">parent.chain/</tt>; the
-      genesis record included), byte for byte, and the evidence of the parent
-      version, as plain files of its content (the field and folder names below
-      are provisional, #55). Signature files, and any witnesses kept beside
-      them, are copied byte for byte, never re-serialised or replaced:
+      <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>
+      and <tt class="verbatim">parent.chain/</tt>; the genesis record included), byte
+      for byte, and the evidence of the parent version, as plain files of its
+      content (the field and folder names below are provisional, #55).
+      Signature files, and any witnesses kept beside them, are copied byte for
+      byte, never re-serialised or replaced:
     </p>
     <ul>
       <li>
@@ -2493,23 +2496,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
       <li>
         <p>
-          <tt class="verbatim">parent.keylog/</tt>, the parent owner's key log, from its
-          first version up to the latest the branch owner knows when it takes
-          the branch point (at least up to the one the signatures name): for
-          each version, <tt class="verbatim">v&lt;n&gt;/inventory.json</tt>, <tt class="verbatim">v&lt;n&gt;/keys.json</tt>
-          and its signature files with the witnesses kept beside them, and <tt
-          class="verbatim">v1/genesis.json</tt>;
-        </p>
-      </li>
-      <li>
-        <p>
           <tt class="verbatim">parent.chain/</tt>, when the parent is itself a branch:
           the parent version's own evidence (its <tt class="verbatim">parent.inventory.json</tt>,
-          <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
-          <tt class="verbatim">parent.keylog/</tt> and <tt class="verbatim">parent.chain/</tt>),
-          byte for byte, so that the branch carries the chain of its parents
-          back to a version of the originator's line: the grandparent's
-          evidence is at <tt class="verbatim">parent.chain/parent.inventory.json</tt>
+          <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>
+          and <tt class="verbatim">parent.chain/</tt>), byte for byte, so that the
+          branch carries the chain of its parents back to a version of the
+          originator's line: the grandparent's evidence is at <tt class="verbatim">parent.chain/parent.inventory.json</tt>
           and so on, the great-grandparent's at <tt class="verbatim">parent.chain/parent.chain/parent.inventory.json</tt>,
           one level of <tt class="verbatim">parent.chain/</tt> for each generation. A
           chain is finite, since each level is fixed by a digest recorded in
@@ -2524,13 +2516,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       later versions are its owner's own, and keep the identity files
       unchanged until the branch point moves. A branch of a branch names its
       grandparent through <tt class="verbatim">parent.object.json</tt>, and carries its
-      evidence in <tt class="verbatim">parent.chain/</tt>: the evidence is
-      self-contained, as key logs are, so that a branch can be checked back to
-      the originator's line after every archive of its parents has gone; a
-      chain grows by one set of evidence files for each level, which is small
-      beside the files of a version. It needs the right to redistribute only
-      the parent version. This is the evidence #22 proposes for accepted
-      copies, completed by the parent owner's signature.
+      evidence in <tt class="verbatim">parent.chain/</tt>: the evidence, with the key
+      logs of the parents' owners, which travel with the branch as owner
+      objects beside it (section 6.5), is self-contained, so that a branch can
+      be checked back to the originator's line after every archive of its
+      parents has gone; a chain grows by one set of evidence files for each
+      level, which is small beside the files of a version. It needs the right
+      to redistribute only the parent version. This is the evidence #22
+      proposes for accepted copies, completed by the parent owner's signature.
     </p>
     <p>
       <strong>Keeping the parent's history.</strong> A branch holds no earlier
@@ -2571,12 +2564,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           the files: every file of the head state of that inventory, except
           <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt> and the
           parent's own evidence (<tt class="verbatim">parent.inventory.json</tt>, <tt
-          class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
-          <tt class="verbatim">parent.keylog/</tt> and <tt class="verbatim">parent.chain/</tt>),
-          is present at the same logical path with the same digest, no other
-          file is present besides <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>
-          and the branch's evidence, and <tt class="verbatim">parent.object.json</tt>
-          has the digest of <tt class="verbatim">object.json</tt> in that state;
+          class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>
+          and <tt class="verbatim">parent.chain/</tt>), is present at the same logical
+          path with the same digest, no other file is present besides <tt
+          class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt> and the
+          branch's evidence, and <tt class="verbatim">parent.object.json</tt> has the
+          digest of <tt class="verbatim">object.json</tt> in that state;
         </p>
       </li>
       <li>
@@ -2601,16 +2594,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
       <li>
         <p>
-          the parent owner's key log: <tt class="verbatim">parent.keylog/v1/genesis.json</tt>
-          has the digest recorded for <tt class="verbatim">genesis.json</tt> in <tt
-          class="verbatim">parent.keylog/v1/inventory.json</tt>, and has the parent's
-          <tt class="verbatim">owner</tt> as its name; the digest of each <tt class="verbatim">parent.keylog/v&lt;n&gt;/inventory.json</tt>
-          is that of a valid key-log version (its <tt class="verbatim">keys.json</tt>
-          has the digest its inventory records, and it is signed by the
-          threshold of the keys of the version before, section 6.5); and the
-          log includes the version the signatures name, with the digest in
-          their <tt class="verbatim">keyLog</tt>, and the later versions known, which
-          are checked under section 6.5;
+          the parent owner's key log: the owner object of the parent's <tt
+          class="verbatim">owner</tt>, kept beside the branch (section 6.5), is a valid
+          key log (section 6.5), and includes the version the signatures name,
+          with the digest in their <tt class="verbatim">keyLog</tt>; its later versions
+          known are checked under section 6.5;
         </p>
       </li>
       <li>
@@ -2639,10 +2627,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       consistent, and the parent owner's signature, checked against its key
       log, shows that the parent version is that owner's, without access to
       wherever the parent's line is kept. A branch MUST therefore hold <tt
-      class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.keylog/</tt>, and
-      <tt class="verbatim">parent.chain/</tt> when its parent is a branch, at each of
-      its branch points. Without them, or when they do not hold, the branch
-      shows only that someone made a parent inventory that agrees with itself.
+      class="verbatim">parent.signatures/</tt>, and <tt class="verbatim">parent.chain/</tt> when
+      its parent is a branch, at each of its branch points, and its copies
+      MUST carry the key logs of its parents' owners (section 6.5); a copy
+      without one of them leaves the signatures that need it unconfirmed, and
+      the verdict of the branch point with them (section 14). Without them, or
+      when they do not hold, the branch shows only that someone made a parent
+      inventory that agrees with itself.
     </p>
     <p>
       <strong>Moving the branch point.</strong> A branch MAY take a later
@@ -2659,18 +2650,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       previous version's; it holds exactly the files of the new parent
       version, as the first version of a branch does, with new evidence (<tt
       class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.keylog/</tt> and
-      <tt class="verbatim">parent.chain/</tt>), and is checked like that first version
-      (this drops the files of the branch's own notes, such as the files of
-      its notices, which section 7.3 keeps in every later version: how a move
-      keeps them is open, section 6.5), and also for continuity: the new
-      parent inventory continues the previous one: both MUST have the same <tt
-      class="verbatim">id</tt>, every entry of <tt class="verbatim">versions</tt> in the previous
-      one is equal, as a JSON value, to the entry of the same version in the
-      new one, and every digest of those entries is in the manifest of the new
-      one. This shows, from the branch alone, that the corrected version
-      continues the version first vetted. The branch stays one sequence of
-      versions under one owner, numbered as section 7.3 says.
+      <tt class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.chain/</tt>),
+      and is checked like that first version (this drops the files of the
+      branch's own notes, such as the files of its notices, which section 7.3
+      keeps in every later version: how a move keeps them is open, section
+      6.5), and also for continuity: the new parent inventory continues the
+      previous one: both MUST have the same <tt class="verbatim">id</tt>, every entry of
+      <tt class="verbatim">versions</tt> in the previous one is equal, as a JSON value,
+      to the entry of the same version in the new one, and every digest of
+      those entries is in the manifest of the new one. This shows, from the
+      branch alone, that the corrected version continues the version first
+      vetted. The branch stays one sequence of versions under one owner,
+      numbered as section 7.3 says.
     </p>
     <p>
       <strong>Accepted copies.</strong> An accepted copy is a branch kept by a
@@ -3003,12 +2994,12 @@ keylog &lt;the value of keyLog&gt;</pre>
           validate the discovery document, and every <tt class="verbatim">object.json</tt>
           (<tt class="verbatim">parent.object.json</tt> included), <tt class="verbatim">members.json</tt>,
           <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">keys.json</tt> and
-          signature file, including those inside <tt class="verbatim">parent.keylog/</tt>,
-          <tt class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.chain/</tt>,
-          against the schemas (a stray or malformed signature file is
-          reported, never fatal) of their declared versions (and the index
-          files of section 6.6, if present), checking formats (dates, URIs) as
-          assertions, which JSON Schema 2020-12 leaves optional;
+          signature file, including those inside <tt class="verbatim">parent.signatures/</tt>
+          and <tt class="verbatim">parent.chain/</tt>, against the schemas (a stray or
+          malformed signature file is reported, never fatal) of their declared
+          versions (and the index files of section 6.6, if present), checking
+          formats (dates, URIs) as assertions, which JSON Schema 2020-12
+          leaves optional;
         </p>
       </li>
       <li>
@@ -3135,39 +3126,40 @@ keylog &lt;the value of keyLog&gt;</pre>
       <li>
         <p>
           for each branch (section 10.5): the evidence of its first version,
-          including the parent owner's key log and signature and, for a branch
-          of a branch, the chain of <tt class="verbatim">parent.chain/</tt> back to the
-          originator's line, and that its later versions keep the identity
-          files unchanged until a version that moves the branch point; for
-          every branch, that its <tt class="verbatim">owner</tt> differs from the <tt
-          class="verbatim">owner</tt> of <tt class="verbatim">parent</tt>, that <tt class="verbatim">parent.name</tt>
-          is a name of its genesis record and its own <tt class="verbatim">name</tt>
-          unless it was renamed after a clash, that a renamed branch has an
-          algorithm number greater than that of <tt class="verbatim">parent.name</tt> (a
-          failure otherwise), and that its owner is not the originator;
-          reporting as a warning, not a failure, a rename that neither the
-          objects nor the tombstones of the archive justify, or a number that
-          is not the smallest free one, since the line that caused it may be
-          kept elsewhere; that the parent's owner is the <tt class="verbatim">originator</tt>
-          of the genesis record or the parent version's <tt class="verbatim">object.json</tt>
-          (<tt class="verbatim">parent.object.json</tt>) declares a <tt class="verbatim">parent</tt>
-          of its own, and declares none when the parent's owner is the
-          originator; for every version that moves the branch point, the same
-          evidence, that the new parent has the same <tt class="verbatim">owner</tt> and
-          <tt class="verbatim">name</tt> as the previous one and a higher object version
-          holding a document version later than the previous branch point's in
-          the history of the new parent version, and the continuity of the two
-          parent inventories (section 10.5); for each branch point, report the
-          first of these verdicts that applies: inconsistent (a check fails,
-          or the parent was resolved and does not match), confirmed (the
-          parent owner's signature of the branch point holds, against its key
-          log, section 13.2), unconfirmed (consistent, but the parent owner's
-          signature of the branch point is unconfirmed or missing, which
-          section 10.5 does not allow); report as the branch's verdict the
-          weakest of those of its branch points (inconsistent, unconfirmed,
-          confirmed, from the weakest); and report separately whether the
-          parent was found, unavailable or removed (tombstoned), and whether
-          it is withdrawn;
+          including the parent owner's signature, against the key log of its
+          owner object kept beside the branch, and, for a branch of a branch,
+          the chain of <tt class="verbatim">parent.chain/</tt> back to the originator's
+          line, each level against the key log of its owner, and that its
+          later versions keep the identity files unchanged until a version
+          that moves the branch point; for every branch, that its <tt class="verbatim">owner</tt>
+          differs from the <tt class="verbatim">owner</tt> of <tt class="verbatim">parent</tt>,
+          that <tt class="verbatim">parent.name</tt> is a name of its genesis record and
+          its own <tt class="verbatim">name</tt> unless it was renamed after a clash,
+          that a renamed branch has an algorithm number greater than that of
+          <tt class="verbatim">parent.name</tt> (a failure otherwise), and that its
+          owner is not the originator; reporting as a warning, not a failure,
+          a rename that neither the objects nor the tombstones of the archive
+          justify, or a number that is not the smallest free one, since the
+          line that caused it may be kept elsewhere; that the parent's owner
+          is the <tt class="verbatim">originator</tt> of the genesis record or the
+          parent version's <tt class="verbatim">object.json</tt> (<tt class="verbatim">parent.object.json</tt>)
+          declares a <tt class="verbatim">parent</tt> of its own, and declares none when
+          the parent's owner is the originator; for every version that moves
+          the branch point, the same evidence, that the new parent has the
+          same <tt class="verbatim">owner</tt> and <tt class="verbatim">name</tt> as the previous
+          one and a higher object version holding a document version later
+          than the previous branch point's in the history of the new parent
+          version, and the continuity of the two parent inventories (section
+          10.5); for each branch point, report the first of these verdicts
+          that applies: inconsistent (a check fails, or the parent was
+          resolved and does not match), confirmed (the parent owner's
+          signature of the branch point holds, against its key log, section
+          13.2), unconfirmed (consistent, but the parent owner's signature of
+          the branch point is unconfirmed or missing, which section 10.5 does
+          not allow); report as the branch's verdict the weakest of those of
+          its branch points (inconsistent, unconfirmed, confirmed, from the
+          weakest); and report separately whether the parent was found,
+          unavailable or removed (tombstoned), and whether it is withdrawn;
         </p>
       </li>
       <li>
@@ -3332,9 +3324,8 @@ keylog &lt;the value of keyLog&gt;</pre>
           (and, with the proposal of section 6.5, <tt class="verbatim">genesis.json</tt>,
           <tt class="verbatim">keys.json</tt>, signature files, <tt class="verbatim">parent.inventory.json</tt>,
           <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
-          <tt class="verbatim">parent.keylog/</tt>, <tt class="verbatim">parent.chain/</tt> and
-          the index files) are placed under CC0, so that they can be harvested
-          and mirrored freely.
+          <tt class="verbatim">parent.chain/</tt> and the index files) are placed under
+          CC0, so that they can be harvested and mirrored freely.
         </p>
       </li>
       <li>
@@ -4005,6 +3996,20 @@ keylog &lt;the value of keyLog&gt;</pre>
           removed.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised:</strong>
+          <tt class="verbatim">parent.keylog/</tt> removed from the evidence of a branch
+          and from every level of <tt class="verbatim">parent.chain/</tt>: a copy
+          carries, as owner objects in the same storage root, the key log of
+          every owner whose signature it holds, its own versions', in <tt
+          class="verbatim">parent.signatures/</tt> and at every level of <tt class="verbatim">parent.chain/</tt>
+          (section 6.5), since a key log checks itself from its owner name,
+          and a copy kept as content would be frozen and repeated in every
+          branch; a branch copied without one of them is unconfirmed, not
+          inconsistent.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4564,13 +4569,13 @@ ocfl/
       the proposal, the selection lists this accepted copy as its member and
       MAY keep the authors' revision set as well. Its content also holds <tt
       class="verbatim">genesis.json</tt> and the evidence of the authors' version: <tt
-      class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures/</tt> (the authors' signature files of
-      their <tt class="verbatim">v4</tt>) and <tt class="verbatim">parent.keylog/</tt> (the
-      authors' key log up to the latest version the journal knows); its
-      extension folder holds the journal's signature files of <tt class="verbatim">v1</tt>,
-      and the journal's storage root keeps the journal's key log (sections
-      6.5, 10.5 and 13.2):
+      class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>
+      and <tt class="verbatim">parent.signatures/</tt> (the authors' signature files of
+      their <tt class="verbatim">v4</tt>); its extension folder holds the journal's
+      signature files of <tt class="verbatim">v1</tt>, and the journal's storage root
+      keeps the journal's key log and the authors' key log, up to the latest
+      version the journal knows, as owner objects (sections 6.5, 10.5 and
+      13.2):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4796,8 +4801,8 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           copy the others; a co-author continuing the work may want its whole
           past. Both are served by one kind of branch: a new object holding
           the branch point with its evidence (the parent's inventory, <tt
-          class="verbatim">object.json</tt>, signatures and the parent owner's key log
-          up to the latest version known, as content files), and, where
+          class="verbatim">object.json</tt> and signatures, as content files, with the
+          parent owner's key log beside it as an owner object), and, where
           wanted, a copy of the parent's line beside it. A branch that
           continued the parent's object would hold inventories naming the
           parent's identifier, fixed by pins and signatures, so it would be

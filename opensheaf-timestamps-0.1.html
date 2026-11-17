@@ -322,15 +322,16 @@
       10.5 of the specification): <tt class="verbatim">parent.signatures/</tt> holds the
       parent owner's signature files of the parent version with their
       timestamp files beside them, under the same file names, without the <tt
-      class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.tsr</tt>),
-      and <tt class="verbatim">parent.keylog/</tt> holds, for each version of the parent
-      owner's key log, its signature files with their timestamp files. Under a
-      declaration of the parent's owner, a branch MUST NOT be taken from a
-      parent version whose timestamps are still pending, and its evidence
-      carries complete proofs only, since the files of a version, once made,
-      never change. A branch whose evidence carries a pending proof is
-      reported: the pending proof counts for nothing, and the verdict of the
-      branch point is the one that the rest of its evidence gives.
+      class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.tsr</tt>);
+      the timestamp files of the parent owner's key log are in its owner
+      object, which travels with the branch (section 6.5 of the
+      specification). Under a declaration of the parent's owner, a branch MUST
+      NOT be taken from a parent version whose timestamps are still pending,
+      and its evidence carries complete proofs only, since the files of a
+      version, once made, never change. A branch whose evidence carries a
+      pending proof is reported: the pending proof counts for nothing, and the
+      verdict of the branch point is the one that the rest of its evidence
+      gives.
     </p>
     <h2 id="auto-10"><a id="9-verification"></a>9. Verification<span style="margin-left: 1em"></span></h2>
     <p>
@@ -365,8 +366,8 @@
       <li>
         <p>
           checks the timestamp files inside <tt class="verbatim">parent.signatures/</tt>
-          and <tt class="verbatim">parent.keylog/</tt> of every branch, and reports
-          those that are pending (section 8).
+          and at every level of <tt class="verbatim">parent.chain/</tt> of every branch,
+          and reports those that are pending (section 8).
         </p>
       </li>
     </ul>
@@ -543,6 +544,13 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.2.ots</pre>
           the first version; dropping a declaration; the limits of removing
           authorities and of listing roots; the names in <tt class="verbatim">parent.signatures/</tt>,
           and pending proofs in a branch's evidence reported.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, revised:</strong> the
+          timestamp files of a parent owner's key log are in its owner object,
+          beside the branch, no longer in <tt class="verbatim">parent.keylog/</tt>.
         </p>
       </li>
     </ul>

@@ -727,7 +727,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       another archive copies its folder of the owner-name layout (section 5 of
       the specification). A branch holds the evidence of its parent version as
       content files (section 10.5 of the specification), so it never shares an
-      object folder with a copy of its parent's line.
+      object folder with a copy of its parent's line; the key logs of its
+      parents' owners are owner objects beside it, at their own paths, like
+      those of the owners that signed its own versions.
     </p>
     <p>
       A public repository SHOULD be archived by <a href="https://www.softwareheritage.org/">Software
@@ -871,6 +873,13 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           of the specification):** witness files are only added, never
           replaced or removed, except with their object by a takedown (section
           5.1).
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
+          of the specification):** the key logs of a branch's parents' owners
+          are owner objects beside it, not content of the branch (section 11).
         </p>
       </li>
     </ul>

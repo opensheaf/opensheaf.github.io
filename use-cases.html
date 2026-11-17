@@ -381,18 +381,18 @@ members:
           new object holding every file of that version except its <tt class="verbatim">datacite.json</tt>,
           its <tt class="verbatim">object.json</tt> and the version's own evidence if it
           is itself a branch (<tt class="verbatim">parent.*</tt>), byte for byte, with
-          the evidence of the authors' version (their inventory, <tt class="verbatim">object.json</tt>,
-          signatures and key log up to the latest version known, and, if the
-          authors' version is itself a branch, the evidence of its own
-          parents; section 10.5). It keeps the document version of the
-          revision it copies (the authors' version 3, say). Only the copied
-          revision needs a licence allowing redistribution; a paper whose
-          first preprint was under a restrictive licence can be accepted in a
-          later, openly licensed version. Later versions of the accepted copy
-          (corrections, notices, a withdrawal) are the editors' acts, signed
-          by the journal; the authors cannot change them. A journal will
-          usually adopt the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> in its key log,
-          from its first version, with <tt class="verbatim">all</tt>, so that every
+          the evidence of the authors' version (their inventory, <tt class="verbatim">object.json</tt>
+          and signatures, and, if the authors' version is itself a branch, the
+          evidence of its own parents; section 10.5), and the authors' key log
+          beside it, as their owner object. It keeps the document version of
+          the revision it copies (the authors' version 3, say). Only the
+          copied revision needs a licence allowing redistribution; a paper
+          whose first preprint was under a restrictive licence can be accepted
+          in a later, openly licensed version. Later versions of the accepted
+          copy (corrections, notices, a withdrawal) are the editors' acts,
+          signed by the journal; the authors cannot change them. A journal
+          will usually adopt the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> in its key
+          log, from its first version, with <tt class="verbatim">all</tt>, so that every
           version it signs is dated, by an RFC 3161 authority it trusts or by
           OpenTimestamps, and forks of its key log are resolved by time. A
           correction the journal makes itself is its own version 4

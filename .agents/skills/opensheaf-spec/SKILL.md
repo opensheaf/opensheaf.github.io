@@ -229,11 +229,11 @@ November 2026; read them before touching any of this.
   declaring `parent` (`owner`, `name`, `objectVersion`, `documentVersion`,
   `inventorySha512`, `url`). No deep branches: a branch is a new object
   holding the branch point plus, as content, `parent.inventory.json`,
-  `parent.object.json`, `parent.signatures/`, `parent.keylog/` (the parent
-  owner's key log up to the latest version known) and, for a branch of a
+  `parent.object.json`, `parent.signatures/` and, for a branch of a
   branch, `parent.chain/` (the parent's own evidence, nested one level per
   generation, back to the originator's line; finite, depth may be bounded), so
-  its evidence is complete; the parent's history, if wanted, is a copy of the
+  its evidence is complete with the parents' owners' key logs, which travel
+  beside it as owner objects (never as content); the parent's history, if wanted, is a copy of the
   parent's line beside it (OCFL inventories fix their object's id). Branch
   points move only forward; accepted copies are branches of the selection's
   owner. Verdicts: inconsistent, unconfirmed, confirmed.
@@ -262,8 +262,8 @@ November 2026; read them before touching any of this.
 - **Owner object**: `genesis.json`, `keys.json`, `object.json` (no
   `datacite.json`).
 - **Identity files**: `genesis.json` in every sealed version, and
-  `parent.inventory.json`, `parent.object.json`, `parent.signatures/`,
-  `parent.keylog/` and, for a branch of a branch, `parent.chain/` in every
+  `parent.inventory.json`, `parent.object.json`, `parent.signatures/` and,
+  for a branch of a branch, `parent.chain/` in every
   version of a branch; these names are reserved.
 - `datacite.json` (8): MUST `titles`, `creators`, `publicationYear`, `types`,
   `version` (the document version as a string), `publisher`; SHOULD abstract,
