@@ -135,13 +135,17 @@ November 2026; read them before touching any of this.
   optional `successor`, another owner). A key is **retired** by leaving it out
   of `keys`; its signatures stay good. An owner whose key may have been exposed
   **ends** (`ended`), and a **fork** of its key log (two valid versions of one
-  number) has the same effect from the fork point: its signatures stay good
-  (the core cannot date them), readers trust its history only as far as other
-  evidence goes (earlier copies, pins, timestamps), archives add nothing more
-  to its lines, and its work continues under the successor by branches; a
-  successor is a hint, never followed automatically, confirmed by the keeper's
-  `.well-known/opensheaf`; two successors are a fork settled outside the
-  format; an owner ended by someone else signs a competing version, a fork. A
+  number) has the same effect from the fork point (the versions each side
+  holds stay versions; none is added after the fork point): its signatures
+  stay good (the core cannot date them), readers trust its history only as far
+  as other evidence goes (earlier copies, pins, timestamps), archives take its
+  lines only from copies (up to the latest signed version of a copy that
+  agrees, also to extend a line held), never as new deposits, and its work
+  continues under the successor by branches; a successor differs from the
+  owner, is a hint, never followed automatically, confirmed by `successors` in
+  the keeper's `.well-known/opensheaf`; two successors are a fork settled
+  outside the format; an owner ended by someone else signs a competing ending
+  version, a fork. Resolvers and gateways report ended and forked owners. A
   thief with a current key is the owner until found out (Radicle's answer: a
   compromised key means a new identity). The first `keys.json` repeats the
   genesis record's keys (as a set) and threshold and is signed by them
@@ -173,7 +177,8 @@ November 2026; read them before touching any of this.
   not signed a version; nothing is ever signed again. **Statuses, defined once
   in 13.2.** A signature is invalid (malformed, wrong name, does not verify,
   `object`/`version`/`inventorySha512` not those of its folder, `signer` not
-  the line's owner, or its key not listed in the version named), unchecked
+  the line's owner, its key not listed in the version named, or the version
+  named follows an end or, for a line signature, is the ending one), unchecked
   (the key-log version it names not reached: key log absent, taken down or
   shorter), or good. A key-log version is signed by `threshold` good
   signatures of keys of the version before. A version of a line is **signed**
@@ -187,12 +192,13 @@ November 2026; read them before touching any of this.
   signed, or a key-log version it did not make, before extending it. **Forks**
   of lines and key logs are reported, never resolved by the core; an archive
   keeps its side and, for a key log, records the first differing version of
-  each other side (inventory, checksum, signature files) under the owner
+  each other side (inventory, checksum, `keys.json`, signature and timestamp
+  files) under the owner
   object's `extensions/opensheaf-witnesses/fork/<n>/<d>/`. **Adding:** an
   archive adds a version only if it is signed once added (good signatures, or
   extended by such a version added from the same copy), against the key log it
   holds (fetched fresh); for an ended or forked owner it copies the key log up
-  to the end and may copy its lines, but extends none it holds; a
+  to the end (or the fork point) and takes its lines only from copies; a
   mirror stops at the latest signed version. What an archive holds stays; one
   let in against the rule (not signed) is reported as a breach in section 14,
   not a failure, and blocks the owner's version of that number there (OCFL
@@ -208,7 +214,8 @@ November 2026; read them before touching any of this.
   of the SHA-256 of the timestamp file's own bytes (copies merge); the owner's
   declaration in `keys.json` under `extensions` (the entry itself, with
   `timestampAuthorities`: SHA-256 fingerprints, trusted for a signature up to
-  the key-log version it names);
+  the key-log version it names, never delisted; a date earlier than that
+  key-log version's own does not count);
   timestamps of signature files only; checks at `genTime`, complete proofs
   only; the date of a version (`threshold`-th earliest date). Evidence only:
   it changes no status, ends no owner, decides no fork, lets nothing into an

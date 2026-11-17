@@ -28,7 +28,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 17
+      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 18
       November 2026. How to keep an OpenSheaf archive in a git repository,
       publish it from there and copy it, without git changing a byte of what
       the archive holds. It adds nothing to the format: readers of an archive
@@ -368,16 +368,18 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       kept at its path, which the same commit adds or extends if needed, or
       extended by a version so signed that the same commit adds; and, for an
       owner that has ended, or whose key log is forked, as the commit's tree
-      shows (by <tt class="verbatim">ended</tt>, or by the evidence of a fork), no
-      version extends a line of that owner already published, though a new
-      copy of its line up to its latest signed version may be added. A version
-      of a key log added is signed with good signatures of keys of the version
+      shows (by <tt class="verbatim">ended</tt>, or by the evidence of a fork), versions
+      of its lines are added only from a copy found elsewhere, up to the
+      latest signed version of a copy that agrees with the published line,
+      never as a new deposit (section 6.5 of the specification). A version of
+      a key log added is signed with good signatures of keys of the version
       before, up to and including one with <tt class="verbatim">ended</tt>, and none
-      after it. Since nothing is removed from the published branch afterwards
-      and OCFL cannot skip a version, a version let in that is not signed
-      would hold its number for good, and the owner's own version of that
-      number could never be added to this archive. Versions already published
-      stay, whatever happens later.
+      after it, nor after the point of a fork whose evidence the tree holds.
+      Since nothing is removed from the published branch afterwards and OCFL
+      cannot skip a version, a version let in that is not signed would hold
+      its number for good, and the owner's own version of that number could
+      never be added to this archive. Versions already published stay,
+      whatever happens later.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -720,20 +722,22 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           than a draft's, is signed once added, as section 5.1 says, against
           key logs that are owner objects at their paths in the commit's tree;
           an added version that is not signed (unsigned, invalid, or
-          unchecked: a key-log version not found), a version extending a
-          published line of an ended or forked owner, a version of a key log
-          after one with <tt class="verbatim">ended</tt>, and an added signature file of
-          the owner that is invalid, are failures, unless a signed version
-          added in the same commit extends that version, so that a pull
-          request adding them cannot pass;
+          unchecked: a key-log version not found), unless a signed version
+          added in the same commit extends it; a version of a key log after
+          one with <tt class="verbatim">ended</tt>, or after the point of a fork whose
+          evidence the tree holds; and an added signature file of the owner
+          that is invalid, are failures, so that a pull request adding them
+          cannot pass;
         </p>
       </li>
       <li>
         <p>
           <strong>reported, never failing</strong>: versions already published
           that are not signed (a breach of section 5.1 that cannot be undone),
-          files that are not witnesses, ended owners, forks of lines and of
-          key logs (section 6.5 of the specification);
+          files that are not witnesses, ended owners and the versions added to
+          their lines (which come only from copies, a rule the check cannot
+          see), forks of lines and of key logs (section 6.5 of the
+          specification);
         </p>
       </li>
       <li>
@@ -905,6 +909,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           tried during the day, were withdrawn.; after a thirteenth review:
           the key log of an ended or forked owner is added up to its end, and
           its lines may be copied, only extending them is refused.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 18 November 2026:</strong> the lines of an
+          ended or forked owner are added only from copies, up to the latest
+          signed version of a copy that agrees, also to extend a published
+          line, and reported; no key-log version after the point of a known
+          fork; the exception for versions extended in the same commit applies
+          to unsigned versions only (sections 5.1 and 10).
         </p>
       </li>
     </ul>

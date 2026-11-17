@@ -1,6 +1,6 @@
 # OpenSheaf timestamps
 
-*Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 17 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that it does so, so that readers can tell which versions existed by a date, for instance before an owner ended. The extension is named by the URI `https://opensheaf.org/opensheaf-timestamps-0.1`. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.*
+*Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 18 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that it does so, so that readers can tell which versions existed by a date, for instance before an owner ended. The extension is named by the URI `https://opensheaf.org/opensheaf-timestamps-0.1`. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.*
 
 > [!WARNING]
 > **Proposal.** This extension belongs to the identity proposal of the specification (owners, key logs and signatures, sections 6.5 and 13.2), on the branch `proposal/identity` (PR #30), not yet agreed. It is discussed in [issue #55](https://github.com/opensheaf/opensheaf.github.io/issues/55).
@@ -9,7 +9,7 @@
 
 In the [OpenSheaf specification](opensheaf-specification-0.1.md), every version of a line is signed by its owner, under a version of the owner's key log, and a good signature stays good (sections 6.5 and 13.2 of the specification). Signatures say who made a version, not when. So when a key may have been exposed, the core cannot tell the signatures made with it before from those its new holder makes after: the owner ends, its signatures stay good, and readers trust its history only as far as other evidence goes (section 6.5 of the specification).
 
-A timestamp is such evidence: it shows that a signature existed by a date. A single researcher needs none. A journal, an institution, or anyone who wants its history to be trusted after a key is lost to others adopts this extension in its key log, from its first version, so that every signature it makes is dated. The extension changes no status of the core: it adds dates that readers may weigh.
+A timestamp is such evidence: it shows that a signature existed by a date. A single researcher needs none. A journal, an institution, or anyone who wants its history to be trusted after a key is lost to others adopts this extension in its key log, from its first version, so that every signature it makes is dated.
 
 ## 2. Conventions
 
@@ -43,7 +43,7 @@ A timestamp is **valid** for a signature file when:
 - for an RFC 3161 token: its message imprint is the SHA-512 digest of the file's bytes; its signing certificate, or the root of the chain it carries, has a fingerprint listed for that signature file (section 4); every certificate of the chain was within its validity period at the token's `genTime`, the signing certificate is for time stamping (RFC 3161, section 2.3), and no revocation known to the reader dates from before `genTime` (as `openssl ts -verify` checks with `-attime` set to `genTime`); and the token verifies;
 - for an OpenTimestamps proof: it is complete, attested in a Bitcoin block; a pending proof counts for nothing.
 
-The **date** of a valid timestamp is the `genTime` of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps proof reaches; the earliest valid timestamp of a signature file is its date. A version is **dated** by the `threshold`-th earliest of the dates of its good signature files naming one key-log version. Dates within two hours of a Bitcoin block time are uncertain by that much.
+The **date** of a valid timestamp is the `genTime` of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps proof reaches; the earliest valid timestamp of a signature file is its date. A date counts only if it is not earlier than the date of the key-log version that the signature file's `keyLog` names, and a signature naming an undated key-log version has none (signatures naming the first version, which its genesis record fixes, are bounded by nothing): an authority is trusted only from the key-log version that lists it, which is itself dated by authorities listed before it, so no one, a thief with a current key included, can list an authority of its own to date signatures before the listing. A version is **dated** by the `threshold`-th earliest of the dates of its good signature files naming one key-log version; a version vouched for (section 13.2 of the specification) existed by the date of the version that vouches for it. Dates within two hours of a Bitcoin block time are uncertain by that much.
 
 ## 6. Use
 
@@ -57,7 +57,7 @@ A verifier that knows this extension, in addition to the checks of section 14 of
 
 ## 8. Security considerations
 
-- **Trust.** An RFC 3161 token rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log, and trusting for a signature only those listed up to the key-log version it names, keeps anyone else, a thief included, from dating with an authority of their own. Listing a root certificate trusts every authority that root certifies, so an owner that wants a single authority lists its signing certificate. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after hours.
+- **Trust.** An RFC 3161 token rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. An authority listed later cannot date a signature earlier than its listing (section 5), so a thief who lists its own dates nothing before the theft. Authorities are never delisted: if a listed one is compromised, the remedy is a new owner (section 6.5 of the specification). Listing a root certificate trusts every authority that root certifies, so an owner that wants a single authority lists its signing certificate. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after hours.
 - **Stripping.** A host can remove timestamp files from a copy; readers merge the timestamp files of every copy they see. A date only shows that a signature existed by then: a thief who stamps what it signs with a stolen key gets dates too, so dates help only before the exposure.
 
 ## Appendix A. JSON Schema (normative)
@@ -91,8 +91,6 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz
 extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots
 ```
 
-If the owner later ends, after the first key was stolen, a reader that believes the theft happened after a given date may trust the versions dated before it.
-
 ## Appendix C. References
 
 - [OpenSheaf specification 0.1](opensheaf-specification-0.1.md), sections 4, 6.5, 10.5, 13.2 and 14
@@ -104,3 +102,4 @@ If the owner later ends, after the first key was stolen, a reader that believes 
 
 - **0.1 (draft), 17 November 2026:** first draft, moving the timestamp rules out of the identity proposal of the specification, then revised the same day with the reviews of PR #30: RFC 3161 tokens and OpenTimestamps proofs of signature files, named by the digest of their own bytes, completed proofs as new files, anyone may stamp; the owner's declaration in `keys.json` under `extensions`; checking at `genTime` with listed authorities and complete proofs only; the date of a version. Finally, following the specification, where an exposed key ends its owner, the extension changes no status: it no longer confirms the signatures of revoked keys (there are none) nor resolves forks of key logs, and only gives dates that readers may weigh.
 - **0.1 (draft), 17 November 2026, after a thirteenth review of PR #30:** the declaration is the entry itself, with only `timestampAuthorities`; the authorities trusted for a signature are those listed up to the key-log version it names, not later ones; guidance for tools merged into section 6.
+- **0.1 (draft), 18 November 2026, after a fourteenth review of PR #30:** a date counts only if not earlier than the date of the key-log version the signature names, so that an authority listed later dates nothing before its listing; a version vouched for existed by the date of the version that vouches for it; a compromised authority means a new owner; repetitions cut.

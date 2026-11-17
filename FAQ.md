@@ -215,10 +215,11 @@ A threshold binds only the signatures naming its version, so owners choose it
 at the start (1 with a spare key against loss, 2 of 3 keys against theft); a
 group of co-authors can share one owner with a threshold, for instance two
 signatures out of three. If a key may have been exposed, the owner
-<dfn>ends</dfn>: a last version of its key log says so and names a successor,
-which continues the work by branches; the old signatures stay good, but
-readers trust them only as far as other evidence goes, since nothing tells the
-owner's signatures from a thief's, and archives no longer extend its lines.
+<dfn>ends</dfn>: a last version of its key log says so and may name a
+successor, which continues the work by branches; the old signatures stay good,
+but readers trust them only as far as other evidence goes, since nothing tells
+the owner's signatures from a thief's, and archives take its lines only from
+copies, never as new deposits.
 Every version of every line is signed, and the key logs travel with the
 objects they sign, so a line can be checked from any copy, even when the
 archives that served it have gone. An owner may name who answers for it (an

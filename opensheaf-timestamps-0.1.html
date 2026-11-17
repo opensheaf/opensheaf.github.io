@@ -28,7 +28,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf timestamps<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 17
+      Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 18
       November 2026. How an owner dates its signatures with RFC 3161 tokens or
       OpenTimestamps proofs, and declares in its key log that it does so, so
       that readers can tell which versions existed by a date, for instance
@@ -58,8 +58,7 @@
       date. A single researcher needs none. A journal, an institution, or
       anyone who wants its history to be trusted after a key is lost to others
       adopts this extension in its key log, from its first version, so that
-      every signature it makes is dated. The extension changes no status of
-      the core: it adds dates that readers may weigh.
+      every signature it makes is dated.
     </p>
     <h2 id="auto-3"><a id="2-conventions"></a>2. Conventions<span style="margin-left: 1em"></span></h2>
     <p>
@@ -179,10 +178,19 @@
       The <strong>date</strong> of a valid timestamp is the <tt class="verbatim">genTime</tt>
       of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps
       proof reaches; the earliest valid timestamp of a signature file is its
-      date. A version is <strong>dated</strong> by the <tt class="verbatim">threshold</tt>-th
-      earliest of the dates of its good signature files naming one key-log
-      version. Dates within two hours of a Bitcoin block time are uncertain by
-      that much.
+      date. A date counts only if it is not earlier than the date of the
+      key-log version that the signature file's <tt class="verbatim">keyLog</tt> names,
+      and a signature naming an undated key-log version has none (signatures
+      naming the first version, which its genesis record fixes, are bounded by
+      nothing): an authority is trusted only from the key-log version that
+      lists it, which is itself dated by authorities listed before it, so no
+      one, a thief with a current key included, can list an authority of its
+      own to date signatures before the listing. A version is
+      <strong>dated</strong> by the <tt class="verbatim">threshold</tt>-th earliest of
+      the dates of its good signature files naming one key-log version; a
+      version vouched for (section 13.2 of the specification) existed by the
+      date of the version that vouches for it. Dates within two hours of a
+      Bitcoin block time are uncertain by that much.
     </p>
     <h2 id="auto-7"><a id="6-use"></a>6. Use<span style="margin-left: 1em"></span></h2>
     <p>
@@ -222,10 +230,11 @@
         <p>
           <strong>Trust.</strong> An RFC 3161 token rests on the authority's
           clock and keys: an authority that misdates, or whose key is stolen,
-          can date a signature falsely. Listing the authorities in the key
-          log, and trusting for a signature only those listed up to the
-          key-log version it names, keeps anyone else, a thief included, from
-          dating with an authority of their own. Listing a root certificate
+          can date a signature falsely. An authority listed later cannot date
+          a signature earlier than its listing (section 5), so a thief who
+          lists its own dates nothing before the theft. Authorities are never
+          delisted: if a listed one is compromised, the remedy is a new owner
+          (section 6.5 of the specification). Listing a root certificate
           trusts every authority that root certifies, so an owner that wants a
           single authority lists its signing certificate. An OpenTimestamps
           proof rests on no authority, only on Bitcoin, but is complete only
@@ -283,11 +292,6 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.q7swxsz56bfiyo
 extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz64.ots
 extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots</pre>
     </div>
-    <p>
-      If the owner later ends, after the first key was stolen, a reader that
-      believes the theft happened after a given date may trust the versions
-      dated before it.
-    </p>
     <h2 id="auto-12"><a id="appendix-c-references"></a>Appendix C. References<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
@@ -339,6 +343,16 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           class="verbatim">timestampAuthorities</tt>; the authorities trusted for a
           signature are those listed up to the key-log version it names, not
           later ones; guidance for tools merged into section 6.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 18 November 2026, after a fourteenth review of
+          PR #30:</strong> a date counts only if not earlier than the date of
+          the key-log version the signature names, so that an authority listed
+          later dates nothing before its listing; a version vouched for
+          existed by the date of the version that vouches for it; a
+          compromised authority means a new owner; repetitions cut.
         </p>
       </li>
     </ul>
