@@ -9,7 +9,7 @@
 
 The [OpenSheaf specification](opensheaf-specification-0.1.md) allows an archive to be kept in git and served by any static web server (section 5 of the specification), and says that git hashes are not part of its integrity (section 13.2). This document says how, for those who keep an archive in git and for the tools that write to such a repository.
 
-Git gives an archive what the format leaves to its keeper:
+Git gives an archive what the format leaves to its maintainer:
 
 - **a history of the whole archive**: every state of the discovery document, so every state the archive published, which the format itself does not keep (the discovery document is a mutable map, section 6.1 of the specification);
 - **copies**: every clone is a complete copy of the archive, with its history;
@@ -43,7 +43,7 @@ A repository conforms to this document if every published commit satisfies secti
 
 A repository SHOULD hold one archive, with the discovery document at the top of the repository and the storage root in `ocfl/`. An archive kept in a sub-folder of a larger repository is allowed; what follows then applies to that folder.
 
-Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
+Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or the folders of the indexes, and they are not published unless the maintainer means them to be (section 7).
 
 The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of lines kept elsewhere are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
 
@@ -99,8 +99,8 @@ Let C be a published commit and C' the next one on the published branch. Between
 4. the replacement of `opensheaf.json`, and files added, replaced or removed among the indexes (`indexes.json`, `names/`, `owners/`, `sha512/`), which are rewritten at every deposit and takedown (section 6.6 of the specification, proposal);
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
 6. the removal of an object folder, with the folders above it that it leaves empty (an owner's folder, or folders of the hash), by a takedown (section 9);
-7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
-8. any change inside the folder of a draft (section 6.5 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
+7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3);
+8. any change inside the folder of a draft (section 6.5 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal, with the creation of the `draft/` folder and its removal when it is left empty: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
 
 No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -138,10 +138,10 @@ A deposit prepared on a branch is published by merging the branch into the publi
 
 Two branches may conflict:
 
-- **Versions of the same object.** If both add version `v<N>` of the same object, and neither is yet signed (a draft, or a version still being prepared), the second to be merged MUST be redone by the tool as `v<N+1>`, with a new inventory; it MUST NOT be resolved by editing files. Two signed versions `v<N>` of one line are a fork of the line (section 6.5 of the specification), never redone by a merge: one of them is withdrawn from the branch before it is published.
+- **Versions of the same object.** If both add version `v<N>` of the same object, and neither is yet signed (a draft, or a version still being prepared), the second to be merged MUST be redone by the tool as `v<N+1>`, with a new inventory; it MUST NOT be resolved by editing files. Two signed versions `v<N>` of one line are a fork of the line (section 6.5 of the specification), never redone by a merge: one of them is dropped from the branch before it is published.
 - **The discovery document and the main collection.** Branches that add versions to different objects both change `opensheaf.json`, and usually the main collection. A merge of these files as text can produce a discovery document that parses but no longer matches the storage root, or a collection version holding the members of only one branch. The `-merge` attribute (section 4.1) makes every such change a conflict; the tool resolves it by writing the discovery document again from the storage root, and by making a new version of the collection, never by combining texts.
 
-A deposit MAY be proposed by a pull request (or merge request) and published by the keeper of the archive when it is merged. The object version is then created (its `created` date in the inventory) before it is published. (When a version becomes public, and how this is recorded, is discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
+A deposit MAY be proposed by a pull request (or merge request) and published by the maintainer of the archive when it is merged. The object version is then created (its `created` date in the inventory) before it is published. (When a version becomes public, and how this is recorded, is discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
 
 ## 7. Publishing
 
@@ -198,7 +198,7 @@ Tools working on a large archive MAY use a partial clone (`git clone --filter=bl
 
 A takedown deletes an object from the storage root and adds a tombstone to the discovery document (section 11.2 of the specification). In git, a commit that deletes the object folder removes it from what is served, but not from the history: the files remain in every earlier commit, every clone, every fork and every archive of the repository.
 
-When content must be removed (by law, or for a breach of rights), the keeper MUST:
+When content must be removed (by law, or for a breach of rights), the maintainer MUST:
 
 1. commit the removal of the object folder and the tombstone, and the update of the indexes if the archive keeps them (the object's entries kept with `status` `removed`, its name removed from `owners/`, section 6.6 of the specification, proposal), as in section 5.1, items 4 and 6;
 2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with `git filter-repo --invert-paths --path ocfl/<path>/`, with the object's path in the layout);
@@ -232,7 +232,7 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 ## 12. Security and privacy
 
 - **What is pushed is public.** Everything committed to a public repository, on any branch, including working files and commits later reverted, is published and copied, and is hard to withdraw (section 9). Private drafts and private reviews (issue [#29](https://github.com/opensheaf/opensheaf.github.io/issues/29)) MUST NOT be pushed to a public repository, even on a branch.
-- **Commit metadata** publishes the names and e-mail addresses of authors and committers, and their time zones. Keepers SHOULD commit with an address meant to be public (on GitHub, a `noreply` address). Commits that concern anonymous referees are made in the name of the journal, not of the referee.
+- **Commit metadata** publishes the names and e-mail addresses of authors and committers, and their time zones. Maintainers SHOULD commit with an address meant to be public (on GitHub, a `noreply` address). Commits that concern anonymous referees are made in the name of the journal, not of the referee.
 - **Code.** Filters and hooks are configured by each user, not by the repository; the attributes of section 4.1 keep user filters off the archive files. Workflows SHOULD NOT build or run deposited sources.
 - **Secrets**, such as tokens for Zenodo, MUST NOT be committed; workflows read them from the secrets of the host.
 

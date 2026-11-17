@@ -256,7 +256,7 @@
       lists its first keys, and whose versions are its <dfn>key log</dfn>: the
       list of its public keys and the number of them that must sign, each
       version signed by the keys of the one before. Keys can thus be added,
-      replaced or revoked while the owner stays the same; a group of
+      replaced or removed while the owner stays the same; a group of
       co-authors can share one owner with a threshold, for instance two
       signatures out of three. Every version of every line is signed, and the
       key logs travel with the objects they sign, so a line can be checked
@@ -329,10 +329,11 @@
       required, and timestamps and others' signatures, optional. Timestamps
       can be RFC 3161 tokens from a time-stamping authority the owner chooses,
       or OpenTimestamps proofs, or both; an owner that wants them for every
-      version, a journal for instance, declares it in its key log, and its
-      versions without one are then invalid. Witnesses need no digests of
-      their own: each one is checked directly against the checksum file it
-      names, which the pins fix.
+      version, a journal for instance, declares it in its key log, with the
+      RFC 3161 authorities it trusts, and its versions without one are then
+      unconfirmed. Witnesses need no digests of their own: a signature is
+      checked against the version it names, which the pins fix, and a
+      timestamp against the signature file it stamps.
     </p>
     <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>
@@ -372,8 +373,10 @@
       A verifier validates the JSON files against the schemas in <a href="schemas/">schemas/</a>,
       validates the storage root with a standard OCFL validator (such as <tt
       class="verbatim">ocfl-py</tt>), checks that the discovery document matches the
-      storage root, and resolves and checks every member of every collection.
-      The specification (section 14) lists the checks.
+      storage root, checks the key logs and the owners' signatures of every
+      version, and resolves and checks the members of the head of every
+      collection (and, optionally, those of earlier versions). The
+      specification (section 14) lists the checks.
     </p>
     <h2 id="auto-26"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
     <p>

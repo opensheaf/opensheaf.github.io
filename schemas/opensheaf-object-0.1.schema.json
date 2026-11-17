@@ -560,6 +560,26 @@
               "required": [
                 "notices"
               ]
+            },
+            {
+              "required": [
+                "withdrawal"
+              ]
+            },
+            {
+              "required": [
+                "licence"
+              ]
+            },
+            {
+              "required": [
+                "agreement"
+              ]
+            },
+            {
+              "required": [
+                "external"
+              ]
             }
           ]
         },

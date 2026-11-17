@@ -17,11 +17,10 @@ metadata, and collections that combine documents from several archives.
 
 Both are excellent services, and OpenSheaf works with them: a document can
 also be on arXiv (linked with `IsIdenticalTo`), and the Zenodo binding gives
-every version a DOI on Zenodo. What OpenSheaf adds is an archive that you
-keep and control, that stores sources (not only PDFs) in a
-documented layout, that anyone can verify file by file, and that can be
-combined with other archives into collections and selections without asking
-any central service.
+every version a DOI on Zenodo. What OpenSheaf adds is an archive that you keep
+and control, that stores sources (not only PDFs) in a documented layout, that
+anyone can verify file by file, and that can be combined with other archives
+into collections and selections without asking any central service.
 
 ## Do I need Zenodo, TeXmacs, git or GitHub?
 
@@ -50,17 +49,17 @@ in most repositories) are not meant for long-term preservation. OCFL (the
 Oxford Common File Layout) is a published specification for exactly this
 problem: versioned objects stored as plain files, every file fixed by a
 SHA-512 digest, readable without any special software, with independent
-validators, used by research libraries. An OpenSheaf archive can still be
-kept in git; git just is not part of its integrity.
+validators, used by research libraries. An OpenSheaf archive can still be kept
+in git; git just is not part of its integrity.
 
 ## Why DataCite metadata, and not RO-Crate, Dublin Core or JATS?
 
 DataCite is the metadata behind DOIs for repositories (Zenodo, arXiv's DOIs,
 university repositories). It has the relations needed here (versions,
 preprints and published articles, collections), it maps directly to Zenodo,
-and its records are harvested by ORCID, OpenAlex and search services.
-RO-Crate is richer but heavier; Dublin Core is too thin; JATS is for the
-full text of journal articles.
+and its records are harvested by ORCID, OpenAlex and search services. RO-Crate
+is richer but heavier; Dublin Core is too thin; JATS is for the full text of
+journal articles.
 
 ## Why JSON and not YAML?
 
@@ -71,29 +70,28 @@ extra libraries. YAML is nicer to edit by hand but converts values silently
 
 ## Why is there a discovery document (opensheaf.json)?
 
-Static web servers cannot list folders, so a program visiting an archive
-could not find its objects. `opensheaf.json`, at the archive's address, lists
-them with their head versions and digests, names the storage root and the
-main collection, and says which version of the specification the archive
-follows. It is only a map: everything it says is checked against the storage
-root.
+Static web servers cannot list folders, so a program visiting an archive could
+not find its objects. `opensheaf.json`, at the archive's address, lists them
+with their head versions and digests, names the storage root and the main
+collection, and says which version of the specification the archive follows.
+It is only a map: everything it says is checked against the storage root.
 
 ## How are objects identified?
 
 A work has a name independent of any archive, the digest of its genesis
 record, and each history of it an owner; the identifier of an object is its
-line, written as a `sheaf:` URI, `sheaf:<name>:<owner>`. Identifiers chosen
-by each archive would clash as soon as one archive kept copies of another's
+line, written as a `sheaf:` URI, `sheaf:<name>:<owner>`. Identifiers chosen by
+each archive would clash as soon as one archive kept copies of another's
 objects; identifiers made from lines never do, so one storage root can hold
 the lines its owners write and copies of others' side by side. The default
 layout puts a line at `<owner>/<name>/`, one folder per owner, so that paths
 can be computed over plain HTTP; a large archive may instead spread its
-objects over folders named by parts of the hash of their identifiers.
-Archives have no identifiers of their own: they are found at their addresses.
-Readable names (`kpz-details`) are **labels** in the discovery document, used
-for the website's URLs; they are not permanent, and permanent links use
-`sheaf:` URIs, for instance `sheaf:<name>/v3` for document version 3 of the
-originator's line. Drafts, which have no name yet, are identified locally, as
+objects over folders named by parts of the hash of their identifiers. Archives
+have no identifiers of their own: they are found at their addresses. Readable
+names (`kpz-details`) are **labels** in the discovery document, used for the
+website's URLs; they are not permanent, and permanent links use `sheaf:` URIs,
+for instance `sheaf:<name>/v3` for document version 3 of the originator's
+line. Drafts, which have no name yet, are identified locally, as
 `sheaf:draft:<id>`.
 
 ## What is the difference between a document version and an object version?
@@ -102,8 +100,8 @@ The document version is the version of the work, what readers see and what
 gets a DOI: it changes only when the document's own files change (sources,
 renditions, change note). The object version (`v1`, `v2`, ...) is OCFL's: it
 changes at every change of the object, including corrections of the
-description (adding the DOI of the journal version, fixing an affiliation)
-and notices about earlier versions.
+description (adding the DOI of the journal version, fixing an affiliation) and
+notices about earlier versions.
 
 ## How are versions numbered and ordered?
 
@@ -141,30 +139,30 @@ readable even if no copy is found.
 
 ## Why both archives and collections?
 
-They answer different questions. An **archive** is custody: a storage root
-and a discovery document, served at an address. It says what is kept there
-and where its files are. An archive hosts the
-lines of any number of owners and owns none of them by hosting them: every
-version of a line is signed by its owner, wherever it is stored, and an
-archive cannot add to another owner's line. A copy kept elsewhere (a mirror)
-stays its owner's line and can only receive the owner's versions (see "Who
-owns an object, and what is a branch?").
+They answer different questions. An **archive** is custody: a storage root and
+a discovery document, served at an address. It says what is kept there and
+where its files are. An archive hosts the lines of any number of owners and
+owns none of them by hosting them: every version of a line is signed by its
+owner, wherever it is stored, and an archive cannot add to another owner's
+line. A copy kept elsewhere (a mirror) stays its owner's line and can only
+receive the owner's versions (see "Who owns an object, and what is a
+branch?").
 
 A **collection** is a statement: a versioned list of pins, made by a curator,
 over objects kept anywhere. It says which objects, in which versions, go
 together: an author's papers, an issue of a journal, a reading list.
-Collections are objects themselves, so they can be pinned, nested and
-included in other collections, across archives.
+Collections are objects themselves, so they can be pinned, nested and included
+in other collections, across archives.
 
 The two are kept apart because an archive changes at every deposit and holds
 facts that are nobody's claim (which objects it holds, their heads, mirrors,
 tombstones), while a collection changes by the rules its curator set (adding
-members, following them as they grow, vetting their versions), and each of
-its versions can be cited and verified as it stood. When an archive's
-documents should be cited as they stood, that is what its main collection is
-for: a catalogue of them, pinned like any other. Archives hold copies, each
-line possibly in several; collections overlay them, any number of views over
-any copies.
+members, following them as they grow, vetting their versions), and each of its
+versions can be cited and verified as it stood. When an archive's documents
+should be cited as they stood, that is what its main collection is for: a
+catalogue of them, pinned like any other. Archives hold copies, each line
+possibly in several; collections overlay them, any number of views over any
+copies.
 
 ## What is the difference between a catalogue and a selection?
 
@@ -197,19 +195,19 @@ changes are the curator's acts (for a journal). The licence of a collection
 > This answer describes the identity proposal (sections 6.5 and 10.5 of the
 > specification; issues #55 and #52), not yet agreed.
 
-A work has a <dfn>name</dfn>, the digest of the genesis record written when
-it is sealed, at its owner's request, before it is first shared. Each history
-of it has an <dfn>owner</dfn>: a person, a group or an institution, which
-decides its versions and signs them. The pair (name, owner) identifies a
+A work has a <dfn>name</dfn>, the digest of the genesis record written when it
+is sealed, at its owner's request, before it is first shared. Each history of
+it has an <dfn>owner</dfn>: a person, a group or an institution, which decides
+its versions and signs them. The pair (name, owner) identifies a
 <dfn>line</dfn>: one history, with a single writer. A line is its signed
 versions, wherever they are stored: the archive that keeps a copy is only
-where it lives, and an owner who moves to another archive continues its
-lines there.
+where it lives, and an owner who moves to another archive continues its lines
+there.
 
 An owner is itself an object, named by its own genesis record, which lists its
 first keys, and whose versions are its <dfn>key log</dfn>: the list of its
 public keys and the number of them that must sign, each version signed by the
-keys of the one before. Keys can thus be added, replaced or revoked while the
+keys of the one before. Keys can thus be added, replaced or removed while the
 owner stays the same; a group of co-authors can share one owner with a
 threshold, for instance two signatures out of three. Every version of every
 line is signed, and the key logs travel with the objects they sign, so a line
@@ -246,23 +244,23 @@ back to the originator's line.
 ## Can documents be linked in richer ways (a short account and its proof)?
 
 Yes, on top of the format rather than in it. The core keeps only what every
-archive needs to keep, cite, compose and verify documents. Other relations
-are built from it: by links inside the documents and DataCite relations,
-which need nothing more, or by **extensions** (section 4 of the
-specification), published separately, whose data an object version records in
-its `object.json`, so that tools that know them can follow the relation when
-they copy, verify or present documents. Extensions never change the core: an
-archive is read and verified without them. The [use cases](USE-CASES.md)
-show a journal publishing a short account of a proof whose detailed argument,
+archive needs to keep, cite, compose and verify documents. Other relations are
+built from it: by links inside the documents and DataCite relations, which
+need nothing more, or by **extensions** (section 4 of the specification),
+published separately, whose data an object version records in its
+`object.json`, so that tools that know them can follow the relation when they
+copy, verify or present documents. Extensions never change the core: an
+archive is read and verified without them. The [use cases](USE-CASES.md) show
+a journal publishing a short account of a proof whose detailed argument,
 possibly written with AI, stays online in the version reviewed.
 
 ## Where do signatures and timestamps go, and why not in the version itself?
 
 A signature or timestamp of an object version can only be made after the
 version is committed, so it cannot be part of that version: a signature of an
-inventory cannot be listed in the inventory it signs. Making a new version
-for each signature would mix evidence with changes of the work, and every
-upgrade of a timestamp proof (OpenTimestamps proofs are completed once their
+inventory cannot be listed in the inventory it signs. Making a new version for
+each signature would mix evidence with changes of the work, and every upgrade
+of a timestamp proof (OpenTimestamps proofs are completed once their
 attestation is confirmed) would be another version.
 
 OCFL does not allow arbitrary files in an object folder; its `logs/` folder is
@@ -274,9 +272,11 @@ where they travel with the object: the owner's signature of every version,
 required, and timestamps and others' signatures, optional. Timestamps can be
 RFC 3161 tokens from a time-stamping authority the owner chooses, or
 OpenTimestamps proofs, or both; an owner that wants them for every version, a
-journal for instance, declares it in its key log, and its versions without one
-are then invalid. Witnesses need no digests of their own: each one is checked
-directly against the checksum file it names, which the pins fix.
+journal for instance, declares it in its key log, with the RFC 3161
+authorities it trusts, and its versions without one are then unconfirmed.
+Witnesses need no digests of their own: a signature is checked against the
+version it names, which the pins fix, and a timestamp against the signature
+file it stamps.
 
 ## Why is the HTML version not part of the deposit?
 
@@ -313,8 +313,10 @@ same host. Appendix C also recommends a sitemap and FAIR Signposting links.
 A verifier validates the JSON files against the schemas in
 [schemas/](schemas/), validates the storage root with a standard OCFL
 validator (such as `ocfl-py`), checks that the discovery document matches the
-storage root, and resolves and checks every member of every collection. The
-specification (section 14) lists the checks.
+storage root, checks the key logs and the owners' signatures of every version,
+and resolves and checks the members of the head of every collection (and,
+optionally, those of earlier versions). The specification (section 14) lists
+the checks.
 
 ## Is the format stable?
 

@@ -39,7 +39,7 @@
 
   <section*|The name><label|the-name>
 
-  A <em|sheaf> is a bundle of papers, or of stalks of wheat tied together. In mathematics, a sheaf is the structure that attaches data to each part of a space so that local pieces, which agree where they overlap, glue into a whole. OpenSheaf works the same way: archives are kept and verified separately, each by its keeper, and collections glue them together without copying, while every piece stays checkable on its own.
+  A <em|sheaf> is a bundle of papers, or of stalks of wheat tied together. In mathematics, a sheaf is the structure that attaches data to each part of a space so that local pieces, which agree where they overlap, glue into a whole. OpenSheaf works the same way: archives are kept and verified separately, each by whoever keeps it, and collections glue them together without copying, while every piece stays checkable on its own.
 
   <section*|Taking part><label|taking-part>
 

@@ -49,7 +49,7 @@
       git and for the tools that write to such a repository.
     </p>
     <p>
-      Git gives an archive what the format leaves to its keeper:
+      Git gives an archive what the format leaves to its maintainer:
     </p>
     <ul>
       <li>
@@ -193,8 +193,8 @@
     <p>
       Working files MAY be kept in the repository. They are not part of the
       archive: they MUST NOT be placed inside the storage root or the folders
-      of the indexes, and they are not published unless the keeper means them
-      to be (section 7).
+      of the indexes, and they are not published unless the maintainer means
+      them to be (section 7).
     </p>
     <p>
       The archive files MUST NOT contain symbolic links or git submodules.
@@ -333,11 +333,13 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       by section 5 of the specification); 6. the removal of an object folder,
       with the folders above it that it leaves empty (an owner's folder, or
       folders of the hash), by a takedown (section 9); 7. the repair of a file
-      whose bytes do not match the digest its inventory records (section 5.3).
+      whose bytes do not match the digest its inventory records (section 5.3);
       8. any change inside the folder of a draft (section 6.5 of the
       specification; <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt> in the owner-name
-      layout), including its removal: drafts are the only objects that may be
-      rewritten or deleted, and are never copied out of the archive.
+      layout), including its removal, with the creation of the <tt class="verbatim">draft/</tt>
+      folder and its removal when it is left empty: drafts are the only
+      objects that may be rewritten or deleted, and are never copied out of
+      the archive.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -437,7 +439,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           with a new inventory; it MUST NOT be resolved by editing files. Two
           signed versions <tt class="verbatim">v&lt;N&gt;</tt> of one line are a fork of
           the line (section 6.5 of the specification), never redone by a
-          merge: one of them is withdrawn from the branch before it is
+          merge: one of them is dropped from the branch before it is
           published.
         </p>
       </li>
@@ -458,7 +460,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     </ul>
     <p>
       A deposit MAY be proposed by a pull request (or merge request) and
-      published by the keeper of the archive when it is merged. The object
+      published by the maintainer of the archive when it is merged. The object
       version is then created (its <tt class="verbatim">created</tt> date in the
       inventory) before it is published. (When a version becomes public, and
       how this is recorded, is discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
@@ -622,7 +624,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     </p>
     <p>
       When content must be removed (by law, or for a breach of rights), the
-      keeper MUST:
+      maintainer MUST:
     </p>
     <p>
       1. commit the removal of the object folder and the tombstone, and the
@@ -747,10 +749,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       <li>
         <p>
           <strong>Commit metadata</strong> publishes the names and e-mail
-          addresses of authors and committers, and their time zones. Keepers
-          SHOULD commit with an address meant to be public (on GitHub, a <tt
-          class="verbatim">noreply</tt> address). Commits that concern anonymous
-          referees are made in the name of the journal, not of the referee.
+          addresses of authors and committers, and their time zones.
+          Maintainers SHOULD commit with an address meant to be public (on
+          GitHub, a <tt class="verbatim">noreply</tt> address). Commits that concern
+          anonymous referees are made in the name of the journal, not of the
+          referee.
         </p>
       </li>
       <li>

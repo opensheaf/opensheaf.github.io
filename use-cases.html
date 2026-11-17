@@ -291,13 +291,13 @@ osheaf verify</pre>
       </li>
       <li>
         <p>
-          Further witnesses that a version existed, with these bytes, at a
-          date: the owner's signatures, which every version carries, and
-          timestamps and others' signatures (section 13.2); a snapshot of the
-          archive's git repository by Software Heritage, cited by its SWHID
-          (section 8.1); and Zenodo deposits (appendix A), which keep the
-          content files, though without the inventory a Zenodo record cannot
-          be checked against a pin.
+          Further witnesses: the owner's signatures, which every version
+          carries, and others' signatures, which say who made or vouched for a
+          version; and timestamps (section 13.2), which show that it existed
+          by a date; a snapshot of the archive's git repository by Software
+          Heritage, cited by its SWHID (section 8.1); and Zenodo deposits
+          (appendix A), which keep the content files, though without the
+          inventory a Zenodo record cannot be checked against a pin.
         </p>
       </li>
     </ul>
@@ -326,7 +326,7 @@ title: Papers preserved by the library
 type: catalogue
 members:
   - archive: https://example.org/papers/   # a base URL (in &lsquo;at&lsquo; of members.json)
-    id: kpz-uniqueness
+    id: kpz-uniqueness                    # its label
     mirror: yes</pre>
       </div>
     </div>
@@ -377,9 +377,10 @@ members:
           To make sure what it vetted stays available, the journal keeps an
           <strong>accepted copy</strong> of each vetted revision: a branch of
           the paper, owned by the journal (an owner with keys of its own), a
-          new object holding every file of that version except its <tt class="verbatim">datacite.json</tt>
-          and <tt class="verbatim">object.json</tt>, byte for byte, with the evidence of
-          the authors' version (their inventory, <tt class="verbatim">object.json</tt>,
+          new object holding every file of that version except its <tt class="verbatim">datacite.json</tt>,
+          its <tt class="verbatim">object.json</tt> and the version's own evidence if it
+          is itself a branch (<tt class="verbatim">parent.*</tt>), byte for byte, with
+          the evidence of the authors' version (their inventory, <tt class="verbatim">object.json</tt>,
           signatures and key log up to the latest version known, and, if the
           authors' version is itself a branch, the evidence of its own
           parents; section 10.5). It keeps the document version of the
@@ -395,7 +396,9 @@ members:
           journal makes itself is its own version 4 (provisionally: the
           numbering on branches is open); when the editors later vet the
           authors' corrected version, the copy moves its branch point to it,
-          with the same evidence, as the journal's next version.
+          with the same evidence, as the journal's next version (the journal's
+          own files are then dropped; how a move keeps them is open, section
+          6.5).
         </p>
       </li>
     </ul>
@@ -406,7 +409,7 @@ members:
 # the object version vetted (vN in the authors' storage), not the document
 # version
 osheaf accept https://authors.example.org/ network-discrimination \
-  --version v2 \
+  --version v3 \
   --stage VoR \
   --agreement &quot;the journal's publication terms&quot;
 # list the issue (issue-7.yaml below): a selection, whose member pins the
@@ -548,7 +551,7 @@ members:
         <pre class="verbatim" xml:space="preserve">
 # the journal keeps an accepted copy of the account, mirrors the detailed
 # argument, and lists both in selections (issue-7.yaml, issue-7-details.yaml)
-osheaf accept https://authors.example.org/ kpz-account --version v2 --stage VoR \
+osheaf accept https://authors.example.org/ kpz-account --version v3 --stage VoR \
   --agreement &quot;the journal's publication terms&quot;
 osheaf mirror https://authors.example.org/ kpz-details
 osheaf collection sync issue-7 --from issue-7.yaml
@@ -719,10 +722,10 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           the report to someone else. Revealing the identifier and the secret
           (the referee, to claim the report; the journal, with the referee's
           agreement or as an institution may require) lets anyone check the
-          attribution by recomputing the digest. A referee who agrees to sign
-          the reports after acceptance is added to their creators, by name, by
-          description-only versions, with the identifier and the secret that
-          open the commitment.
+          attribution by recomputing the digest. A referee who agrees to be
+          named in the reports after acceptance is added to their creators, by
+          name, by description-only versions, with the identifier and the
+          secret that open the commitment.
         </p>
       </li>
       <li>
@@ -848,8 +851,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           deadline asks; the student's signature shows whose it is. Timestamps
           are optional; an institution may ask its students to declare them in
           their key logs. When the institution keeps a mirror of the work at
-          each submission (if the licence allows, or by agreement, #39), the
-          mirror is also its receipt.
+          each submission (if the licence allows; copying by agreement is
+          open, #39), the mirror is also its receipt.
         </p>
       </li>
       <li>
@@ -1025,8 +1028,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a referee agrees to be named</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the report's owner (the journal) adds the referee to its
           creators by a description-only version, which is followed</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the revision vetted is unchanged; the editors may vet the
-          signed version as a new revision</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the vetted revision keeps its pin; the version naming the
+          referee is not vetted, unless a new document version is</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">the member's archive moves</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the pin stays valid; readers follow redirects, the other
