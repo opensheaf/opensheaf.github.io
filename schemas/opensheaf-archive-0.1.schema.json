@@ -123,7 +123,25 @@
             "maxLength": 64,
             "$comment": "proposal (section 6.3): a readable label, not an identifier"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "owner"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "status": {
+                  "const": "active"
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "tombstones": {

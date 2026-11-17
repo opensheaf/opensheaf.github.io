@@ -132,10 +132,12 @@ copies may be found, and a version with the SHA-512 digest of its inventory
 (the "pin"), or, in a selection, its revisions. Since an inventory fixes all
 its files, the pin fixes the member completely, and a collection becomes a
 hash tree over everything it contains. If the member's archive moves or
-disappears, the member can be fetched from a mirror, from its DOI deposit or
-from a Software Heritage snapshot: any copy that matches the pin is the right
-one. A collection also keeps a cached citation of each member, so that it
-stays readable even if no copy is found.
+disappears, the member can be fetched from a mirror or any other copy: any
+copy that matches the pin is the right one. External copies, such as a DOI
+deposit or a Software Heritage snapshot, are a last resort: they keep the
+files but not the inventory, so they cannot be checked against the pin (#22).
+A collection also keeps a cached citation of each member, so that it stays
+readable even if no copy is found.
 
 ## Why both archives and collections?
 
@@ -223,21 +225,23 @@ Anyone can copy a genesis record, so the name alone cannot say whose history
 is the right one. That is why the owner is part of the identity: a copy
 continued by another owner is a <dfn>branch</dfn>, which declares the version
 it starts from, and an archive cannot pass its own changes off as another
-owner's, since it cannot sign for it. A branch is a new object: it keeps
-only the version it starts from, with the parent's inventory, `object.json`,
-signatures and the part of the parent owner's key log they need as evidence,
-and adds its own versions (a journal keeping the version it vetted, then its
+owner's, since it cannot sign for it. A branch is a new object: it keeps only
+the version it starts from, with the parent's inventory, `object.json`,
+signatures and the parent owner's key log (up to the latest version known) as
+evidence, and, for a branch of a branch, the evidence of its own parents, and
+adds its own versions (a journal keeping the version it vetted, then its
 corrections; a co-author carrying the work on). It cannot continue the
-parent's object, whose inventories record the parent's identifier. A
-co-author who wants the whole past at hand keeps a copy of the parent's line
-beside the branch, as a separate object; in git the files they share are
-stored once. An accepted copy is a branch kept by a selection's owner.
+parent's object, whose inventories record the parent's identifier. A co-author
+who wants the whole past at hand keeps a copy of the parent's line beside the
+branch, as a separate object; in git the files they share are stored once. An
+accepted copy is a branch kept by a selection's owner.
 
-A branch can be checked without its parent: the genesis record gives the
-name, the copied inventory gives the parent pin, the files match that
-inventory, the copied `object.json` says whose version it was, and the parent
-owner's signature, checked against the copied part of its key log, shows that
-the version is that owner's.
+A branch can be checked without its parent: the genesis record gives the name,
+the copied inventory gives the parent pin, the files match that inventory, the
+copied `object.json` says whose version it was, and the parent owner's
+signature, checked against the copied key log, shows that the version is that
+owner's; for a branch of a branch, the same holds for each parent in turn,
+back to the originator's line.
 
 ## Can documents be linked in richer ways (a short account and its proof)?
 
@@ -261,16 +265,18 @@ for each signature would mix evidence with changes of the work, and every
 upgrade of a timestamp proof (OpenTimestamps proofs are completed once their
 attestation is confirmed) would be another version.
 
-OCFL does not allow arbitrary files in an object folder; its `logs/` folder
-is meant for unstructured records of actions and is not covered by digests.
-The place OCFL provides for data that is not part of any version is the
-object's `extensions/` folder (the registered mutable-head extension keeps its
-data there). So OpenSheaf puts witnesses in
-`extensions/opensheaf-witnesses/`, where they travel with the object: the
-owner's signature of every version, required, and timestamps and others'
-signatures, optional. Witnesses need no
-digests of their own: each one is checked directly against the checksum file
-it names, which the pins fix.
+OCFL does not allow arbitrary files in an object folder; its `logs/` folder is
+meant for unstructured records of actions and is not covered by digests. The
+place OCFL provides for data that is not part of any version is the object's
+`extensions/` folder (the registered mutable-head extension keeps its data
+there). So OpenSheaf puts witnesses in `extensions/opensheaf-witnesses/`,
+where they travel with the object: the owner's signature of every version,
+required, and timestamps and others' signatures, optional. Timestamps can be
+RFC 3161 tokens from a time-stamping authority the owner chooses, or
+OpenTimestamps proofs, or both; an owner that wants them for every version, a
+journal for instance, declares it in its key log, and its versions without one
+are then invalid. Witnesses need no digests of their own: each one is checked
+directly against the checksum file it names, which the pins fix.
 
 ## Why is the HTML version not part of the deposit?
 

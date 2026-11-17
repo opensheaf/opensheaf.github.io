@@ -380,18 +380,22 @@ members:
           new object holding every file of that version except its <tt class="verbatim">datacite.json</tt>
           and <tt class="verbatim">object.json</tt>, byte for byte, with the evidence of
           the authors' version (their inventory, <tt class="verbatim">object.json</tt>,
-          signatures and the part of their key log those need, section 10.5).
-          It keeps the document version of the revision it copies (the
-          authors' version 3, say). Only the copied revision needs a licence
-          allowing redistribution; a paper whose first preprint was under a
-          restrictive licence can be accepted in a later, openly licensed
-          version. Later versions of the accepted copy (corrections, notices,
-          a withdrawal) are the editors' acts, signed by the journal; the
-          authors cannot change them. A correction the journal makes itself is
-          its own version 4 (provisionally: the numbering on branches is
-          open); when the editors later vet the authors' corrected version,
-          the copy moves its branch point to it, with the same evidence, as
-          the journal's next version.
+          signatures and key log up to the latest version known, and, if the
+          authors' version is itself a branch, the evidence of its own
+          parents; section 10.5). It keeps the document version of the
+          revision it copies (the authors' version 3, say). Only the copied
+          revision needs a licence allowing redistribution; a paper whose
+          first preprint was under a restrictive licence can be accepted in a
+          later, openly licensed version. Later versions of the accepted copy
+          (corrections, notices, a withdrawal) are the editors' acts, signed
+          by the journal; the authors cannot change them. A journal will
+          usually declare in its key log that every version it signs is
+          timestamped, by an RFC 3161 authority it trusts or by OpenTimestamps
+          (section 13.2), so that its record is dated. A correction the
+          journal makes itself is its own version 4 (provisionally: the
+          numbering on branches is open); when the editors later vet the
+          authors' corrected version, the copy moves its branch point to it,
+          with the same evidence, as the journal's next version.
         </p>
       </li>
     </ul>
@@ -639,13 +643,14 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       <li>
         <p>
           <strong>Priority without disclosure.</strong> The authors can
-          timestamp each object version with <a href="https://opentimestamps.org/">OpenTimestamps</a>
-          (section 13.2). The proof is made on the digest of the inventory,
-          which reveals nothing of the content, and later shows that exactly
-          these files existed at that date. The authors' signatures, which
-          every version carries (section 13.2), show who made them. Since a
-          line is the same wherever it is copied, the proof still holds when
-          the line is later made public.
+          timestamp the signature of each object version (section 13.2), with
+          an RFC 3161 time-stamping authority or with <a href="https://opentimestamps.org/">OpenTimestamps</a>,
+          or both. The signature file holds only digests, which reveal nothing
+          of the content, and the timestamp later shows that exactly these
+          files existed at that date. The authors' signatures, which every
+          version carries (section 13.2), show who made them. Since a line is
+          the same wherever it is copied, the proof still holds when the line
+          is later made public.
         </p>
       </li>
       <li>
@@ -832,16 +837,18 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           its owner, with keys of their own, signs every version, and takes
           the line along on leaving (section 6.5). Until the work is examined
           the archive is usually private (issue #29). Work in progress is a
-          draft (section 6.5), which may be rewritten; handing it in seals it,
-          and fixes it.
+          draft (section 6.5), which may be rewritten; handing it in seals it:
+          sealing makes a new, fixed object, the line, from the draft.
         </p>
       </li>
       <li>
         <p>
           <strong>Dates.</strong> A timestamp of each object version (section
           13.2) shows that this revision existed by that date, which is what a
-          deadline asks; the student's signature shows whose it is. When the
-          institution keeps a mirror of the work at each submission, the
+          deadline asks; the student's signature shows whose it is. Timestamps
+          are optional; an institution may ask its students to declare them in
+          their key logs. When the institution keeps a mirror of the work at
+          each submission (if the licence allows, or by agreement, #39), the
           mirror is also its receipt.
         </p>
       </li>
@@ -1007,7 +1014,7 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           report the member as removed</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the same for the pinned revisions; an accepted copy is a
           line of the selection's owner, to which the takedown is applied
-          separately</td>
+          separately; copies kept elsewhere are not reached (open, #33)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a document kept privately is made public</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">it can be a member once a copy of its line is public: the
@@ -1015,7 +1022,7 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the same; published reports keep pointing to the versions
           they reviewed</td>
         </tr><tr>
-          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a referee signs a report</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a referee agrees to be named</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the report's owner (the journal) adds the referee to its
           creators by a description-only version, which is followed</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the revision vetted is unchanged; the editors may vet the
@@ -1047,8 +1054,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a version's licence forbids redistribution</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the line cannot be mirrored, only referenced</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the revision cannot be copied, only referenced (unless
-          the authors grant the right)</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the revision cannot be copied, only referenced (copying
+          by agreement is open, #39)</td>
         </tr></tbody>
       </table>
     </p>

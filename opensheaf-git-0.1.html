@@ -141,9 +141,11 @@
           <dfn>Archive files</dfn>: the files the specification requires to be
           served byte for byte: the discovery document <tt class="verbatim">opensheaf.json</tt>,
           the storage root (by convention <tt class="verbatim">ocfl/</tt>) and, if used,
-          the indexes (<tt class="verbatim">indexes.json</tt> and the folders <tt class="verbatim">names/</tt>,
-          <tt class="verbatim">owners/</tt> and <tt class="verbatim">sha512/</tt>, section 6.6 of
-          the specification, proposal).
+          the indexes (the folders <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>
+          and <tt class="verbatim">sha512/</tt>, which an archive declares in its
+          discovery document, and <tt class="verbatim">indexes.json</tt>, only in a
+          repository that serves indexes for several archives, as a custodian
+          or a resolver does; section 6.6 of the specification).
         </p>
       </li>
       <li>
@@ -314,28 +316,28 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       storage root (<tt class="verbatim">&lt;owner&gt;/&lt;name&gt;</tt> in the
       owner-name layout, or the folders of the hash and the encoded identifier
       in the hashed layout, section 5 of the specification), with the folders
-      of the hash it needs, and the files of a complete OCFL object (a new
-      object, or the copy of an object of another archive); 2. a new version
-      folder <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt>, where <tt class="verbatim">v&lt;N-1&gt;</tt>
-      is the head of the object in C, with the replacement of the object's
-      root <tt class="verbatim">inventory.json</tt> and its checksum file by those of
-      the new version; 3. files added, replaced or removed in an object's <tt
-      class="verbatim">extensions/opensheaf-witnesses/</tt> folder; 4. the replacement
-      of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced or removed
-      among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
-      <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
-      at every deposit and takedown (section 6.6 of the specification,
-      proposal); 5. at the creation of the storage root, its own files (<tt
-      class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
-      configuration of the layout extension, and the loose files allowed by
-      section 5 of the specification); 6. the removal of an object folder,
-      with the folders of the hash it leaves empty, by a takedown (section 9);
-      7. the repair of a file whose bytes do not match the digest its
-      inventory records (section 5.3). 8. any change inside the folder of a
-      draft (section 6.5 of the specification; <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt>
-      in the owner-name layout), including its removal: drafts are the only
-      objects that may be rewritten or deleted, and are never copied out of
-      the archive.
+      above it that it needs (a new owner's folder, or folders of the hash),
+      and the files of a complete OCFL object (a new object, or the copy of an
+      object of another archive); 2. a new version folder <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt>,
+      where <tt class="verbatim">v&lt;N-1&gt;</tt> is the head of the object in C, with
+      the replacement of the object's root <tt class="verbatim">inventory.json</tt> and
+      its checksum file by those of the new version; 3. files added, replaced
+      or removed in an object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
+      folder; 4. the replacement of <tt class="verbatim">opensheaf.json</tt>, and files
+      added, replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
+      <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
+      which are rewritten at every deposit and takedown (section 6.6 of the
+      specification, proposal); 5. at the creation of the storage root, its
+      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
+      the configuration of the layout extension, and the loose files allowed
+      by section 5 of the specification); 6. the removal of an object folder,
+      with the folders above it that it leaves empty (an owner's folder, or
+      folders of the hash), by a takedown (section 9); 7. the repair of a file
+      whose bytes do not match the digest its inventory records (section 5.3).
+      8. any change inside the folder of a draft (section 6.5 of the
+      specification; <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt> in the owner-name
+      layout), including its removal: drafts are the only objects that may be
+      rewritten or deleted, and are never copied out of the archive.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -412,9 +414,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       may be rebuilt on them: a sealed version is signed by its owner, and is
       never rebuilt, on any branch, since a new version with other bytes would
       be a fork of its line (section 6.5 of the specification). Drafts, under
-      the reserved owner <tt class="verbatim">draft</tt>, may change until they are
-      sealed; private states of archives are discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue
-      #29</a>.
+      the reserved owner <tt class="verbatim">draft</tt>, may change freely; sealing
+      makes a new, fixed object from a draft; private states of archives are
+      discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.
     </p>
     <h3 id="auto-17"><a id="63-merging"></a>6.3 Merging<span style="margin-left: 1em"></span></h3>
     <p>
@@ -429,9 +431,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       <li>
         <p>
           <strong>Versions of the same object.</strong> If both add version
-          <tt class="verbatim">v&lt;N&gt;</tt> of the same object, the second to be
-          merged MUST be redone by the tool as <tt class="verbatim">v&lt;N+1&gt;</tt>,
-          with a new inventory; it MUST NOT be resolved by editing files.
+          <tt class="verbatim">v&lt;N&gt;</tt> of the same object, and neither is yet
+          signed (a draft, or a version still being prepared), the second to
+          be merged MUST be redone by the tool as <tt class="verbatim">v&lt;N+1&gt;</tt>,
+          with a new inventory; it MUST NOT be resolved by editing files. Two
+          signed versions <tt class="verbatim">v&lt;N&gt;</tt> of one line are a fork of
+          the line (section 6.5 of the specification), never redone by a
+          merge: one of them is withdrawn from the branch before it is
+          published.
         </p>
       </li>
       <li>
@@ -839,6 +846,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           an owner moves by copying its folder (section 11); drafts, at <tt
           class="verbatim">draft/&lt;id&gt;/</tt>, may be changed or removed by any
           commit (section 5.1).
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/identity</tt>
+          of the specification):** two signed versions with the same number
+          are a fork, never redone by a merge (section 6); owner folders
+          created and removed with their objects (section 5.1); <tt class="verbatim">indexes.json</tt>
+          only in repositories serving indexes for several archives; sealing
+          makes a new object from a draft.
         </p>
       </li>
     </ul>

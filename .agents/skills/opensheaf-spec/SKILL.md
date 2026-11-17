@@ -119,29 +119,48 @@ The model follows #55 and #52 (and their comments), and the audit fixes of
   gives `a` or `q`).
 - **Owner** (6.5, 7.5): a keyed identity (person, group, institution); an
   object of kind `owner`, named by its genesis record, which lists its
-  first `keys` and `threshold` (the **owner name**,
-  recorded in `originator`, `owner`, `parent.owner`, `sheaf:` URIs). Its
-  versions are its **key log**: `keys.json` (`keys`, Ed25519 `did:key`;
-  `threshold`; optional `revoked` and `keeper`); each version signed by
-  `threshold` keys of the one before; the first `keys.json` repeats the
-  genesis record's keys and threshold. No named owners, no owner
-  identifiers. One `threshold` governs both the key log and the owner's
-  lines (as in Radicle). The optional **keeper** link (ORCID iD, domain) is confirmed
-  by the keeper (ORCID record, `/.well-known/opensheaf`), never required.
+  first `keys` and `threshold` (the **owner name**, recorded in
+  `originator`, `owner`, `parent.owner`, `sheaf:` URIs); an owner object is
+  its own originator, always `active`, never withdrawn, branched or
+  mirrored apart from the lines it signs. Its versions are its **key log**:
+  `keys.json` (`format`, `keys` as Ed25519 `did:key`, `threshold` at most
+  the number of keys; optional `revoked`, never also in `keys`; `keeper`,
+  `https` URLs; `timestamps`, `keylog` or `all`); the first `keys.json`
+  repeats the genesis record's keys and threshold and is signed by them
+  (`keyLog` naming itself); vN+1 is signed by `threshold` keys of vN
+  (`keyLog` naming vN). One `threshold` governs the key log and the lines
+  (as in Radicle). The optional **keeper** link (ORCID iD, domain) is
+  confirmed by the keeper (ORCID record, `/.well-known/opensheaf`). No
+  named owners, no owner identifiers. Anonymous owners (16): an owner made
+  for the purpose, without `keeper`.
 - **Signing** (6.5, 13.2): every sealed version of a line is signed by its
-  owner, `threshold` keys of the key-log version named, each in
-  `extensions/opensheaf-witnesses/<v>/signature-<k>.json` (`<k>` from a
-  digest of the key; fields `object`, `version`, `inventorySha512`,
-  `signer`, `key`, `keyLog` as a pin `sheaf:<owner>/v<n>?sha512=...`,
+  owner: at least `threshold` valid signature files of the owner naming one
+  key-log version; other files (stray, other key-log versions, other
+  owners) are ignored and reported, never fatal. Files
+  `extensions/opensheaf-witnesses/<v>/signature-<k>.json` (`<k>` the first
+  16 base32 characters of the SHA-256 of the `did:key`; fields `object`,
+  `version`, `inventorySha512`, `signer` and the owner of `keyLog`, both the
+  line's owner, `key`, `keyLog` as a pin `sheaf:<owner>/v<n>?sha512=...`,
   `signature`), signing a defined five-line message binding object,
-  version, inventory and key-log version; all signatures of a version name
-  one key-log version, which MUST be the latest; an older one, or a key
-  revoked later, counts only with an earlier timestamp. Third parties:
-  `witness-<label>.json`.
+  version, inventory and key-log version. **Decision B**: a signature
+  naming an older key-log version counts without a timestamp while its key
+  is still in `keys` of the latest known version, not revoked, and the
+  threshold has not been raised; otherwise only with a timestamp earlier
+  than that of the key-log version that made the change (unconfirmed
+  otherwise); never for a key-log version under an older one. Third
+  parties: `witness-<label>.json`, another owner's `keyLog`.
+- **Timestamps** (13.2): optional, of two kinds, on the signature file:
+  RFC 3161 tokens (`signature-<k>.json.tsr`, DER `TimeStampResp`, SHA-512
+  imprint of the file, `openssl ts -verify`) and OpenTimestamps proofs
+  (`signature-<k>.json.ots`); an owner may use both. A policy in
+  `keys.json` (`timestamps`) makes versions it covers invalid without one.
+  **Decision A**: a fork of a key log is resolved by the earliest
+  timestamp of the first differing version when the owner declares a
+  policy, and otherwise reported, not resolved.
 - **Key logs travel with the objects they sign** (6.5): a copy keeps the
   signers' owner objects in its storage root, up to the latest key-log
-  version its maker knows; readers use the longest valid log; freshness
-  cannot be proved offline. A
+  version its maker knows; readers use the longest of copies that extend
+  one another, never across a fork; freshness cannot be proved offline. A
   line is its signed versions, wherever stored; an archive MUST NOT add to
   a line a version its owner did not sign. No signed list of an owner's
   lines exists (lines are linear).
@@ -151,17 +170,21 @@ The model follows #55 and #52 (and their comments), and the audit fixes of
   which owners they host (`owners` in the discovery document). An owner
   moving to another archive copies its key log and continues its lines (not
   a branch); a branch happens only when the owner changes.
-- **Identifiers and labels** (6.3, 5): an object's OCFL `id` is its first
+- **Identifiers and labels** (6.3, 5): an object's OCFL `id` is its
   line, `sheaf:<name>:<owner>`, for branches too (a draft is
   `sheaf:draft:<id>`, `<id>` a label of at most 64 characters, chosen
   locally, not reused while the draft exists); default layout
   `opensheaf-owner-name-storage-layout` (`<owner>/<name>/`, drafts in
   `draft/<id>/`; the key log at `<owner>/<owner>/`), or `0003` for large
-  archives. Readable `label`s in the discovery document, not permanent.
+  archives, where line identifiers (111 characters) are always shortened
+  to 100 encoded characters plus the digest; an identifier of neither form
+  is an error, and the owner-name layout has no configuration. Readable
+  `label`s in the discovery document, not permanent.
 - **Clashes** (6.5): one object per line in a storage root; sealing draws a
   new nonce if the owner's line is taken; a branch takes `parent.name`,
   moves its branch point onto the owner's own earlier branch of the same
-  parent line, or takes the smallest free algorithm number above the
+  parent line when the new branch point is later in the parent line's
+  history, or takes the smallest free algorithm number above the
   parent's (refused if none up to 15); lines stay taken after a takedown.
   No `sealed`: an archive accepts an object whose genesis record it
   holds only if it is signed by the record's originator (the same line) or
@@ -169,7 +192,9 @@ The model follows #55 and #52 (and their comments), and the audit fixes of
   originator's line (a branch), compared by the algorithm-0 name, also
   against tombstones' `genesisName`. A work
   is searched for under all 16 names, keeping byte-identical records and
-  lines whose signatures hold. Aliases open (#44).
+  lines whose signatures hold. A tool never reuses a nonce nor copies a
+  genesis record into anything but a copy or branch of its work. Aliases
+  open (#44).
 - **Draft and sealing** (6.5): drafts are a sandbox owner `draft`, at
   `draft/<id>/`: never signed, pinned or copied out of their archive, the
   only objects that may be rewritten or deleted, listed apart or not at
@@ -180,19 +205,26 @@ The model follows #55 and #52 (and their comments), and the audit fixes of
   declaring `parent` (`owner`, `name`, `objectVersion`, `documentVersion`,
   `inventorySha512`, `url`). No deep branches: a branch is a new object
   holding the branch point plus, as content, `parent.inventory.json`,
-  `parent.object.json`, `parent.signatures/` and `parent.keylog/`
-  (required), so its evidence is complete; the parent's history, if
+  `parent.object.json`, `parent.signatures/`, `parent.keylog/` (the
+  parent owner's key log up to the latest version known) and, for a branch
+  of a branch, `parent.chain/` (the parent's own evidence, nested one level
+  per generation, back to the originator's line; finite, depth may be
+  bounded), so its evidence is complete; the parent's history, if
   wanted, is a copy of the parent's line beside it (OCFL inventories fix
   their object's id). Branch points move only forward; accepted copies are
   branches of the selection's owner. Verdicts: inconsistent, unconfirmed, confirmed.
 - **`sheaf:` URIs** (6.6): `sheaf:<name>`, `sheaf:<name>:<owner>`,
   `sheaf:<name>:*`, `/v<n>`, `?sha512=` (a pin), `at=` (a hint),
-  `sheaf:<owner>` (a key log). Copies count only if signatures hold; a
-  resolver uses the latest head among valid copies; short forms of at least
-  8 characters (16 printed), ambiguous across owners.
+  `sheaf:<owner>` (a key log; `sha512` after its object version). Copies
+  count only if signatures hold; a resolver uses the latest head among
+  valid copies, and keeps looking past a tombstone (hosts can add unsigned
+  ones), reporting both; short forms of at least 8 characters (16
+  printed), ambiguous across owners. **Resolvers** are a conformance
+  class (4).
 - **Indexes** (6.6): `names/`, `owners/`, `sha512/` with prefixes of 2 to 4
-  characters (entries name `owner`, `id`, `label`, no `ownerId`,
-  `archiveId`); maps, never witnesses. **Gateways**: domain open (#35);
+  characters (`names/` entries carry `name`, `originator` (for an owner
+  object, its own name), `owner`, `id`, `label`, `genesis` (the exact
+  text of `genesis.json`), `status`; no `ownerId`, `archiveId`); maps, never witnesses. **Gateways**: domain open (#35);
   registering `sheaf` is #36; the format's name, and so the gateway and
   the `opensheaf-` strings, may change.
 - **Open questions**: listed at the end of section 6.5; do not settle them
@@ -285,7 +317,8 @@ other way round.
   processes and anonymous referees, #33 takedowns and copies, #34 mirrors
   and licences, #37 and #38 resolution and pins through mirrors, #35 a
   gateway for `sheaf:` URIs, #36 registering `sheaf` with IANA, #42 an
-  inconsistency in the appendix E examples, #44 name collisions and
+  inconsistency in the appendix E examples (fixed on this branch), #53
+  several owners of a line (closed: thresholds in key logs), #44 name collisions and
   aliases, #52 archives as hosts, #54 custody policies, #55 owners as
   keyed identities. PR #30 holds the identity proposal (with #56 merged
   into it). Read the relevant issue before touching its topic.

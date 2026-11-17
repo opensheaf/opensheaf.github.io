@@ -31,7 +31,7 @@ The principle: git is a store and a transport for the files of the archive. The 
 The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL are to be interpreted as described in BCP 14 (RFC 2119, RFC 8174) when, and only when, they appear in all capitals. Terms of the specification (archive, storage root, discovery document, object, object version, pin, mirror, witness, takedown, tombstone) keep their meaning.
 
 - <dfn>Repository</dfn>: a git repository holding one archive.
-- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, the indexes (`indexes.json` and the folders `names/`, `owners/` and `sha512/`, section 6.6 of the specification, proposal).
+- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, the indexes (the folders `names/`, `owners/` and `sha512/`, which an archive declares in its discovery document, and `indexes.json`, only in a repository that serves indexes for several archives, as a custodian or a resolver does; section 6.6 of the specification).
 - <dfn>Presentation files</dfn>: the website of the archive (appendix C of the specification), generated from the archive files.
 - <dfn>Working files</dfn>: every other file of the repository: settings of tools, descriptions of deposits, sources being prepared, scripts, workflows.
 - <dfn>Published branch</dfn>: the branch from which the archive is served (usually `main`). A <dfn>published commit</dfn> is a commit of its first-parent history.
@@ -93,12 +93,12 @@ Git keeps neither empty folders nor modification times, and records of file mode
 
 Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
 
-1. a new object folder `ocfl/<path>/`, where `<path>` is the object's path in the layout of the storage root (`<owner>/<name>` in the owner-name layout, or the folders of the hash and the encoded identifier in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive);
+1. a new object folder `ocfl/<path>/`, where `<path>` is the object's path in the layout of the storage root (`<owner>/<name>` in the owner-name layout, or the folders of the hash and the encoded identifier in the hashed layout, section 5 of the specification), with the folders above it that it needs (a new owner's folder, or folders of the hash), and the files of a complete OCFL object (a new object, or the copy of an object of another archive);
 2. a new version folder `ocfl/<path>/v<N>/`, where `v<N-1>` is the head of the object in C, with the replacement of the object's root `inventory.json` and its checksum file by those of the new version;
 3. files added, replaced or removed in an object's `extensions/opensheaf-witnesses/` folder;
 4. the replacement of `opensheaf.json`, and files added, replaced or removed among the indexes (`indexes.json`, `names/`, `owners/`, `sha512/`), which are rewritten at every deposit and takedown (section 6.6 of the specification, proposal);
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
-6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9);
+6. the removal of an object folder, with the folders above it that it leaves empty (an owner's folder, or folders of the hash), by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
 8. any change inside the folder of a draft (section 6.5 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
 
@@ -130,7 +130,7 @@ Commits and tags MAY be signed. They are witnesses of who published a state of t
 
 ### 6.2 Working branches
 
-Git branches other than the published branch are <dfn>working branches</dfn>: working space, not branches of an object (section 10.5 of the specification, proposal). They MAY be rewritten, but only drafts may be rebuilt on them: a sealed version is signed by its owner, and is never rebuilt, on any branch, since a new version with other bytes would be a fork of its line (section 6.5 of the specification). Drafts, under the reserved owner `draft`, may change until they are sealed; private states of archives are discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).
+Git branches other than the published branch are <dfn>working branches</dfn>: working space, not branches of an object (section 10.5 of the specification, proposal). They MAY be rewritten, but only drafts may be rebuilt on them: a sealed version is signed by its owner, and is never rebuilt, on any branch, since a new version with other bytes would be a fork of its line (section 6.5 of the specification). Drafts, under the reserved owner `draft`, may change freely; sealing makes a new, fixed object from a draft; private states of archives are discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).
 
 ### 6.3 Merging
 
@@ -138,7 +138,7 @@ A deposit prepared on a branch is published by merging the branch into the publi
 
 Two branches may conflict:
 
-- **Versions of the same object.** If both add version `v<N>` of the same object, the second to be merged MUST be redone by the tool as `v<N+1>`, with a new inventory; it MUST NOT be resolved by editing files.
+- **Versions of the same object.** If both add version `v<N>` of the same object, and neither is yet signed (a draft, or a version still being prepared), the second to be merged MUST be redone by the tool as `v<N+1>`, with a new inventory; it MUST NOT be resolved by editing files. Two signed versions `v<N>` of one line are a fork of the line (section 6.5 of the specification), never redone by a merge: one of them is withdrawn from the branch before it is published.
 - **The discovery document and the main collection.** Branches that add versions to different objects both change `opensheaf.json`, and usually the main collection. A merge of these files as text can produce a discovery document that parses but no longer matches the storage root, or a collection version holding the members of only one branch. The `-merge` attribute (section 4.1) makes every such change a conflict; the tool resolves it by writing the discovery document again from the storage root, and by making a new version of the collection, never by combining texts.
 
 A deposit MAY be proposed by a pull request (or merge request) and published by the keeper of the archive when it is merged. The object version is then created (its `created` date in the inventory) before it is published. (When a version becomes public, and how this is recorded, is discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
@@ -253,3 +253,4 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 - **0.1 (draft), 16 November 2026, revision:** the hashed storage layout of the specification: the append-only rules (section 5.1) and the takedown (section 9) use the object's path in the layout, with the folders of the hash; large archives in git should use the hashed layout (section 8).
 - **0.1 (draft), 16 November 2026, proposal (branch `proposal/identity` of the specification):** the indexes of the identity proposal (`indexes.json`, `names/`, `owners/`, `sha512/`) are archive files: stored byte for byte (section 4.1), rewritten at every deposit and takedown (sections 5.1 and 9); git branches other than the published branch are called working branches (section 6.2), not drafts, which the proposal defines as objects without a genesis record, and a sealed version is not rebuilt once shared.
 - **0.1 (draft), 17 November 2026, proposal (branch `proposal/owners` of the specification):** copies of lines carry the key logs of their signers, witnesses are kept only in objects' extension folders, and an owner moves by copying its folder (section 11); drafts, at `draft/<id>/`, may be changed or removed by any commit (section 5.1).
+- **0.1 (draft), 17 November 2026, proposal (branch `proposal/identity` of the specification):** two signed versions with the same number are a fork, never redone by a merge (section 6); owner folders created and removed with their objects (section 5.1); `indexes.json` only in repositories serving indexes for several archives; sealing makes a new object from a draft.

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json",
   "title": "OpenSheaf key log version (keys.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branch proposal/owners; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys is checked by verifiers.",
+  "$comment": "Proposal (section 6.5 of the specification, branch proposal/owners; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys is checked by verifiers. That revoked keys are not in keys is checked by verifiers.",
   "type": "object",
   "required": [
     "format",
@@ -41,6 +41,13 @@
         "pattern": "^https://"
       },
       "$comment": "optional: who answers for the owner (an ORCID iD, a web address, a domain)"
+    },
+    "timestamps": {
+      "enum": [
+        "keylog",
+        "all"
+      ],
+      "$comment": "proposal (sections 6.5, 13.2): the owner's timestamp policy"
     }
   },
   "$defs": {

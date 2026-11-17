@@ -170,8 +170,10 @@
       Since an inventory fixes all its files, the pin fixes the member
       completely, and a collection becomes a hash tree over everything it
       contains. If the member's archive moves or disappears, the member can be
-      fetched from a mirror, from its DOI deposit or from a Software Heritage
-      snapshot: any copy that matches the pin is the right one. A collection
+      fetched from a mirror or any other copy: any copy that matches the pin
+      is the right one. External copies, such as a DOI deposit or a Software
+      Heritage snapshot, are a last resort: they keep the files but not the
+      inventory, so they cannot be checked against the pin (#22). A collection
       also keeps a cached citation of each member, so that it stays readable
       even if no copy is found.
     </p>
@@ -273,21 +275,23 @@
       the version it starts from, and an archive cannot pass its own changes
       off as another owner's, since it cannot sign for it. A branch is a new
       object: it keeps only the version it starts from, with the parent's
-      inventory, <tt class="verbatim">object.json</tt>, signatures and the part of the
-      parent owner's key log they need as evidence, and adds its own versions
-      (a journal keeping the version it vetted, then its corrections; a
-      co-author carrying the work on). It cannot continue the parent's object,
-      whose inventories record the parent's identifier. A co-author who wants
-      the whole past at hand keeps a copy of the parent's line beside the
-      branch, as a separate object; in git the files they share are stored
-      once. An accepted copy is a branch kept by a selection's owner.
+      inventory, <tt class="verbatim">object.json</tt>, signatures and the parent
+      owner's key log (up to the latest version known) as evidence, and, for a
+      branch of a branch, the evidence of its own parents, and adds its own
+      versions (a journal keeping the version it vetted, then its corrections;
+      a co-author carrying the work on). It cannot continue the parent's
+      object, whose inventories record the parent's identifier. A co-author
+      who wants the whole past at hand keeps a copy of the parent's line
+      beside the branch, as a separate object; in git the files they share are
+      stored once. An accepted copy is a branch kept by a selection's owner.
     </p>
     <p>
       A branch can be checked without its parent: the genesis record gives the
       name, the copied inventory gives the parent pin, the files match that
       inventory, the copied <tt class="verbatim">object.json</tt> says whose version it
-      was, and the parent owner's signature, checked against the copied part
-      of its key log, shows that the version is that owner's.
+      was, and the parent owner's signature, checked against the copied key
+      log, shows that the version is that owner's; for a branch of a branch,
+      the same holds for each parent in turn, back to the originator's line.
     </p>
     <h2 id="auto-19"><a id="can-documents-be-linked-in-richer-ways-a-short-account-and-its-proof"></a>Can documents be linked in richer ways (a short account
     and its proof)?<span style="margin-left: 1em"></span></h2>
@@ -322,9 +326,13 @@
       registered mutable-head extension keeps its data there). So OpenSheaf
       puts witnesses in <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, where
       they travel with the object: the owner's signature of every version,
-      required, and timestamps and others' signatures, optional. Witnesses
-      need no digests of their own: each one is checked directly against the
-      checksum file it names, which the pins fix.
+      required, and timestamps and others' signatures, optional. Timestamps
+      can be RFC 3161 tokens from a time-stamping authority the owner chooses,
+      or OpenTimestamps proofs, or both; an owner that wants them for every
+      version, a journal for instance, declares it in its key log, and its
+      versions without one are then invalid. Witnesses need no digests of
+      their own: each one is checked directly against the checksum file it
+      names, which the pins fix.
     </p>
     <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>

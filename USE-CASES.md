@@ -246,22 +246,25 @@ particular version of each paper.
   reviewed. A correction accepted by the editors adds a revision to the set,
   as a new version of the issue, recorded in its inventory as the editors'
   act.
-- To make sure what it vetted stays available, the journal keeps an
-  **accepted copy** of each vetted revision: a branch of the paper, owned by
-  the journal (an owner with keys of its own), a new object holding every
-  file of that version except its `datacite.json` and `object.json`, byte
-  for byte, with the evidence of the
-  authors' version (their inventory, `object.json`, signatures and the part
-  of their key log those need, section 10.5). It keeps the document version
-  of the revision it copies (the authors' version 3, say). Only the copied
-  revision needs a licence allowing redistribution; a paper whose first
-  preprint was under a restrictive licence can be accepted in a later,
-  openly licensed version. Later versions of the accepted copy (corrections,
-  notices, a withdrawal) are the editors' acts, signed by the journal; the
-  authors cannot change them. A correction the journal makes itself is its
-  own version 4 (provisionally: the numbering on branches is open); when the
-  editors later vet the authors' corrected version, the copy moves its
-  branch point to it, with the same evidence, as the journal's next version.
+- To make sure what it vetted stays available, the journal keeps an **accepted
+  copy** of each vetted revision: a branch of the paper, owned by the journal
+  (an owner with keys of its own), a new object holding every file of that
+  version except its `datacite.json` and `object.json`, byte for byte, with
+  the evidence of the authors' version (their inventory, `object.json`,
+  signatures and key log up to the latest version known, and, if the authors'
+  version is itself a branch, the evidence of its own parents; section 10.5).
+  It keeps the document version of the revision it copies (the authors'
+  version 3, say). Only the copied revision needs a licence allowing
+  redistribution; a paper whose first preprint was under a restrictive licence
+  can be accepted in a later, openly licensed version. Later versions of the
+  accepted copy (corrections, notices, a withdrawal) are the editors' acts,
+  signed by the journal; the authors cannot change them. A journal will
+  usually declare in its key log that every version it signs is timestamped,
+  by an RFC 3161 authority it trusts or by OpenTimestamps (section 13.2), so
+  that its record is dated. A correction the journal makes itself is its own
+  version 4 (provisionally: the numbering on branches is open); when the
+  editors later vet the authors' corrected version, the copy moves its branch
+  point to it, with the same evidence, as the journal's next version.
 
 ```sh
 # keep an accepted copy of the version the editors vetted; --version names
@@ -440,11 +443,12 @@ together with as much of the review as the participants agree to make public
   archive](#a-researchers-own-archive), while a version deposited privately
   becomes public only later; #29 proposes to leave it out and add it, by a
   description-only version, when the version is made public.
-- **Priority without disclosure.** The authors can timestamp each object
-  version with [OpenTimestamps](https://opentimestamps.org/) (section 13.2).
-  The proof is made on the digest of the inventory, which reveals nothing of
-  the content, and later shows that exactly these files existed at that
-  date. The authors' signatures, which every version carries (section
+- **Priority without disclosure.** The authors can timestamp the signature
+  of each object version (section 13.2), with an RFC 3161 time-stamping
+  authority or with [OpenTimestamps](https://opentimestamps.org/), or both.
+  The signature file holds only digests, which reveal nothing of the
+  content, and the timestamp later shows that exactly these files existed
+  at that date. The authors' signatures, which every version carries (section
   13.2), show who made them. Since a line is the same wherever it is copied,
   the proof still holds when the line is later made public.
 - **The submission.** The authors send the journal their line (a copy, with
@@ -556,12 +560,14 @@ was done, not only of what was handed in.
   their own, signs every version, and takes the line along on leaving
   (section 6.5). Until the work is examined the archive is usually private
   (issue #29). Work in progress is a draft (section 6.5), which may be
-  rewritten; handing it in seals it, and fixes it.
+  rewritten; handing it in seals it: sealing makes a new, fixed object, the
+  line, from the draft.
 - **Dates.** A timestamp of each object version (section 13.2) shows that
   this revision existed by that date, which is what a deadline asks; the
-  student's signature shows whose it is. When the
-  institution keeps a mirror of the work at each submission, the mirror is
-  also its receipt.
+  student's signature shows whose it is. Timestamps are optional; an
+  institution may ask its students to declare them in their key logs. When
+  the institution keeps a mirror of the work at each submission (if the
+  licence allows, or by agreement, #39), the mirror is also its receipt.
 - **Comments.** The supervisors' comments are documents (`Text`, with a
   `resourceType` such as "Supervisor's comments"), each with `Reviews`
   pointing to the exact object version commented on: a short text, an
@@ -640,11 +646,11 @@ copies.
 | the authors add a notice or a description | it is followed, like any new version | not vetted; presentations may show it, saying where it comes from |
 | the authors withdraw the document | it is followed: the withdrawn document stays, with its notice | the vetted revisions stay, and presentations show the authors' withdrawal notice with the document (section 11.1); the curator decides what else (a notice of its own, a withdrawal of its accepted copy) |
 | the editors correct a vetted version | not applicable | a new revision in the set, or a new version of the accepted copy: the editors' act, in the selection's history |
-| a document is taken down (by law, or to erase personal data, section 16) | the object is deleted and a tombstone stays; verifiers report the member as removed | the same for the pinned revisions; an accepted copy is a line of the selection's owner, to which the takedown is applied separately |
+| a document is taken down (by law, or to erase personal data, section 16) | the object is deleted and a tombstone stays; verifiers report the member as removed | the same for the pinned revisions; an accepted copy is a line of the selection's owner, to which the takedown is applied separately; copies kept elsewhere are not reached (open, #33) |
 | a document kept privately is made public | it can be a member once a copy of its line is public: the same line, so earlier pins stay valid (issue #29) | the same; published reports keep pointing to the versions they reviewed |
-| a referee signs a report | the report's owner (the journal) adds the referee to its creators by a description-only version, which is followed | the revision vetted is unchanged; the editors may vet the signed version as a new revision |
+| a referee agrees to be named | the report's owner (the journal) adds the referee to its creators by a description-only version, which is followed | the revision vetted is unchanged; the editors may vet the signed version as a new revision |
 | the member's archive moves | the pin stays valid; readers follow redirects, the other locations listed in member entries (`at`), or indexes | the same |
 | the member's owner moves to another archive | the line continues there, as the same line; the collection finds it through `at`, once updated, or through indexes | the same; vetted revisions are unchanged |
 | another archive adds a version to a member's line | it is not the owner's: its signature does not hold, so verifiers reject it, and the collection does not follow it | the same |
 | the member's archive disappears | members are fetched from mirrors, or any copy matching the pin; Zenodo deposits keep the files but cannot be checked against the pin | the accepted copy keeps the vetted revision; references keep their cached citations |
-| a version's licence forbids redistribution | the line cannot be mirrored, only referenced | the revision cannot be copied, only referenced (unless the authors grant the right) |
+| a version's licence forbids redistribution | the line cannot be mirrored, only referenced | the revision cannot be copied, only referenced (copying by agreement is open, #39) |
