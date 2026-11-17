@@ -208,14 +208,18 @@
       </li>
       <li>
         <p>
-          <dfn>Draft</dfn>: an object without a genesis record, not yet
-          sealed; no pin may name its versions (section 6.5).
+          <dfn>Draft</dfn>: an object of the reserved owner <tt class="verbatim">draft</tt>,
+          kept by one archive at <tt class="verbatim">draft/&lt;id&gt;/</tt>: never
+          signed, pinned or copied out of its archive, and the only object
+          that MAY be rewritten or deleted; sealing it makes a new object, the
+          first version of a line (section 6.5).
         </p>
       </li>
       <li>
         <p>
-          <dfn>Sealing</dfn>: the object version that adds the genesis record,
-          made at the owner's request before a version first leaves the
+          <dfn>Sealing</dfn>: making the first version of a line from a work:
+          a new object holding the genesis record and the work, signed by its
+          owner, made at the owner's request before the work first leaves the
           owner's hands (section 6.5).
         </p>
       </li>
@@ -531,20 +535,20 @@
       registered with OCFL, so validators may warn about it. It places the
       object whose identifier is <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>
       (section 6.3) at <tt class="verbatim">&lt;storage root
-      URL&gt;&lt;owner&gt;/&lt;name&gt;/</tt>, and an object with any other
-      identifier (a draft, section 6.3) at <tt class="verbatim">&lt;storage root
-      URL&gt;drafts/&lt;id&gt;/</tt>. An owner object, whose line is <tt
+      URL&gt;&lt;owner&gt;/&lt;name&gt;/</tt>, and a draft, whose identifier
+      is <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt> (section 6.3), at <tt class="verbatim">&lt;storage
+      root URL&gt;draft/&lt;id&gt;/</tt>. An owner object, whose line is <tt
       class="verbatim">sheaf:&lt;owner&gt;:&lt;owner&gt;</tt>, is thus at <tt class="verbatim">&lt;owner&gt;/&lt;owner&gt;/</tt>,
       so that the folder of an owner holds its key log and every line of that
       owner in the archive, and an owner moving to another archive (section
       6.5) copies one folder. It has no parameters; <tt class="verbatim">ocfl_layout.json</tt>
       names it with a <tt class="verbatim">description</tt> (<tt class="verbatim">&quot;Lines at
-      &lt;owner&gt;/&lt;name&gt;, drafts at drafts/&lt;id&gt;&quot;</tt>).
+      &lt;owner&gt;/&lt;name&gt;, drafts at draft/&lt;id&gt;&quot;</tt>).
     </p>
     <p>
       Because OCFL allows inside a storage root only the folders that hold
       objects (the objects themselves and the folders above them that the
-      layout gives: the folders of owners and <tt class="verbatim">drafts/</tt>, or the
+      layout gives: the folders of owners and <tt class="verbatim">draft/</tt>, or the
       folders of the hash) and extensions, the storage root SHOULD be a
       dedicated folder (by convention <tt class="verbatim">ocfl/</tt>), and presentation
       files MUST NOT be placed inside it.
@@ -608,9 +612,9 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">objects</tt>: the list of all objects in the storage
-          root, each with <tt class="verbatim">id</tt> (its identifier, section 6.3),
-          <tt class="verbatim">kind</tt>, <tt class="verbatim">head</tt> (the head object
+          <tt class="verbatim">objects</tt>: the list of all objects in the storage root
+          except drafts, each with <tt class="verbatim">id</tt> (its identifier, section
+          6.3), <tt class="verbatim">kind</tt>, <tt class="verbatim">head</tt> (the head object
           version), <tt class="verbatim">inventorySha512</tt> (the SHA-512 digest of the
           head inventory, as written in its checksum file) and <tt class="verbatim">status</tt>
           (<tt class="verbatim">active</tt> or <tt class="verbatim">withdrawn</tt>, section 11);
@@ -627,12 +631,14 @@
       class="verbatim">mainCollection</tt> (the identifier of the collection that lists
       the archive's documents), <tt class="verbatim">contact</tt> (a URI) and, if its
       objects use extensions, <tt class="verbatim">extensions</tt> (their names, section
-      4). It MAY contain <tt class="verbatim">owners</tt> (the owner names of the owners
-      it hosts, section 6.5), <tt class="verbatim">mirrors</tt> (base URLs of complete
-      copies of the archive), <tt class="verbatim">tombstones</tt> (section 11.3), <tt
-      class="verbatim">indexes</tt> (the indexes kept, each with the length of its
-      prefix, section 6.6) and <tt class="verbatim">feed</tt> (the URL of an Atom feed
-      of new object versions).
+      4). It MAY contain <tt class="verbatim">drafts</tt> (drafts it chooses to show as
+      unfinished work, each with <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt> and
+      <tt class="verbatim">head</tt>, on which nothing may rely, section 6.5; or none),
+      <tt class="verbatim">owners</tt> (the owner names of the owners it hosts, section
+      6.5), <tt class="verbatim">mirrors</tt> (base URLs of complete copies of the
+      archive), <tt class="verbatim">tombstones</tt> (section 11.3), <tt class="verbatim">indexes</tt>
+      (the indexes kept, each with the length of its prefix, section 6.6) and
+      <tt class="verbatim">feed</tt> (the URL of an Atom feed of new object versions).
     </p>
     <p>
       The discovery document is mutable: it is rewritten whenever an object is
@@ -667,8 +673,8 @@
     <p>
       The identifier of an object (its OCFL <tt class="verbatim">id</tt>) is its first
       line, written as a <tt class="verbatim">sheaf:</tt> URI with its owner part: <tt
-      class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>, the name and owner of the
-      first sealed version of the object (section 6.5). For every sealed
+      class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>, the name and owner that
+      its <tt class="verbatim">object.json</tt> records (section 6.5). For every sealed
       object (an originator's line, a branch, an owner object) this is the
       line itself: a branch is a new object, never a continuation of the
       parent's (section 10.5). Two objects of different lines never have the
@@ -679,11 +685,15 @@
       given by its <tt class="verbatim">object.json</tt>, never by its identifier.
     </p>
     <p>
-      A draft kept in an archive (section 6.5) has no line yet; its identifier
+      A draft (section 6.5) belongs to the reserved owner <tt class="verbatim">draft</tt>,
+      which is never a name or an owner name (those have 52 characters): its
+      identifier is <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>, where <tt class="verbatim">&lt;id&gt;</tt>
       is chosen by the archive, MUST match <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>
-      and MUST be at most 64 characters long, and the object keeps it after it
-      is sealed, since OCFL identifiers cannot change (whether sealing should
-      instead start a new object, named by its line, is open, section 6.5).
+      and MUST be at most 64 characters long, and is unique among the
+      archive's drafts. It is a local identifier, never resolved and never
+      written in a <tt class="verbatim">sheaf:</tt> URI outside the archive (the exact
+      form is provisional, #29). A draft never becomes a line: sealing makes a
+      new object (section 6.5).
     </p>
     <p>
       <strong>Labels.</strong> An archive MAY give each line it holds a label,
@@ -703,8 +713,9 @@
     <ul>
       <li>
         <p>
-          reads the discovery document at a location of the member (its <tt
-          class="verbatim">archiveUrl</tt>, section 10.2) and fetches <tt class="verbatim">&lt;storageRoot&gt;&lt;path&gt;/&lt;version&gt;/inventory.json</tt>,
+          reads the discovery document at a location of the member (one of its
+          <tt class="verbatim">at</tt>, section 10.2; all are equal, and a client tries
+          them in any order) and fetches <tt class="verbatim">&lt;storageRoot&gt;&lt;path&gt;/&lt;version&gt;/inventory.json</tt>,
           where <tt class="verbatim">&lt;path&gt;</tt> is the path of the member's
           object, <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt> (section
           6.3), given by the <tt class="verbatim">storageLayout</tt> of that discovery
@@ -715,10 +726,10 @@
       </li>
       <li>
         <p>
-          if this fails, tries the mirrors listed in the member, then those
-          listed in that archive's discovery document, each resolved through
-          its own discovery document and layout, then MAY look the line up in
-          indexes and resolvers (section 6.6);
+          if this fails at every location of <tt class="verbatim">at</tt>, tries the
+          mirrors listed in those archives' discovery documents, each resolved
+          through its own discovery document and layout, then MAY look the
+          line up in indexes and resolvers (section 6.6);
         </p>
       </li>
       <li>
@@ -875,7 +886,12 @@
       date, in the key log's inventory, of the first version that revokes it,
       since anyone holding a stolen key can name an old version. Two different
       versions of a key log with the same number are a fork of the owner,
-      reported as any fork.
+      reported as any fork. One <tt class="verbatim">threshold</tt> governs both the key
+      log and every line of the owner, as in Radicle, where the threshold of
+      an identity document also decides its canonical branch: a person uses a
+      threshold of 1 with a spare key; a group raises it, and then also
+      governs together what it publishes. A second threshold, for lines alone,
+      can be added later if needed.
     </p>
     <p>
       <strong>Key logs travel with the objects they sign.</strong> A copy of
@@ -912,16 +928,19 @@
       (section 6.6).
     </p>
     <p>
-      <strong>Drafts.</strong> A draft has no owner and no genesis record yet;
-      it receives both when it is sealed, and is not signed before. The
-      absence of a genesis record is what marks a draft: it is part of the
-      content, so it travels with every copy, and no other mark is needed. An
-      object version without a genesis record MUST NOT be named by a pin (in a
-      collection, or as a parent). Drafts are usually kept by their owners,
-      outside archives; a draft kept in an archive is served only to its
-      owner, or listed in a public discovery document as work not yet shared,
-      on which nothing may rely (#29). Whether a draft may be rewritten before
-      sealing is open (below).
+      <strong>Drafts.</strong> A draft is a sandbox: an object of the reserved
+      owner <tt class="verbatim">draft</tt>, kept by one archive at <tt class="verbatim">draft/&lt;id&gt;/</tt>
+      (sections 5 and 6.3), in the same format as any object (OCFL versions,
+      <tt class="verbatim">object.json</tt>, <tt class="verbatim">datacite.json</tt>) but without
+      a genesis record. It is never signed and never pinned, and it is never
+      copied out of its archive: mirrors, custodians, collections, indexes and
+      <tt class="verbatim">sheaf:</tt> URIs never take drafts. It is the only object
+      that MAY be rewritten or deleted: the rule that versions are fixed, and
+      the tombstones of section 11.3, do not apply to it. The discovery
+      document MAY list drafts apart, as unfinished work on which nothing may
+      rely, or not at all (section 6.1, #29). The format says nothing about
+      where a draft's content came from: a tool may read any object and
+      recreate its files in a draft, as far as their licences allow.
     </p>
     <p>
       <strong>One writer per line.</strong> The object versions of a line form
@@ -969,22 +988,19 @@
       declares none is not a valid line of the name.
     </p>
     <p>
-      <strong>Sealing and transfer.</strong> The object version that seals a
-      draft adds the genesis record, makes its owner the first writer, and is
-      the first version that owner signs. The owner seals an object before
-      first sharing or publishing a version of it, and tools SHOULD seal only
-      at the owner's request, not as a side effect. A draft cannot be pinned:
-      a catalogue that follows it (section 10.2) pins it only once it is
-      sealed. Versions made before sealing stay in the object's history, fixed
-      by every later pin like any earlier version, but belong to no line and
-      cannot be named by a pin or vetted (whether sealing may instead rewrite
-      them is open, below). A line is not handed over: when another owner
-      continues the work (an author leaving an institution, when the line is
-      the institution's; a journal handing a report to its referee), the new
-      owner makes a branch (section 10.5), and MAY keep a copy of the previous
-      owner's line beside it, and the previous owner MAY add a notice to its
-      own line pointing to the branch. An owner taking its own lines elsewhere
-      moves (above), which is not a hand-over.
+      <strong>Sealing and transfer.</strong> Sealing makes a new object: the
+      line <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>, at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>,
+      whose first version holds the genesis record and the work, signed by its
+      owner. The versions of a draft it was made from are not part of the
+      line, and nothing in the line refers to them. The owner seals a work
+      before first sharing or publishing it, and tools SHOULD seal only at the
+      owner's request, not as a side effect. A line is not handed over: when
+      another owner continues the work (an author leaving an institution, when
+      the line is the institution's; a journal handing a report to its
+      referee), the new owner makes a branch (section 10.5), and MAY keep a
+      copy of the previous owner's line beside it, and the previous owner MAY
+      add a notice to its own line pointing to the branch. An owner taking its
+      own lines elsewhere moves (above), which is not a hand-over.
     </p>
     <p>
       <strong>Clashes.</strong> A name is used to refer to objects, so the
@@ -1052,21 +1068,22 @@
       algorithm 0.
     </p>
     <p>
-      <strong>Refusals.</strong> One genesis record names one work. Every line
-      records, in <tt class="verbatim">sealed</tt> of its <tt class="verbatim">object.json</tt>
-      (section 9), the version that sealed the work: the <tt class="verbatim">objectVersion</tt>
-      and <tt class="verbatim">inventorySha512</tt> of the originator's sealing version,
-      which every branch copies unchanged from its parent. When an object is
-      created or deposited, an archive refuses an object whose genesis record
-      is that of an object it holds, or one of whose 16 names is the name of a
-      tombstone it holds (section 11.3), but whose <tt class="verbatim">sealed</tt>
-      differs from that object's or tombstone's (a genesis record reused for
-      another work: its owner seals the other work anew). A tool MUST NOT copy
-      a genesis record into an object that is not a copy or a branch of the
-      work it was written for, nor reuse a nonce. What an archive cannot see
-      (a clash with a line kept elsewhere) is found by resolvers: the search
-      for a work groups lines by <tt class="verbatim">sealed</tt> and lists different
-      groups as different works (section 6.6).
+      <strong>Refusals.</strong> One genesis record names one work and its
+      originator. The first version of the originator's line MUST be signed by
+      the originator named in the genesis record, and every other line of the
+      record is a branch, whose evidence is signed by its parent's owner
+      (section 10.5). Someone who reuses a genesis record for another work
+      therefore cannot make a valid line of it: the originator's signature
+      cannot be made by anyone else, and a branch needs a parent signed by its
+      owner. Only the originator can reuse its own record, and a second
+      history it signs under it is a fork of its line, detected and
+      attributable to it. When an object is created or deposited, an archive
+      that holds an object (or a tombstone) with the same genesis record
+      accepts it only if it is signed by the genesis record's originator (the
+      same line) or carries parent evidence signed by its parent's owner (a
+      branch), and otherwise refuses it. A tool MUST NOT copy a genesis record
+      into an object that is not a copy or a branch of the work it was written
+      for, nor reuse a nonce.
     </p>
     <p>
       <strong>Existing objects.</strong> This draft assumes that every sealed
@@ -1119,11 +1136,8 @@
       </li>
       <li>
         <p>
-          Whether a draft may be rewritten before it is sealed, against the
-          rule that versions are fixed; whether tools MUST seal only at the
-          owner's request; and whether sealing a draft kept in an archive
-          should start a new object named by its line, rather than keep the
-          draft's identifier (section 6.3) (#29).
+          How drafts are shared before sealing (among co-authors, with a
+          journal under review), and how an archive serves them (#29).
         </p>
       </li>
       <li>
@@ -1235,18 +1249,17 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           whose <tt class="verbatim">object.json</tt> has the line's owner and whose
           signatures hold. A branch's line holds only its own versions, from
           its branch point (section 10.5); the parent's versions are named
-          with the parent's owner, and a document version held only by
-          versions made before sealing (section 6.5) belongs to no line and
-          has no <tt class="verbatim">sheaf:</tt> URI. Several object versions of the
-          line may hold document version n: without a digest, the URI names
-          the one listed for n in the <tt class="verbatim">history</tt> of the line's
-          head, or, without <tt class="verbatim">history</tt>, the last object version
-          of the line holding n (section 7.3). What it names can then change
-          as the line grows, by a description or a notice, and copies with
-          different heads may answer differently: a resolver uses the latest
-          head among the copies it found whose signatures hold and that agree
-          (section 6.5), and says where it found them, since a copy that stops
-          early looks complete by itself.
+          with the parent's owner; drafts have no <tt class="verbatim">sheaf:</tt> URI
+          (section 6.5). Several object versions of the line may hold document
+          version n: without a digest, the URI names the one listed for n in
+          the <tt class="verbatim">history</tt> of the line's head, or, without <tt
+          class="verbatim">history</tt>, the last object version of the line holding n
+          (section 7.3). What it names can then change as the line grows, by a
+          description or a notice, and copies with different heads may answer
+          differently: a resolver uses the latest head among the copies it
+          found whose signatures hold and that agree (section 6.5), and says
+          where it found them, since a copy that stops early looks complete by
+          itself.
         </p>
       </li>
       <li>
@@ -1313,12 +1326,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       algorithm; looks each of them up in the indexes it knows; and keeps only
       the entries whose genesis record is, byte for byte, the one it obtained,
       discarding the others as collisions (removed entries without a genesis
-      record are listed apart, as removed lines of those names; removed
-      entries that kept it are grouped by the <tt class="verbatim">sealed</tt> of the
-      index, there being no copy, and marked removed); it groups the lines it
-      keeps by their <tt class="verbatim">sealed</tt>, read from the copies (<tt class="verbatim">object.json</tt>),
-      not from indexes kept by others, and lists different groups as different
-      works (a genesis record reused in two archives), without choosing. The
+      record are listed apart, as removed lines of those names, and removed
+      entries that kept it are marked removed); and it keeps only the lines
+      whose signatures hold: the originator's line signed by the originator
+      its genesis record names, and branches whose parent evidence is signed
+      by their parents' owners (section 10.5). Since no one else can make the
+      originator's signature, the lines kept are lines of one work, and a
+      genesis record reused for another work yields no valid line. The
       comparison is of bytes, so it does not rely on any hash being free of
       collisions. Resolving a line needs no search: <tt class="verbatim">sheaf:&lt;name&gt;</tt>
       names the originator's line, always named by algorithm 0 (a clash when
@@ -1401,7 +1415,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           text of its <tt class="verbatim">genesis.json</tt>, the string whose UTF-8
           encoding is exactly the bytes of the file, so that a work can be
           searched for, and collisions removed, from the indexes alone
-          (above); and <tt class="verbatim">sealed</tt>, as in <tt class="verbatim">object.json</tt>;
+          (above);
         </p>
       </li>
       <li>
@@ -1438,22 +1452,22 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <tt class="verbatim">indexes.json</tt>, a JSON object with <tt class="verbatim">format</tt>
       and <tt class="verbatim">indexes</tt>) maps each index kept to the length of its
       <tt class="verbatim">&lt;p&gt;</tt>. An index kept for several archives adds to
-      each entry <tt class="verbatim">archiveUrl</tt>: the base URL of the archive
-      serving that copy, a location (section 6.2). An archive's indexes list
-      every object of its storage root with a genesis record and every sealed
-      version of it, each entry of <tt class="verbatim">names/</tt> and <tt class="verbatim">sha512/</tt>
-      with <tt class="verbatim">status</tt> (<tt class="verbatim">active</tt> or <tt class="verbatim">withdrawn</tt>);
-      a tombstoned object keeps its entries with <tt class="verbatim">status</tt> <tt
-      class="verbatim">removed</tt>, so that a resolver can report it as section 11.3
-      asks; a removed entry of <tt class="verbatim">names/</tt> keeps <tt class="verbatim">name</tt>,
-      <tt class="verbatim">owner</tt>, <tt class="verbatim">id</tt>, <tt class="verbatim">status</tt> and
-      <tt class="verbatim">sealed</tt>, and MAY drop <tt class="verbatim">originator</tt> and <tt
-      class="verbatim">genesis</tt>. A file with no entries is omitted, so that, where
-      the indexes are declared, a missing file means no entry. A resolver
-      looks up a URI in <tt class="verbatim">names/</tt> at the archives and indexes it
-      knows, starting from <tt class="verbatim">at</tt>, keeping the entries whose <tt
-      class="verbatim">owner</tt> matches the owner part, or, without an owner part,
-      those whose <tt class="verbatim">owner</tt> is their <tt class="verbatim">originator</tt>
+      each entry <tt class="verbatim">at</tt>: a list holding the base URL of the
+      archive serving that copy, a location (section 6.2). An archive's
+      indexes list every object of its storage root with a genesis record
+      (never drafts) and every sealed version of it, each entry of <tt class="verbatim">names/</tt>
+      and <tt class="verbatim">sha512/</tt> with <tt class="verbatim">status</tt> (<tt class="verbatim">active</tt>
+      or <tt class="verbatim">withdrawn</tt>); a tombstoned object keeps its entries
+      with <tt class="verbatim">status</tt> <tt class="verbatim">removed</tt>, so that a resolver
+      can report it as section 11.3 asks; a removed entry of <tt class="verbatim">names/</tt>
+      keeps <tt class="verbatim">name</tt>, <tt class="verbatim">owner</tt>, <tt class="verbatim">id</tt>
+      and <tt class="verbatim">status</tt>, and MAY drop <tt class="verbatim">originator</tt> and
+      <tt class="verbatim">genesis</tt>. A file with no entries is omitted, so that,
+      where the indexes are declared, a missing file means no entry. A
+      resolver looks up a URI in <tt class="verbatim">names/</tt> at the archives and
+      indexes it knows, starting from <tt class="verbatim">at</tt>, keeping the entries
+      whose <tt class="verbatim">owner</tt> matches the owner part, or, without an owner
+      part, those whose <tt class="verbatim">owner</tt> is their <tt class="verbatim">originator</tt>
       (for a removed entry without <tt class="verbatim">originator</tt>, whose <tt
       class="verbatim">owner</tt> is the originator read from any copy of the genesis
       record; when no copy of the genesis record is found, it is reported as a
@@ -1525,25 +1539,23 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <tt class="verbatim">sha512</tt> as digest algorithm. Every object version MUST
       contain, in its content, the files <tt class="verbatim">object.json</tt> and,
       except in an owner object (section 7.5), <tt class="verbatim">datacite.json</tt>
-      at the top level, and, from the version that seals the object, <tt
-      class="verbatim">genesis.json</tt> (section 6.5); every version of a branch also
-      holds the evidence of its current branch point, <tt class="verbatim">parent.inventory.json</tt>,
-      <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>
-      and <tt class="verbatim">parent.keylog/</tt> (section 10.5), unchanged until the
-      branch point moves again. These are the identity files of the object;
-      they are not files of the document's own (section 7.3), and the names
-      <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">parent.inventory.json</tt>, <tt
-      class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures</tt> and
-      <tt class="verbatim">parent.keylog</tt> are reserved for them at the top level of
-      the content. Every version directory MUST contain a copy of the
-      inventory as of that version, with its checksum file (OCFL makes this a
-      recommendation; OpenSheaf requires it, so that each version can be
-      pinned and fetched on its own). Version directories MUST NOT be
-      zero-padded (<tt class="verbatim">v1</tt>, <tt class="verbatim">v2</tt>, &hellip;, not <tt
-      class="verbatim">v001</tt>), which OCFL allows. OCFL recommends that object
-      identifiers be URIs; with the proposal of section 6.5 they are <tt
-      class="verbatim">sheaf:</tt> URIs (section 6.3), except the identifiers of drafts,
-      which are short names, about which OCFL validators may warn.
+      at the top level, and, except in a draft, <tt class="verbatim">genesis.json</tt>
+      (section 6.5); every version of a branch also holds the evidence of its
+      current branch point, <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
+      <tt class="verbatim">parent.signatures/</tt> and <tt class="verbatim">parent.keylog/</tt>
+      (section 10.5), unchanged until the branch point moves again. These are
+      the identity files of the object; they are not files of the document's
+      own (section 7.3), and the names <tt class="verbatim">genesis.json</tt>, <tt
+      class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
+      <tt class="verbatim">parent.signatures</tt> and <tt class="verbatim">parent.keylog</tt> are
+      reserved for them at the top level of the content. Every version
+      directory MUST contain a copy of the inventory as of that version, with
+      its checksum file (OCFL makes this a recommendation; OpenSheaf requires
+      it, so that each version can be pinned and fetched on its own). Version
+      directories MUST NOT be zero-padded (<tt class="verbatim">v1</tt>, <tt class="verbatim">v2</tt>,
+      &hellip;, not <tt class="verbatim">v001</tt>), which OCFL allows. OCFL recommends
+      that object identifiers be URIs; with the proposal of section 6.5 they
+      are <tt class="verbatim">sheaf:</tt> URIs (section 6.3), drafts included.
     </p>
     <p>
       Each version in the inventory MUST have a <tt class="verbatim">user</tt> with a
@@ -1617,14 +1629,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       number.
     </p>
     <p>
-      <strong>Identity versions.</strong> An object version that seals an
-      existing draft without adding files of the document's own adds only
-      identity files (section 7.1), which are not files of the document's own:
-      it keeps the document version it holds, and is otherwise treated as a
-      description-only version. An object sealed by a version that also adds
-      files of its own (for instance an object sealed at its first version)
-      takes a new document version, as any new version does. External labels
-      (arXiv's <tt class="verbatim">v3</tt>) are recorded in <tt class="verbatim">external</tt>
+      <strong>Sealing.</strong> The first version of a line, made by sealing
+      (section 6.5), holds the work as its owner seals it: document version 1
+      for an originator's line, the document version of the branch point for a
+      branch (section 10.5). The drafts it was made from are not part of it.
+      External labels (arXiv's <tt class="verbatim">v3</tt>) are recorded in <tt class="verbatim">external</tt>
       (section 9), and presentations SHOULD show them with the document
       version.
     </p>
@@ -1733,11 +1742,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       class="verbatim">owner</tt> (both the owner name) and <tt class="verbatim">status</tt>; it
       has no <tt class="verbatim">datacite.json</tt>, no document versions and none of
       the fields specific to documents, collections or lines (<tt class="verbatim">documentVersion</tt>,
-      <tt class="verbatim">sealed</tt>, <tt class="verbatim">parent</tt>). Its object versions are
-      numbered as OCFL numbers them, and each later one MUST be signed by at
-      least <tt class="verbatim">threshold</tt> keys of the one before (section 13.2).
-      An owner object is never withdrawn, branched or mirrored apart from the
-      lines it signs; it is copied with them (section 6.5).
+      <tt class="verbatim">parent</tt>). Its object versions are numbered as OCFL
+      numbers them, and each later one MUST be signed by at least <tt class="verbatim">threshold</tt>
+      keys of the one before (section 13.2). An owner object is never
+      withdrawn, branched or mirrored apart from the lines it signs; it is
+      copied with them (section 6.5).
     </p>
     <h2 id="auto-20"><a id="8-description-datacitejson"></a>8. Description: datacite.json<span style="margin-left: 1em"></span></h2>
     <p>
@@ -1991,12 +2000,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
     </ul>
     <p>
-      From the first version of its line (section 6.5: the version that seals
-      it, or for a branch the first version after the branch point), an object
-      MUST also contain <tt class="verbatim">name</tt>, <tt class="verbatim">owner</tt> (the owner
-      name) and <tt class="verbatim">sealed</tt> (the originator's sealing version, a
-      pin with <tt class="verbatim">objectVersion</tt> and <tt class="verbatim">inventorySha512</tt>,
-      section 6.5), and a branch <tt class="verbatim">parent</tt> (section 10.5). With
+      In every version of a line (section 6.5), an object MUST also contain
+      <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> (the owner name), and a
+      branch <tt class="verbatim">parent</tt> (section 10.5); a draft has neither. With
       the proposal of section 6.5, <tt class="verbatim">object.json</tt> names no
       archive: lines belong to their owners, wherever they are kept (#52).
     </p>
@@ -2203,21 +2209,21 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
       <li>
         <p>
-          <tt class="verbatim">archiveUrl</tt>: a base URL where a copy of the line was
-          found when the collection version was made, a location (section
-          6.2).
+          <tt class="verbatim">at</tt>: a non-empty list of base URLs where copies of
+          the line may be found, all equal hints (section 6.2), as the <tt
+          class="verbatim">at</tt> parameter of <tt class="verbatim">sheaf:</tt> URIs (section
+          6.6); always a list, also of one URL.
         </p>
       </li>
     </ul>
     <p>
-      Each member MAY have <tt class="verbatim">mirrors</tt> (further locations: base
-      URLs of archives holding copies of the line, section 10.4), <tt class="verbatim">doi</tt>
-      (the version DOI), <tt class="verbatim">conceptDoi</tt> and <tt class="verbatim">cite</tt>,
-      a cached citation (<tt class="verbatim">title</tt>, <tt class="verbatim">creators</tt> as a
-      list of names, <tt class="verbatim">year</tt>, and <tt class="verbatim">issued</tt>, the
-      member's <tt class="verbatim">Issued</tt> date) so that the collection stays
-      readable, and can be ordered, without resolving its members, also if
-      they become unavailable. <tt class="verbatim">cite</tt> is not authoritative.
+      Each member MAY have <tt class="verbatim">doi</tt> (the version DOI), <tt class="verbatim">conceptDoi</tt>
+      and <tt class="verbatim">cite</tt>, a cached citation (<tt class="verbatim">title</tt>, <tt
+      class="verbatim">creators</tt> as a list of names, <tt class="verbatim">year</tt>, and <tt
+      class="verbatim">issued</tt>, the member's <tt class="verbatim">Issued</tt> date) so that
+      the collection stays readable, and can be ordered, without resolving its
+      members, also if they become unavailable. <tt class="verbatim">cite</tt> is not
+      authoritative.
     </p>
     <p>
       <strong>Members of a catalogue</strong> MUST have <tt class="verbatim">version</tt>,
@@ -2293,11 +2299,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       OCFL objects only grow; it MUST NOT be changed otherwise, and an archive
       MUST NOT add to it a version its owner has not signed (section 6.5).
       Mirroring is allowed only if the licences of all the versions copied
-      allow redistribution. A catalogue MAY list a location of a copy in the
-      member's <tt class="verbatim">mirrors</tt>. An archive that keeps a copy of
-      another archive entirely SHOULD be listed in the <tt class="verbatim">mirrors</tt>
-      of that archive's discovery document, with the agreement of those who
-      keep it.
+      allow redistribution. A collection MAY list the location of a copy in
+      the member's <tt class="verbatim">at</tt>. An archive that keeps a copy of another
+      archive entirely SHOULD be listed in the <tt class="verbatim">mirrors</tt> of that
+      archive's discovery document, with the agreement of those who keep it.
     </p>
     <p>
       Mirrors serve preservation and access (an institution keeping copies of
@@ -2310,23 +2315,22 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       versions, the branch point: a co-author carrying the work on, a journal
       keeping the version it vetted and correcting it afterwards. Its genesis
       record is the object's, so it has the parent's name (section 6.5), or,
-      after a clash, another name of the same genesis record; it copies <tt
-      class="verbatim">sealed</tt> from its parent. From its first version after the
-      branch point, its <tt class="verbatim">object.json</tt> records its own <tt class="verbatim">owner</tt>
-      and <tt class="verbatim">parent</tt>: the <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>,
-      <tt class="verbatim">objectVersion</tt> (the branch point), <tt class="verbatim">documentVersion</tt>
-      and <tt class="verbatim">inventorySha512</tt> of the parent version, and SHOULD
-      record the <tt class="verbatim">url</tt> of that object version, an absolute URL
-      (<tt class="verbatim">&lt;storage root URL&gt;&lt;path&gt;/&lt;version&gt;/</tt>,
-      with <tt class="verbatim">&lt;path&gt;</tt> the object's path in the layout of the
-      parent's storage root, section 5), so that it can be resolved (section
-      6.4). Its <tt class="verbatim">datacite.json</tt> describes it with the branch
-      owner (for a selection, the body behind it) as <tt class="verbatim">publisher</tt>
-      and keeps the relations of the parent version; the first version of a
-      branch, and every version that moves its branch point, SHOULD link the
-      parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if it has
-      one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt> of <tt
-      class="verbatim">parent</tt>).
+      after a clash, another name of the same genesis record; From its first
+      version after the branch point, its <tt class="verbatim">object.json</tt> records
+      its own <tt class="verbatim">owner</tt> and <tt class="verbatim">parent</tt>: the <tt class="verbatim">owner</tt>,
+      <tt class="verbatim">name</tt>, <tt class="verbatim">objectVersion</tt> (the branch point),
+      <tt class="verbatim">documentVersion</tt> and <tt class="verbatim">inventorySha512</tt> of
+      the parent version, and SHOULD record the <tt class="verbatim">url</tt> of that
+      object version, an absolute URL (<tt class="verbatim">&lt;storage root
+      URL&gt;&lt;path&gt;/&lt;version&gt;/</tt>, with <tt class="verbatim">&lt;path&gt;</tt>
+      the object's path in the layout of the parent's storage root, section
+      5), so that it can be resolved (section 6.4). Its <tt class="verbatim">datacite.json</tt>
+      describes it with the branch owner (for a selection, the body behind it)
+      as <tt class="verbatim">publisher</tt> and keeps the relations of the parent
+      version; the first version of a branch, and every version that moves its
+      branch point, SHOULD link the parent version with <tt class="verbatim">IsIdenticalTo</tt>:
+      its DOI if it has one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt>
+      of <tt class="verbatim">parent</tt>).
     </p>
     <p>
       <strong>A branch is a new object.</strong> Its identifier is its own
@@ -2436,8 +2440,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           of <tt class="verbatim">parent.object.json</tt>; <tt class="verbatim">parent.name</tt>
           is a name of this genesis record, by the algorithm of its last
           character, and is the branch's own <tt class="verbatim">name</tt> unless the
-          branch was renamed after a clash (section 6.5), <tt class="verbatim">sealed</tt>
-          equals that of <tt class="verbatim">parent.object.json</tt>, the branch's <tt
+          branch was renamed after a clash (section 6.5), the branch's <tt
           class="verbatim">owner</tt> differs from the parent's, and the parent's owner
           is the <tt class="verbatim">originator</tt> of the genesis record, or <tt
           class="verbatim">parent.object.json</tt> declares a <tt class="verbatim">parent</tt> of
@@ -2523,8 +2526,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       member; it MAY list the original revision set as well. A branch is not a
       mirror: it is another line, with its own inventories, and its own
       versions cannot stand for the parent in the resolution of a pin (section
-      6.4), so it is never listed in <tt class="verbatim">mirrors</tt>; a copy of the
-      parent's line kept beside it is a mirror like any other.
+      6.4), so a location holding only the branch is never given in <tt class="verbatim">at</tt>
+      for the parent; a copy of the parent's line kept beside it is a mirror
+      like any other.
     </p>
     <p>
       A version that the selection makes itself, such as a journal's typeset
@@ -2580,13 +2584,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <tt class="verbatim">inventorySha512</tt> of that version, <tt class="verbatim">date</tt>
       and <tt class="verbatim">reason</tt> (plain text, since the discovery document has
       no content files), and, for an object with a genesis record, its <tt
-      class="verbatim">name</tt>, <tt class="verbatim">owner</tt> and <tt class="verbatim">sealed</tt>,
-      which it MUST record, so that its line stays taken in that archive and
-      its genesis record cannot be reused there for another work (section
-      6.5). Identifiers of tombstoned objects MUST NOT be reused. Verifiers
-      report a pin to a tombstoned object as &quot;removed&quot;, not as a
-      corruption. External copies (DOI records, snapshots) follow the rules of
-      their services.
+      class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, which it MUST record, so
+      that its line stays taken in that archive (section 6.5). Drafts leave no
+      tombstone. Identifiers of tombstoned objects MUST NOT be reused.
+      Verifiers report a pin to a tombstoned object as &quot;removed&quot;,
+      not as a corruption. External copies (DOI records, snapshots) follow the
+      rules of their services.
     </p>
     <p>
       Note: OCFL 1.1 has no way to remove files from an object short of
@@ -2849,10 +2852,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           pinned object version holds the stated document version; for a
           member with <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, check
           them against the <tt class="verbatim">object.json</tt> of the pinned version;
-          check that no pin names an object version without a genesis record
-          (section 6.5); report each as verified, mismatch (a copy was found
-          and does not match), unavailable (no copy found) or removed
-          (tombstoned);
+          check that no pin names a draft (section 6.5); report each as
+          verified, mismatch (a copy was found and does not match),
+          unavailable (no copy found) or removed (tombstoned);
         </p>
       </li>
       <li>
@@ -2872,24 +2874,23 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       <li>
         <p>
           for each object with a genesis record (section 6.5): that <tt class="verbatim">genesis.json</tt>
-          is the same in every object version from the first that holds it,
-          that <tt class="verbatim">name</tt> is its digest by the algorithm named in
-          its last character, that its <tt class="verbatim">kind</tt> is the <tt class="verbatim">kind</tt>
-          of <tt class="verbatim">object.json</tt>, that the identifier of the object is
-          <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt> of its first sealed
-          version (a draft sealed in place keeps its own, section 6.3), that
-          <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt> and <tt class="verbatim">sealed</tt>
-          do not change from the first version of the line, that no two
-          objects of the archive, nor an object and a tombstone, have the same
-          <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> at their heads, that
-          objects with the same genesis record have the same <tt class="verbatim">sealed</tt>,
-          and that an object one of whose names is a tombstone's name has the
-          tombstone's <tt class="verbatim">sealed</tt>, that a line without <tt class="verbatim">parent</tt>
-          is named by algorithm 0 and its <tt class="verbatim">sealed</tt> pins its own
-          sealing version, that the discovery document lists the head's <tt
+          is the same in every object version, that <tt class="verbatim">name</tt> is
+          its digest by the algorithm named in its last character, that its
+          <tt class="verbatim">kind</tt> is the <tt class="verbatim">kind</tt> of <tt class="verbatim">object.json</tt>,
+          that the identifier of the object is <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>,
+          that <tt class="verbatim">owner</tt> and <tt class="verbatim">name</tt> do not change
+          between versions, that no two objects of the archive, nor an object
+          and a tombstone, have the same <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>,
+          that a line without <tt class="verbatim">parent</tt> is named by algorithm 0,
+          is owned by the originator its genesis record names and is signed by
+          it from its first version, that objects with the same genesis record
+          are that line and branches whose parent evidence is signed by their
+          parents' owners, that the discovery document lists the head's <tt
           class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, and that a line whose
           owner is not the originator declares a parent and that the
-          originator's line declares none;
+          originator's line declares none; and that drafts are only at <tt
+          class="verbatim">draft/&lt;id&gt;/</tt>, unlisted in <tt class="verbatim">objects</tt>
+          and in the indexes;
         </p>
       </li>
       <li>
@@ -2906,26 +2907,26 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           owner is not the originator; reporting as a warning, not a failure,
           a rename that neither the objects nor the tombstones of the archive
           justify, or a number that is not the smallest free one, since the
-          line that caused it may be kept elsewhere; that <tt class="verbatim">sealed</tt>
-          equals the parent's, and that the parent's owner is the <tt class="verbatim">originator</tt>
-          of the genesis record or the parent version's <tt class="verbatim">object.json</tt>
-          (<tt class="verbatim">parent.object.json</tt>) declares a <tt class="verbatim">parent</tt>
-          of its own, and declares none when the parent's owner is the
-          originator; for every version that moves the branch point, the same
-          evidence, that the new parent has the same <tt class="verbatim">owner</tt> and
-          <tt class="verbatim">name</tt> as the previous one and a higher object version
-          holding a document version later than the previous branch point's in
-          the history of the new parent version, and the continuity of the two
-          parent inventories (section 10.5); for each branch point, report the
-          first of these verdicts that applies: inconsistent (a check fails,
-          or the parent was resolved and does not match), confirmed (the
-          parent owner's signature of the branch point holds, against its key
-          log, section 13.2), unconfirmed (consistent, without a parent
-          signature that holds, which section 10.5 does not allow); report as
-          the branch's verdict the weakest of those of its branch points
-          (inconsistent, unconfirmed, confirmed, from the weakest); and report
-          separately whether the parent was found, unavailable or removed
-          (tombstoned), and whether it is withdrawn;
+          line that caused it may be kept elsewhere; that the parent's owner
+          is the <tt class="verbatim">originator</tt> of the genesis record or the
+          parent version's <tt class="verbatim">object.json</tt> (<tt class="verbatim">parent.object.json</tt>)
+          declares a <tt class="verbatim">parent</tt> of its own, and declares none when
+          the parent's owner is the originator; for every version that moves
+          the branch point, the same evidence, that the new parent has the
+          same <tt class="verbatim">owner</tt> and <tt class="verbatim">name</tt> as the previous
+          one and a higher object version holding a document version later
+          than the previous branch point's in the history of the new parent
+          version, and the continuity of the two parent inventories (section
+          10.5); for each branch point, report the first of these verdicts
+          that applies: inconsistent (a check fails, or the parent was
+          resolved and does not match), confirmed (the parent owner's
+          signature of the branch point holds, against its key log, section
+          13.2), unconfirmed (consistent, without a parent signature that
+          holds, which section 10.5 does not allow); report as the branch's
+          verdict the weakest of those of its branch points (inconsistent,
+          unconfirmed, confirmed, from the weakest); and report separately
+          whether the parent was found, unavailable or removed (tombstoned),
+          and whether it is withdrawn;
         </p>
       </li>
       <li>
@@ -3016,13 +3017,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
       <li>
         <p>
-          <strong>First deposit wins (proposal).</strong> An archive refuses
-          an object sealed outside it whose line is taken when it is
-          deposited, and an object whose genesis record it holds with another
-          <tt class="verbatim">sealed</tt> (section 6.5), so a genesis record reused for
-          another work and deposited first gets the other refused there, and
-          its owner seals it anew. Lines cannot be written under another
-          owner, since only signatures decide whose a version is.
+          <strong>Reused genesis records (proposal).</strong> A genesis record
+          names its originator, whose signature no one else can make, so
+          reusing it for another work gives no valid line; an archive accepts
+          an object whose genesis record it holds only when it is signed by
+          that originator or carries parent evidence signed by its parent's
+          owner (section 6.5). Lines cannot be written under another owner,
+          since only signatures decide whose a version is.
         </p>
       </li>
       <li>
@@ -3085,8 +3086,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           minimal (section 9). A request to erase personal data from an
           immutable history is handled by a takedown (section 11.2); with the
           proposal of section 6.5, the tombstone and the indexes then keep the
-          name, the owner name and <tt class="verbatim">sealed</tt>, which identify no
-          person by themselves.
+          name and the owner name, which identify no person by themselves.
         </p>
       </li>
       <li>
@@ -3591,6 +3591,26 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           resolved.
         </p>
       </li>
+      <li>
+        <p>
+          **0.1 (draft), 17 November 2026, proposal revised (branch <tt class="verbatim">proposal/owners</tt>):**
+          one <tt class="verbatim">threshold</tt> governs both the key log and the
+          owner's lines, as in Radicle, no longer provisional; <tt class="verbatim">sealed</tt>
+          withdrawn, since signatures make it redundant (an archive accepts an
+          object whose genesis record it holds only if it is signed by the
+          record's originator or carries parent evidence signed by its
+          parent's owner); drafts are a sandbox owner <tt class="verbatim">draft</tt>,
+          at <tt class="verbatim">draft/&lt;id&gt;/</tt> with the provisional identifier
+          <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>, never signed, pinned or
+          copied out of their archive, and the only objects that may be
+          rewritten or deleted; sealing makes a new object, and versions made
+          before sealing are no longer part of the line (changing PR #30);
+          collection members give their locations as <tt class="verbatim">at</tt>, a
+          list of base URLs, all equal hints, replacing <tt class="verbatim">archiveUrl</tt>
+          and <tt class="verbatim">mirrors</tt> (#39, in part); index entries for
+          several archives give <tt class="verbatim">at</tt> too.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -3914,7 +3934,6 @@ ocfl/
   &quot;kind&quot;: &quot;document&quot;,
   &quot;name&quot;: &quot;72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq&quot;,
   &quot;owner&quot;: &quot;zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a&quot;,
-  &quot;sealed&quot;: { &quot;objectVersion&quot;: &quot;v1&quot;, &quot;inventorySha512&quot;: &quot;9a0c&hellip;&quot; },
   &quot;documentVersion&quot;: 1,
   &quot;mainSource&quot;: &quot;fractional-phi42-mass-gap.tm&quot;,
   &quot;sourceFormat&quot;: &quot;application/x-texmacs&quot;,
@@ -4010,7 +4029,7 @@ ocfl/
     { &quot;kind&quot;: &quot;document&quot;,
       &quot;name&quot;: &quot;72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq&quot;,
       &quot;owner&quot;: &quot;zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a&quot;,
-      &quot;archiveUrl&quot;: &quot;https://mgubi.org/papers/&quot;,
+      &quot;at&quot;: [ &quot;https://mgubi.org/papers/&quot; ],
       &quot;version&quot;: &quot;v3&quot;,
       &quot;inventorySha512&quot;: &quot;9a0c&hellip;&quot;,
       &quot;follow&quot;: &quot;latest&quot;,
@@ -4036,7 +4055,7 @@ ocfl/
     { &quot;kind&quot;: &quot;document&quot;,
       &quot;name&quot;: &quot;olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda&quot;,
       &quot;owner&quot;: &quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba&quot;,
-      &quot;archiveUrl&quot;: &quot;https://authors.example.org/&quot;,
+      &quot;at&quot;: [ &quot;https://authors.example.org/&quot;, &quot;https://mirror.example.net/authors/&quot; ],
       &quot;revisions&quot;: [
         { &quot;documentVersion&quot;: 2, &quot;version&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;4f1e&hellip;&quot; },
         { &quot;documentVersion&quot;: 3, &quot;version&quot;: &quot;v4&quot;, &quot;inventorySha512&quot;: &quot;c07a&hellip;&quot; } ],
@@ -4044,7 +4063,7 @@ ocfl/
     { &quot;kind&quot;: &quot;collection&quot;,
       &quot;name&quot;: &quot;q3vx&hellip;&quot;,
       &quot;owner&quot;: &quot;m7ka&hellip;&quot;,
-      &quot;archiveUrl&quot;: &quot;https://seminar.example.org/&quot;,
+      &quot;at&quot;: [ &quot;https://seminar.example.org/&quot; ],
       &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 3, &quot;version&quot;: &quot;v3&quot;, &quot;inventorySha512&quot;: &quot;7d21&hellip;&quot; } ] }
   ]
 }</pre>
@@ -4146,7 +4165,6 @@ ocfl/
   &quot;kind&quot;: &quot;document&quot;,
   &quot;name&quot;: &quot;olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda&quot;,
   &quot;owner&quot;: &quot;iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a&quot;,
-  &quot;sealed&quot;: { &quot;objectVersion&quot;: &quot;v1&quot;, &quot;inventorySha512&quot;: &quot;1d4a&hellip;&quot; },
   &quot;parent&quot;: {
     &quot;owner&quot;: &quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba&quot;,
     &quot;name&quot;: &quot;olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda&quot;,
@@ -4203,7 +4221,6 @@ https://opensheaf.org/sheaf:olqybey6/v3
       &quot;owner&quot;: &quot;iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a&quot;,
       &quot;id&quot;: &quot;sheaf:olqybey6lzdauivy7bfpj2dnljrgm4x3mouukcdhhfurov3bupda:iztwg6bj7mu3lkq7frglicixkesrrj5um7c5tyquzazw4vs2fv4a&quot;,
       &quot;status&quot;: &quot;active&quot;,
-      &quot;sealed&quot;: { &quot;objectVersion&quot;: &quot;v1&quot;, &quot;inventorySha512&quot;: &quot;1d4a&hellip;&quot; },
       &quot;genesis&quot;: &quot;{\n  \&quot;format\&quot;: \&quot;opensheaf-genesis/0.1\&quot;,\n  \&quot;kind\&quot;: \&quot;document\&quot;,\n  \&quot;created\&quot;: \&quot;2026-03-02T09:14:00Z\&quot;,\n  \&quot;originator\&quot;: \&quot;dftbeyx3iav4wydksw2dp46xupnep3vqyh3njrfy7valpxdlsxba\&quot;,\n  \&quot;nonce\&quot;: \&quot;5f2c8e1a9b7d4036c2e1f08a7b6d5c43\&quot;\n}\n&quot; }
   ]
 }</pre>
@@ -4305,8 +4322,9 @@ https://opensheaf.org/sheaf:olqybey6/v3
           record and keeps its keys in a log, each version signed by the keys
           of the one before, as Radicle's identity documents and The Update
           Framework do: keys rotate, are revoked and are shared with a
-          threshold, while the owner name stays. Who answers for an owner is a
-          separate, optional link, confirmed by the keeper (#41).
+          threshold, while the owner name stays. One threshold governs both
+          the key log and the owner's lines, as in Radicle. Who answers for an
+          owner is a separate, optional link, confirmed by the keeper (#41).
         </p>
       </li>
       <li>

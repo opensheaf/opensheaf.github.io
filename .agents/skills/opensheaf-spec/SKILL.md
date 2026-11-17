@@ -127,7 +127,8 @@ their revision comments) before touching any of this.
   versions are its **key log**: `keys.json` (`keys`, Ed25519 `did:key`;
   `threshold`; optional `revoked` and `keeper`); each version signed by
   `threshold` keys of the one before. No named owners, no owner
-  identifiers. The optional **keeper** link (ORCID iD, domain) is confirmed
+  identifiers. One `threshold` governs both the key log and the owner's
+  lines (as in Radicle). The optional **keeper** link (ORCID iD, domain) is confirmed
   by the keeper (ORCID record, `/.well-known/opensheaf`), never required.
 - **Signing** (6.5, 13.2): every sealed version of a line is signed by its
   owner, `threshold` keys of the key-log version named, each in
@@ -141,28 +142,33 @@ their revision comments) before touching any of this.
   a line a version its owner did not sign. No signed list of an owner's
   lines exists (lines are linear).
 - **Archives** (6.1 to 6.4): hosts with no identity, found at their base
-  URL; every location (`archiveUrl`, `mirrors`, `at`) is a hint. They choose
+  URL; every location (`at` of members, a list of base URLs; `mirrors` of
+  a discovery document; `at` of URIs) is a hint. They choose
   which owners they host (`owners` in the discovery document). An owner
   moving to another archive copies its key log and continues its lines (not
   a branch); a branch happens only when the owner changes.
 - **Identifiers and labels** (6.3, 5): an object's OCFL `id` is its first
-  line, `sheaf:<name>:<owner>`, for branches too (a draft has a chosen
-  short id); default layout
+  line, `sheaf:<name>:<owner>`, for branches too (a draft is
+  `sheaf:draft:<id>`, provisional); default layout
   `opensheaf-owner-name-storage-layout` (`<owner>/<name>/`, drafts in
-  `drafts/<id>/`; the key log at `<owner>/<owner>/`), or `0003` for large
+  `draft/<id>/`; the key log at `<owner>/<owner>/`), or `0003` for large
   archives. Readable `label`s in the discovery document, not permanent.
 - **Clashes** (6.5): one object per line in a storage root; sealing draws a
   new nonce if the owner's line is taken; a branch takes `parent.name`,
   moves its branch point onto the owner's own earlier branch of the same
   parent line, or takes the smallest free algorithm number above the
   parent's (refused if none up to 15); lines stay taken after a takedown.
-  `sealed` is a pin (`objectVersion`, `inventorySha512`) of the
-  originator's sealing version; an archive refuses a genesis record reused
-  for another work. A work is searched for under all 16 names, keeping
-  byte-identical records, grouped by `sealed`. Aliases open (#44).
-- **Draft and sealing** (6.5): a draft has no genesis record and no owner,
-  is not signed, and cannot be pinned. Sealing is at the owner's request,
-  before a version first leaves the owner's hands.
+  No `sealed`: an archive accepts an object whose genesis record it
+  holds only if it is signed by the record's originator (the same line) or
+  carries parent evidence signed by its parent's owner (a branch). A work
+  is searched for under all 16 names, keeping byte-identical records and
+  lines whose signatures hold. Aliases open (#44).
+- **Draft and sealing** (6.5): drafts are a sandbox owner `draft`, at
+  `draft/<id>/`: never signed, pinned or copied out of their archive, the
+  only objects that may be rewritten or deleted, listed apart or not at
+  all. Sealing, at the owner's request before the work first leaves the
+  owner's hands, makes a new object (the line); draft versions are not part
+  of it.
 - **Branches** (10.5): lines of other owners with the same genesis record,
   declaring `parent` (`owner`, `name`, `objectVersion`, `documentVersion`,
   `inventorySha512`, `url`). No deep branches: a branch is a new object
@@ -213,8 +219,8 @@ their revision comments) before touching any of this.
   MAY `changes`, `stage` (NISO JAV: `AO`, `SMUR`, `AM`, `P`, `VoR`, ...),
   `history`, `notices`, `licence`, `agreement`, `external`, `withdrawal`,
   `extensions`; (proposal) no `archiveId` or `objectId`, but `name`,
-  `owner` (an owner name) and `sealed` (a pin) from the first version of
-  its line, and `parent` in a branch.
+  `owner` (an owner name) in every version of a line, and `parent` in a
+  branch.
 - Metadata files (`datacite.json`, `object.json`, `members.json`,
   inventories, the discovery document; in the proposal also
   `genesis.json`, the `parent.*` files and the index files) are CC0 (16).

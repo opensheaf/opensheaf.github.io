@@ -264,23 +264,6 @@
       "pattern": "^[a-z2-7]{52}$",
       "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
     },
-    "sealed": {
-      "type": "object",
-      "$comment": "proposal (section 6.5): a pin of the originator's sealing version, copied unchanged by every branch",
-      "required": [
-        "objectVersion",
-        "inventorySha512"
-      ],
-      "properties": {
-        "objectVersion": {
-          "$ref": "#/$defs/objectVersion"
-        },
-        "inventorySha512": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{128}$"
-        }
-      }
-    },
     "parent": {
       "type": "object",
       "$comment": "proposal (section 10.5): the parent version of a branch",
@@ -530,11 +513,6 @@
             },
             {
               "required": [
-                "sealed"
-              ]
-            },
-            {
-              "required": [
                 "parent"
               ]
             },
@@ -590,17 +568,13 @@
   ],
   "dependentRequired": {
     "name": [
-      "owner",
-      "sealed"
+      "owner"
     ],
     "parent": [
       "name",
       "owner"
     ],
     "owner": [
-      "name"
-    ],
-    "sealed": [
       "name"
     ]
   }

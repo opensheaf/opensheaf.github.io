@@ -220,8 +220,11 @@ instance two signatures out of three. Every version of every line is signed,
 and the key logs travel with the objects they sign, so a line can be checked
 from any copy, even when the archives that served it have gone. An owner may
 name who answers for it (an ORCID iD, an institution), which the keeper
-confirms in a place only it controls; nothing requires it. A draft has no
-owner and no genesis record: that absence is what marks it as a draft.
+confirms in a place only it controls; nothing requires it. Drafts are a
+sandbox: objects of a reserved owner, `draft`, kept by one archive, never
+signed, pinned or copied out of it, and free to be rewritten or deleted.
+Sealing makes a new object, the first version of the line; the draft's
+versions are not part of it.
 
 Anyone can copy a genesis record, so the name alone cannot say whose history
 is the right one. That is why the owner is part of the identity: a copy

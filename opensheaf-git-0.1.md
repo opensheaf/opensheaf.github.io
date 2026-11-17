@@ -101,6 +101,7 @@ Let C be a published commit and C' the next one on the published branch. Between
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
+8. under the revised identity proposal of the specification (branch `proposal/owners`, section 6.5), any change inside the folder of a draft, `ocfl/draft/<id>/`, including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
 
 No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -252,4 +253,4 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 - **0.1 (draft), 15 November 2026, revision:** repairs (section 5.3): a file whose bytes do not match its inventory, such as a Git LFS pointer committed by mistake, is replaced by the right bytes in a new commit, the only change allowed to an existing version folder; the append-only check accepts it.
 - **0.1 (draft), 16 November 2026, revision:** the hashed storage layout of the specification: the append-only rules (section 5.1) and the takedown (section 9) use the object's path in the layout, with the folders of the hash; large archives in git should use the hashed layout (section 8).
 - **0.1 (draft), 16 November 2026, proposal (branch `proposal/identity` of the specification):** the indexes of the identity proposal (`indexes.json`, `names/`, `owners/`, `sha512/`) are archive files: stored byte for byte (section 4.1), rewritten at every deposit and takedown (sections 5.1 and 9); git branches other than the published branch are called working branches (section 6.2), not drafts, which the proposal defines as objects without a genesis record, and a sealed version is not rebuilt once shared.
-- **0.1 (draft), 17 November 2026, proposal (branch `proposal/owners` of the specification):** copies of lines carry the key logs of their signers, witnesses are kept only in objects' extension folders, and an owner moves by copying its folder (section 11).
+- **0.1 (draft), 17 November 2026, proposal (branch `proposal/owners` of the specification):** copies of lines carry the key logs of their signers, witnesses are kept only in objects' extension folders, and an owner moves by copying its folder (section 11); drafts, at `draft/<id>/`, may be changed or removed by any commit (section 5.1).

@@ -171,11 +171,11 @@ osheaf verify</pre>
       of another archive. In an <strong>catalogue</strong> with <tt class="verbatim">follow</tt>,
       each time she updates the collection (<tt class="verbatim">osheaf collect</tt>) it
       pins the head of her co-author's object, its newest object version;
-      nothing is copied, and no permission is needed. Her member entry can
-      list in <tt class="verbatim">mirrors</tt> the archives that mirror the paper
-      (section 10.2), so that readers still reach it when her co-author's
-      archive is down. If she wants the paper in her archive too, and the
-      licences of all its versions allow redistribution, she can
+      nothing is copied, and no permission is needed. Her member entry lists
+      in <tt class="verbatim">at</tt> the archives where the paper may be found, all
+      equal locations (section 10.2), so that readers still reach it when her
+      co-author's archive is down. If she wants the paper in her archive too,
+      and the licences of all its versions allow redistribution, she can
       <strong>mirror</strong> it: a byte-for-byte copy of the whole object,
       which stays the co-author's object (<tt class="verbatim">mirrorOf</tt>). Under the
       identity proposal (sections 6.5 and 10.4, not yet agreed), the mirror is
@@ -288,7 +288,7 @@ id: preserved
 title: Papers preserved by the library
 type: catalogue
 members:
-  - archive: https://example.org/papers/   # the base URL (archiveUrl in members.json)
+  - archive: https://example.org/papers/   # a base URL (in &lsquo;at&lsquo; of members.json)
     id: kpz-uniqueness
     mirror: yes</pre>
       </div>
@@ -297,12 +297,11 @@ members:
     <p>
       An author moves her archive to a new domain. Its archive identifier (a
       <tt class="verbatim">tag:</tt> URI) does not change. Collections recorded the base
-      URL of the time (<tt class="verbatim">archiveUrl</tt>): readers still reach the
-      archive through HTTP redirects from the old address, which she should
-      keep as long as she can, or through the mirrors listed in member
-      entries; curators update <tt class="verbatim">archiveUrl</tt> in a new version of
-      their collections. Pins stay valid, because they fix bytes, not
-      addresses.
+      URLs of the time (<tt class="verbatim">at</tt>): readers still reach the archive
+      through HTTP redirects from the old address, which she should keep as
+      long as she can, or through the other locations listed in member
+      entries; curators update <tt class="verbatim">at</tt> in a new version of their
+      collections. Pins stay valid, because they fix bytes, not addresses.
     </p>
     <div class="os-alert os-note">
       <font class="os-alert-label">Note.</font> Under the identity proposal (sections 6.2 and
@@ -499,7 +498,7 @@ members:
           which is what the journal wants for a document it vetted but does
           not publish (an accepted copy would make it a document of the
           journal). The selection <tt class="verbatim">issue-7-details</tt> lists the
-          mirror in its member's <tt class="verbatim">mirrors</tt>; a Software Heritage
+          mirror in its member's <tt class="verbatim">at</tt>; a Software Heritage
           snapshot of her archive is a further witness.
         </p>
       </li>
@@ -546,9 +545,9 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       {
         &quot;role&quot;: &quot;detailed-argument&quot;,
         &quot;kind&quot;: &quot;document&quot;,
-        &quot;archive&quot;: &quot;tag:example.org,2026:authors&quot;,
-        &quot;archiveUrl&quot;: &quot;https://authors.example.org/&quot;,
-        &quot;id&quot;: &quot;kpz-details&quot;,
+        &quot;name&quot;: &quot;k7pd&hellip;&quot;,
+        &quot;owner&quot;: &quot;dftb&hellip;&quot;,
+        &quot;at&quot;: [ &quot;https://authors.example.org/&quot; ],
         &quot;revisions&quot;: [
           { &quot;documentVersion&quot;: 3, &quot;version&quot;: &quot;v3&quot;, &quot;inventorySha512&quot;: &quot;9f2c&hellip;&quot; }
         ]
@@ -601,8 +600,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           archives that are served (section 5), but the same files, kept in a
           private repository, can be deposited, pinned and verified in the
           same way by whoever has them. Whether such an archive conforms, what
-          <tt class="verbatim">archiveUrl</tt> it gives and how its members are resolved
-          are open questions (issue #29). So is its <tt class="verbatim">Available</tt>
+          <tt class="verbatim">at</tt> it gives and how its members are resolved are
+          open questions (issue #29). So is its <tt class="verbatim">Available</tt>
           date: the specification asks for the date of deposit (section 8), as
           for the drafts found later in <a href="#a-researchers-own-archive">A researcher's own
           archive</a>, while a version deposited privately becomes public only
@@ -744,8 +743,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       </li>
       <li>
         <p>
-          what <tt class="verbatim">archiveUrl</tt> a private archive gives, and how
-          verifiers resolve its members;
+          what <tt class="verbatim">at</tt> a private archive gives, and how verifiers
+          resolve its members;
         </p>
       </li>
       <li>
@@ -994,7 +993,7 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">the member's archive moves</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the pin stays valid; readers follow redirects or the
-          mirrors listed in member entries</td>
+          other locations listed in member entries (<tt class="verbatim">at</tt>)</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the same</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">the member's archive disappears</td>

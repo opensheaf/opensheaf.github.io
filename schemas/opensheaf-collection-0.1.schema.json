@@ -26,9 +26,9 @@
         "type": "object",
         "required": [
           "kind",
-          "archiveUrl",
           "name",
-          "owner"
+          "owner",
+          "at"
         ],
         "properties": {
           "kind": {
@@ -37,12 +37,6 @@
               "collection"
             ]
           },
-          "archiveUrl": {
-            "type": "string",
-            "format": "uri",
-            "pattern": "/$",
-            "$comment": "proposal (section 6.2): a location where a copy was found, a hint"
-          },
           "version": {
             "type": "string",
             "pattern": "^v[1-9][0-9]*$"
@@ -50,14 +44,6 @@
           "inventorySha512": {
             "type": "string",
             "pattern": "^[0-9a-f]{128}$"
-          },
-          "mirrors": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uri",
-              "pattern": "/$"
-            }
           },
           "doi": {
             "type": "string"
@@ -123,6 +109,17 @@
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
             "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+          },
+          "at": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "/$"
+            },
+            "$comment": "proposal (sections 6.2, 10.2): base URLs where copies may be found, all equal hints"
           }
         }
       }

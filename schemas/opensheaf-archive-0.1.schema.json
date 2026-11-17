@@ -41,16 +41,8 @@
     },
     "mainCollection": {
       "type": "string",
-      "anyOf": [
-        {
-          "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
-        },
-        {
-          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-          "maxLength": 64
-        }
-      ],
-      "$comment": "proposal (section 6.3): the object's first line, sheaf:<name>:<owner>, or the identifier of a draft"
+      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
+      "$comment": "proposal (section 6.3): the object's line, sheaf:<name>:<owner>"
     },
     "profiles": {
       "type": "array",
@@ -89,16 +81,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "anyOf": [
-              {
-                "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
-              },
-              {
-                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-                "maxLength": 64
-              }
-            ],
-            "$comment": "proposal (section 6.3): the object's first line, sheaf:<name>:<owner>, or the identifier of a draft"
+            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
+            "$comment": "proposal (section 6.3): the object's line, sheaf:<name>:<owner>"
           },
           "kind": {
             "enum": [
@@ -163,16 +147,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "anyOf": [
-              {
-                "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
-              },
-              {
-                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-                "maxLength": 64
-              }
-            ],
-            "$comment": "proposal (section 6.3): the object's first line, sheaf:<name>:<owner>, or the identifier of a draft"
+            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
+            "$comment": "proposal (section 6.3): the object's line, sheaf:<name>:<owner>"
           },
           "kind": {
             "enum": [
@@ -201,24 +177,6 @@
             "pattern": "^[a-z2-7]{52}$",
             "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
           },
-          "sealed": {
-            "type": "object",
-            "$comment": "proposal (section 6.5): a pin of the originator's sealing version",
-            "required": [
-              "objectVersion",
-              "inventorySha512"
-            ],
-            "properties": {
-              "objectVersion": {
-                "type": "string",
-                "pattern": "^v[1-9][0-9]*$"
-              },
-              "inventorySha512": {
-                "type": "string",
-                "pattern": "^[0-9a-f]{128}$"
-              }
-            }
-          },
           "owner": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
@@ -227,13 +185,9 @@
         },
         "dependentRequired": {
           "name": [
-            "owner",
-            "sealed"
+            "owner"
           ],
           "owner": [
-            "name"
-          ],
-          "sealed": [
             "name"
           ]
         }
@@ -282,6 +236,36 @@
       },
       "uniqueItems": true,
       "$comment": "proposal (section 6.5): the owner names of the owners the archive hosts"
+    },
+    "drafts": {
+      "type": "array",
+      "$comment": "proposal (sections 6.1, 6.5): drafts shown as unfinished work, on which nothing may rely",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "head"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^sheaf:draft:[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 76,
+            "$comment": "proposal (section 6.3): a draft's local identifier (form provisional, #29)"
+          },
+          "kind": {
+            "enum": [
+              "document",
+              "collection"
+            ]
+          },
+          "head": {
+            "type": "string",
+            "pattern": "^v[1-9][0-9]*$"
+          }
+        }
+      }
     }
   }
 }

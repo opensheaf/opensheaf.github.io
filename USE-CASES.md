@@ -102,8 +102,8 @@ instance "papers with my students") as a member of another archive. In an
 **catalogue** with `follow`, each time she updates the collection
 (`osheaf collect`) it pins the head of her co-author's object, its newest
 object version; nothing is copied, and no permission is needed. Her member
-entry can list in `mirrors` the archives that mirror the paper (section
-10.2), so that readers still reach it when her co-author's archive is down. If she wants the paper in her archive too, and the
+entry lists in `at` the archives where the paper may be found, all equal
+locations (section 10.2), so that readers still reach it when her co-author's archive is down. If she wants the paper in her archive too, and the
 licences of all its versions allow redistribution, she can **mirror** it: a
 byte-for-byte copy of the whole object, which stays the co-author's object
 (`mirrorOf`). Under the identity proposal (sections 6.5 and 10.4, not yet
@@ -185,7 +185,7 @@ id: preserved
 title: Papers preserved by the library
 type: catalogue
 members:
-  - archive: https://example.org/papers/   # the base URL (archiveUrl in members.json)
+  - archive: https://example.org/papers/   # a base URL (in `at` of members.json)
     id: kpz-uniqueness
     mirror: yes
 ```
@@ -193,10 +193,10 @@ members:
 ### An archive that moves
 
 An author moves her archive to a new domain. Its archive identifier (a `tag:`
-URI) does not change. Collections recorded the base URL of the time
-(`archiveUrl`): readers still reach the archive through HTTP redirects from
+URI) does not change. Collections recorded the base URLs of the time
+(`at`): readers still reach the archive through HTTP redirects from
 the old address, which she should keep as long as she can, or through
-the mirrors listed in member entries; curators update `archiveUrl` in a new
+the other locations listed in member entries; curators update `at` in a new
 version of their collections. Pins stay valid, because they fix bytes, not
 addresses.
 
@@ -336,7 +336,7 @@ analysis by people and machines.
   licences allow: a mirror is the authors' object, impartial, every version,
   which is what the journal wants for a document it vetted but does not
   publish (an accepted copy would make it a document of the journal). The
-  selection `issue-7-details` lists the mirror in its member's `mirrors`; a
+  selection `issue-7-details` lists the mirror in its member's `at`; a
   Software Heritage snapshot of her archive is a further witness.
 - **Later versions.** When she improves the detailed argument after
   publication, her catalogue follows it; the account published by
@@ -371,9 +371,9 @@ such extension is published yet, and its design is discussed in issue #28):
       {
         "role": "detailed-argument",
         "kind": "document",
-        "archive": "tag:example.org,2026:authors",
-        "archiveUrl": "https://authors.example.org/",
-        "id": "kpz-details",
+        "name": "k7pd...",
+        "owner": "dftb...",
+        "at": [ "https://authors.example.org/" ],
         "revisions": [
           { "documentVersion": 3, "version": "v3", "inventorySha512": "9f2c..." }
         ]
@@ -416,7 +416,7 @@ together with as much of the review as the participants agree to make public
 - **A private archive.** The specification describes archives that are
   served (section 5), but the same files, kept in a private repository, can
   be deposited, pinned and verified in the same way by whoever has them.
-  Whether such an archive conforms, what `archiveUrl` it gives and how its
+  Whether such an archive conforms, what `at` it gives and how its
   members are resolved are open questions (issue #29). So is its `Available`
   date: the specification asks for the date of deposit (section 8), as for
   the drafts found later in [A researcher's own
@@ -507,7 +507,7 @@ Open questions for the specification, discussed in issue #29:
   them, or publishing is a copy into another archive, with a new identity
   (and new inventories, so that published reports would pin versions readers
   cannot resolve);
-- what `archiveUrl` a private archive gives, and how verifiers resolve its
+- what `at` a private archive gives, and how verifiers resolve its
   members;
 - `Available` for versions deposited privately;
 - mirrors made with the owner's agreement, for objects whose licence does
@@ -626,6 +626,6 @@ copies.
 | a document is taken down (by law, or to erase personal data, section 16) | the object is deleted and a tombstone stays; verifiers report the member as removed | the same for the pinned revisions; an accepted copy is a document of the selection's archive, to which the takedown is applied separately |
 | a document kept privately is made public | it can be a member once its archive can be resolved (how, issue #29) | the same; published reports keep pointing to the versions they reviewed |
 | a referee signs a report | the report's archive adds the referee to its creators by a description-only version, which is followed | the revision vetted is unchanged; the editors may vet the signed version as a new revision |
-| the member's archive moves | the pin stays valid; readers follow redirects or the mirrors listed in member entries | the same |
+| the member's archive moves | the pin stays valid; readers follow redirects or the other locations listed in member entries (`at`) | the same |
 | the member's archive disappears | members are fetched from mirrors, or any copy matching the pin; Zenodo deposits keep the files but cannot be checked against the pin | the accepted copy keeps the vetted revision; references keep their cached citations |
 | a version's licence forbids redistribution | the object cannot be mirrored, only referenced | the revision cannot be copied, only referenced (unless the authors grant the right) |

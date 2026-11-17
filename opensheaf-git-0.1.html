@@ -333,7 +333,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       by section 5 of the specification); 6. the removal of an object folder,
       with the folders of the hash it leaves empty, by a takedown (section 9);
       7. the repair of a file whose bytes do not match the digest its
-      inventory records (section 5.3).
+      inventory records (section 5.3). 8. under the revised identity proposal
+      of the specification (branch <tt class="verbatim">proposal/owners</tt>, section
+      6.5), any change inside the folder of a draft, <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt>,
+      including its removal: drafts are the only objects that may be rewritten
+      or deleted, and are never copied out of the archive.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -834,7 +838,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           **0.1 (draft), 17 November 2026, proposal (branch <tt class="verbatim">proposal/owners</tt>
           of the specification):** copies of lines carry the key logs of their
           signers, witnesses are kept only in objects' extension folders, and
-          an owner moves by copying its folder (section 11).
+          an owner moves by copying its folder (section 11); drafts, at <tt
+          class="verbatim">draft/&lt;id&gt;/</tt>, may be changed or removed by any
+          commit (section 5.1).
         </p>
       </li>
     </ul>
