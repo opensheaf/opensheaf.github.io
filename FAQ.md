@@ -218,7 +218,7 @@ signatures out of three. If a key may have been exposed, the owner
 <dfn>ends</dfn>: a last version of its key log says so and names a successor,
 which continues the work by branches; the old signatures stay good, but
 readers trust them only as far as other evidence goes, since nothing tells the
-owner's signatures from a thief's, and archives add nothing more to its lines.
+owner's signatures from a thief's, and archives no longer extend its lines.
 Every version of every line is signed, and the key logs travel with the
 objects they sign, so a line can be checked from any copy, even when the
 archives that served it have gone. An owner may name who answers for it (an

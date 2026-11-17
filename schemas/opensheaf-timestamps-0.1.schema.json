@@ -2,16 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json",
   "title": "OpenSheaf timestamps extension: the owner's declaration, version 0.1",
-  "$comment": "Proposal (OpenSheaf timestamps 0.1, extension https://opensheaf.org/opensheaf-timestamps-0.1). The value of extensions[\"https://opensheaf.org/opensheaf-timestamps-0.1\"] in keys.json. Dedicated to the public domain under CC0 1.0.",
+  "$comment": "Proposal (OpenSheaf timestamps 0.1, extension https://opensheaf.org/opensheaf-timestamps-0.1). The value of extensions[\"https://opensheaf.org/opensheaf-timestamps-0.1\"] in keys.json; the entry, even empty, declares that the owner timestamps every signature it makes. Dedicated to the public domain under CC0 1.0.",
   "type": "object",
-  "required": [
-    "timestamps"
-  ],
   "properties": {
-    "timestamps": {
-      "const": true,
-      "$comment": "true: the owner timestamps every signature it makes, of its key log and of its lines"
-    },
     "timestampAuthorities": {
       "type": "array",
       "uniqueItems": true,
@@ -19,7 +12,7 @@
         "type": "string",
         "pattern": "^[0-9a-f]{64}$"
       },
-      "$comment": "SHA-256 fingerprints of the signing or root certificates of RFC 3161 authorities added to those trusted; cumulative over the versions of the key log, never removed"
+      "$comment": "SHA-256 fingerprints of the signing or root certificates of RFC 3161 authorities; a signature file trusts those listed in the key-log version it names and in the versions before it"
     }
   }
 }

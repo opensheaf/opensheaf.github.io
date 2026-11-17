@@ -74,9 +74,9 @@
       This extension follows the extension mechanism of section 4 of the
       specification: it never changes the meaning of what the specification
       defines, nor relaxes its requirements, never changes the status of a
-      signature or a version, never ends or resolves a fork, and never lets a
-      version into an archive. A reader that does not know it ignores the
-      files and data it defines.
+      signature or a version, never ends an owner or decides a fork, and never
+      lets a version into an archive. A reader that does not know it ignores
+      the files and data it defines.
     </p>
     <h2 id="auto-4"><a id="3-timestamps"></a>3. Timestamps<span style="margin-left: 1em"></span></h2>
     <p>
@@ -131,24 +131,21 @@
     <ul>
       <li>
         <p>
-          <tt class="verbatim">timestamps</tt>, REQUIRED: <tt class="verbatim">true</tt>: the
-          owner timestamps every signature it makes, of its key log and of its
-          lines;
-        </p>
-      </li>
-      <li>
-        <p>
           <tt class="verbatim">timestampAuthorities</tt>, OPTIONAL: RFC 3161
           time-stamping authorities the owner trusts, each the SHA-256
           fingerprint (lowercase hexadecimal) of the authority's signing
-          certificate or of the root certificate of its chain. The list is
-          cumulative: the authorities trusted are those listed in any version
-          of the key log up to the latest the reader knows, and a later
-          version cannot remove one. Without any, only OpenTimestamps proofs
-          are used.
+          certificate or of the root certificate of its chain. The authorities
+          trusted for a signature file are those listed in the key-log version
+          its <tt class="verbatim">keyLog</tt> names and in the versions before it, so
+          that no one can add an authority later to date earlier signatures.
+          Without any, only OpenTimestamps proofs are used.
         </p>
       </li>
     </ul>
+    <p>
+      The entry, even empty, declares that the owner timestamps every
+      signature it makes, of its key log and of its lines.
+    </p>
     <p>
       The declaration validates against the schema of appendix A, and is part
       of the key-log version, signed with it.
@@ -162,7 +159,7 @@
         <p>
           for an RFC 3161 token: its message imprint is the SHA-512 digest of
           the file's bytes; its signing certificate, or the root of the chain
-          it carries, has a fingerprint listed in <tt class="verbatim">timestampAuthorities</tt>
+          it carries, has a fingerprint listed for that signature file
           (section 4); every certificate of the chain was within its validity
           period at the token's <tt class="verbatim">genTime</tt>, the signing
           certificate is for time stamping (RFC 3161, section 2.3), and no
@@ -201,6 +198,14 @@
       complete proofs only; the timestamp files of key logs are in their owner
       objects.
     </p>
+    <p>
+      Tools that create an owner SHOULD offer to adopt this extension in the
+      first version of its key log, and SHOULD timestamp each signature when
+      they make it, before a version leaves its owner's hands: with an RFC
+      3161 token where an owner cannot wait for an OpenTimestamps proof to
+      complete, and with an OpenTimestamps proof beside it where an owner
+      wants evidence that rests on no authority.
+    </p>
     <h2 id="auto-8"><a id="7-verification"></a>7. Verification<span style="margin-left: 1em"></span></h2>
     <p>
       A verifier that knows this extension, in addition to the checks of
@@ -209,40 +214,22 @@
       checks every timestamp file against the signature file it stamps
       (section 5) and its name against the digest of its bytes (section 3),
       reporting each as valid, invalid, pending, or from an authority not
-      listed, and reports the date of each version signed under a declaration,
-      or that it is undated, a warning.
+      listed, and reports the date of each version.
     </p>
-    <h2 id="auto-9"><a id="8-guidance-for-tools"></a>8. Guidance for tools<span style="margin-left: 1em"></span></h2>
-    <ul>
-      <li>
-        <p>
-          Tools that create an owner SHOULD offer to adopt this extension in
-          the first version of its key log.
-        </p>
-      </li>
-      <li>
-        <p>
-          Tools SHOULD timestamp each signature when they make it, under a
-          declaration, and before a version leaves its owner's hands; with an
-          RFC 3161 token where an owner cannot wait for an OpenTimestamps
-          proof to complete, and with an OpenTimestamps proof beside it where
-          an owner wants evidence that rests on no authority.
-        </p>
-      </li>
-    </ul>
-    <h2 id="auto-10"><a id="9-security-considerations"></a>9. Security considerations<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-9"><a id="8-security-considerations"></a>8. Security considerations<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
           <strong>Trust.</strong> An RFC 3161 token rests on the authority's
           clock and keys: an authority that misdates, or whose key is stolen,
-          can date a signature falsely. Listing the authorities in the key log
-          keeps anyone else from dating with an authority of their own, and an
-          authority once listed stays trusted for its tokens. Listing a root
-          certificate trusts every authority that root certifies, so an owner
-          that wants a single authority lists its signing certificate. An
-          OpenTimestamps proof rests on no authority, only on Bitcoin, but is
-          complete only after hours.
+          can date a signature falsely. Listing the authorities in the key
+          log, and trusting for a signature only those listed up to the
+          key-log version it names, keeps anyone else, a thief included, from
+          dating with an authority of their own. Listing a root certificate
+          trusts every authority that root certifies, so an owner that wants a
+          single authority lists its signing certificate. An OpenTimestamps
+          proof rests on no authority, only on Bitcoin, but is complete only
+          after hours.
         </p>
       </li>
       <li>
@@ -255,13 +242,13 @@
         </p>
       </li>
     </ul>
-    <h2 id="auto-11"><a id="appendix-a-json-schema-normative"></a>Appendix A. JSON Schema (normative)<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-10"><a id="appendix-a-json-schema-normative"></a>Appendix A. JSON Schema (normative)<span style="margin-left: 1em"></span></h2>
     <p>
       The data of the declaration, the value of <tt class="verbatim">extensions[&quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;]</tt>
       in <tt class="verbatim">keys.json</tt>, validates against <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json">opensheaf-timestamps-0.1.schema.json</a>
       (JSON Schema 2020-12, CC0 1.0).
     </p>
-    <h2 id="auto-12"><a id="appendix-b-example-non-normative"></a>Appendix B. Example (non-normative)<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-11"><a id="appendix-b-example-non-normative"></a>Appendix B. Example (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
       The <tt class="verbatim">keys.json</tt> of the first version of an owner's key
       log, adopting the extension from the start, with one RFC 3161 authority
@@ -278,7 +265,6 @@
   &quot;threshold&quot;: 1,
   &quot;extensions&quot;: {
     &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
-      &quot;timestamps&quot;: true,
       &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
     }
   }
@@ -302,7 +288,7 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
       believes the theft happened after a given date may trust the versions
       dated before it.
     </p>
-    <h2 id="auto-13"><a id="appendix-c-references"></a>Appendix C. References<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-12"><a id="appendix-c-references"></a>Appendix C. References<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -327,7 +313,7 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
         </p>
       </li>
     </ul>
-    <h2 id="auto-14"><a id="changelog"></a>Changelog<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-13"><a id="changelog"></a>Changelog<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>
@@ -337,14 +323,22 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           RFC 3161 tokens and OpenTimestamps proofs of signature files, named
           by the digest of their own bytes, completed proofs as new files,
           anyone may stamp; the owner's declaration in <tt class="verbatim">keys.json</tt>
-          under <tt class="verbatim">extensions</tt> (<tt class="verbatim">timestamps</tt>,
-          cumulative <tt class="verbatim">timestampAuthorities</tt>); checking at <tt
-          class="verbatim">genTime</tt> with listed authorities and complete proofs
-          only; the date of a version. Finally, following the specification,
-          where an exposed key ends its owner, the extension changes no
-          status: it no longer confirms the signatures of revoked keys (there
-          are none) nor resolves forks of key logs, and only gives dates that
-          readers may weigh.
+          under <tt class="verbatim">extensions</tt>; checking at <tt class="verbatim">genTime</tt>
+          with listed authorities and complete proofs only; the date of a
+          version. Finally, following the specification, where an exposed key
+          ends its owner, the extension changes no status: it no longer
+          confirms the signatures of revoked keys (there are none) nor
+          resolves forks of key logs, and only gives dates that readers may
+          weigh.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, after a thirteenth review of
+          PR #30:</strong> the declaration is the entry itself, with only <tt
+          class="verbatim">timestampAuthorities</tt>; the authorities trusted for a
+          signature are those listed up to the key-log version it names, not
+          later ones; guidance for tools merged into section 6.
         </p>
       </li>
     </ul>

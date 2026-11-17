@@ -320,25 +320,25 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       in the hashed layout, section 5 of the specification), with the folders
       above it that it needs (a new owner's folder, or folders of the hash),
       and the files of a complete OCFL object: a new object, or the copy of a
-      line kept elsewhere, up to its signed head (its root inventory then that
-      of this version, section 10.4 of the specification); 2. new version
-      folders <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt> to <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;M&gt;/</tt>,
-      M not less than N, where <tt class="verbatim">v&lt;N-1&gt;</tt> is the head of the
-      object in C, with the replacement of the object's root <tt class="verbatim">inventory.json</tt>
-      and its checksum file by those of <tt class="verbatim">v&lt;M&gt;</tt>, and the
-      versions' signature files in item 3; 3. files added in an object's <tt
-      class="verbatim">extensions/opensheaf-witnesses/</tt> folder: signature files <tt
-      class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt> of the line's owner
-      that are not invalid (section 13.2 of the specification), their
-      timestamp files, others' witnesses and, in an owner object, the evidence
-      of forks of its key log under <tt class="verbatim">fork/</tt> (section 6.5 of the
-      specification). A file there, once published, is never replaced or
-      removed, except with its object by a takedown, even when it is not a
-      witness (a stray or malformed file, which is reported and kept):
-      timestamps are made of the bytes of signature files, and a completed
-      timestamp proof is a new file beside the pending one; 4. the replacement
-      of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced or removed
-      among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
+      line kept elsewhere, up to its latest signed version (its root inventory
+      then that of this version, section 10.4 of the specification); 2. new
+      version folders <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt> to <tt
+      class="verbatim">ocfl/&lt;path&gt;/v&lt;M&gt;/</tt>, M not less than N, where <tt
+      class="verbatim">v&lt;N-1&gt;</tt> is the head of the object in C, with the
+      replacement of the object's root <tt class="verbatim">inventory.json</tt> and its
+      checksum file by those of <tt class="verbatim">v&lt;M&gt;</tt>, and the versions'
+      signature files in item 3; 3. files added in an object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
+      folder: signature files <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>
+      of the line's owner that are not invalid (section 13.2 of the
+      specification), their timestamp files, others' witnesses and, in an
+      owner object, the evidence of forks of its key log under <tt class="verbatim">fork/</tt>
+      (section 6.5 of the specification). A file there, once published, is
+      never replaced or removed, except with its object by a takedown, even
+      when it is not a witness (a stray or malformed file, which is reported
+      and kept): timestamps are made of the bytes of signature files, and a
+      completed timestamp proof is a new file beside the pending one; 4. the
+      replacement of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced
+      or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
       <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
       at every deposit and takedown (section 6.6 of the specification,
       proposal); 5. at the creation of the storage root, its own files (<tt
@@ -366,15 +366,18 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       (sections 6.5 and 13.2 of the specification): signed with good
       signatures of its line's owner, against the key log of the owner object
       kept at its path, which the same commit adds or extends if needed, or
-      extended by a version so signed that the same commit adds; and none is
-      added to the lines of an owner that has ended, or whose key log is
-      forked, as the commit's tree shows (by <tt class="verbatim">ended</tt>, or by the
-      evidence of a fork). A version of a key log added is signed with good
-      signatures of keys of the version before. Since nothing is removed from
-      the published branch afterwards and OCFL cannot skip a version, a
-      version let in that is not signed would hold its number for good, and
-      the owner's own version of that number could never be added to this
-      archive. Versions already published stay, whatever happens later.
+      extended by a version so signed that the same commit adds; and, for an
+      owner that has ended, or whose key log is forked, as the commit's tree
+      shows (by <tt class="verbatim">ended</tt>, or by the evidence of a fork), no
+      version extends a line of that owner already published, though a new
+      copy of its line up to its latest signed version may be added. A version
+      of a key log added is signed with good signatures of keys of the version
+      before, up to and including one with <tt class="verbatim">ended</tt>, and none
+      after it. Since nothing is removed from the published branch afterwards
+      and OCFL cannot skip a version, a version let in that is not signed
+      would hold its number for good, and the owner's own version of that
+      number could never be added to this archive. Versions already published
+      stay, whatever happens later.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -717,8 +720,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           than a draft's, is signed once added, as section 5.1 says, against
           key logs that are owner objects at their paths in the commit's tree;
           an added version that is not signed (unsigned, invalid, or
-          unchecked: a key-log version not found), a version added to the
-          lines of an ended or forked owner, and an added signature file of
+          unchecked: a key-log version not found), a version extending a
+          published line of an ended or forked owner, a version of a key log
+          after one with <tt class="verbatim">ended</tt>, and an added signature file of
           the owner that is invalid, are failures, unless a signed version
           added in the same commit extends that version, so that a pull
           request adding them cannot pass;
@@ -898,7 +902,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           6.3); takedowns leave in place the owner objects that other objects
           need (section 9); private keys are never committed (section 12).
           Setting aside versions, removing files, revocation and the tail,
-          tried during the day, were withdrawn.
+          tried during the day, were withdrawn.; after a thirteenth review:
+          the key log of an ended or forked owner is added up to its end, and
+          its lines may be copied, only extending them is refused.
         </p>
       </li>
     </ul>

@@ -95,7 +95,7 @@ what its two standards leave open:
   the content stays. **Takedown** (11.2): the object is deleted and a
   **tombstone** stays in the discovery document (11.3); owner objects that
   kept objects need stay, and an owner object is taken down only for itself
-  (only through its keeper or by law once any fork of its key log is known),
+  (only through its keeper or by law once it has ended or its key log forked),
   leaving the signatures that need it unchecked (11.2).
 - **Witnesses** (13.2): in `extensions/opensheaf-witnesses/` of the object,
   not part of any version: the owner's signature files (required for every
@@ -132,19 +132,22 @@ November 2026; read them before touching any of this.
   at most the number of keys; optional `keeper`, `https` URLs; `extensions`,
   the data of extensions concerning the key log, keyed by URI, such as the
   timestamps declaration; `ended`, `true` in the last version, with an
-  optional `successor` owner name). A key is **retired** by leaving it out of
-  `keys`; its signatures stay good. An owner whose key may have been exposed
+  optional `successor`, another owner). A key is **retired** by leaving it out
+  of `keys`; its signatures stay good. An owner whose key may have been exposed
   **ends** (`ended`), and a **fork** of its key log (two valid versions of one
   number) has the same effect from the fork point: its signatures stay good
   (the core cannot date them), readers trust its history only as far as other
   evidence goes (earlier copies, pins, timestamps), archives add nothing more
   to its lines, and its work continues under the successor by branches; a
-  successor is a hint, two successors are a fork settled outside the format. A
+  successor is a hint, never followed automatically, confirmed by the keeper's
+  `.well-known/opensheaf`; two successors are a fork settled outside the
+  format; an owner ended by someone else signs a competing version, a fork. A
   thief with a current key is the owner until found out (Radicle's answer: a
   compromised key means a new identity). The first `keys.json` repeats the
   genesis record's keys (as a set) and threshold and is signed by them
   (`keyLog` naming itself); vN+1 is signed by `threshold` keys of vN (`keyLog`
-  naming vN); no version follows one with `ended`. One `threshold` governs the
+  naming vN); no version follows one with `ended`, and no line signature names
+  the ending version, which only ends. One `threshold` governs the
   key log and the lines (as in Radicle); a threshold binds only the signatures
   naming its version; owners choose at the start: 1 with a spare key (survives
   loss) or 2 of 3 keys (survives one theft). The optional **keeper** link
@@ -188,13 +191,14 @@ November 2026; read them before touching any of this.
   object's `extensions/opensheaf-witnesses/fork/<n>/<d>/`. **Adding:** an
   archive adds a version only if it is signed once added (good signatures, or
   extended by such a version added from the same copy), against the key log it
-  holds (fetched fresh), and none to the lines of an ended or forked owner; a
+  holds (fetched fresh); for an ended or forked owner it copies the key log up
+  to the end and may copy its lines, but extends none it holds; a
   mirror stops at the latest signed version. What an archive holds stays; one
   let in against the rule (not signed) is reported as a breach in section 14,
   not a failure, and blocks the owner's version of that number there (OCFL
   cannot skip), that copy being one side of a fork of the line; only a
-  takedown removes a version. Extensions never change a status, end or resolve
-  a fork, or let a version in (section 4). Third parties:
+  takedown removes a version. Extensions never change a status, end an owner,
+  decide a fork, or let a version in (section 4). Third parties:
   `witness-<label>.json`, another owner's `keyLog`.
 - **Timestamps: an extension, not the core.** Defined in
   `opensheaf-timestamps-0.1.md` (URI
@@ -202,11 +206,12 @@ November 2026; read them before touching any of this.
   OpenTimestamps `.ots` files beside signature files, named
   `signature-<k>.json.<e>.tsr|.ots` with `<e>` the first 16 base32 characters
   of the SHA-256 of the timestamp file's own bytes (copies merge); the owner's
-  declaration in `keys.json` under `extensions` (`timestamps`: `true`;
-  `timestampAuthorities`: SHA-256 fingerprints, cumulative over the key log);
+  declaration in `keys.json` under `extensions` (the entry itself, with
+  `timestampAuthorities`: SHA-256 fingerprints, trusted for a signature up to
+  the key-log version it names);
   timestamps of signature files only; checks at `genTime`, complete proofs
   only; the date of a version (`threshold`-th earliest date). Evidence only:
-  it changes no status, ends or resolves no fork, lets nothing into an
+  it changes no status, ends no owner, decides no fork, lets nothing into an
   archive; readers may use dates to trust an ended or forked owner's versions
   made before the exposure; anyone MAY stamp any signature file at any time;
   owners SHOULD adopt it from their first key-log version. Its schema is
@@ -265,7 +270,7 @@ November 2026; read them before touching any of this.
   a copy of the parent's line beside it (OCFL inventories fix their object's
   id). Branch points move only forward; accepted copies are branches of the
   selection's owner. Verdicts: inconsistent (a failed check, missing or
-  invalid parent signatures), pending (the parent version unchecked: its
+  invalid parent signatures), unchecked (the parent version unchecked: its
   owner's key log missing), confirmed.
 - **`sheaf:` URIs** (6.6): `sheaf:<name>`, `sheaf:<name>:<owner>`,
   `sheaf:<name>:*`, `/v<n>`, `?sha512=` (a pin), `at=` (a hint),
@@ -322,8 +327,8 @@ assertions), the storage root and objects against OCFL, the discovery document
 against the storage root, the rules of sections 7 to 11 on every object
 version (document version numbering, `history`, notices kept), and resolves
 and checks the pins of the head of every collection, reporting each member as
-verified, mismatch, pending, not a version, unavailable or removed. Over HTTP it
-cannot list folders, so completeness is checked only with the files. It also
+verified, mismatch, unchecked, not a version, unavailable or removed. Over HTTP
+it cannot list folders, so completeness is checked only with the files. It also
 checks genesis records and names, key logs and every signature (the signed
 message, and the statuses of signatures and versions classified as in 13.2,
 fork evidence, stray files reported), owners and lines, that no pin names a

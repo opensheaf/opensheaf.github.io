@@ -477,11 +477,10 @@
           extension that concerns an owner's key log records its data, in the
           same way, under <tt class="verbatim">extensions</tt> in <tt class="verbatim">keys.json</tt>
           (section 6.5), where the owner's signatures of the key-log version
-          fix it; the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> is one. Such an
-          extension adds evidence that readers may weigh (for instance the
-          date by which a signature existed); it never changes the status of a
-          signature or a version (section 13.2), never ends or resolves a
-          fork, and never lets a version into an archive.
+          fix it; such an extension, as the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>,
+          only adds evidence that readers may weigh: it never changes a status
+          (section 13.2), ends an owner, decides a fork or lets a version into
+          an archive.
         </p>
       </li>
     </ul>
@@ -1001,17 +1000,23 @@
       <strong>Ending an owner.</strong> An owner whose key may have been
       exposed ends: it signs, as usual, a last version of its key log with <tt
       class="verbatim">ended</tt> <tt class="verbatim">true</tt> and, OPTIONALLY, <tt class="verbatim">successor</tt>,
-      the owner name of a new owner that continues its work. No version of the
-      key log after it is valid. A successor is a hint, which the keeper
-      (below) MAY confirm.
+      the owner name of a new owner that continues its work, which MUST differ
+      from its own. The ending version only ends: no version of the key log
+      follows it, and no signature of a line may name it (section 13.2). A
+      successor is a hint, never followed automatically, which the keeper
+      (below) MAY confirm by listing it in <tt class="verbatim">owners</tt> of its <tt
+      class="verbatim">.well-known/opensheaf</tt> file. If someone else ends the owner
+      with its keys, the owner signs a competing version of the same number,
+      which makes a fork (below).
     </p>
     <p>
       <strong>Forks of a key log.</strong> Two different valid versions of a
       key log with the same number, each signed by <tt class="verbatim">threshold</tt>
       keys of the version before, are a <strong>fork</strong>, made by whoever
-      holds old keys. The core cannot tell which side is the owner's, and
-      treats the owner as ended at the fork point. Two successors named on two
-      sides of a fork are reported, and settled outside the format.
+      holds <tt class="verbatim">threshold</tt> keys of the version before. The core
+      cannot tell which side is the owner's, and treats the owner as ended at
+      the fork point. Two successors named on two sides of a fork are
+      reported, and settled outside the format.
     </p>
     <p>
       <strong>After an end or a fork.</strong> The owner's signatures stay
@@ -1023,9 +1028,9 @@
       under its successor, by branches of its versions (section 10.5). A thief
       holding a key that is still current is the owner until found out: the
       format cannot prevent it, only make it visible; a threshold of 2 or more
-      from the first version makes a theft harder. This is Radicle's answer,
-      where a node's key is its identity and a compromised key means a new
-      node.
+      from the first version makes a theft harder (above). This is Radicle's
+      answer, where a node's key is its identity and a compromised key means a
+      new node.
     </p>
     <p>
       <strong>Evidence of forks.</strong> An archive keeps one copy of each
@@ -1120,11 +1125,15 @@
       only if, once added, it is signed (section 13.2) against the key log the
       archive holds: signed by its owner, or extended by a signed version
       added with it from the same copy; tools fetch the latest key log they
-      can find before adding. It adds no version to the lines of an owner that
-      has ended or whose key log is forked, as far as it knows (above), and no
-      invalid signature file. A mirror thus lags at the latest signed version,
-      and a forger's version never enters. An archive that continues another
-      owner's line makes a branch, under its own owner (section 10.5).
+      can find before adding. For an owner that has ended or whose key log is
+      forked, as far as it knows (above), it adds the key log up to and
+      including the end (for a fork, the side it keeps, with the evidence of
+      the other), and MAY make a new copy of a line up to its latest signed
+      version, which readers weigh as they weigh that owner's history; but it
+      extends no line of that owner that it already holds. It adds no invalid
+      signature file. A mirror thus lags at the latest signed version, and a
+      forger's version never enters. An archive that continues another owner's
+      line makes a branch, under its own owner (section 10.5).
       <strong>Versions an archive holds stay</strong>: nothing that a host or
       a thief can produce leads to removing one; only a takedown does (section
       11.2). A version let in against this rule that is not signed is
@@ -1340,7 +1349,9 @@
           Takedowns: a branch keeps the parent version after the parent is
           taken down, and mirrors, indexes kept by others and gateways may go
           on serving a taken-down object; with lines stored anywhere, an
-          owner's takedown needs a statement signed by the owner (#33).
+          owner's takedown needs a statement signed by the owner, and for an
+          owner that has ended or whose key log is forked, its keeper or the
+          law (#33).
         </p>
       </li>
       <li>
@@ -2690,7 +2701,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           the parent's owner, are good signatures of it from <tt class="verbatim">threshold</tt>
           distinct keys of one key-log version, or when the verifier finds a
           signed version of the parent's line that extends it (section 6.5);
-          it is <strong>pending</strong> when it would be signed if its
+          it is <strong>unchecked</strong> when it would be signed if its
           unchecked signatures were good; otherwise it is not a version, a
           failure of this check;
         </p>
@@ -2716,13 +2727,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       its parent is a branch, at each of its branch points, and its copies
       MUST carry the key logs of its parents' owners (section 6.5); a copy
       without one of them leaves the signatures that need it unchecked, and
-      the branch point pending (section 14). When a parent's owner later ends,
-      or its key log forks, the branch point stays confirmed, since signatures
-      stay good; readers weigh it as they weigh that owner's history (section
-      6.5). Without <tt class="verbatim">parent.signatures/</tt>, or when they leave the
-      parent version not a version, the branch shows only that someone made a
-      parent inventory that agrees with itself, and is inconsistent (section
-      14).
+      the branch point unchecked (section 14). When a parent's owner later
+      ends, or its key log forks, the branch point stays confirmed, since
+      signatures stay good; readers weigh it as they weigh that owner's
+      history (section 6.5). Without <tt class="verbatim">parent.signatures/</tt>, or
+      when they leave the parent version not a version, the branch shows only
+      that someone made a parent inventory that agrees with itself, and is
+      inconsistent (section 14).
     </p>
     <p>
       <strong>Moving the branch point.</strong> A branch MAY take a later
@@ -2836,11 +2847,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       (section 11.3); the signatures of that owner in the objects the archive
       still keeps cannot be checked there, so they are unchecked (section
       13.2), and the versions and branch points that rely on them are
-      unchecked or pending, not invalid or inconsistent, until the key log is
-      found elsewhere. The rule that a copy carries its owners' key logs
-      (section 6.5), and the checks of section 14, then accept the tombstone
-      in place of the owner object. An owner object restored later, with the
-      same genesis record and a key log whose versions extend the version the
+      unchecked, not invalid or inconsistent, until the key log is found
+      elsewhere. The rule that a copy carries its owners' key logs (section
+      6.5), and the checks of section 14, then accept the tombstone in place
+      of the owner object. An owner object restored later, with the same
+      genesis record and a key log whose versions extend the version the
       tombstone pins, is the same line returning, not a reuse of its
       identifier (section 11.3).
     </p>
@@ -2941,12 +2952,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
     <p>
       Digests show that files were not changed; they do not show who made them
       or when. With the proposal of section 6.5, every sealed object version
-      is signed by the owner of its line, and MAY be timestamped and vouched
-      for by others. Witness files are kept in the object's extension folder
-      <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, so that they travel
-      with the object when it is copied or mirrored. OCFL allows object
-      extension folders, which are not part of any version; the extension name
-      <tt class="verbatim">opensheaf-witnesses</tt> is not yet registered with OCFL, so
+      is signed by the owner of its line, and MAY be timestamped and witnessed
+      by others. Witness files are kept in the object's extension folder <tt
+      class="verbatim">extensions/opensheaf-witnesses/</tt>, so that they travel with
+      the object when it is copied or mirrored. OCFL allows object extension
+      folders, which are not part of any version; the extension name <tt
+      class="verbatim">opensheaf-witnesses</tt> is not yet registered with OCFL, so
       validators may warn about it. Witnesses can be added later, by the owner
       of the line or by others, and are never replaced once made (a completed
       timestamp proof is a new file beside the pending one, as the <a href="opensheaf-timestamps-0.1.html">timestamps
@@ -3053,9 +3064,11 @@ keylog &lt;the value of keyLog&gt;</pre>
           class="verbatim">object</tt>, <tt class="verbatim">version</tt> and <tt class="verbatim">inventorySha512</tt>
           are not those of the version whose folder holds it (in <tt class="verbatim">parent.signatures/</tt>,
           of the parent version; the digest also in its checksum file), its
-          <tt class="verbatim">signer</tt> is not the line's owner, or the key log
-          reaches the version named, with that digest, and the key is not
-          listed in its <tt class="verbatim">keys</tt>;
+          <tt class="verbatim">signer</tt> is not the line's owner, the key log reaches
+          the version named, with that digest, and the key is not listed in
+          its <tt class="verbatim">keys</tt>, or the version named follows one with <tt
+          class="verbatim">ended</tt>, or, for a signature of a line, has <tt class="verbatim">ended</tt>
+          itself (section 6.5);
         </p>
       </li>
       <li>
@@ -3079,7 +3092,8 @@ keylog &lt;the value of keyLog&gt;</pre>
       class="verbatim">threshold</tt> distinct keys of the version before (for the first
       version, of itself), <tt class="verbatim">threshold</tt> being that version's,
       have good signature files naming it; key logs are read version by
-      version, and a fork ends the owner (section 6.5).
+      version, a version after one with <tt class="verbatim">ended</tt> is not a version
+      of the key log, and a fork ends the owner (section 6.5).
     </p>
     <p>
       A version of a line is:
@@ -3131,7 +3145,7 @@ keylog &lt;the value of keyLog&gt;</pre>
     </p>
     <p>
       <strong>Others' witnesses.</strong> A signature by someone other than
-      the owner (a third party vouching for a version) is <tt class="verbatim">&lt;version&gt;/witness-&lt;label&gt;.json</tt>,
+      the owner (a third party attesting a version) is <tt class="verbatim">&lt;version&gt;/witness-&lt;label&gt;.json</tt>,
       where <tt class="verbatim">&lt;label&gt;</tt> is chosen by whoever adds it and
       matches <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>, with the fields and
       the signed message of a signature file, <tt class="verbatim">signer</tt> and <tt
@@ -3243,9 +3257,9 @@ keylog &lt;the value of keyLog&gt;</pre>
           against the <tt class="verbatim">object.json</tt> of the pinned version, and
           that the pinned version is signed by its owner (section 13.2); check
           that no pin names a draft (section 6.5); report each as verified,
-          mismatch (a copy was found and does not match), pending (the pinned
-          version is unchecked), not a version (section 13.2), unavailable (no
-          copy found) or removed (tombstoned);
+          mismatch (a copy was found and does not match), unchecked (the
+          pinned version is unchecked), not a version (section 13.2),
+          unavailable (no copy found) or removed (tombstoned);
         </p>
       </li>
       <li>
@@ -3329,12 +3343,12 @@ keylog &lt;the value of keyLog&gt;</pre>
           that applies: inconsistent (a check fails, including a parent
           version that is not a version, or the parent was resolved and does
           not match), confirmed (the parent version is signed, against its
-          owner's key log, section 10.5), pending (consistent, but the parent
-          version is unchecked, section 10.5); report as the branch's verdict
-          the weakest of those of its branch points (inconsistent, pending,
-          confirmed, from the weakest); and report separately whether the
-          parent was found, unavailable or removed (tombstoned), and whether
-          it is withdrawn;
+          owner's key log, section 10.5), unchecked (consistent, but the
+          parent version is unchecked, section 10.5); report as the branch's
+          verdict the weakest of those of its branch points (inconsistent,
+          unchecked, confirmed, from the weakest); and report separately
+          whether the parent was found, unavailable or removed (tombstoned),
+          and whether it is withdrawn;
         </p>
       </li>
       <li>
@@ -3402,39 +3416,25 @@ keylog &lt;the value of keyLog&gt;</pre>
       <li>
         <p>
           <strong>Branches and owners (proposal).</strong> The evidence a
-          branch carries, the parent's signatures included, and the key logs
-          of its parents' owners beside it, are untrusted input, checked like
-          inventories from other archives. Every line is signed by its owner,
-          so no archive can add to another owner's line: a version it makes is
-          its own branch, or invalid (section 6.5). Archives add only signed
-          versions, and none to the lines of an owner that has ended or whose
-          key log is forked, so a forger's version never enters by the rules;
-          one let in against them blocks the owner's version of that number in
-          that archive, since OCFL versions cannot be skipped, and that
-          archive then holds one side of a fork of the line (section 6.5).
+          branch carries, and the key logs of its parents' owners beside it,
+          are untrusted input, checked like inventories from other archives.
+          Every line is signed by its owner, and archives add only signed
+          versions, so no archive can add to another owner's line, and a
+          version let in against the rule blocks the owner's version of that
+          number in that archive (section 6.5).
         </p>
       </li>
       <li>
         <p>
-          <strong>Keys (proposal).</strong> An owner name is the digest of a
-          genesis record listing the owner's first keys, so no one can write
-          another first version of its key log. A signature binds the object,
-          the version, its inventory and the key-log version it relies on
-          (section 13.2), is judged against that version alone, and stays
-          good, so owners add and retire keys without signing anything again,
-          and need not know where their lines are kept. The core does not date
-          signatures, so it cannot tell a leaked key's earlier signatures from
-          later ones: an owner whose key may have been exposed ends, and so
-          does, in effect, an owner whose key log is forked, which whoever
-          holds <tt class="verbatim">threshold</tt> old keys can do; its work continues
-          under a successor, and its history is trusted as far as other
-          evidence goes (section 6.5). A thief with a current key is the owner
-          until found out. A threshold of 2 with three keys kept apart, from
-          the first version, resists the theft of one key; a threshold of 1
-          with a spare key only its loss. A copy that withholds the later
-          versions of a key log hides an end: no one can prove offline that a
-          key log is complete. An owner that loses every key cannot even end;
-          its keeper can only announce a successor.
+          <strong>Keys (proposal).</strong> A signature binds the object, the
+          version, its inventory and the key-log version it names, and stays
+          good, so owners add and retire keys without signing anything again;
+          since the core does not date signatures, an owner whose key may have
+          been exposed, or whose key log is forked, ends, and a thief with a
+          current key is the owner until found out (section 6.5). A copy that
+          withholds the later versions of a key log hides an end, and an owner
+          that loses every key cannot even end; its keeper can only announce a
+          successor.
         </p>
       </li>
       <li>
@@ -4395,6 +4395,20 @@ keylog &lt;the value of keyLog&gt;</pre>
           vouched for by a later version signed directly.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, after a thirteenth review (PR
+          #30):</strong> the key log of an ended or forked owner is always
+          copied, up to and including the end, and its lines may be copied up
+          to their latest signed version; only extending them is frozen; the
+          ending version only ends, and no signature of a line may name it;
+          <tt class="verbatim">successor</tt> differs from the owner, is never followed
+          automatically, and is confirmed by the keeper's <tt class="verbatim">.well-known/opensheaf</tt>;
+          an owner ended by someone else answers with a competing version, a
+          fork; branch points and members unchecked rather than pending;
+          section 15 shortened; the timestamps declaration is only <tt class="verbatim">timestampAuthorities</tt>.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4883,11 +4897,10 @@ ocfl/
       The <tt class="verbatim">keys.json</tt> of the first version of that owner's key
       log repeats the <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt> of
       the genesis record, and adopts the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>
-      from the start, declaring that it timestamps every signature it makes
-      (so that, if the owner ever ends, readers can tell which versions were
-      signed before a key was exposed, section 6.5) and listing one RFC 3161
-      authority it trusts (a placeholder fingerprint); it is signed by its own
-      key:
+      from the start, listing one RFC 3161 authority it trusts (a placeholder
+      fingerprint), so that, if the owner ever ends, readers can tell which
+      versions were signed before a key was exposed (section 6.5); it is
+      signed by its own key:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4898,7 +4911,6 @@ ocfl/
   &quot;threshold&quot;: 1,
   &quot;extensions&quot;: {
     &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
-      &quot;timestamps&quot;: true,
       &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
     }
   }
@@ -4907,9 +4919,10 @@ ocfl/
     </div>
     <p>
       The <tt class="verbatim">keys.json</tt> of the second version, which added a spare
-      key, names the keeper and keeps the declaration (the authorities it
-      lists are cumulative, so it need not repeat them); it is signed by the
-      key of the first version:
+      key, names the keeper and keeps the declaration (signatures naming this
+      version trust the authorities listed in it and in the versions before,
+      so it need not repeat them); it is signed by the key of the first
+      version:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4921,7 +4934,7 @@ ocfl/
   &quot;threshold&quot;: 1,
   &quot;keeper&quot;: [ &quot;https://orcid.org/0000-0002-1234-5677&quot; ],
   &quot;extensions&quot;: {
-    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: { &quot;timestamps&quot;: true }
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {}
   }
 }</pre>
       </div>
@@ -4931,10 +4944,11 @@ ocfl/
       log, after the laptop holding the first key was stolen: the owner ends,
       naming as successor a new owner it has created with new keys (a
       placeholder name), which continues its work by branches; it is signed by
-      the spare key, listed in the second version. The signatures the owner
-      made stay good; readers trust its versions as far as other evidence
-      goes, such as the timestamps of their signatures and the journal's pin
-      of the authors' <tt class="verbatim">v4</tt> below:
+      the spare key, listed in the second version, and no signature of a line
+      may name it. The signatures the owner made stay good; readers trust its
+      versions as far as other evidence goes, such as the timestamps of their
+      signatures and the journal's pin of the authors' <tt class="verbatim">v4</tt>
+      below:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4946,7 +4960,7 @@ ocfl/
   &quot;threshold&quot;: 1,
   &quot;keeper&quot;: [ &quot;https://orcid.org/0000-0002-1234-5677&quot; ],
   &quot;extensions&quot;: {
-    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: { &quot;timestamps&quot;: true }
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {}
   },
   &quot;ended&quot;: true,
   &quot;successor&quot;: &quot;successorownerddddddddddddddddddddddddddddddddddddda&quot;
@@ -5134,12 +5148,12 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           are different acts. An archive (an author's, an institution's, a
           storage site) keeps what its members deposit, every version, without
           judging them: following an object as it grows is its job. A
-          selection (a journal, a digest, a review journal) vouches for
-          particular revisions: a later version by the authors has not been
-          vetted, so it cannot enter the selection by itself, and a change of
-          what is vetted is an editorial act that the selection's own history
-          records. Pinning whole objects in one case and revision sets in the
-          other makes the difference explicit and checkable.
+          selection (a journal, a digest, a review journal) attests particular
+          revisions: a later version by the authors has not been vetted, so it
+          cannot enter the selection by itself, and a change of what is vetted
+          is an editorial act that the selection's own history records.
+          Pinning whole objects in one case and revision sets in the other
+          makes the difference explicit and checkable.
         </p>
       </li>
       <li>
@@ -5219,14 +5233,11 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           signatures still counted, through forks of the key log, mirrors and
           branches; every rule moved the problem without solving it, since
           only trusted time can date a signature (<tt class="verbatim">drafts/keys-and-forks.md</tt>
-          on <tt class="verbatim">main</tt> tells the story). Radicle's answer is
-          simpler: a key is an identity, and a compromised key means a new
-          one. OpenSheaf does the same with owners: an owner whose key may
-          have been exposed ends, its signatures stay good, readers trust its
-          history as far as other evidence goes, and its work continues under
-          a successor, by branches. A version signed by its owner vouches for
-          every version before it, since its inventory fixes them, as
-          Radicle's canonical head vouches for the commits it reaches.
+          on <tt class="verbatim">main</tt> tells the story). OpenSheaf takes Radicle's
+          answer, where a compromised key means a new identity (section 6.5).
+          A version signed by its owner vouches for every version before it,
+          since its inventory fixes them, as Radicle's canonical head vouches
+          for the commits it reaches.
         </p>
       </li>
       <li>

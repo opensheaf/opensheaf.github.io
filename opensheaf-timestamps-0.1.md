@@ -15,7 +15,7 @@ A timestamp is such evidence: it shows that a signature existed by a date. A sin
 
 The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL in this document are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals. Terms are those of the specification: owner, key log, key-log version, signature file, witness, line, branch, ended owner.
 
-This extension follows the extension mechanism of section 4 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes the status of a signature or a version, never ends or resolves a fork, and never lets a version into an archive. A reader that does not know it ignores the files and data it defines.
+This extension follows the extension mechanism of section 4 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes the status of a signature or a version, never ends an owner or decides a fork, and never lets a version into an archive. A reader that does not know it ignores the files and data it defines.
 
 ## 3. Timestamps
 
@@ -30,8 +30,9 @@ A timestamp file of the signature file `<version>/signature-<k>.json` (section 1
 
 An owner adopts this extension in its key log: a version of the key log holds, in its `keys.json`, under `extensions` (section 6.5 of the specification), an entry keyed by `https://opensheaf.org/opensheaf-timestamps-0.1`, an object with:
 
-- `timestamps`, REQUIRED: `true`: the owner timestamps every signature it makes, of its key log and of its lines;
-- `timestampAuthorities`, OPTIONAL: RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The list is cumulative: the authorities trusted are those listed in any version of the key log up to the latest the reader knows, and a later version cannot remove one. Without any, only OpenTimestamps proofs are used.
+- `timestampAuthorities`, OPTIONAL: RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The authorities trusted for a signature file are those listed in the key-log version its `keyLog` names and in the versions before it, so that no one can add an authority later to date earlier signatures. Without any, only OpenTimestamps proofs are used.
+
+The entry, even empty, declares that the owner timestamps every signature it makes, of its key log and of its lines.
 
 The declaration validates against the schema of appendix A, and is part of the key-log version, signed with it.
 
@@ -39,7 +40,7 @@ The declaration validates against the schema of appendix A, and is part of the k
 
 A timestamp is **valid** for a signature file when:
 
-- for an RFC 3161 token: its message imprint is the SHA-512 digest of the file's bytes; its signing certificate, or the root of the chain it carries, has a fingerprint listed in `timestampAuthorities` (section 4); every certificate of the chain was within its validity period at the token's `genTime`, the signing certificate is for time stamping (RFC 3161, section 2.3), and no revocation known to the reader dates from before `genTime` (as `openssl ts -verify` checks with `-attime` set to `genTime`); and the token verifies;
+- for an RFC 3161 token: its message imprint is the SHA-512 digest of the file's bytes; its signing certificate, or the root of the chain it carries, has a fingerprint listed for that signature file (section 4); every certificate of the chain was within its validity period at the token's `genTime`, the signing certificate is for time stamping (RFC 3161, section 2.3), and no revocation known to the reader dates from before `genTime` (as `openssl ts -verify` checks with `-attime` set to `genTime`); and the token verifies;
 - for an OpenTimestamps proof: it is complete, attested in a Bitcoin block; a pending proof counts for nothing.
 
 The **date** of a valid timestamp is the `genTime` of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps proof reaches; the earliest valid timestamp of a signature file is its date. A version is **dated** by the `threshold`-th earliest of the dates of its good signature files naming one key-log version. Dates within two hours of a Bitcoin block time are uncertain by that much.
@@ -48,18 +49,15 @@ The **date** of a valid timestamp is the `genTime` of an RFC 3161 token, or the 
 
 Dates are evidence for readers; this extension draws no conclusion from them in the format. For an owner that has ended, or whose key log is forked (section 6.5 of the specification), a reader MAY trust the versions dated before the time it believes a key was exposed, and SHOULD say on what evidence. The time of the version that ends the owner, and of the first differing version of each side of a fork, bound when the owner knew. A branch keeps the timestamp files of its parent's signatures beside them in `parent.signatures/`, without the `<version>/` folder (`parent.signatures/signature-<k>.json.<e>.tsr`), complete proofs only; the timestamp files of key logs are in their owner objects.
 
+Tools that create an owner SHOULD offer to adopt this extension in the first version of its key log, and SHOULD timestamp each signature when they make it, before a version leaves its owner's hands: with an RFC 3161 token where an owner cannot wait for an OpenTimestamps proof to complete, and with an OpenTimestamps proof beside it where an owner wants evidence that rests on no authority.
+
 ## 7. Verification
 
-A verifier that knows this extension, in addition to the checks of section 14 of the specification, validates each declaration against the schema of appendix A, merges the timestamp files of every copy it sees, checks every timestamp file against the signature file it stamps (section 5) and its name against the digest of its bytes (section 3), reporting each as valid, invalid, pending, or from an authority not listed, and reports the date of each version signed under a declaration, or that it is undated, a warning.
+A verifier that knows this extension, in addition to the checks of section 14 of the specification, validates each declaration against the schema of appendix A, merges the timestamp files of every copy it sees, checks every timestamp file against the signature file it stamps (section 5) and its name against the digest of its bytes (section 3), reporting each as valid, invalid, pending, or from an authority not listed, and reports the date of each version.
 
-## 8. Guidance for tools
+## 8. Security considerations
 
-- Tools that create an owner SHOULD offer to adopt this extension in the first version of its key log.
-- Tools SHOULD timestamp each signature when they make it, under a declaration, and before a version leaves its owner's hands; with an RFC 3161 token where an owner cannot wait for an OpenTimestamps proof to complete, and with an OpenTimestamps proof beside it where an owner wants evidence that rests on no authority.
-
-## 9. Security considerations
-
-- **Trust.** An RFC 3161 token rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log keeps anyone else from dating with an authority of their own, and an authority once listed stays trusted for its tokens. Listing a root certificate trusts every authority that root certifies, so an owner that wants a single authority lists its signing certificate. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after hours.
+- **Trust.** An RFC 3161 token rests on the authority's clock and keys: an authority that misdates, or whose key is stolen, can date a signature falsely. Listing the authorities in the key log, and trusting for a signature only those listed up to the key-log version it names, keeps anyone else, a thief included, from dating with an authority of their own. Listing a root certificate trusts every authority that root certifies, so an owner that wants a single authority lists its signing certificate. An OpenTimestamps proof rests on no authority, only on Bitcoin, but is complete only after hours.
 - **Stripping.** A host can remove timestamp files from a copy; readers merge the timestamp files of every copy they see. A date only shows that a signature existed by then: a thief who stamps what it signs with a stolen key gets dates too, so dates help only before the exposure.
 
 ## Appendix A. JSON Schema (normative)
@@ -78,7 +76,6 @@ The `keys.json` of the first version of an owner's key log, adopting the extensi
   "threshold": 1,
   "extensions": {
     "https://opensheaf.org/opensheaf-timestamps-0.1": {
-      "timestamps": true,
       "timestampAuthorities": [ "5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147" ]
     }
   }
@@ -105,4 +102,5 @@ If the owner later ends, after the first key was stolen, a reader that believes 
 
 ## Changelog
 
-- **0.1 (draft), 17 November 2026:** first draft, moving the timestamp rules out of the identity proposal of the specification, then revised the same day with the reviews of PR #30: RFC 3161 tokens and OpenTimestamps proofs of signature files, named by the digest of their own bytes, completed proofs as new files, anyone may stamp; the owner's declaration in `keys.json` under `extensions` (`timestamps`, cumulative `timestampAuthorities`); checking at `genTime` with listed authorities and complete proofs only; the date of a version. Finally, following the specification, where an exposed key ends its owner, the extension changes no status: it no longer confirms the signatures of revoked keys (there are none) nor resolves forks of key logs, and only gives dates that readers may weigh.
+- **0.1 (draft), 17 November 2026:** first draft, moving the timestamp rules out of the identity proposal of the specification, then revised the same day with the reviews of PR #30: RFC 3161 tokens and OpenTimestamps proofs of signature files, named by the digest of their own bytes, completed proofs as new files, anyone may stamp; the owner's declaration in `keys.json` under `extensions`; checking at `genTime` with listed authorities and complete proofs only; the date of a version. Finally, following the specification, where an exposed key ends its owner, the extension changes no status: it no longer confirms the signatures of revoked keys (there are none) nor resolves forks of key logs, and only gives dates that readers may weigh.
+- **0.1 (draft), 17 November 2026, after a thirteenth review of PR #30:** the declaration is the entry itself, with only `timestampAuthorities`; the authorities trusted for a signature are those listed up to the key-log version it names, not later ones; guidance for tools merged into section 6.

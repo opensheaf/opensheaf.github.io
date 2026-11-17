@@ -156,7 +156,7 @@
 
     <item>Since every collection pins its members by digest, any copy whose bytes match is as good as the original: integrity comes from the pin, not from the place; and a copy without a digest is its owner's when its signatures hold. Verifiers check mirrors exactly as originals.
 
-    <item>Further witnesses: the owner's signatures, which every version carries, and others' signatures, which say who made or vouched for a version; and timestamps (section 13.2, and the timestamps extension), which show that it existed by a date; a snapshot of the archive's git repository by Software Heritage, cited by its SWHID (section 8.1); and Zenodo deposits (appendix A), which keep the content files, though without the inventory a Zenodo record cannot be checked against a pin.
+    <item>Further witnesses: the owner's signatures, which every version carries, and others' signatures, which say who made or attested a version; and timestamps (section 13.2, and the timestamps extension), which show that it existed by a date; a snapshot of the archive's git repository by Software Heritage, cited by its SWHID (section 8.1); and Zenodo deposits (appendix A), which keep the content files, though without the inventory a Zenodo record cannot be checked against a pin.
   </itemize>
 
   <\html-div-class|language-bash>
