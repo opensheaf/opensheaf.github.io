@@ -120,11 +120,11 @@
       </li>
     </ul>
     <p>
-      A timestamp file of the signature file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>,
-      in the object's extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>,
-      is <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;d&gt;.tsr</tt>
-      or <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;d&gt;.ots</tt>,
-      beside it, where <tt class="verbatim">&lt;d&gt;</tt> is the first 16 characters of
+      A timestamp file of the signature file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json</tt>
+      (section 13.2 of the specification), in the object's extension folder
+      <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, is <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json.&lt;e&gt;.tsr</tt>
+      or <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json.&lt;e&gt;.ots</tt>,
+      beside it, where <tt class="verbatim">&lt;e&gt;</tt> is the first 16 characters of
       the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the
       timestamp file's own bytes. Names made from the contents never collide:
       two copies that add timestamps independently can be merged by taking
@@ -140,9 +140,7 @@
       stays unchanged. <strong>Anyone holding a copy MAY timestamp any
       signature file at any time</strong>: a timestamp only shows that the
       file existed by its date, and the earliest one is the file's date
-      (section 5), so a later timestamp never harms. Whoever finds a side of a
-      fork whose signatures are undated SHOULD stamp them, so that the side is
-      dated no later than its discovery (section 7).
+      (section 5), so a later timestamp never harms.
     </p>
     <h2 id="auto-5"><a id="4-the-owners-declaration"></a>4. The owner's declaration<span style="margin-left: 1em"></span></h2>
     <p>
@@ -258,12 +256,13 @@
       counts, unless the core leaves it unconfirmed for another reason, if its
       date is earlier than the time of the first key-log version that lists
       the key in <tt class="verbatim">revoked</tt>, and than the earliest <tt class="verbatim">since</tt>
-      given for that key, if any. If that version has no time, none is
-      confirmed. The time of the revoking version dates the end of the owner's
-      trust in a key, not its theft: without <tt class="verbatim">since</tt>, signatures
-      that a thief made and stamped before the revocation are confirmed too,
-      so owners revoke a key as soon as they fear it exposed, and give <tt
-      class="verbatim">since</tt> when they can tell when the exposure began.
+      given for that key on the owner's side, if any. If that version has no
+      time, none is confirmed. The time of the revoking version dates the end
+      of the owner's trust in a key, not its theft: without <tt class="verbatim">since</tt>,
+      signatures that a thief made and stamped before the revocation are
+      confirmed too, so owners revoke a key as soon as they fear it exposed,
+      and give <tt class="verbatim">since</tt> when they can tell when the exposure
+      began.
     </p>
     <p>
       <strong>Forks of a key log.</strong> A fork (section 6.5 of the
@@ -273,13 +272,16 @@
       differing version of every side has a time, and one is earlier than
       every other and in a tie with none, its side is the owner's, and the
       others are reported; otherwise the fork stays unresolved, as in the
-      core: a side never wins because another's timestamps are missing, since
-      a host can strip them from a copy, and a side left undated by whoever
-      made it is dated by whoever finds it (section 3). A fork within a side
-      is resolved in the same way. Once a fork is resolved, the owner's side
-      is the key log: the keys it adds count, its revocations apply, and those
-      listed only on other sides are ignored. A fork at a version before the
-      owner adopted the extension is never resolved by it.
+      core. A reader judges with the timestamp files of every copy it sees,
+      merged (section 8): a copy stripped of a side's earliest timestamps can
+      show the fork resolved the wrong way, but resolution only confirms or
+      leaves unconfirmed (section 6.5 of the specification), so a reader that
+      sees the stripped files restored resolves it otherwise, and nothing is
+      lost meanwhile. A fork within a side is resolved in the same way. Once a
+      fork is resolved, the owner's side is the key log: the keys it adds
+      count, its revocations apply, and those listed only on other sides are
+      ignored. A fork at a version before the owner adopted the extension is
+      never resolved by it.
     </p>
     <p>
       <strong>Missing timestamps</strong> never make anything unconfirmed:
@@ -298,7 +300,7 @@
       10.5 of the specification): <tt class="verbatim">parent.signatures/</tt> holds the
       parent owner's signature files of the parent version with their
       timestamp files beside them, under the same file names, without the <tt
-      class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;d&gt;.tsr</tt>);
+      class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;-&lt;d&gt;.json.&lt;e&gt;.tsr</tt>);
       the timestamp files of the parent owner's key log are in its owner
       object, which travels with the branch (section 6.5 of the
       specification). Under a declaration of the parent's owner, a branch MUST
@@ -382,8 +384,7 @@
       </li>
       <li>
         <p>
-          Tools SHOULD stamp the undated signatures of a side of a fork they
-          find, and MAY stamp any signature file again, for instance when an
+          Tools MAY stamp any signature file again, for instance when an
           algorithm that its timestamps rely on weakens (section 3).
         </p>
       </li>
@@ -412,13 +413,18 @@
       <li>
         <p>
           <strong>Stripping.</strong> A host can remove timestamp files from a
-          copy; the signatures they confirmed are then unconfirmed again, and
-          a fork unresolved, until a copy with the files restores them, and
-          nothing that the core lets count is lost. A host that removes the
-          earliest timestamps of a revoking key-log version and keeps later
-          ones moves its time later; <tt class="verbatim">since</tt>, signed by the
-          owner, bounds what this can confirm, and readers merge the timestamp
-          files of every copy they see (section 9).
+          copy; the signatures they confirmed are then unconfirmed again,
+          until a copy with the files restores them. A copy stripped of a
+          side's earliest timestamps, and stamped again later by anyone, can
+          even resolve a fork the wrong way for readers who see only that
+          copy; since resolution only confirms or leaves unconfirmed, and
+          never makes anything not a version, readers who merge the timestamp
+          files of every copy they see reverse it, and nothing that the core
+          lets count is lost. A host that removes the earliest timestamps of a
+          revoking key-log version and keeps later ones moves its time later;
+          <tt class="verbatim">since</tt>, signed by the owner, bounds what this can
+          confirm, and readers merge the timestamp files of every copy they
+          see (section 9).
         </p>
       </li>
       <li>
@@ -432,9 +438,10 @@
       <li>
         <p>
           <strong>Forks.</strong> A side of a fork cannot bring its own
-          authorities, nor win by stripping the other sides' timestamps, nor
-          block resolution by leaving its own undated, since whoever finds it
-          stamps it (sections 3 and 7). But time decides for whoever stamps
+          authorities, and wins by stripping the other sides' timestamps only
+          for readers who see no copy that keeps them (above). A side left
+          undated keeps the fork unresolved until someone stamps it, which
+          anyone may do (section 3). But time decides for whoever stamps
           first: a thief who holds <tt class="verbatim">threshold</tt> keys of a
           version, forks the key log there and stamps the fork before the
           owner's next version, wins it, even if it publishes the fork later.
@@ -490,10 +497,10 @@
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.q7swxsz56bfiyotn.tsr
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz64.ots
-extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots</pre>
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.q7swxsz56bfiyotn.tsr
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.hm5uhlee72brbz64.ots
+extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6-mkzr4dyq5yh2b6tc.json.yq77barzw3gj7dbj.ots</pre>
     </div>
     <p>
       If the owner later revokes the first key, in version 3 of its key log,
@@ -643,6 +650,19 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           of the owner's side; dropping the declaration ends only the
           confirmation of revoked keys' signatures; a compromised listed
           authority can be answered only by a new owner.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, revised after a ninth
+          audit:</strong> timestamp files follow the new names of signature
+          files (<tt class="verbatim">signature-&lt;k&gt;-&lt;d&gt;.json.&lt;e&gt;.tsr</tt>);
+          the advice that whoever finds an undated side of a fork stamps it is
+          withdrawn; a stripped and re-stamped copy can resolve a fork the
+          wrong way for readers who see only it, which merging the timestamp
+          files of every copy reverses, since resolution only confirms or
+          leaves unconfirmed; the earliest <tt class="verbatim">since</tt> is the one on
+          the owner's side.
         </p>
       </li>
     </ul>

@@ -966,9 +966,10 @@
       13.2; throughout this specification, the signatures of a version
       <strong>hold</strong> when it is signed. Other files in the witness
       folder of a version (stray, malformed, or signature files that do not
-      verify under their own <tt class="verbatim">key</tt>) are not witnesses: they are
-      ignored and reported, never fatal, so that a host cannot break a version
-      by adding a file, and any archive MAY remove them.
+      count) are ignored and reported, never fatal, and kept: a host can
+      neither break a version by adding a file nor block a signature by
+      planting one, since each signature file is named by its own digest
+      (section 13.2), so a planted file sits beside the real one.
     </p>
     <p>
       <strong>Choosing a threshold.</strong> One <tt class="verbatim">threshold</tt>
@@ -1048,20 +1049,26 @@
       resolve a fork replaces its identity by a new owner, announced through
       its keeper. Once a fork is resolved, the owner's side is the key log,
       and a signature naming a version of another side is judged as if it
-      named the fork point. What was signed before the fork stays signed.
+      named the fork point; one whose key is not listed there is unconfirmed,
+      not invalid, so that resolving a fork, which a stripped copy can get
+      wrong (the timestamps extension, section 11), never makes anything not a
+      version, and a better-informed reader can resolve it otherwise. What was
+      signed before the fork stays signed.
     </p>
     <p>
       <strong>Evidence of forks.</strong> An archive keeps one copy of each
       line, a key log included (section 6.3). When it learns of a fork of a
-      line or of a key log, it keeps the side it holds, and records each other
-      side it knows in the object's extension folder, under <tt class="verbatim">extensions/opensheaf-witnesses/fork/&lt;n&gt;/&lt;d&gt;/</tt>,
+      key log, it keeps the side it holds, and records each other side it
+      knows in the owner object's extension folder, under <tt class="verbatim">extensions/opensheaf-witnesses/fork/&lt;n&gt;/&lt;d&gt;/</tt>,
       where <tt class="verbatim">&lt;n&gt;</tt> is the number of that side's first
       differing version (<tt class="verbatim">v3</tt>) and <tt class="verbatim">&lt;d&gt;</tt> the
       first 16 characters of the lowercase base32 (RFC 4648, without padding)
       SHA-256 digest of its inventory file: the inventory file, its checksum
-      file, its signature files and their timestamp files, byte for byte. The
-      evidence checks itself against the versions the archive keeps, and lets
-      the archive's readers see the fork although they hold one side.
+      file and the witness folder of that version (its signature files and
+      their timestamp files), byte for byte. A fork of a line is reported, not
+      recorded. The evidence checks itself against the versions the archive
+      keeps, and lets the archive's readers see the fork although they hold
+      one side.
     </p>
     <p>
       <strong>Key logs travel with the objects they sign.</strong> A copy of
@@ -1137,30 +1144,21 @@
       is needed: an archive's discovery document lists what it holds, without
       guaranteeing that an owner has no lines elsewhere. Two copies that do
       not agree are a <strong>fork of the line</strong>, reported with the
-      status of each side (section 13.2), and recorded by an archive that
-      holds one side (above); a fork whose sides are both signed was made with
-      keys of the owner, and is attributable to whoever holds them. <strong>No
-      archive drops a version it holds because of a fork</strong>: it keeps
-      its side, and readers rely only on signed versions. <strong>An archive
-      MUST NOT add a version to a line unless it has checked it against the
-      owner's key log</strong> and found it signed, or unconfirmed because of
-      a revoked key or a fork of the key log (section 13.2): a version whose
-      signatures name a key-log version not found is never added, and an
-      archive that continues another owner's line makes a branch, under its
-      own owner (section 10.5). A version found, after it was added by an
-      archive that did not check it, to be not a version of the line, or
-      unconfirmed only because the key-log version its signatures name is not
-      found (section 13.2), MAY be <strong>set aside</strong>, with the
-      versions after it, since OCFL keeps every version it records and
-      versions cannot otherwise be added after it: the archive truncates the
-      object, removing their version folders and replacing the root inventory
-      and its checksum file by those of the last version before them, byte for
-      byte, and moves the inventory and checksum file of the first version set
-      aside, and the witness folders (<tt class="verbatim">&lt;version&gt;/</tt>) of
-      every version set aside, to <tt class="verbatim">extensions/opensheaf-witnesses/fork/&lt;n&gt;/&lt;d&gt;/</tt>
-      (above), so that what was removed can be checked. The versions kept are
-      not changed; besides a takedown (section 11.2), this is the only removal
-      of a version of a sealed object.
+      status of each side (section 13.2); a fork whose sides are both signed
+      was made with keys of the owner, and is attributable to whoever holds
+      them. <strong>No archive drops a version it holds because of a
+      fork</strong>: it keeps its side, and readers rely only on signed
+      versions. <strong>An archive MUST NOT add a version to a line unless it
+      has checked it against the owner's key log</strong> and found it signed,
+      or unconfirmed because of a revoked key or a fork of the key log
+      (section 13.2): a version whose signatures name a key-log version not
+      found is never added, and an archive that continues another owner's line
+      makes a branch, under its own owner (section 10.5). A version that an
+      archive added without checking it, and that is not a version of the line
+      or relies on a key-log version not found, stays where it is, reported,
+      and is never shown as a version of the line (section 13.2): nothing that
+      a host or a thief can produce leads to removing a version; only a
+      takedown removes one (section 11.2).
     </p>
     <p>
       <strong>Archives and owners.</strong> An archive decides which owners it
@@ -2513,12 +2511,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       #52). A mirror is brought up to date only by copying the new versions of
       the line, with the new versions of the key logs they name, which is
       possible because OCFL objects only grow; it MUST NOT be changed
-      otherwise (except to set aside what is not a version, to remove files
-      that are not witnesses, and to record the evidence of forks, section
-      6.5), and never drops a version it holds because of a fork: new versions
-      are added only after they are checked, and a copy that departs from it
-      is a fork, recorded as evidence (section 6.5). Mirroring is allowed only
-      if the licences of all the versions copied allow redistribution. A
+      otherwise (except to add witnesses, and to record the evidence of forks
+      of key logs, section 6.5), and never drops a version it holds: new
+      versions are added only after they are checked, and a copy that departs
+      from it is a fork, reported (section 6.5). Mirroring is allowed only if
+      the licences of all the versions copied allow redistribution. A
       collection MAY list the location of a copy in the member's <tt class="verbatim">at</tt>.
       An archive that keeps a copy of another archive entirely SHOULD be
       listed in the <tt class="verbatim">mirrors</tt> of that archive's discovery
@@ -2587,7 +2584,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           <tt class="verbatim">parent.signatures/</tt>, the parent owner's signature
           files of the parent version (section 13.2), under their names in the
           parent's extension folder without the <tt class="verbatim">&lt;version&gt;/</tt>
-          folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json</tt>),
+          folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;-&lt;d&gt;.json</tt>),
           with the witnesses kept beside them (such as timestamp proofs of the
           <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>), if any;
         </p>
@@ -2697,9 +2694,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           key log (section 6.5), and includes the version the signatures name,
           with the digest in their <tt class="verbatim">keyLog</tt>; its later versions
           known are checked under section 6.5, for revoked keys and forks; a
-          key log that is not available leaves the parent's signatures
-          unconfirmed (section 13.2), which is reported, and is not a failure
-          of this check;
+          key-log version not found leaves the parent's signatures unconfirmed
+          (section 13.2), which is reported, and is not a failure of this
+          check;
         </p>
       </li>
       <li>
@@ -2846,19 +2843,20 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       except when the owner object is itself taken down, and MAY keep it
       after. An owner object is taken down only for itself: at its owner's
       request, by a statement signed by <tt class="verbatim">threshold</tt> keys of the
-      latest version of its key log (of the fork point, during a fork that is
-      not resolved), or by law. Whoever holds a key not yet revoked can make
-      such a statement, so an archive SHOULD also hear the owner's keeper
-      (section 6.5), when it names one, before acting on a statement alone.
-      Its line then gets a tombstone like any other (section 11.3); the
-      signatures of that owner in the objects the archive still keeps cannot
-      be checked there, so they, and the versions and branch points that rely
-      on them, are unconfirmed, not inconsistent (sections 6.5 and 13.2),
-      until the key log is found elsewhere. The rule that a copy carries its
-      owners' key logs (section 6.5), and the checks of section 14, then
-      accept the tombstone in place of the owner object. An owner object
-      restored later, with the same genesis record and a key log whose
-      versions extend the version the tombstone pins, is the same line
+      latest version of its key log, or by law; during a fork of its key log
+      that is not resolved, only through its keeper or by law, since whoever
+      forked it holds keys of the fork point. Whoever holds a key not yet
+      revoked can make such a statement, so an archive SHOULD also hear the
+      owner's keeper (section 6.5), when it names one, before acting on a
+      statement alone. Its line then gets a tombstone like any other (section
+      11.3); the signatures of that owner in the objects the archive still
+      keeps cannot be checked there, so they, and the versions and branch
+      points that rely on them, are unconfirmed, not inconsistent (sections
+      6.5 and 13.2), until the key log is found elsewhere. The rule that a
+      copy carries its owners' key logs (section 6.5), and the checks of
+      section 14, then accept the tombstone in place of the owner object. An
+      owner object restored later, with the same genesis record and a key log
+      whose versions extend the version the tombstone pins, is the same line
       returning, not a reuse of its identifier (section 11.3).
     </p>
     <h3 id="auto-33"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
@@ -2974,11 +2972,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
     </p>
     <p>
       <strong>Signature files.</strong> An owner's signature of object version
-      <tt class="verbatim">&lt;version&gt;</tt> is a JSON file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>
+      <tt class="verbatim">&lt;version&gt;</tt> is a JSON file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json</tt>
       in the extension folder, one for each key that signs, where <tt class="verbatim">&lt;k&gt;</tt>
       is the first 16 characters of the lowercase base32 (RFC 4648, without
       padding) SHA-256 digest of the key's <tt class="verbatim">did:key</tt> URI, as
-      UTF-8, so that file names never collide after keys rotate. It has:
+      UTF-8, and <tt class="verbatim">&lt;d&gt;</tt> the same of the file's own bytes,
+      so that file names never collide after keys rotate, and a file planted
+      under a key's name never takes the place of that key's signature. It
+      has:
     </p>
     <ul>
       <li>
@@ -3069,9 +3070,9 @@ keylog &lt;the value of keyLog&gt;</pre>
       <li>
         <p>
           <strong>invalid</strong> when it is malformed, its name does not
-          match the digest of its key, its signature does not verify, or the
-          key log reaches the version named, with that digest, and the key is
-          not listed in its <tt class="verbatim">keys</tt>;
+          match the digests of its key and of its bytes, its signature does
+          not verify, or the key log reaches the version named, with that
+          digest, and the key is not listed in its <tt class="verbatim">keys</tt>;
         </p>
       </li>
       <li>
@@ -3083,9 +3084,10 @@ keylog &lt;the value of keyLog&gt;</pre>
           fork not resolved; or <strong>the key-log version it names is not
           found</strong>: the key log the reader holds does not reach it, with
           that digest (absent, taken down, section 11.2, shorter, or holding
-          another version of that number). Anyone can name a key-log version
-          that does not exist, so archives never add versions that rely on
-          such signatures (section 6.5);
+          another version of that number, on no side of a known fork; the
+          evidence of forks counts as part of the key log held). Anyone can
+          name a key-log version that does not exist, so archives never add
+          versions that rely on such signatures (section 6.5);
         </p>
       </li>
       <li>
@@ -3136,10 +3138,10 @@ keylog &lt;the value of keyLog&gt;</pre>
       a key log are signed in the same way, <tt class="verbatim">object</tt> being the
       owner object, by the keys of the version before (for the first, by its
       own keys, which its genesis record fixes). Files that are not witnesses
-      (section 6.5) are reported, never fatal, and MAY be removed. Signature
-      files, and the witnesses kept beside them, are never re-serialised or
-      replaced once made, here or in <tt class="verbatim">parent.signatures/</tt>, since
-      witnesses such as timestamps are made of their bytes.
+      (section 6.5) are reported, never fatal, and kept. Signature files, and
+      the witnesses kept beside them, are never re-serialised or replaced once
+      made, here or in <tt class="verbatim">parent.signatures/</tt>, since witnesses
+      such as timestamps are made of their bytes.
     </p>
     <p>
       <strong>Timestamps.</strong> A timestamp shows that a signature existed
@@ -3287,12 +3289,9 @@ keylog &lt;the value of keyLog&gt;</pre>
           those taken down (section 6.5), reporting when a later version of a
           key log is known elsewhere; and for every sealed object version,
           that its signature files and the version are classified as in
-          section 13.2 (the signed message rebuilt, no key signing a version
-          twice), reporting every version that is unconfirmed or not a
-          version, with its reason, and files that are not witnesses, never
-          fatal; and that a version set aside (section 6.5) was not a version,
-          or unconfirmed only because the key-log version its signatures name
-          is not found, reporting an improper removal otherwise;
+          section 13.2 (the signed message rebuilt, each key counted once),
+          reporting every version that is unconfirmed or not a version, with
+          its reason, and files that are not witnesses, never fatal;
         </p>
       </li>
       <li>
@@ -4322,6 +4321,24 @@ keylog &lt;the value of keyLog&gt;</pre>
           the junk-file limit removed from section 15.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised after a
+          ninth audit:</strong> nothing that a host or a thief can produce
+          leads to removing anything: setting aside versions (truncating an
+          object) and removing files that are not witnesses are withdrawn; a
+          version added unchecked that is not a version stays, reported and
+          never shown as one; signature files are named <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;-&lt;d&gt;.json</tt>,
+          <tt class="verbatim">&lt;d&gt;</tt> from the digest of the file itself, so
+          that a planted file never takes the place of a real signature; after
+          a fork of a key log is resolved, a signature naming a losing side
+          whose key is not listed at the fork point is unconfirmed, not
+          invalid; the evidence of forks is recorded for key logs only; a
+          key-log version not found excludes the sides of a known fork; during
+          an unresolved fork of its key log, an owner object is taken down
+          only through its keeper or by law.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4902,10 +4919,12 @@ ocfl/
       </div>
     </div>
     <p>
-      The signature file <tt class="verbatim">v4/signature-qvi7ibhm7zsahqx6.json</tt> of
-      the authors' object version <tt class="verbatim">v4</tt> (its name from the digest
-      of the key), which the journal vetted, in the extension folder <tt
-      class="verbatim">extensions/opensheaf-witnesses/</tt> of the paper (section 13.2):
+      The signature file <tt class="verbatim">v4/signature-qvi7ibhm7zsahqx6-&lt;d&gt;.json</tt>
+      of the authors' object version <tt class="verbatim">v4</tt> (its name from the
+      digest of the key and, <tt class="verbatim">&lt;d&gt;</tt>, of the file, left out
+      here since the example shortens it), which the journal vetted, in the
+      extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt> of the
+      paper (section 13.2):
     </p>
     <div class="language-json">
       <div class="tmweb-code">

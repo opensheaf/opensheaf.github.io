@@ -324,20 +324,19 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       its checksum file by those of the new version; 3. files added in an
       object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt> folder; a file
       there, once published, is never replaced or removed (section 13.2 of the
-      specification), except with its object by a takedown, by setting aside
-      (item 9), or when it is not a witness (a malformed file, or a signature
-      file that does not verify under its own key, which MAY be removed,
-      section 6.5 of the specification): timestamps are made of the bytes of
-      signature files, which a copy may already hold, and a completed
-      timestamp proof is a new file beside the pending one; 4. the replacement
-      of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced or removed
-      among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
-      <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
-      at every deposit and takedown (section 6.6 of the specification,
-      proposal); 5. at the creation of the storage root, its own files (<tt
-      class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
-      configuration of the layout extension, and the loose files allowed by
-      section 5 of the specification); 6. the removal of an object folder,
+      specification), except with its object by a takedown, even when it is
+      not a witness (a malformed file, or a signature file that does not
+      count, which is reported and kept, section 6.5 of the specification):
+      timestamps are made of the bytes of signature files, which a copy may
+      already hold, and a completed timestamp proof is a new file beside the
+      pending one; 4. the replacement of <tt class="verbatim">opensheaf.json</tt>, and
+      files added, replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
+      <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
+      which are rewritten at every deposit and takedown (section 6.6 of the
+      specification, proposal); 5. at the creation of the storage root, its
+      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
+      the configuration of the layout extension, and the loose files allowed
+      by section 5 of the specification); 6. the removal of an object folder,
       with the folders above it that it leaves empty (an owner's folder, or
       folders of the hash), by a takedown (section 9); 7. the repair of a file
       whose bytes do not match the digest its inventory records (section 5.3);
@@ -346,22 +345,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       layout), including its removal, with the creation of the <tt class="verbatim">draft/</tt>
       folder and its removal when it is left empty: drafts are the only
       objects that may be rewritten or deleted, and are never copied out of
-      the archive; 9. setting aside versions that are not versions of their
-      line, or that rely on a key-log version not found (section 6.5 of the
-      specification, &quot;One writer per line&quot;): the removal of the
-      version folders <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;k&gt;/</tt> to the
-      head of the object, the replacement of the object's root <tt class="verbatim">inventory.json</tt>
-      and its checksum file by those of <tt class="verbatim">v&lt;k-1&gt;/</tt>, byte
-      for byte, and the move of the inventory and checksum file of <tt class="verbatim">v&lt;k&gt;</tt>,
-      and of the witness folders of <tt class="verbatim">v&lt;k&gt;</tt> to the head, to
-      <tt class="verbatim">extensions/opensheaf-witnesses/fork/v&lt;k&gt;/&lt;d&gt;/</tt>
-      (<tt class="verbatim">&lt;d&gt;</tt> from the digest of that inventory), all in
-      one commit; it never changes a version kept.
+      the archive.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
-      folder is changed, renamed or removed, except by a repair or by setting
-      aside (item 9). Several changes MAY be made in one commit.
+      folder is changed, renamed or removed, except by a repair. Several
+      changes MAY be made in one commit.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -698,13 +687,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           next, only the changes of section 5.1 (for a pull request: between
           its base and its head); a change to a file of an existing version
           folder is accepted only as a repair, when the new bytes have the
-          digest its inventory records and the old bytes did not, and the
-          removal of version folders only as a setting aside (item 9 of
-          section 5.1), when the root inventory becomes that of the last
-          version kept, the first version removed is found among the evidence
-          of forks, and it was not a version, or relied on a key-log version
-          not found (section 13.2 of the specification), an improper removal
-          being reported otherwise;
+          digest its inventory records and the old bytes did not;
         </p>
       </li>
       <li>
@@ -946,6 +929,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           and the append-only check reports an improper removal of versions
           that were versions; files that are not witnesses may be removed
           (item 3).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal (ninth audit of the
+          specification):</strong> setting aside versions (item 9 of section
+          5.1) and removing files that are not witnesses are withdrawn:
+          nothing in an object's version folders or witness folder is removed
+          except by a takedown, and the append-only check accepts no other
+          removal.
         </p>
       </li>
     </ul>
