@@ -31,7 +31,7 @@ The principle: git is a store and a transport for the files of the archive. The 
 The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL are to be interpreted as described in BCP 14 (RFC 2119, RFC 8174) when, and only when, they appear in all capitals. Terms of the specification (archive, storage root, discovery document, object, object version, pin, mirror, witness, takedown, tombstone) keep their meaning.
 
 - <dfn>Repository</dfn>: a git repository holding one archive.
-- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, `witnesses/` and the indexes (`indexes.json` and the folders `names/`, `owners/` and `sha512/`, section 6.6 of the specification, proposal).
+- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, the indexes (`indexes.json` and the folders `names/`, `owners/` and `sha512/`, section 6.6 of the specification, proposal).
 - <dfn>Presentation files</dfn>: the website of the archive (appendix C of the specification), generated from the archive files.
 - <dfn>Working files</dfn>: every other file of the repository: settings of tools, descriptions of deposits, sources being prepared, scripts, workflows.
 - <dfn>Published branch</dfn>: the branch from which the archive is served (usually `main`). A <dfn>published commit</dfn> is a commit of its first-parent history.
@@ -43,7 +43,7 @@ A repository conforms to this document if every published commit satisfies secti
 
 A repository SHOULD hold one archive, with the discovery document at the top of the repository and the storage root in `ocfl/`. An archive kept in a sub-folder of a larger repository is allowed; what follows then applies to that folder.
 
-Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root, `witnesses/` or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
+Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
 
 The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of objects of other archives are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
 
@@ -51,14 +51,13 @@ The archive files MUST NOT contain symbolic links or git submodules. Members of 
 
 ### 4.1 Attributes
 
-The repository MUST contain a `.gitattributes` file at its top with these lines (with `witnesses/**` only if the archive uses that folder, the lines of the indexes only if it keeps them, and the paths adjusted if the archive is in a sub-folder):
+The repository MUST contain a `.gitattributes` file at its top with these lines (with the lines of the indexes only if it keeps them, and the paths adjusted if the archive is in a sub-folder):
 
 ```
 # OpenSheaf archive files: stored and checked out byte for byte,
 # never merged as text.
 opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
 ocfl/**        -text -filter -ident -working-tree-encoding -export-subst -merge
-witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge
 indexes.json   -text -filter -ident -working-tree-encoding -export-subst -merge
 names/**       -text -filter -ident -working-tree-encoding -export-subst -merge
 owners/**      -text -filter -ident -working-tree-encoding -export-subst -merge
@@ -94,14 +93,14 @@ Git keeps neither empty folders nor modification times, and records of file mode
 
 Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
 
-1. a new object folder `ocfl/<path>/`, where `<path>` is the object's path in the layout of the storage root (`<id>`, or `<t1>/<t2>/<t3>/<id>` in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive);
+1. a new object folder `ocfl/<path>/`, where `<path>` is the object's path in the layout of the storage root (`<owner>/<name>` in the owner-name layout, or the folders of the hash and the encoded identifier in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive);
 2. a new version folder `ocfl/<path>/v<N>/`, where `v<N-1>` is the head of the object in C, with the replacement of the object's root `inventory.json` and its checksum file by those of the new version;
-3. files added, replaced or removed in an object's `extensions/opensheaf-witnesses/` folder, or under `witnesses/`;
+3. files added, replaced or removed in an object's `extensions/opensheaf-witnesses/` folder;
 4. the replacement of `opensheaf.json`, and files added, replaced or removed among the indexes (`indexes.json`, `names/`, `owners/`, `sha512/`), which are rewritten at every deposit and takedown (section 6.6 of the specification, proposal);
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
-8. under the revised identity proposal of the specification (branch `proposal/owners`, section 6.5), any change inside the folder of a draft, `ocfl/draft/<id>/`, including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
+8. any change inside the folder of a draft (section 6.5 of the specification), `ocfl/draft/<id>/`, including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
 
 No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -193,7 +192,7 @@ An archive near these limits can:
 - store large files with Git LFS, deployed by a workflow (section 4.2);
 - move to a host with other limits, or to its own server.
 
-Tools working on a large archive MAY use a partial clone (`git clone --filter=blob:none`) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the flat-direct layout reaches its limits first: every deposit rewrites the tree of `ocfl/`, which lists every object, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 5 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19).)
+Tools working on a large archive MAY use a partial clone (`git clone --filter=blob:none`) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the owner-name layout reaches its limits first: every deposit rewrites the tree of an owner's folder, which lists every line of that owner, and the tree of `ocfl/`, which lists every owner, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 5 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in [issue #19](https://github.com/opensheaf/opensheaf.github.io/issues/19).)
 
 ## 9. Takedown
 
@@ -226,7 +225,7 @@ A clone of the published branch is a complete copy of the archive. A clone that 
 
 Mirroring an object of another archive is copying its files and checking them against a pin; it does not need, and SHOULD NOT use, a merge of the other archive's repository.
 
-Under the revised identity proposal of the specification (branch `proposal/owners`, sections 6.5 and 10.4), a mirror is a copy of a line, kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder `extensions/opensheaf-witnesses/`, and `witnesses/` is not used. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification).
+A mirror is a copy of a line (sections 6.5 and 10.4 of the specification), kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder `extensions/opensheaf-witnesses/`, and `witnesses/` is not used. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification). A branch holds the evidence of its parent version as content files (section 10.5), so it never shares an object folder with a copy of its parent's line.
 
 A public repository SHOULD be archived by [Software Heritage](https://www.softwareheritage.org/), which keeps dated snapshots of it named by SWHIDs. A snapshot is a witness that the archive held these files at that date, as other external copies are (section 13.2 of the specification); its identifiers are git hashes, not part of the integrity of the archive. Together with the history of the published branch, snapshots also witness the successive states of the discovery document.
 

@@ -252,7 +252,7 @@
             "type": "string",
             "pattern": "^sheaf:draft:[a-z0-9]+(-[a-z0-9]+)*$",
             "maxLength": 76,
-            "$comment": "proposal (section 6.3): a draft's local identifier (form provisional, #29)"
+            "$comment": "proposal (section 6.3): a draft's local identifier, sheaf:draft:<id>, <id> following the pattern of labels, at most 64 characters (76 in all)"
           },
           "kind": {
             "enum": [

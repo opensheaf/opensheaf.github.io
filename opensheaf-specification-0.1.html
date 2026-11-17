@@ -688,12 +688,14 @@
       A draft (section 6.5) belongs to the reserved owner <tt class="verbatim">draft</tt>,
       which is never a name or an owner name (those have 52 characters): its
       identifier is <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>, where <tt class="verbatim">&lt;id&gt;</tt>
-      is chosen by the archive, MUST match <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>
-      and MUST be at most 64 characters long, and is unique among the
-      archive's drafts. It is a local identifier, never resolved and never
-      written in a <tt class="verbatim">sheaf:</tt> URI outside the archive (the exact
-      form is provisional, #29). A draft never becomes a line: sealing makes a
-      new object (section 6.5).
+      is chosen locally by the archive, MUST match the pattern of labels, <tt
+      class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>, and MUST be at most 64 characters
+      long, so that the whole identifier has at most 76 characters; it MUST
+      NOT be reused in the archive while the draft exists. It is a local
+      identifier, never resolved and never written in a <tt class="verbatim">sheaf:</tt>
+      URI outside the archive (private archives and how drafts are shared are
+      discussed in #29). A draft never becomes a line: sealing makes a new
+      object (section 6.5).
     </p>
     <p>
       <strong>Labels.</strong> An archive MAY give each line it holds a label,
@@ -3600,15 +3602,25 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           object whose genesis record it holds only if it is signed by the
           record's originator or carries parent evidence signed by its
           parent's owner); drafts are a sandbox owner <tt class="verbatim">draft</tt>,
-          at <tt class="verbatim">draft/&lt;id&gt;/</tt> with the provisional identifier
-          <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>, never signed, pinned or
-          copied out of their archive, and the only objects that may be
-          rewritten or deleted; sealing makes a new object, and versions made
-          before sealing are no longer part of the line (changing PR #30);
-          collection members give their locations as <tt class="verbatim">at</tt>, a
-          list of base URLs, all equal hints, replacing <tt class="verbatim">archiveUrl</tt>
-          and <tt class="verbatim">mirrors</tt> (#39, in part); index entries for
-          several archives give <tt class="verbatim">at</tt> too.
+          at <tt class="verbatim">draft/&lt;id&gt;/</tt> with the identifier <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>,
+          never signed, pinned or copied out of their archive, and the only
+          objects that may be rewritten or deleted; sealing makes a new
+          object, and versions made before sealing are no longer part of the
+          line (changing PR #30); collection members give their locations as
+          <tt class="verbatim">at</tt>, a list of base URLs, all equal hints, replacing
+          <tt class="verbatim">archiveUrl</tt> and <tt class="verbatim">mirrors</tt> (#39, in
+          part); index entries for several archives give <tt class="verbatim">at</tt>
+          too.
+        </p>
+      </li>
+      <li>
+        <p>
+          **0.1 (draft), 17 November 2026, proposal revised (branch <tt class="verbatim">proposal/owners</tt>):**
+          the identifier of a draft settled: <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>,
+          <tt class="verbatim">&lt;id&gt;</tt> following the pattern of labels, at most
+          64 characters (76 in all), chosen locally and not reused while the
+          draft exists; the examples use full-length names; the use cases, the
+          FAQ and the companion on git describe the proposal throughout.
         </p>
       </li>
     </ul>
@@ -4043,7 +4055,7 @@ ocfl/
       A <tt class="verbatim">members.json</tt> of a selection: an issue of a journal,
       with a paper vetted in its version 2 and, after a correction accepted by
       the editors, its version 3; and a member that is itself a collection,
-      vetted in one version (the seminar's names are shortened here):
+      vetted in one version (the seminar's names are illustrative):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4061,8 +4073,8 @@ ocfl/
         { &quot;documentVersion&quot;: 3, &quot;version&quot;: &quot;v4&quot;, &quot;inventorySha512&quot;: &quot;c07a&hellip;&quot; } ],
       &quot;cite&quot;: { &quot;title&quot;: &quot;Quantum network discrimination&quot;, &quot;creators&quot;: [&quot;C. Hirche&quot;], &quot;year&quot;: 2021 } },
     { &quot;kind&quot;: &quot;collection&quot;,
-      &quot;name&quot;: &quot;q3vx&hellip;&quot;,
-      &quot;owner&quot;: &quot;m7ka&hellip;&quot;,
+      &quot;name&quot;: &quot;seminarcollectionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;,
+      &quot;owner&quot;: &quot;seminarownerccccccccccccccccccccccccccccccccccccccca&quot;,
       &quot;at&quot;: [ &quot;https://seminar.example.org/&quot; ],
       &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 3, &quot;version&quot;: &quot;v3&quot;, &quot;inventorySha512&quot;: &quot;7d21&hellip;&quot; } ] }
   ]

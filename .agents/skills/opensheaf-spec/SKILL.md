@@ -149,7 +149,8 @@ their revision comments) before touching any of this.
   a branch); a branch happens only when the owner changes.
 - **Identifiers and labels** (6.3, 5): an object's OCFL `id` is its first
   line, `sheaf:<name>:<owner>`, for branches too (a draft is
-  `sheaf:draft:<id>`, provisional); default layout
+  `sheaf:draft:<id>`, `<id>` a label of at most 64 characters, chosen
+  locally, not reused while the draft exists); default layout
   `opensheaf-owner-name-storage-layout` (`<owner>/<name>/`, drafts in
   `draft/<id>/`; the key log at `<owner>/<owner>/`), or `0003` for large
   archives. Readable `label`s in the discovery document, not permanent.

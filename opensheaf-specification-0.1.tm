@@ -195,7 +195,7 @@
 
   The identifier of an object (its OCFL <verbatim|id>) is its first line, written as a <verbatim|sheaf:> URI with its owner part: <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>>, the name and owner that its <verbatim|object.json> records (section 6.5). For every sealed object (an originator's line, a branch, an owner object) this is the line itself: a branch is a new object, never a continuation of the parent's (section 10.5). Two objects of different lines never have the same identifier, in any archive, so an archive keeps the lines its owners write and copies of lines kept elsewhere side by side in one storage root. The identifier MUST be unique in the storage root, and MUST NOT be reused, also after a takedown. The kind of an object is given by its <verbatim|object.json>, never by its identifier.
 
-  A draft (section 6.5) belongs to the reserved owner <verbatim|draft>, which is never a name or an owner name (those have 52 characters): its identifier is <verbatim|sheaf:draft:\<less\>id\<gtr\>>, where <verbatim|\<less\>id\<gtr\>> is chosen by the archive, MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$> and MUST be at most 64 characters long, and is unique among the archive's drafts. It is a local identifier, never resolved and never written in a <verbatim|sheaf:> URI outside the archive (the exact form is provisional, #29). A draft never becomes a line: sealing makes a new object (section 6.5).
+  A draft (section 6.5) belongs to the reserved owner <verbatim|draft>, which is never a name or an owner name (those have 52 characters): its identifier is <verbatim|sheaf:draft:\<less\>id\<gtr\>>, where <verbatim|\<less\>id\<gtr\>> is chosen locally by the archive, MUST match the pattern of labels, <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>, and MUST be at most 64 characters long, so that the whole identifier has at most 76 characters; it MUST NOT be reused in the archive while the draft exists. It is a local identifier, never resolved and never written in a <verbatim|sheaf:> URI outside the archive (private archives and how drafts are shared are discussed in #29). A draft never becomes a line: sealing makes a new object (section 6.5).
 
   <strong|Labels.> An archive MAY give each line it holds a label, in <verbatim|objects> of its discovery document: a short readable name, matching <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>, at most 64 characters, unique among the labels of the discovery document, which its website MAY use for readable URLs. A label is not an identifier: it is the archive's choice, may be added or changed, and URLs built on it may break; permanent links use <verbatim|sheaf:> URIs (section 6.6). Labels SHOULD be short, readable and chosen by the depositor, and SHOULD NOT be derived mechanically from the title.
 
@@ -874,7 +874,9 @@
 
     <item>**0.1 (draft), 17 November 2026, proposal revised (branch <verbatim|proposal/owners>):** deep branches removed: every branch is a new object, under its own line's identifier, holding the branch point with its evidence (<verbatim|parent.inventory.json>, <verbatim|parent.object.json>, and now <verbatim|parent.signatures/> and <verbatim|parent.keylog/>, the parent owner's signatures and the part of its key log they need) as content files; the parent's history, when wanted, is a copy of the parent's line kept beside it, since OCFL inventories record their object's identifier and a branch cannot continue the parent's object; the open question on deep branches and storage roots is resolved.
 
-    <item>**0.1 (draft), 17 November 2026, proposal revised (branch <verbatim|proposal/owners>):** one <verbatim|threshold> governs both the key log and the owner's lines, as in Radicle, no longer provisional; <verbatim|sealed> withdrawn, since signatures make it redundant (an archive accepts an object whose genesis record it holds only if it is signed by the record's originator or carries parent evidence signed by its parent's owner); drafts are a sandbox owner <verbatim|draft>, at <verbatim|draft/\<less\>id\<gtr\>/> with the provisional identifier <verbatim|sheaf:draft:\<less\>id\<gtr\>>, never signed, pinned or copied out of their archive, and the only objects that may be rewritten or deleted; sealing makes a new object, and versions made before sealing are no longer part of the line (changing PR #30); collection members give their locations as <verbatim|at>, a list of base URLs, all equal hints, replacing <verbatim|archiveUrl> and <verbatim|mirrors> (#39, in part); index entries for several archives give <verbatim|at> too.
+    <item>**0.1 (draft), 17 November 2026, proposal revised (branch <verbatim|proposal/owners>):** one <verbatim|threshold> governs both the key log and the owner's lines, as in Radicle, no longer provisional; <verbatim|sealed> withdrawn, since signatures make it redundant (an archive accepts an object whose genesis record it holds only if it is signed by the record's originator or carries parent evidence signed by its parent's owner); drafts are a sandbox owner <verbatim|draft>, at <verbatim|draft/\<less\>id\<gtr\>/> with the identifier <verbatim|sheaf:draft:\<less\>id\<gtr\>>, never signed, pinned or copied out of their archive, and the only objects that may be rewritten or deleted; sealing makes a new object, and versions made before sealing are no longer part of the line (changing PR #30); collection members give their locations as <verbatim|at>, a list of base URLs, all equal hints, replacing <verbatim|archiveUrl> and <verbatim|mirrors> (#39, in part); index entries for several archives give <verbatim|at> too.
+
+    <item>**0.1 (draft), 17 November 2026, proposal revised (branch <verbatim|proposal/owners>):** the identifier of a draft settled: <verbatim|sheaf:draft:\<less\>id\<gtr\>>, <verbatim|\<less\>id\<gtr\>> following the pattern of labels, at most 64 characters (76 in all), chosen locally and not reused while the draft exists; the examples use full-length names; the use cases, the FAQ and the companion on git describe the proposal throughout.
   </itemize>
 
   <section*|Appendix A. Zenodo binding (normative for archives declaring the profile <verbatim|zenodo>)><label|appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo>
@@ -1195,7 +1197,7 @@
   </verbatim-code>
   </html-div-class>
 
-  A <verbatim|members.json> of a selection: an issue of a journal, with a paper vetted in its version 2 and, after a correction accepted by the editors, its version 3; and a member that is itself a collection, vetted in one version (the seminar's names are shortened here):
+  A <verbatim|members.json> of a selection: an issue of a journal, with a paper vetted in its version 2 and, after a correction accepted by the editors, its version 3; and a member that is itself a collection, vetted in one version (the seminar's names are illustrative):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1225,9 +1227,9 @@
 
     \ \ \ \ { "kind": "collection",
 
-    \ \ \ \ \ \ "name": "q3vx...",
+    \ \ \ \ \ \ "name": "seminarcollectionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 
-    \ \ \ \ \ \ "owner": "m7ka...",
+    \ \ \ \ \ \ "owner": "seminarownerccccccccccccccccccccccccccccccccccccccca",
 
     \ \ \ \ \ \ "at": [ "https://seminar.example.org/" ],
 

@@ -78,28 +78,23 @@ main collection, and says which version of the specification the archive
 follows. It is only a map: everything it says is checked against the storage
 root.
 
-## Why are identifiers short names and not URIs?
+## How are objects identified?
 
-On `main` they are: the flat-direct storage layout puts each object in a
-folder named by its identifier, so paths stay readable and can be computed
-over plain HTTP; a folder name cannot contain `/`. The archive itself has a
-URI-like identifier (a `tag:` URI), and an object is named globally by the
-pair (archive identifier, object identifier).
-
-The identity proposal (sections 6.3, 6.5 and 6.6, not yet agreed) changes
-this. A work gets a name independent of any archive, the digest of its
-genesis record, and each history of it an owner; the identifier of an object
-is its line, written as a `sheaf:` URI, `sheaf:<name>:<owner>`. Identifiers
-chosen by each archive clash as soon as one archive keeps copies of another's
+A work has a name independent of any archive, the digest of its genesis
+record, and each history of it an owner; the identifier of an object is its
+line, written as a `sheaf:` URI, `sheaf:<name>:<owner>`. Identifiers chosen
+by each archive would clash as soon as one archive kept copies of another's
 objects; identifiers made from lines never do, so one storage root can hold
 the lines its owners write and copies of others' side by side. The default
-layout puts a line at `<owner>/<name>/`, one folder per owner; a large
-archive may instead spread its objects over folders named by parts of the
-hash of their identifiers. Archives have no identifiers of their own: they
-are found at their addresses. Readable names (`kpz-details`) become
-**labels** in the discovery document, used for the website's URLs; they are
-not permanent, and permanent links use `sheaf:` URIs, for instance
-`sheaf:<name>/v3`.
+layout puts a line at `<owner>/<name>/`, one folder per owner, so that paths
+can be computed over plain HTTP; a large archive may instead spread its
+objects over folders named by parts of the hash of their identifiers.
+Archives have no identifiers of their own: they are found at their addresses.
+Readable names (`kpz-details`) are **labels** in the discovery document, used
+for the website's URLs; they are not permanent, and permanent links use
+`sheaf:` URIs, for instance `sheaf:<name>/v3` for document version 3 of the
+originator's line. Drafts, which have no name yet, are identified locally, as
+`sheaf:draft:<id>`.
 
 ## What is the difference between a document version and an object version?
 
@@ -132,8 +127,8 @@ version itself.
 
 ## How do collections work across archives? What if another archive disappears?
 
-A collection lists its members by line (name and owner, under the identity
-proposal), an address where a copy was found, version and the SHA-512 digest
+A collection lists its members by line (name and owner), the addresses
+where copies may be found, version and the SHA-512 digest
 of that version's inventory (the "pin"). Since an inventory fixes all its
 files, the pin fixes the member completely, and a collection becomes a hash
 tree over everything it contains. If the member's archive moves or
@@ -146,13 +141,12 @@ stays readable even if no copy is found.
 
 They answer different questions. An **archive** is custody: a storage root
 and a discovery document, served at an address. It says what is kept there
-and where its files are. Under the identity proposal, an archive hosts the
+and where its files are. An archive hosts the
 lines of any number of owners and owns none of them by hosting them: every
 version of a line is signed by its owner, wherever it is stored, and an
 archive cannot add to another owner's line. A copy kept elsewhere (a mirror)
-stays its owner's line and can only receive the owner's versions. (On
-`main`, the archive is the single writer of its objects, named by an archive
-identifier; see "Who owns an object, and what is a branch?")
+stays its owner's line and can only receive the owner's versions (see "Who
+owns an object, and what is a branch?").
 
 A **collection** is a statement: a versioned list of pins, made by a curator,
 over objects kept anywhere. It says which objects, in which versions, go
@@ -198,9 +192,8 @@ extends to its members.
 ## Who owns an object, and what is a branch?
 
 > [!NOTE]
-> This answer describes a proposal (sections 6.5 and 10.5 of the
-> specification, on the branches `proposal/identity` and `proposal/owners`;
-> issues #55 and #52), not yet agreed.
+> This answer describes the identity proposal (sections 6.5 and 10.5 of the
+> specification; issues #55 and #52), not yet agreed.
 
 A work has a <dfn>name</dfn>, the digest of the genesis record written when
 it is sealed, at its owner's request, before it is first shared. Each history
@@ -273,9 +266,9 @@ is meant for unstructured records of actions and is not covered by digests.
 The place OCFL provides for data that is not part of any version is the
 object's `extensions/` folder (the registered mutable-head extension keeps its
 data there). So OpenSheaf puts witnesses in
-`extensions/opensheaf-witnesses/`, where they travel with the object. An
-archive that never touches object folders after commit may keep them in a
-`witnesses/` folder outside the storage root instead. Witnesses need no
+`extensions/opensheaf-witnesses/`, where they travel with the object: the
+owner's signature of every version, required, and timestamps and others'
+signatures, optional. Witnesses need no
 digests of their own: each one is checked directly against the checksum file
 it names, which the pins fix.
 

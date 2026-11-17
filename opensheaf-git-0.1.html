@@ -141,10 +141,9 @@
           <dfn>Archive files</dfn>: the files the specification requires to be
           served byte for byte: the discovery document <tt class="verbatim">opensheaf.json</tt>,
           the storage root (by convention <tt class="verbatim">ocfl/</tt>) and, if used,
-          <tt class="verbatim">witnesses/</tt> and the indexes (<tt class="verbatim">indexes.json</tt>
-          and the folders <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt> and
-          <tt class="verbatim">sha512/</tt>, section 6.6 of the specification,
-          proposal).
+          the indexes (<tt class="verbatim">indexes.json</tt> and the folders <tt class="verbatim">names/</tt>,
+          <tt class="verbatim">owners/</tt> and <tt class="verbatim">sha512/</tt>, section 6.6 of
+          the specification, proposal).
         </p>
       </li>
       <li>
@@ -191,9 +190,9 @@
     </p>
     <p>
       Working files MAY be kept in the repository. They are not part of the
-      archive: they MUST NOT be placed inside the storage root, <tt class="verbatim">witnesses/</tt>
-      or the folders of the indexes, and they are not published unless the
-      keeper means them to be (section 7).
+      archive: they MUST NOT be placed inside the storage root or the folders
+      of the indexes, and they are not published unless the keeper means them
+      to be (section 7).
     </p>
     <p>
       The archive files MUST NOT contain symbolic links or git submodules.
@@ -207,8 +206,7 @@
     <h3 id="auto-6"><a id="41-attributes"></a>4.1 Attributes<span style="margin-left: 1em"></span></h3>
     <p>
       The repository MUST contain a <tt class="verbatim">.gitattributes</tt> file at its
-      top with these lines (with <tt class="verbatim">witnesses/**</tt> only if the
-      archive uses that folder, the lines of the indexes only if it keeps
+      top with these lines (with the lines of the indexes only if it keeps
       them, and the paths adjusted if the archive is in a sub-folder):
     </p>
     <div class="tmweb-code">
@@ -217,7 +215,6 @@
 # never merged as text.
 opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
 ocfl/**        -text -filter -ident -working-tree-encoding -export-subst -merge
-witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge
 indexes.json   -text -filter -ident -working-tree-encoding -export-subst -merge
 names/**       -text -filter -ident -working-tree-encoding -export-subst -merge
 owners/**      -text -filter -ident -working-tree-encoding -export-subst -merge
@@ -314,7 +311,8 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     <p>
       1. a new object folder <tt class="verbatim">ocfl/&lt;path&gt;/</tt>, where <tt
       class="verbatim">&lt;path&gt;</tt> is the object's path in the layout of the
-      storage root (<tt class="verbatim">&lt;id&gt;</tt>, or <tt class="verbatim">&lt;t1&gt;/&lt;t2&gt;/&lt;t3&gt;/&lt;id&gt;</tt>
+      storage root (<tt class="verbatim">&lt;owner&gt;/&lt;name&gt;</tt> in the
+      owner-name layout, or the folders of the hash and the encoded identifier
       in the hashed layout, section 5 of the specification), with the folders
       of the hash it needs, and the files of a complete OCFL object (a new
       object, or the copy of an object of another archive); 2. a new version
@@ -322,20 +320,19 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       is the head of the object in C, with the replacement of the object's
       root <tt class="verbatim">inventory.json</tt> and its checksum file by those of
       the new version; 3. files added, replaced or removed in an object's <tt
-      class="verbatim">extensions/opensheaf-witnesses/</tt> folder, or under <tt class="verbatim">witnesses/</tt>;
-      4. the replacement of <tt class="verbatim">opensheaf.json</tt>, and files added,
-      replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt
-      class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
-      which are rewritten at every deposit and takedown (section 6.6 of the
-      specification, proposal); 5. at the creation of the storage root, its
-      own files (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>,
-      the configuration of the layout extension, and the loose files allowed
-      by section 5 of the specification); 6. the removal of an object folder,
+      class="verbatim">extensions/opensheaf-witnesses/</tt> folder; 4. the replacement
+      of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced or removed
+      among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
+      <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
+      at every deposit and takedown (section 6.6 of the specification,
+      proposal); 5. at the creation of the storage root, its own files (<tt
+      class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
+      configuration of the layout extension, and the loose files allowed by
+      section 5 of the specification); 6. the removal of an object folder,
       with the folders of the hash it leaves empty, by a takedown (section 9);
       7. the repair of a file whose bytes do not match the digest its
-      inventory records (section 5.3). 8. under the revised identity proposal
-      of the specification (branch <tt class="verbatim">proposal/owners</tt>, section
-      6.5), any change inside the folder of a draft, <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt>,
+      inventory records (section 5.3). 8. any change inside the folder of a
+      draft (section 6.5 of the specification), <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt>,
       including its removal: drafts are the only objects that may be rewritten
       or deleted, and are never copied out of the archive.
     </p>
@@ -599,14 +596,15 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       Tools working on a large archive MAY use a partial clone (<tt class="verbatim">git
       clone &ndash;filter=blob:none</tt>) or a sparse checkout, since adding a
       version to an object needs only that object's folder and the discovery
-      document. In git, the flat-direct layout reaches its limits first: every
-      deposit rewrites the tree of <tt class="verbatim">ocfl/</tt>, which lists every
-      object, and the web views of forges show at most about a thousand
-      entries of a folder. An archive expected to hold tens of thousands of
-      objects or more SHOULD therefore be created with the hashed layout
-      (section 5 of the specification), which spreads the objects over folders
-      of a few entries each. (Indexes for archives of millions of objects are
-      discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a>.)
+      document. In git, the owner-name layout reaches its limits first: every
+      deposit rewrites the tree of an owner's folder, which lists every line
+      of that owner, and the tree of <tt class="verbatim">ocfl/</tt>, which lists every
+      owner, and the web views of forges show at most about a thousand entries
+      of a folder. An archive expected to hold tens of thousands of objects or
+      more SHOULD therefore be created with the hashed layout (section 5 of
+      the specification), which spreads the objects over folders of a few
+      entries each. (Indexes for archives of millions of objects are discussed
+      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a>.)
     </p>
     <h2 id="auto-24"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
     <p>
@@ -708,15 +706,17 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       other archive's repository.
     </p>
     <p>
-      Under the revised identity proposal of the specification (branch <tt
-      class="verbatim">proposal/owners</tt>, sections 6.5 and 10.4), a mirror is a copy
-      of a line, kept in the storage root at the path of its identifier,
+      A mirror is a copy of a line (sections 6.5 and 10.4 of the
+      specification), kept in the storage root at the path of its identifier,
       together with the key logs of the owners that signed it, which are owner
       objects at their own paths; the signatures are in each object's
       extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, and
       <tt class="verbatim">witnesses/</tt> is not used. Copying a line is copying those
       object folders, and an owner moving to another archive copies its folder
-      of the owner-name layout (section 5 of the specification).
+      of the owner-name layout (section 5 of the specification). A branch
+      holds the evidence of its parent version as content files (section
+      10.5), so it never shares an object folder with a copy of its parent's
+      line.
     </p>
     <p>
       A public repository SHOULD be archived by <a href="https://www.softwareheritage.org/">Software

@@ -110,33 +110,24 @@
       of the specification the archive follows. It is only a map: everything
       it says is checked against the storage root.
     </p>
-    <h2 id="auto-10"><a id="why-are-identifiers-short-names-and-not-uris"></a>Why are identifiers short names and not URIs?<span
-    style="margin-left: 1em"></span></h2>
+    <h2 id="auto-10"><a id="how-are-objects-identified"></a>How are objects identified?<span style="margin-left: 1em"></span></h2>
     <p>
-      On <tt class="verbatim">main</tt> they are: the flat-direct storage layout puts
-      each object in a folder named by its identifier, so paths stay readable
-      and can be computed over plain HTTP; a folder name cannot contain <tt
-      class="verbatim">/</tt>. The archive itself has a URI-like identifier (a <tt
-      class="verbatim">tag:</tt> URI), and an object is named globally by the pair
-      (archive identifier, object identifier).
-    </p>
-    <p>
-      The identity proposal (sections 6.3, 6.5 and 6.6, not yet agreed)
-      changes this. A work gets a name independent of any archive, the digest
-      of its genesis record, and each history of it an owner; the identifier
-      of an object is its line, written as a <tt class="verbatim">sheaf:</tt> URI, <tt
-      class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>. Identifiers chosen by each
-      archive clash as soon as one archive keeps copies of another's objects;
-      identifiers made from lines never do, so one storage root can hold the
-      lines its owners write and copies of others' side by side. The default
-      layout puts a line at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>, one
-      folder per owner; a large archive may instead spread its objects over
-      folders named by parts of the hash of their identifiers. Archives have
-      no identifiers of their own: they are found at their addresses. Readable
-      names (<tt class="verbatim">kpz-details</tt>) become <strong>labels</strong> in
-      the discovery document, used for the website's URLs; they are not
-      permanent, and permanent links use <tt class="verbatim">sheaf:</tt> URIs, for
-      instance <tt class="verbatim">sheaf:&lt;name&gt;/v3</tt>.
+      A work has a name independent of any archive, the digest of its genesis
+      record, and each history of it an owner; the identifier of an object is
+      its line, written as a <tt class="verbatim">sheaf:</tt> URI, <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>.
+      Identifiers chosen by each archive would clash as soon as one archive
+      kept copies of another's objects; identifiers made from lines never do,
+      so one storage root can hold the lines its owners write and copies of
+      others' side by side. The default layout puts a line at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>,
+      one folder per owner, so that paths can be computed over plain HTTP; a
+      large archive may instead spread its objects over folders named by parts
+      of the hash of their identifiers. Archives have no identifiers of their
+      own: they are found at their addresses. Readable names (<tt class="verbatim">kpz-details</tt>)
+      are <strong>labels</strong> in the discovery document, used for the
+      website's URLs; they are not permanent, and permanent links use <tt
+      class="verbatim">sheaf:</tt> URIs, for instance <tt class="verbatim">sheaf:&lt;name&gt;/v3</tt>
+      for document version 3 of the originator's line. Drafts, which have no
+      name yet, are identified locally, as <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>.
     </p>
     <h2 id="auto-11"><a id="what-is-the-difference-between-a-document-version-and-an-object-version"></a>What is the difference between a document version and
     an object version?<span style="margin-left: 1em"></span></h2>
@@ -173,29 +164,26 @@
     <h2 id="auto-14"><a id="how-do-collections-work-across-archives-what-if-another-archive-disappears"></a>How do collections work across archives? What if
     another archive disappears?<span style="margin-left: 1em"></span></h2>
     <p>
-      A collection lists its members by line (name and owner, under the
-      identity proposal), an address where a copy was found, version and the
-      SHA-512 digest of that version's inventory (the &quot;pin&quot;). Since
-      an inventory fixes all its files, the pin fixes the member completely,
-      and a collection becomes a hash tree over everything it contains. If the
-      member's archive moves or disappears, the member can be fetched from a
-      mirror, from its DOI deposit or from a Software Heritage snapshot: any
-      copy that matches the pin is the right one. A collection also keeps a
-      cached citation of each member, so that it stays readable even if no
-      copy is found.
+      A collection lists its members by line (name and owner), the addresses
+      where copies may be found, version and the SHA-512 digest of that
+      version's inventory (the &quot;pin&quot;). Since an inventory fixes all
+      its files, the pin fixes the member completely, and a collection becomes
+      a hash tree over everything it contains. If the member's archive moves
+      or disappears, the member can be fetched from a mirror, from its DOI
+      deposit or from a Software Heritage snapshot: any copy that matches the
+      pin is the right one. A collection also keeps a cached citation of each
+      member, so that it stays readable even if no copy is found.
     </p>
     <h2 id="auto-15"><a id="why-both-archives-and-collections"></a>Why both archives and collections?<span style="margin-left: 1em"></span></h2>
     <p>
       They answer different questions. An <strong>archive</strong> is custody:
       a storage root and a discovery document, served at an address. It says
-      what is kept there and where its files are. Under the identity proposal,
-      an archive hosts the lines of any number of owners and owns none of them
-      by hosting them: every version of a line is signed by its owner,
-      wherever it is stored, and an archive cannot add to another owner's
-      line. A copy kept elsewhere (a mirror) stays its owner's line and can
-      only receive the owner's versions. (On <tt class="verbatim">main</tt>, the archive
-      is the single writer of its objects, named by an archive identifier; see
-      &quot;Who owns an object, and what is a branch?&quot;)
+      what is kept there and where its files are. An archive hosts the lines
+      of any number of owners and owns none of them by hosting them: every
+      version of a line is signed by its owner, wherever it is stored, and an
+      archive cannot add to another owner's line. A copy kept elsewhere (a
+      mirror) stays its owner's line and can only receive the owner's versions
+      (see &quot;Who owns an object, and what is a branch?&quot;).
     </p>
     <p>
       A <strong>collection</strong> is a statement: a versioned list of pins,
@@ -246,10 +234,9 @@
     </p>
     <h2 id="auto-18"><a id="who-owns-an-object-and-what-is-a-branch"></a>Who owns an object, and what is a branch?<span style="margin-left: 1em"></span></h2>
     <div class="os-alert os-note">
-      <font class="os-alert-label">Note.</font> This answer describes a proposal (sections 6.5
-      and 10.5 of the specification, on the branches <tt class="verbatim">proposal/identity</tt>
-      and <tt class="verbatim">proposal/owners</tt>; issues #55 and #52), not yet
-      agreed.
+      <font class="os-alert-label">Note.</font> This answer describes the identity proposal
+      (sections 6.5 and 10.5 of the specification; issues #55 and #52), not
+      yet agreed.
     </div>
     <p>
       A work has a <dfn>name</dfn>, the digest of the genesis record written
@@ -333,11 +320,10 @@
       version is the object's <tt class="verbatim">extensions/</tt> folder (the
       registered mutable-head extension keeps its data there). So OpenSheaf
       puts witnesses in <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, where
-      they travel with the object. An archive that never touches object
-      folders after commit may keep them in a <tt class="verbatim">witnesses/</tt>
-      folder outside the storage root instead. Witnesses need no digests of
-      their own: each one is checked directly against the checksum file it
-      names, which the pins fix.
+      they travel with the object: the owner's signature of every version,
+      required, and timestamps and others' signatures, optional. Witnesses
+      need no digests of their own: each one is checked directly against the
+      checksum file it names, which the pins fix.
     </p>
     <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>
