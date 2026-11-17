@@ -199,7 +199,7 @@
       Members of collections that belong to other archives are reached through
       the discovery documents of those archives and checked by their pins
       (section 10.3 of the specification), never included as submodules;
-      copies of objects of other archives are mirrors (section 10.4 of the
+      copies of lines kept elsewhere are mirrors (section 10.4 of the
       specification), copied byte for byte into the storage root.
     </p>
     <h2 id="auto-5"><a id="4-storing-bytes"></a>4. Storing bytes<span style="margin-left: 1em"></span></h2>
@@ -332,9 +332,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       with the folders of the hash it leaves empty, by a takedown (section 9);
       7. the repair of a file whose bytes do not match the digest its
       inventory records (section 5.3). 8. any change inside the folder of a
-      draft (section 6.5 of the specification), <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt>,
-      including its removal: drafts are the only objects that may be rewritten
-      or deleted, and are never copied out of the archive.
+      draft (section 6.5 of the specification; <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt>
+      in the owner-name layout), including its removal: drafts are the only
+      objects that may be rewritten or deleted, and are never copied out of
+      the archive.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -407,15 +408,13 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     <p>
       Git branches other than the published branch are <dfn>working
       branches</dfn>: working space, not branches of an object (section 10.5
-      of the specification, proposal). They MAY be rewritten, and the object
-      versions they hold are not yet published: a tool MAY rebuild them,
-      changing their pins, until they are merged into the published branch,
-      unless a version has already been shared, since a sealed version MUST
-      NOT change once it has left its owner's hands (section 6.5 of the
-      specification, proposal). Once a version is on the published branch it
-      is fixed. (Drafts, objects without a genesis record, and private states
-      of archives and objects are discussed in section 6.5 of the
-      specification, proposal, and in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
+      of the specification, proposal). They MAY be rewritten, but only drafts
+      may be rebuilt on them: a sealed version is signed by its owner, and is
+      never rebuilt, on any branch, since a new version with other bytes would
+      be a fork of its line (section 6.5 of the specification). Drafts, under
+      the reserved owner <tt class="verbatim">draft</tt>, may change until they are
+      sealed; private states of archives are discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue
+      #29</a>.
     </p>
     <h3 id="auto-17"><a id="63-merging"></a>6.3 Merging<span style="margin-left: 1em"></span></h3>
     <p>
@@ -698,11 +697,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       is a copy at another base URL; the archive MAY list it in <tt class="verbatim">mirrors</tt>
       of its discovery document (section 6.1 of the specification). It is not
       a mirror in the sense of section 10.4 of the specification, which copies
-      one object of another archive into an archive's own storage root.
+      one line kept elsewhere into an archive's own storage root.
     </p>
     <p>
-      Mirroring an object of another archive is copying its files and checking
-      them against a pin; it does not need, and SHOULD NOT use, a merge of the
+      Mirroring a line kept elsewhere is copying its files and checking them
+      against a pin; it does not need, and SHOULD NOT use, a merge of the
       other archive's repository.
     </p>
     <p>
@@ -710,13 +709,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       specification), kept in the storage root at the path of its identifier,
       together with the key logs of the owners that signed it, which are owner
       objects at their own paths; the signatures are in each object's
-      extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, and
-      <tt class="verbatim">witnesses/</tt> is not used. Copying a line is copying those
-      object folders, and an owner moving to another archive copies its folder
-      of the owner-name layout (section 5 of the specification). A branch
-      holds the evidence of its parent version as content files (section
-      10.5), so it never shares an object folder with a copy of its parent's
-      line.
+      extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>.
+      Copying a line is copying those object folders, and an owner moving to
+      another archive copies its folder of the owner-name layout (section 5 of
+      the specification). A branch holds the evidence of its parent version as
+      content files (section 10.5 of the specification), so it never shares an
+      object folder with a copy of its parent's line.
     </p>
     <p>
       A public repository SHOULD be archived by <a href="https://www.softwareheritage.org/">Software

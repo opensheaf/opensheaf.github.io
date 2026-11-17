@@ -169,7 +169,8 @@
           impartial about their versions: each member pins an object with all
           its versions, and may follow it as it grows. The main collection of
           an archive's documents, and the list of lines an archive keeps
-          copies of, are catalogues.
+          copies of, both kept by the archive acting as an owner, are
+          catalogues.
         </p>
       </li>
       <li>
@@ -494,17 +495,27 @@
           and <tt class="verbatim">&lt;t3&gt;</tt> are the first three groups of three
           characters of the lowercase hexadecimal SHA-256 digest of the
           identifier (as UTF-8), and <tt class="verbatim">&lt;encoded id&gt;</tt> is the
-          identifier encoded as that extension says. Archives SHOULD use the
-          owner-name layout unless their size makes one folder per owner, or
-          per name, impractical (for instance from tens of thousands of lines,
-          or fewer in a git repository; appendix F). The layout is chosen when
-          the archive is created: changing it keeps every pin valid, since
-          clients compute paths from <tt class="verbatim">storageLayout</tt>, but moves
-          every object and so changes every URL into the storage root (the <tt
-          class="verbatim">url</tt> of a branch's <tt class="verbatim">parent</tt>, section 10.5,
-          or a link in a document), so archives SHOULD NOT change it. The
-          storage root MAY contain, as loose files allowed by OCFL, a copy of
-          the OCFL specification and of this specification.
+          identifier encoded as that extension says: every character other
+          than <tt class="verbatim">A-Z</tt>, <tt class="verbatim">a-z</tt>, <tt class="verbatim">0-9</tt>,
+          <tt class="verbatim">-</tt> and <tt class="verbatim">_</tt> percent-encoded in lowercase
+          hexadecimal, and, when the result is longer than 100 characters, its
+          first 100 characters followed by <tt class="verbatim">-</tt> and the full
+          digest. Identifiers of lines (<tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>,
+          111 characters, 115 once encoded) are always shortened so: the line
+          <tt class="verbatim">sheaf:72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq:zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a</tt>
+          of appendix E is at <tt class="verbatim">c3e/a2b/045/sheaf%3a72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq%3azgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5w-c3ea2b045d0d7a97e38820cbe32a544877df289e66d786dad722a14811662921/</tt>.
+          The path is computed from the identifier, so readers need not decode
+          it. Archives SHOULD use the owner-name layout unless their size
+          makes one folder per owner, or per name, impractical (for instance
+          from tens of thousands of lines, or fewer in a git repository;
+          appendix F). The layout is chosen when the archive is created:
+          changing it keeps every pin valid, since clients compute paths from
+          <tt class="verbatim">storageLayout</tt>, but moves every object and so changes
+          every URL into the storage root (the <tt class="verbatim">url</tt> of a
+          branch's <tt class="verbatim">parent</tt>, section 10.5, or a link in a
+          document), so archives SHOULD NOT change it. The storage root MAY
+          contain, as loose files allowed by OCFL, a copy of the OCFL
+          specification and of this specification.
         </p>
       </li>
       <li>
@@ -671,18 +682,19 @@
     </p>
     <h3 id="auto-10"><a id="63-object-identifiers-and-labels"></a>6.3 Object identifiers and labels<span style="margin-left: 1em"></span></h3>
     <p>
-      The identifier of an object (its OCFL <tt class="verbatim">id</tt>) is its first
-      line, written as a <tt class="verbatim">sheaf:</tt> URI with its owner part: <tt
-      class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>, the name and owner that
-      its <tt class="verbatim">object.json</tt> records (section 6.5). For every sealed
-      object (an originator's line, a branch, an owner object) this is the
-      line itself: a branch is a new object, never a continuation of the
-      parent's (section 10.5). Two objects of different lines never have the
-      same identifier, in any archive, so an archive keeps the lines its
-      owners write and copies of lines kept elsewhere side by side in one
-      storage root. The identifier MUST be unique in the storage root, and
-      MUST NOT be reused, also after a takedown. The kind of an object is
-      given by its <tt class="verbatim">object.json</tt>, never by its identifier.
+      The identifier of an object (its OCFL <tt class="verbatim">id</tt>) is its line,
+      written as a <tt class="verbatim">sheaf:</tt> URI with its owner part: <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>,
+      the name and owner that its <tt class="verbatim">object.json</tt> records (section
+      6.5). For every sealed object (an originator's line, a branch, an owner
+      object) this is the line itself: a branch is a new object, never a
+      continuation of the parent's (section 10.5). Two objects of different
+      lines never have the same identifier, in any archive, so an archive
+      keeps the lines its owners write and copies of lines kept elsewhere side
+      by side in one storage root. The identifier MUST be unique in the
+      storage root; the identifier of a sealed object MUST NOT be reused, also
+      after a takedown (a draft's may be, once the draft is gone). The kind of
+      an object is given by its <tt class="verbatim">object.json</tt>, never by its
+      identifier.
     </p>
     <p>
       A draft (section 6.5) belongs to the reserved owner <tt class="verbatim">draft</tt>,
@@ -721,9 +733,9 @@
           where <tt class="verbatim">&lt;path&gt;</tt> is the path of the member's
           object, <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt> (section
           6.3), given by the <tt class="verbatim">storageLayout</tt> of that discovery
-          document (section 5): <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;</tt>, or
-          the folders of the hash and the encoded identifier in the hashed
-          layout;
+          document (section 5): <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;</tt>,
+          or, in the hashed layout, the folders of the hash and the encoded,
+          shortened identifier (section 5);
         </p>
       </li>
       <li>
@@ -816,13 +828,13 @@
       (k in decimal), so that algorithm 0 gives a last character <tt class="verbatim">a</tt>
       or <tt class="verbatim">q</tt>. Names are made by algorithm 0, except a branch
       named by another algorithm to avoid a clash (below); names made by
-      different algorithms never coincide. A later version of the genesis
-      record MAY use another hash function. Since RFC 4648 sets the four bits
-      to zero, names are compared as strings and never decoded. Anyone holding
-      a copy can compute it; it is unique without a registry in practice,
-      since the record holds a random nonce; since a name is used to refer to
-      objects, clashes are resolved where lines are made (below). <tt class="verbatim">object.json</tt>
-      records it as <tt class="verbatim">name</tt>.
+      different algorithms never coincide. A later format version of the
+      genesis record MAY use another hash function. Since RFC 4648 sets the
+      four bits to zero, names are compared as strings and never decoded.
+      Anyone holding a copy can compute it; it is unique without a registry in
+      practice, since the record holds a random nonce; since a name is used to
+      refer to objects, clashes are resolved where lines are made (below). <tt
+      class="verbatim">object.json</tt> records it as <tt class="verbatim">name</tt>.
     </p>
     <p>
       <strong>Owners.</strong> An owner is a keyed identity: a person, a group
@@ -837,6 +849,11 @@
       a file <tt class="verbatim">keys.json</tt> with:
     </p>
     <ul>
+      <li>
+        <p>
+          <tt class="verbatim">format</tt>: <tt class="verbatim">&quot;opensheaf-keys/0.1&quot;</tt>;
+        </p>
+      </li>
       <li>
         <p>
           <tt class="verbatim">keys</tt>: the public keys of the owner, each an Ed25519
@@ -861,8 +878,8 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">keeper</tt>, OPTIONAL: URIs of the person or institution
-          who answers for the owner (below).
+          <tt class="verbatim">keeper</tt>, OPTIONAL: <tt class="verbatim">https</tt> URLs of the
+          person or institution who answers for the owner (below).
         </p>
       </li>
     </ul>
@@ -935,11 +952,11 @@
       <strong>Keepers (optional).</strong> An owner MAY name, in <tt class="verbatim">keeper</tt>
       of its key log, the person or institution who answers for it: an ORCID
       iD (<tt class="verbatim">https://orcid.org/&hellip;</tt>), a web address, an
-      institution's domain. The keeper MAY confirm it, in a place only the
-      keeper controls: a link naming the owner in its ORCID record, or a file
-      <tt class="verbatim">https://&lt;domain&gt;/.well-known/opensheaf</tt> on its
-      domain, a JSON object with <tt class="verbatim">owners</tt>, the owner names it
-      answers for. When a keeper is named, a verifier MAY check both
+      institution's domain written as <tt class="verbatim">https://&lt;domain&gt;/</tt>.
+      The keeper MAY confirm it, in a place only the keeper controls: a link
+      naming the owner in its ORCID record, or a file <tt class="verbatim">https://&lt;domain&gt;/.well-known/opensheaf</tt>
+      on its domain, a JSON object with <tt class="verbatim">owners</tt>, the owner
+      names it answers for. When a keeper is named, a verifier MAY check both
       directions, and reports the link as confirmed, claimed only (the owner
       names a keeper who does not confirm it), or absent. A confirmation is
       read as it is now: a keeper who withdraws it ends the link, and what the
@@ -1012,18 +1029,19 @@
     </p>
     <p>
       <strong>Sealing and transfer.</strong> Sealing makes a new object: the
-      line <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>, at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>,
-      whose first version holds the genesis record and the work, signed by its
-      owner. The versions of a draft it was made from are not part of the
-      line, and nothing in the line refers to them. The owner seals a work
-      before first sharing or publishing it, and tools SHOULD seal only at the
-      owner's request, not as a side effect. A line is not handed over: when
-      another owner continues the work (an author leaving an institution, when
-      the line is the institution's; a journal handing a report to its
-      referee), the new owner makes a branch (section 10.5), and MAY keep a
-      copy of the previous owner's line beside it, and the previous owner MAY
-      add a notice to its own line pointing to the branch. An owner taking its
-      own lines elsewhere moves (above), which is not a hand-over.
+      line <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>, at its path in
+      the layout (<tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt> in the
+      owner-name layout), whose first version holds the genesis record and the
+      work, signed by its owner. The versions of a draft it was made from are
+      not part of the line, and nothing in the line refers to them. The owner
+      seals a work before first sharing or publishing it, and tools SHOULD
+      seal only at the owner's request, not as a side effect. A line is not
+      handed over: when another owner continues the work (an author leaving an
+      institution, when the line is the institution's; a journal handing a
+      report to its referee), the new owner makes a branch (section 10.5), and
+      MAY keep a copy of the previous owner's line beside it, and the previous
+      owner MAY add a notice to its own line pointing to the branch. An owner
+      taking its own lines elsewhere moves (above), which is not a hand-over.
     </p>
     <p>
       <strong>Clashes.</strong> A name is used to refer to objects, so the
@@ -1231,19 +1249,19 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       and a document version, a positive integer without leading zeros;
       optionally <tt class="verbatim">?</tt> and a query of parameters <tt class="verbatim">key=value</tt>
       joined by <tt class="verbatim">&amp;</tt>, among them at most one <tt class="verbatim">sha512</tt>,
-      only after a document version, whose value is the SHA-512 digest of an
-      inventory file, 128 lowercase hexadecimal digits, as in a pin (section
-      10.2), and at most one <tt class="verbatim">at</tt>, after <tt class="verbatim">sha512</tt>
-      if both are present (below). A resolver ignores parameters it does not
-      know; no part other than the value of <tt class="verbatim">at</tt> is
-      percent-encoded; this proposal defines no fragment. The scheme, the
-      name, the owner name, <tt class="verbatim">v</tt>, the digest and the parameter
-      names are lowercase, and a resolver MAY fold uppercase letters in them;
-      the value of <tt class="verbatim">at</tt> is case-sensitive. The name of an owner
-      is the name of its genesis record, so <tt class="verbatim">sheaf:&lt;owner&gt;</tt>
-      names the originator's line of that record, which is the owner object
-      itself; for the versions of a key log, <tt class="verbatim">/v&lt;n&gt;</tt> is
-      the object version number.
+      only after a version (a document version, or for a key log an object
+      version), whose value is the SHA-512 digest of an inventory file, 128
+      lowercase hexadecimal digits, as in a pin (section 10.2), and at most
+      one <tt class="verbatim">at</tt>, after <tt class="verbatim">sha512</tt> if both are present
+      (below). A resolver ignores parameters it does not know; no part other
+      than the value of <tt class="verbatim">at</tt> is percent-encoded; this proposal
+      defines no fragment. The scheme, the name, the owner name, <tt class="verbatim">v</tt>,
+      the digest and the parameter names are lowercase, and a resolver MAY
+      fold uppercase letters in them; the value of <tt class="verbatim">at</tt> is
+      case-sensitive. The name of an owner is the name of its genesis record,
+      so <tt class="verbatim">sheaf:&lt;owner&gt;</tt> names the originator's line of
+      that record, which is the owner object itself; for the versions of a key
+      log, <tt class="verbatim">/v&lt;n&gt;</tt> is the object version number.
     </p>
     <ul>
       <li>
@@ -1849,11 +1867,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       </li>
     </ul>
     <p>
-      <tt class="verbatim">publisher</tt> is the archive's name, or the external service
-      registering a DOI for the version (appendix A). <tt class="verbatim">publisher</tt>
-      and <tt class="verbatim">affiliation</tt> SHOULD be written as objects (with <tt
-      class="verbatim">name</tt> and, where available, an identifier); readers MUST also
-      accept plain strings.
+      <tt class="verbatim">publisher</tt> is the owner of the line, or the body behind
+      it (a journal, an institution), or the external service registering a
+      DOI for the version (appendix A). <tt class="verbatim">publisher</tt> and <tt
+      class="verbatim">affiliation</tt> SHOULD be written as objects (with <tt class="verbatim">name</tt>
+      and, where available, an identifier); readers MUST also accept plain
+      strings.
     </p>
     <p>
       <tt class="verbatim">doi</tt> and <tt class="verbatim">url</tt> are OPTIONAL: they are
@@ -2166,7 +2185,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
           versions, and the collection may follow it as it grows, whoever adds
           the versions: the owner of the object decides what its versions are.
           The main collection of an archive's documents, and the list of lines
-          an archive keeps copies of (section 10.4), are catalogues.
+          an archive keeps copies of (section 10.4), both kept by the archive
+          acting as an owner (section 6.5), are catalogues.
         </p>
       </li>
       <li>
@@ -2344,22 +2364,22 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       versions, the branch point: a co-author carrying the work on, a journal
       keeping the version it vetted and correcting it afterwards. Its genesis
       record is the object's, so it has the parent's name (section 6.5), or,
-      after a clash, another name of the same genesis record; From its first
-      version after the branch point, its <tt class="verbatim">object.json</tt> records
-      its own <tt class="verbatim">owner</tt> and <tt class="verbatim">parent</tt>: the <tt class="verbatim">owner</tt>,
-      <tt class="verbatim">name</tt>, <tt class="verbatim">objectVersion</tt> (the branch point),
-      <tt class="verbatim">documentVersion</tt> and <tt class="verbatim">inventorySha512</tt> of
-      the parent version, and SHOULD record the <tt class="verbatim">url</tt> of that
-      object version, an absolute URL (<tt class="verbatim">&lt;storage root
-      URL&gt;&lt;path&gt;/&lt;version&gt;/</tt>, with <tt class="verbatim">&lt;path&gt;</tt>
-      the object's path in the layout of the parent's storage root, section
-      5), so that it can be resolved (section 6.4). Its <tt class="verbatim">datacite.json</tt>
-      describes it with the branch owner (for a selection, the body behind it)
-      as <tt class="verbatim">publisher</tt> and keeps the relations of the parent
-      version; the first version of a branch, and every version that moves its
-      branch point, SHOULD link the parent version with <tt class="verbatim">IsIdenticalTo</tt>:
-      its DOI if it has one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt>
-      of <tt class="verbatim">parent</tt>).
+      after a clash, another name of the same genesis record. From its first
+      version, its <tt class="verbatim">object.json</tt> records its own <tt class="verbatim">owner</tt>
+      and <tt class="verbatim">parent</tt>: the <tt class="verbatim">owner</tt>, <tt class="verbatim">name</tt>,
+      <tt class="verbatim">objectVersion</tt> (the branch point), <tt class="verbatim">documentVersion</tt>
+      and <tt class="verbatim">inventorySha512</tt> of the parent version, and SHOULD
+      record the <tt class="verbatim">url</tt> of that object version, an absolute URL
+      (<tt class="verbatim">&lt;storage root URL&gt;&lt;path&gt;/&lt;version&gt;/</tt>,
+      with <tt class="verbatim">&lt;path&gt;</tt> the object's path in the layout of the
+      parent's storage root, section 5), so that it can be resolved (section
+      6.4). Its <tt class="verbatim">datacite.json</tt> describes it with the branch
+      owner (for a selection, the body behind it) as <tt class="verbatim">publisher</tt>
+      and keeps the relations of the parent version; the first version of a
+      branch, and every version that moves its branch point, SHOULD link the
+      parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if it has
+      one, otherwise a <tt class="verbatim">URL</tt> (the <tt class="verbatim">url</tt> of <tt
+      class="verbatim">parent</tt>).
     </p>
     <p>
       <strong>A branch is a new object.</strong> Its identifier is its own
@@ -2444,8 +2464,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
       point's files are stored twice only on plain file systems, and once in
       git, which shares them. This is how Radicle keeps forks: a fork has its
       own namespace, and the parent's is replicated beside it. A copy of the
-      parent's line is allowed only if the licences of its versions allow
-      redistribution, or with the agreement of their owners.
+      parent's line is a mirror, allowed only if the licences of its versions
+      allow redistribution (section 10.4; copying by agreement is open, #39).
     </p>
     <p>
       <strong>The evidence of a branch.</strong> Its first version shows,
@@ -2628,10 +2648,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;      a version of an owner'
     <h3 id="auto-32"><a id="112-takedown"></a>11.2 Takedown<span style="margin-left: 1em"></span></h3>
     <p>
       When content must be removed (by law, or for a breach of rights), the
-      object is deleted from the storage root, together with the folders of
-      the hash that the deletion leaves empty (in the hashed layout, section
-      5, since OCFL forbids empty folders in a storage root), and a tombstone
-      MUST be added to the discovery document.
+      object is deleted from the storage root, together with the folders above
+      it that the deletion leaves empty (the folder of an owner in the
+      owner-name layout, the folders of the hash in the hashed layout, section
+      5; OCFL forbids empty folders in a storage root), and a tombstone MUST
+      be added to the discovery document.
     </p>
     <h3 id="auto-33"><a id="113-tombstones"></a>11.3 Tombstones<span style="margin-left: 1em"></span></h3>
     <p>
@@ -2947,12 +2968,12 @@ keylog &lt;the value of keyLog&gt;</pre>
           collection versions check the pins of members of the archive itself
           (resolving the members of other archives for every earlier
           collection version is OPTIONAL); for a revision, check that the
-          pinned object version holds the stated document version; for a
-          member with <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>, check
-          them against the <tt class="verbatim">object.json</tt> of the pinned version;
-          check that no pin names a draft (section 6.5); report each as
-          verified, mismatch (a copy was found and does not match),
-          unavailable (no copy found) or removed (tombstoned);
+          pinned object version holds the stated document version; check the
+          <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> of each member
+          against the <tt class="verbatim">object.json</tt> of the pinned version; check
+          that no pin names a draft (section 6.5); report each as verified,
+          mismatch (a copy was found and does not match), unavailable (no copy
+          found) or removed (tombstoned);
         </p>
       </li>
       <li>
@@ -2993,8 +3014,9 @@ keylog &lt;the value of keyLog&gt;</pre>
           discovery document lists the head's <tt class="verbatim">name</tt> and <tt
           class="verbatim">owner</tt>, and that a line whose owner is not the originator
           declares a parent and that the originator's line declares none; and
-          that drafts are only at <tt class="verbatim">draft/&lt;id&gt;/</tt>, unlisted
-          in <tt class="verbatim">objects</tt> and in the indexes;
+          that drafts are only at the path of <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt>
+          (<tt class="verbatim">draft/&lt;id&gt;/</tt> in the owner-name layout),
+          unlisted in <tt class="verbatim">objects</tt> and in the indexes;
         </p>
       </li>
       <li>
@@ -3189,8 +3211,10 @@ keylog &lt;the value of keyLog&gt;</pre>
           <tt class="verbatim">members.json</tt>, inventories and the discovery document
           (and, with the proposal of section 6.5, <tt class="verbatim">genesis.json</tt>,
           <tt class="verbatim">keys.json</tt>, signature files, <tt class="verbatim">parent.inventory.json</tt>,
-          <tt class="verbatim">parent.object.json</tt> and the index files) are placed
-          under CC0, so that they can be harvested and mirrored freely.
+          <tt class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures/</tt>,
+          <tt class="verbatim">parent.keylog/</tt>, <tt class="verbatim">parent.chain/</tt> and
+          the index files) are placed under CC0, so that they can be harvested
+          and mirrored freely.
         </p>
       </li>
       <li>
@@ -3758,6 +3782,23 @@ keylog &lt;the value of keyLog&gt;</pre>
           the algorithm-0 name of the genesis record.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, proposal revised after an
+          audit:</strong> the path of a line in the hashed layout (shortened
+          with its digest, as extension 0003 does for identifiers over 100
+          characters) with a worked example; copying a parent's line by
+          agreement left open (#39), as for mirrors; <tt class="verbatim">keys.json</tt>
+          has a <tt class="verbatim">format</tt>; <tt class="verbatim">keeper</tt> holds <tt
+          class="verbatim">https</tt> URLs; <tt class="verbatim">publisher</tt> is the line's
+          owner or the body behind it; a draft's identifier may be reused once
+          it is gone; empty folders of owners removed at a takedown; <tt
+          class="verbatim">sha512</tt> allowed after a key log's object version;
+          catalogues of copies kept by the archive as an owner; identity files
+          listed in full in the CC0 list; references and wording corrected;
+          the examples consistent (the catalogue pins the head).
+        </p>
+      </li>
     </ul>
     <h2 id="auto-42"><a id="appendix-a-zenodo-binding-normative-for-archives-declaring-the-profile-zenodo"></a>Appendix A. Zenodo binding (normative for archives
     declaring the profile <tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h2>
@@ -4177,7 +4218,7 @@ ocfl/
       &quot;name&quot;: &quot;72kqjazmz3pvvf4a2t4wzefimdzwrkxwum2ta4b73ikqude7dljq&quot;,
       &quot;owner&quot;: &quot;zgjup5lqdg4kec2lyvdq2f3d55b6wyouvji5wwbregthijfnsu3a&quot;,
       &quot;at&quot;: [ &quot;https://mgubi.org/papers/&quot; ],
-      &quot;version&quot;: &quot;v3&quot;,
+      &quot;version&quot;: &quot;v1&quot;,
       &quot;inventorySha512&quot;: &quot;9a0c&hellip;&quot;,
       &quot;follow&quot;: &quot;latest&quot;,
       &quot;cite&quot;: { &quot;title&quot;: &quot;Mass gap for the fractional $\\Phi^4_2$ model&quot;,
@@ -4243,6 +4284,7 @@ ocfl/
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 {
+  &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
   &quot;keys&quot;: [ &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
             &quot;did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH&quot; ],
   &quot;threshold&quot;: 1,
@@ -4536,11 +4578,11 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
       </li>
       <li>
         <p>
-          <strong>Why the archive numbers document versions itself.</strong>
-          External numberings have gaps (versions an external service no
-          longer serves) and do not cover versions that were never public
-          there. The archive's own numbers have no gaps; external labels are
-          recorded beside them.
+          <strong>Why the owner of a line numbers its document versions
+          itself.</strong> External numberings have gaps (versions an external
+          service no longer serves) and do not cover versions that were never
+          public there. The owner's own numbers have no gaps; external labels
+          are recorded beside them.
         </p>
       </li>
       <li>
@@ -4589,8 +4631,7 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
           provides for data that is not part of any version (the registered
           mutable-head extension keeps its data there), so witnesses go in <tt
           class="verbatim">extensions/opensheaf-witnesses/</tt> and travel with the
-          object; <tt class="verbatim">witnesses/</tt> outside the storage root remains
-          for archives that never touch object folders after commit.
+          object.
         </p>
       </li>
       <li>
@@ -4639,8 +4680,8 @@ https://opensheaf.org/sheaf:lvfmiq2z/v3
       </li>
       <li>
         <p>
-          <a href="https://www.rfc-editor.org/rfc/rfc2119">RFC 2119</a>, <a href="https://www.rfc-editor.org/rfc/rfc8174">RFC 8174</a>, <a href="https://www.rfc-editor.org/rfc/rfc8259">RFC 8259</a>,
-          <a href="https://www.rfc-editor.org/rfc/rfc4151">RFC 4151</a> and <a href="https://www.rfc-editor.org/rfc/rfc3339">RFC 3339</a>
+          <a href="https://www.rfc-editor.org/rfc/rfc2119">RFC 2119</a>, <a href="https://www.rfc-editor.org/rfc/rfc8174">RFC 8174</a>, <a href="https://www.rfc-editor.org/rfc/rfc8259">RFC 8259</a>
+          and <a href="https://www.rfc-editor.org/rfc/rfc3339">RFC 3339</a>
         </p>
       </li>
       <li>

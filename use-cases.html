@@ -377,20 +377,21 @@ members:
           To make sure what it vetted stays available, the journal keeps an
           <strong>accepted copy</strong> of each vetted revision: a branch of
           the paper, owned by the journal (an owner with keys of its own), a
-          new object holding exactly the files of that version, byte for byte,
-          with the evidence of the authors' version (their inventory, <tt
-          class="verbatim">object.json</tt>, signatures and the part of their key log
-          those need, section 10.5). It keeps the document version of the
-          revision it copies (the authors' version 3, say). Only the copied
-          revision needs a licence allowing redistribution; a paper whose
-          first preprint was under a restrictive licence can be accepted in a
-          later, openly licensed version. Later versions of the accepted copy
-          (corrections, notices, a withdrawal) are the editors' acts, signed
-          by the journal; the authors cannot change them. A correction the
-          journal makes itself is its own version 4 (provisionally: the
-          numbering on branches is open); when the editors later vet the
-          authors' corrected version, the copy moves its branch point to it,
-          with the same evidence, as the journal's next version.
+          new object holding every file of that version except its <tt class="verbatim">datacite.json</tt>
+          and <tt class="verbatim">object.json</tt>, byte for byte, with the evidence of
+          the authors' version (their inventory, <tt class="verbatim">object.json</tt>,
+          signatures and the part of their key log those need, section 10.5).
+          It keeps the document version of the revision it copies (the
+          authors' version 3, say). Only the copied revision needs a licence
+          allowing redistribution; a paper whose first preprint was under a
+          restrictive licence can be accepted in a later, openly licensed
+          version. Later versions of the accepted copy (corrections, notices,
+          a withdrawal) are the editors' acts, signed by the journal; the
+          authors cannot change them. A correction the journal makes itself is
+          its own version 4 (provisionally: the numbering on branches is
+          open); when the editors later vet the authors' corrected version,
+          the copy moves its branch point to it, with the same evidence, as
+          the journal's next version.
         </p>
       </li>
     </ul>
@@ -629,7 +630,7 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           <tt class="verbatim">at</tt> it gives and how its members are resolved are
           open questions (issue #29). So is its <tt class="verbatim">Available</tt>
           date: the specification asks for the date of deposit (section 8), as
-          for the drafts found later in <a href="#a-researchers-own-archive">A researcher's own
+          for the early versions found later in <a href="#a-researchers-own-archive">A researcher's own
           archive</a>, while a version deposited privately becomes public only
           later; #29 proposes to leave it out and add it, by a
           description-only version, when the version is made public.
@@ -658,7 +659,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           under review is usually not licensed for redistribution, while the
           specification allows mirrors only when the licences allow it
           (section 10.4): here the mirror is made with the authors' agreement,
-          which the specification does not yet provide for (#29).
+          which the specification does not yet provide for (copying by
+          agreement, #39; what custodians promise, #54).
         </p>
       </li>
       <li>
@@ -755,7 +757,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       </li>
     </ul>
     <p>
-      Open questions for the specification, discussed in issue #29:
+      Open questions for the specification, discussed in issues #29, #39 and
+      #54:
     </p>
     <ul>
       <li>
@@ -781,7 +784,7 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       <li>
         <p>
           mirrors made with the owner's agreement, for objects whose licence
-          does not allow redistribution;
+          does not allow redistribution (#39, #54);
         </p>
       </li>
       <li>
@@ -1013,8 +1016,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           they reviewed</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a referee signs a report</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the report's archive adds the referee to its creators by
-          a description-only version, which is followed</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the report's owner (the journal) adds the referee to its
+          creators by a description-only version, which is followed</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the revision vetted is unchanged; the editors may vet the
           signed version as a new revision</td>
         </tr><tr>

@@ -63,7 +63,7 @@ A *sheaf* is a bundle of papers, or of stalks of wheat tied together. In
 mathematics, a sheaf is the structure that attaches data to each part of a
 space so that local pieces, which agree where they overlap, glue into a
 whole. OpenSheaf works the same way: archives are kept and verified
-separately, each by its owner, and collections glue them together without
+separately, each by its keeper, and collections glue them together without
 copying, while every piece stays checkable on its own.
 
 ## Taking part
@@ -138,9 +138,17 @@ on GitHub, and archives made with them.
   [`opensheaf-archive-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-archive-0.1.schema.json)
   for `opensheaf.json`,
   [`opensheaf-object-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-object-0.1.schema.json)
-  for `object.json` and
+  for `object.json`,
   [`opensheaf-collection-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-collection-0.1.schema.json)
-  for `members.json`.
+  for `members.json`, and, for the identity proposal,
+  [`opensheaf-genesis-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json)
+  for `genesis.json`,
+  [`opensheaf-keys-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json)
+  for `keys.json`,
+  [`opensheaf-signature-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-signature-0.1.schema.json)
+  for signature files and
+  [`opensheaf-index-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json)
+  for the index files.
 - [`index.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm)/[`index.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html),
   [`opensheaf-specification-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html),
   [`faq.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm)/[`faq.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html),

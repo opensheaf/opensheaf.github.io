@@ -45,7 +45,7 @@ A repository SHOULD hold one archive, with the discovery document at the top of 
 
 Working files MAY be kept in the repository. They are not part of the archive: they MUST NOT be placed inside the storage root or the folders of the indexes, and they are not published unless the keeper means them to be (section 7).
 
-The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of objects of other archives are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
+The archive files MUST NOT contain symbolic links or git submodules. Members of collections that belong to other archives are reached through the discovery documents of those archives and checked by their pins (section 10.3 of the specification), never included as submodules; copies of lines kept elsewhere are mirrors (section 10.4 of the specification), copied byte for byte into the storage root.
 
 ## 4. Storing bytes
 
@@ -100,7 +100,7 @@ Let C be a published commit and C' the next one on the published branch. Between
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`, `ocfl_layout.json`, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
-8. any change inside the folder of a draft (section 6.5 of the specification), `ocfl/draft/<id>/`, including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
+8. any change inside the folder of a draft (section 6.5 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
 
 No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -130,7 +130,7 @@ Commits and tags MAY be signed. They are witnesses of who published a state of t
 
 ### 6.2 Working branches
 
-Git branches other than the published branch are <dfn>working branches</dfn>: working space, not branches of an object (section 10.5 of the specification, proposal). They MAY be rewritten, and the object versions they hold are not yet published: a tool MAY rebuild them, changing their pins, until they are merged into the published branch, unless a version has already been shared, since a sealed version MUST NOT change once it has left its owner's hands (section 6.5 of the specification, proposal). Once a version is on the published branch it is fixed. (Drafts, objects without a genesis record, and private states of archives and objects are discussed in section 6.5 of the specification, proposal, and in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).)
+Git branches other than the published branch are <dfn>working branches</dfn>: working space, not branches of an object (section 10.5 of the specification, proposal). They MAY be rewritten, but only drafts may be rebuilt on them: a sealed version is signed by its owner, and is never rebuilt, on any branch, since a new version with other bytes would be a fork of its line (section 6.5 of the specification). Drafts, under the reserved owner `draft`, may change until they are sealed; private states of archives are discussed in [issue #29](https://github.com/opensheaf/opensheaf.github.io/issues/29).
 
 ### 6.3 Merging
 
@@ -221,11 +221,11 @@ These checks SHOULD run on every push and every pull request (for instance in a 
 
 ## 11. Copies, mirrors and witnesses
 
-A clone of the published branch is a complete copy of the archive. A clone that is served (for instance a fork published with GitHub Pages) is a copy at another base URL; the archive MAY list it in `mirrors` of its discovery document (section 6.1 of the specification). It is not a mirror in the sense of section 10.4 of the specification, which copies one object of another archive into an archive's own storage root.
+A clone of the published branch is a complete copy of the archive. A clone that is served (for instance a fork published with GitHub Pages) is a copy at another base URL; the archive MAY list it in `mirrors` of its discovery document (section 6.1 of the specification). It is not a mirror in the sense of section 10.4 of the specification, which copies one line kept elsewhere into an archive's own storage root.
 
-Mirroring an object of another archive is copying its files and checking them against a pin; it does not need, and SHOULD NOT use, a merge of the other archive's repository.
+Mirroring a line kept elsewhere is copying its files and checking them against a pin; it does not need, and SHOULD NOT use, a merge of the other archive's repository.
 
-A mirror is a copy of a line (sections 6.5 and 10.4 of the specification), kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder `extensions/opensheaf-witnesses/`, and `witnesses/` is not used. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification). A branch holds the evidence of its parent version as content files (section 10.5), so it never shares an object folder with a copy of its parent's line.
+A mirror is a copy of a line (sections 6.5 and 10.4 of the specification), kept in the storage root at the path of its identifier, together with the key logs of the owners that signed it, which are owner objects at their own paths; the signatures are in each object's extension folder `extensions/opensheaf-witnesses/`. Copying a line is copying those object folders, and an owner moving to another archive copies its folder of the owner-name layout (section 5 of the specification). A branch holds the evidence of its parent version as content files (section 10.5 of the specification), so it never shares an object folder with a copy of its parent's line.
 
 A public repository SHOULD be archived by [Software Heritage](https://www.softwareheritage.org/), which keeps dated snapshots of it named by SWHIDs. A snapshot is a witness that the archive held these files at that date, as other external copies are (section 13.2 of the specification); its identifiers are git hashes, not part of the integrity of the archive. Together with the history of the published branch, snapshots also witness the successive states of the discovery document.
 

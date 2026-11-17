@@ -17,8 +17,8 @@ metadata, and collections that combine documents from several archives.
 
 Both are excellent services, and OpenSheaf works with them: a document can
 also be on arXiv (linked with `IsIdenticalTo`), and the Zenodo binding gives
-every version a DOI on Zenodo. What OpenSheaf adds is an archive that its
-owner keeps and controls, that stores sources (not only PDFs) in a
+every version a DOI on Zenodo. What OpenSheaf adds is an archive that you
+keep and control, that stores sources (not only PDFs) in a
 documented layout, that anyone can verify file by file, and that can be
 combined with other archives into collections and selections without asking
 any central service.
@@ -107,13 +107,13 @@ and notices about earlier versions.
 
 ## How are versions numbered and ordered?
 
-The archive numbers document versions itself, from 1 and without gaps, even
-when an external service numbers them differently: if arXiv still serves only
-v1, v3 and v4 of a paper, they are document versions 1, 2 and 3, and the
-arXiv labels are recorded beside them. Versions are normally in the order of
-their numbers. When an earlier version turns up later, it gets the next
-number and an explicit `history` in `object.json` puts it in its place; the
-current version, the one readers are directed to, is the last in the
+The owner of a line numbers its document versions itself, from 1 and without
+gaps, even when an external service numbers them differently: if arXiv still
+serves only v1, v3 and v4 of a paper, they are document versions 1, 2 and 3,
+and the arXiv labels are recorded beside them. Versions are normally in the
+order of their numbers. When an earlier version turns up later, it gets the
+next number and an explicit `history` in `object.json` puts it in its place;
+the current version, the one readers are directed to, is the last in the
 history. Dates are only information: they may be approximate or unknown, so
 they never decide the order.
 
@@ -125,13 +125,13 @@ erratum, as text or as a file): notices are later statements about a version,
 kept with the object and shown with that version, and they never change the
 version itself.
 
-## How do collections work across archives? What if another archive disappears?
+## How do collections work across archives? What if an archive disappears?
 
-A collection lists its members by line (name and owner), the addresses
-where copies may be found, version and the SHA-512 digest
-of that version's inventory (the "pin"). Since an inventory fixes all its
-files, the pin fixes the member completely, and a collection becomes a hash
-tree over everything it contains. If the member's archive moves or
+A collection lists its members by line (name and owner), the addresses where
+copies may be found, and a version with the SHA-512 digest of its inventory
+(the "pin"), or, in a selection, its revisions. Since an inventory fixes all
+its files, the pin fixes the member completely, and a collection becomes a
+hash tree over everything it contains. If the member's archive moves or
 disappears, the member can be fetched from a mirror, from its DOI deposit or
 from a Software Heritage snapshot: any copy that matches the pin is the right
 one. A collection also keeps a cached citation of each member, so that it
@@ -162,7 +162,7 @@ its versions can be cited and verified as it stood. When an archive's
 documents should be cited as they stood, that is what its main collection is
 for: a catalogue of them, pinned like any other. Archives hold copies, each
 line possibly in several; collections overlay them, any number of views over
-any holdings.
+any copies.
 
 ## What is the difference between a catalogue and a selection?
 
@@ -180,14 +180,14 @@ cases](USE-CASES.md) show both at work.
 
 ## Can I put someone else's paper in my collection?
 
-Yes. A reference (a pin) copies nothing and needs no permission. There are
-two ways to keep a copy, both allowed only if the licence of what is copied
-permits redistribution (or the authors agree): a **mirror** copies the whole
-line, every version, and stays its owner's line (for an institution or a
-storage site); an **accepted copy** takes the one revision a selection vetted
-into a line of the selection's owner, where later changes are the curator's
-acts (for a journal). The licence of a collection (CC0 for the list) never
-extends to its members.
+Yes. A reference (a pin) copies nothing and needs no permission. There are two
+ways to keep a copy, both allowed only if the licence of what is copied
+permits redistribution (copying by the authors' agreement is still open, #39):
+a **mirror** copies the whole line, every version, and stays its owner's line
+(for an institution or a storage site); an **accepted copy** takes the one
+revision a selection vetted into a line of the selection's owner, where later
+changes are the curator's acts (for a journal). The licence of a collection
+(CC0 for the list) never extends to its members.
 
 ## Who owns an object, and what is a branch?
 
@@ -213,9 +213,9 @@ threshold, for instance two signatures out of three. Every version of every
 line is signed, and the key logs travel with the objects they sign, so a line
 can be checked from any copy, even when the archives that served it have gone.
 An owner may name who answers for it (an ORCID iD, an institution), which the
-keeper confirms in a place only it controls; nothing requires it. Drafts are a
-sandbox: objects of a reserved owner, `draft`, kept by one archive, never
-signed, pinned or copied out of it, and free to be rewritten or deleted.
+keeper may confirm in a place only it controls; nothing requires it. Drafts
+are a sandbox: objects of a reserved owner, `draft`, kept by one archive,
+never signed, pinned or copied out of it, and free to be rewritten or deleted.
 Sealing makes a new object, the first version of the line; the draft's
 versions are not part of it.
 
@@ -239,7 +239,7 @@ inventory, the copied `object.json` says whose version it was, and the parent
 owner's signature, checked against the copied part of its key log, shows that
 the version is that owner's.
 
-## Can documents be linked in richer ways (a short account and its full proof)?
+## Can documents be linked in richer ways (a short account and its proof)?
 
 Yes, on top of the format rather than in it. The core keeps only what every
 archive needs to keep, cite, compose and verify documents. Other relations
