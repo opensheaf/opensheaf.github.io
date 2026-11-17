@@ -985,40 +985,47 @@
     <p>
       <strong>A signed version vouches for its past.</strong> In OCFL the
       inventory of a version records the digests of every file of every
-      version before it (section 7.1), so a version signed by its owner
-      vouches for every version it extends, whatever their own signatures
-      (section 13.2). Readers rely only on signed versions: the latest signed
-      version of a copy gives the line's history, current version and status,
-      for presentations, pins, collections and resolution, and versions after
-      it that are not signed are never shown as versions of the line.
-      <strong>Owner tools MUST show the owner</strong> a version that a new
-      version would extend and that is not signed, or a version of its key log
-      that the owner did not make, before signing, so that an owner never
-      takes a thief's version into its line unknowingly.
+      version before it (section 7.1), so a version signed directly by its
+      owner vouches for every version it extends, whatever their own
+      signatures: those versions are signed too, <strong>vouched for</strong>
+      rather than signed directly (section 13.2). Readers rely only on signed
+      versions: the latest signed version of a copy gives the line's history,
+      current version and status, for presentations, pins, collections and
+      resolution, and versions after it that are not signed are never shown as
+      versions of the line. <strong>Owner tools MUST show the owner</strong> a
+      version that a new version would extend and that is not signed, or a
+      version of its key log that the owner did not make, before signing, so
+      that an owner never takes a thief's version into its line unknowingly.
     </p>
     <p>
       <strong>Ending an owner.</strong> An owner whose key may have been
       exposed ends: it signs, as usual, a last version of its key log with <tt
       class="verbatim">ended</tt> <tt class="verbatim">true</tt> and, OPTIONALLY, <tt class="verbatim">successor</tt>,
-      the owner name of a new owner that continues its work. No version after
-      it is valid. Two different valid versions of a key log with the same
-      number, each signed by <tt class="verbatim">threshold</tt> keys of the version
-      before, are a <strong>fork</strong>, made by whoever holds old keys; the
-      core cannot tell which side is the owner's, and treats the owner as
-      ended at the fork point. For an owner that has ended, or whose key log
-      is forked: its signatures stay good, since the core cannot date them;
-      versions signed after its key was exposed cannot be told apart from a
-      thief's, so readers trust its history only as far as other evidence goes
-      (copies held before, the pins of collections, timestamps, section 13.2);
-      archives that know the end or the fork add no new version to its lines
-      (below); and its work continues under its successor, by branches of its
-      versions (section 10.5). A successor is a hint, which the keeper (below)
-      MAY confirm; two successors named on two sides of a fork are reported,
-      and settled outside the format. A thief holding a key that is still
-      current is the owner until found out: the format cannot prevent it, only
-      make it visible. A threshold of 2 or more from the first version makes a
-      theft harder. This is Radicle's answer, where a node's key is its
-      identity and a compromised key means a new node.
+      the owner name of a new owner that continues its work. No version of the
+      key log after it is valid. A successor is a hint, which the keeper
+      (below) MAY confirm.
+    </p>
+    <p>
+      <strong>Forks of a key log.</strong> Two different valid versions of a
+      key log with the same number, each signed by <tt class="verbatim">threshold</tt>
+      keys of the version before, are a <strong>fork</strong>, made by whoever
+      holds old keys. The core cannot tell which side is the owner's, and
+      treats the owner as ended at the fork point. Two successors named on two
+      sides of a fork are reported, and settled outside the format.
+    </p>
+    <p>
+      <strong>After an end or a fork.</strong> The owner's signatures stay
+      good, since the core cannot date them; but versions signed after its key
+      was exposed cannot be told apart from a thief's, so readers trust its
+      history only as far as other evidence goes (copies held before, the pins
+      of collections, timestamps, section 13.2). Archives that know the end or
+      the fork add no new version to its lines (below), and its work continues
+      under its successor, by branches of its versions (section 10.5). A thief
+      holding a key that is still current is the owner until found out: the
+      format cannot prevent it, only make it visible; a threshold of 2 or more
+      from the first version makes a theft harder. This is Radicle's answer,
+      where a node's key is its identity and a compromised key means a new
+      node.
     </p>
     <p>
       <strong>Evidence of forks.</strong> An archive keeps one copy of each
@@ -3080,11 +3087,13 @@ keylog &lt;the value of keyLog&gt;</pre>
     <ul>
       <li>
         <p>
-          <strong>signed</strong> when at least <tt class="verbatim">threshold</tt>
-          distinct keys of one key-log version, <tt class="verbatim">threshold</tt>
-          being that version's, have good signature files naming that version,
-          or when a later signed version of the same line extends it, since
-          its inventory fixes it (sections 6.5 and 7.1);
+          <strong>signed</strong> when it is <strong>signed directly</strong>,
+          at least <tt class="verbatim">threshold</tt> distinct keys of one key-log
+          version, <tt class="verbatim">threshold</tt> being that version's, having good
+          signature files naming that version, or <strong>vouched
+          for</strong>, a later version of the same line signed directly
+          extending it, since its inventory fixes it (sections 6.5 and 7.1); a
+          version vouched for needs no signatures of its own;
         </p>
       </li>
       <li>
@@ -4376,6 +4385,14 @@ keylog &lt;the value of keyLog&gt;</pre>
           not the line's owner; readers, presentations and followed catalogues
           use the latest signed version; timestamps are evidence only (the
           timestamps extension changes no status).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 17 November 2026, wording (PR #30):</strong>
+          &quot;Ending an owner&quot; split into the end, forks of a key log,
+          and what follows them; a version of a line is signed directly or
+          vouched for by a later version signed directly.
         </p>
       </li>
     </ul>
