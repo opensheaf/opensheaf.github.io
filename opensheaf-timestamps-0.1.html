@@ -195,14 +195,14 @@
     <h2 id="auto-7"><a id="6-use"></a>6. Use<span style="margin-left: 1em"></span></h2>
     <p>
       Dates are evidence for readers; this extension draws no conclusion from
-      them in the format. For an owner that has ended, or whose key log is
-      forked (section 6.3 of the specification), a reader MAY trust the
-      versions dated before the time it believes a key was exposed, and SHOULD
-      say on what evidence. The time of the version that ends the owner, and
-      of the first differing version of each side of a fork, bound when the
-      owner knew. A branch keeps the timestamp files of its parent's
-      signatures beside them in <tt class="verbatim">parent.signatures/</tt>, without
-      the <tt class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>),
+      them in the format. For an owner that has ended or is tainted, and for
+      keys nullified at a fork (section 6.3 of the specification), a reader
+      MAY trust the versions dated before the time it believes a key was
+      exposed, and SHOULD say on what evidence. The time of the version that
+      ends the owner, and of each version a fork record or a healing version
+      carries, bound when the owner knew. A branch keeps the timestamp files
+      of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>,
+      without the <tt class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>),
       complete proofs only; the timestamp files of key logs are in their owner
       objects.
     </p>
