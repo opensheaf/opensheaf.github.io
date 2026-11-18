@@ -37,11 +37,10 @@
       1.0).
     </div>
     <div class="os-alert os-warning">
-      <font class="os-alert-label">Warning.</font> <strong>Draft, being rebuilt.</strong> This
-      text is being rebuilt, concept by concept, from the <a href="reference/opensheaf-specification-0.1-full.md">reference
-      text</a> of PR #30, into a shorter and coherent whole. A concept not yet
-      rebuilt is read in the reference text. Until version 1.0, any revision
-      may change the format in incompatible ways.
+      <font class="os-alert-label">Warning.</font> <strong>Draft.</strong> Until version 1.0,
+      any revision may change the format in incompatible ways. The text before
+      its rebuild, with the changelog of every revision of the draft, is kept
+      as the <a href="reference/opensheaf-specification-0.1-full.md">reference text</a>.
     </div>
     <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
@@ -1127,10 +1126,10 @@
       and <tt class="verbatim">extensions</tt>. Its authority comes from the genesis
       record: another first version under the same owner name would need other
       keys, and so another name. It is signed by <tt class="verbatim">threshold</tt> of
-      its own keys. Every later version vN+1 MUST be signed by at least <tt
-      class="verbatim">threshold</tt> distinct keys of vN, <tt class="verbatim">threshold</tt>
-      being that of vN. Signature files, and when a signature is good, are
-      defined in section 7.
+      its own keys. Every later version vN+1, except a fork record (section
+      6.3), MUST be signed by at least <tt class="verbatim">threshold</tt> distinct keys
+      of vN, <tt class="verbatim">threshold</tt> being that of vN. Signature files, and
+      when a signature is good, are defined in section 7.
     </p>
     <p>
       A key is added or retired, the threshold or the data of an extension
@@ -2872,7 +2871,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <tt class="verbatim">withdrawn</tt> and <tt class="verbatim">withdrawal</tt> (section 4.3),
       and whose <tt class="verbatim">datacite.json</tt> has <tt class="verbatim">withdrawal.date</tt>
       as <tt class="verbatim">Withdrawn</tt> (section 4.4). The status is the line's,
-      read from its latest signed version (section 7.3), whatever document
+      read from its latest signed version (section 7.3), or, without the key
+      log, its latest unchecked version (section 3.1), whatever document
       version that holds; a single document version is retracted by a notice
       (section 4.2). A branch or an accepted copy is withdrawn only by its own
       owner (section 9).
@@ -4386,15 +4386,649 @@ ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpb
       stolen key (section 6.3). The signatures made with the stolen key stay
       good, and readers weigh them as section 6.4 says.
     </p>
-    <h2 id="auto-94"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-94"><a id="appendix-d-rationale-non-normative"></a>Appendix D. Rationale (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
-      Each part is rebuilt in turn, from the reference text and an audit of
-      the concept, and agreed before the next. Sections 1 to 16 are rebuilt;
-      the others are planned as follows, and read meanwhile in the reference
-      text.
+      The reasons for the main choices, in the order of the sections.
     </p>
+    <h3 id="auto-95"><a id="d1-archives-and-objects"></a>D.1 Archives and objects<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why OCFL and DataCite.</strong> OCFL is a published
+          specification for versioned objects as plain files with digests,
+          with independent validators; DataCite is the metadata of DOIs, with
+          relations for versions and collections, and its REST API form lets
+          <tt class="verbatim">datacite.json</tt> be sent to a DOI service as it is.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a minimal core.</strong> Richer structures (a proof and
+          its detailed argument, a dataset and its analyses) are built on top,
+          by links, DataCite relations or extensions, whose data the pins and
+          signatures fix with each version (section 2), leaving room for
+          designs not yet imagined.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why archives are hosts.</strong> Once owners sign their
+          lines, a name for an archive identifies no authority and ties lines
+          to places (#52, #55); every location is a hint, checked by pins and
+          signatures. <tt class="verbatim">replicas</tt> was dropped for that reason,
+          and because it is read from the very site that may be gone.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why identifiers from lines, and two layouts.</strong>
+          Identifiers chosen by archives clash once an archive keeps copies of
+          another's objects; lines never clash (#52). The owner-name layout
+          keeps each owner in one folder, which moves by copying; the hashed
+          layout serves archives too large for that, mostly in git.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why document and object versions.</strong> Readers and DOI
+          services see versions of the work; the storage keeps every change, a
+          corrected description or a notice included, each fixed by its pin.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why the owner numbers its document versions.</strong>
+          External numberings have gaps and miss versions never public there;
+          external labels are kept beside the owner's numbers.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why an explicit history.</strong> Dates may be approximate
+          or unknown, and fixed versions cannot correct pointers to their
+          predecessors when a version is found later. A list of object
+          versions, read from the latest signed version, can be corrected; it
+          cannot list digests, since a version cannot contain the digest of
+          its own inventory.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why the deposit is read from the inventory.</strong> OCFL
+          already records it; repeating it in <tt class="verbatim">object.json</tt>
+          would let the two disagree.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-96"><a id="d2-names"></a>D.2 Names<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why names from genesis records.</strong> A digest of a file
+          every copy carries is checked by anyone, needs no registry and names
+          no archive; its nonce makes it unique in practice, and taking the
+          bytes as stored needs no canonical form of JSON.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why algorithm numbers.</strong> Clashes are resolved where
+          lines are made, and a branch, sharing its parent's record, is
+          renamed by another algorithm. The number fills the four bits that
+          RFC 4648 leaves zero, so names of algorithm 0 are plain digests and
+          algorithms never coincide.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why signatures decide reused genesis records.</strong> Only
+          the originator signs the originator's line, and every other line
+          carries signed parents back to it, the whole chain, since one level
+          would let a chain of branches pass. A reused record is useless to
+          anyone else, and no archive keeps a first-come register of names
+          (section 5.4).
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-97"><a id="d3-owners"></a>D.3 Owners<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why keyed owners with key logs.</strong> An owner asserted
+          by a name (an ORCID iD, an archive's identifier) cannot stop others
+          writing under it; signatures make every version checkable anywhere,
+          also after its archives have gone (#55). A key cannot change, so the
+          owner keeps its keys in a log, each version signed by the keys of
+          the one before, as Radicle's identity documents and The Update
+          Framework do.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why the owner name fixes the first keys.</strong> Otherwise
+          anyone could write a first key-log version under a published owner
+          name; as Radicle's repository identifier commits to its first
+          delegates, the name commits to the first keys.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why one threshold.</strong> As in Radicle, an owner decides
+          once how many keys act in its name, for its key log and its lines
+          alike.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why exposed keys are nullified, never revoked.</strong>
+          Signatures carry no time, so nothing tells what a key signed before
+          it leaked from what a thief signs after; revocation would need
+          trusted time to decide which signatures count. So no signature is
+          undone: the owner ends (Radicle's answer: a compromised key means a
+          new identity) or nullifies the keys and heals, and readers weigh the
+          past by other evidence (section 6.4).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why fork records.</strong> The format cannot tell the
+          owner's side of a fork from a thief's, so it follows neither: a fork
+          record carries both, as the checkable fact of two signed versions of
+          one number, in a version of the key log that travels with every copy
+          and nullifies their keys wherever it arrives. Healing, with spare
+          keys that took no part, supersedes it. Versions are replaced only in
+          key logs, which hold no work (provisional, #58).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why key logs travel beside objects.</strong> A key log
+          checks itself from its owner name, so any copy will do; as an owner
+          object it is copied once per storage root and grows without changing
+          the lines it signs.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why timestamps are an extension.</strong> A single
+          researcher needs none, since signatures stay good; an institution
+          may want signatures dated by a provider it names, to tell what came
+          before an exposure. The extension keeps the trade-offs of RFC 3161
+          authorities and OpenTimestamps out of the core, and changes no
+          status.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why keepers confirm.</strong> A key log could name anyone as
+          keeper; the keeper confirms the link where only it can, and can
+          withdraw it without touching anything signed (#41).
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-98"><a id="d4-lines-and-signatures"></a>D.4 Lines and signatures<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why signatures name the key-log version.</strong> A
+          signature of a checksum file alone could be paired with any key-log
+          version. Judged against the version it names, a signature survives
+          retired keys: an owner cannot find every copy of its lines to sign
+          them again.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a signed version vouches for its past.</strong> An
+          inventory fixes every earlier version, so one signature covers them
+          all, as Radicle's canonical head vouches for the commits it reaches.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Where witnesses live.</strong> A witness follows its
+          version, so it cannot be in it, and a new version for each would mix
+          evidence with the work. OCFL closes the object folder, and its <tt
+          class="verbatim">logs/</tt> are not covered by digests; extension folders hold
+          data outside every version, as the mutable-head extension does.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why no list of an owner's lines.</strong> Copies are
+          compared through the inventories they share, so a copy that stops
+          early is only older.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why versions held are never removed.</strong> If a host or a
+          thief could cause a removal, it could remove the owner's own
+          versions; keeping everything costs at most one blocked version
+          number in one archive.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-99"><a id="d5-collections"></a>D.5 Collections<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why pins by inventory digest.</strong> One digest fixes a
+          whole object version, so collections are hash trees across archives,
+          any matching copy will do, and locations are equal hints.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why catalogues and selections.</strong> Keeping and vetting
+          are different acts. A catalogue keeps every version without judging
+          it; a selection attests particular revisions, so a later version
+          cannot enter by itself, and a change of what is vetted is an
+          editorial act in the selection's history.
+        </p>
+      </li>
+      <li>
+        <p>
+          **Why <tt class="verbatim">follow</tt> is a setting.** A collection version
+          states exactly what it contains; a floating &quot;latest&quot; would
+          change its meaning over time.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-100"><a id="d6-branches-and-accepted-copies"></a>D.6 Branches and accepted copies<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why every branch is a new object.</strong> A journal needs
+          only the version it vetted, a co-author perhaps the whole past,
+          which a copy of the parent's line beside the branch gives. A branch
+          continuing the parent's object would hold inventories naming the
+          parent's identifier, and collide with that copy; Radicle likewise
+          keeps forks beside their sources.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why the evidence carries signatures and the whole
+          chain.</strong> Without the parent owner's signatures a branch shows
+          only a parent inventory that agrees with itself; the chain lets a
+          branch of a branch be checked back to the originator's line after
+          its parents' archives have gone (#22).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why accepted copies are branches, not mirrors.</strong> A
+          mirror grows only by its owner's versions; an accepted copy
+          continues one revision under the selection's responsibility, and
+          OCFL cannot hold part of an object.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-101"><a id="d7-drafts-and-sealing"></a>D.7 Drafts and sealing<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why drafts.</strong> A version that has left its owner's
+          hands may be cited, pinned or copied, and must stay fixed and
+          signed; a draft keeps unfinished work in the usual format, marked,
+          outside its content, as something on which nothing may rely.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why sealing makes a new object.</strong> Continuing the
+          draft would start the line with unsigned history that may have
+          changed; a new object starts it at its first signed version.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why only at the owner's request.</strong> Sealing fixes a
+          name and signs for ever; a tool sealing as a side effect would make
+          the owner answer for a version it did not choose to share.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-102"><a id="d8-copies-and-mirrors"></a>D.8 Copies and mirrors<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why a mirror is not marked.</strong> It is the same line,
+          checked by its owner's signatures, so a mark would add nothing a
+          reader could rely on; identifiers from lines made the earlier <tt
+          class="verbatim">mirrorOf</tt> unnecessary (#52).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why mirrors grow only by the owner's versions.</strong> Like
+          catalogues they are impartial; and OCFL objects only grow, so a copy
+          that departs from a mirror is a fork, never a correction.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-103"><a id="d9-identifiers"></a>D.9 Identifiers<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          **Why <tt class="verbatim">sheaf:</tt> URIs.** Earlier global names built on
+          an archive's identifier (<tt class="verbatim">tag:</tt> or ARK URIs) tied
+          lines to places (#14, #52). One scheme writes lines, versions, pins
+          and owners, and signatures name key-log versions with it.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why the owner part defaults to the originator.</strong> The
+          genesis record every copy carries names the originator, so the URI
+          is fixed by the work; &quot;the latest&quot; line would depend on
+          what a resolver knows.
+        </p>
+      </li>
+      <li>
+        <p>
+          **Why <tt class="verbatim">/v&lt;n&gt;</tt> is a document version.** Readers
+          cite versions of the work; object versions change at every notice,
+          and a citation that must not move carries the digest.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why short forms are only for people.</strong> Eight
+          characters are 40 bits: another owner can make a short form
+          ambiguous, never take it over, and resolvers may know different
+          lines.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why gateways redirect only temporarily, and only to checked
+          copies.</strong> Copies move and are taken down, so a permanent
+          redirect would fix a stale location in browsers' caches; a gateway
+          that serves only what it checked cannot send readers to a forged
+          copy.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why external records do not resolve pins.</strong> A deposit
+          or a snapshot keeps a version's files but not its inventory or
+          signatures, so nothing ties them to the pin or the owner (#22).
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-104"><a id="d10-withdrawal-takedown-and-tombstones"></a>D.10 Withdrawal, takedown and tombstones<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why a withdrawal keeps the content.</strong> A retracted
+          paper stays part of the record, cited and collected; deleting it
+          would break every pin and signature that includes it.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a takedown deletes the whole object.</strong> OCFL 1.1
+          cannot remove a file without changing the inventories, and so every
+          pin and signature; deleting the object leaves all else valid, which
+          is also why erasure is a takedown. Every removal is one, so nothing
+          leaves an archive silently.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a tombstone is not signed.</strong> Takedowns are often
+          made against the owner's will, and a host can add a tombstone
+          falsely; it speaks for one archive only.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a tombstone keeps the genesis name.</strong> A work
+          taken down cannot then return there under a reused record (section
+          5.4).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why owner objects outlive takedowns of lines.</strong> Every
+          other line, branch and copy the owner signed needs the key log; and
+          since a thief can sign a takedown request, the keeper is heard.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-105"><a id="d11-verification"></a>D.11 Verification<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why errors, warnings and results.</strong> An error is a
+          breach the archive can repair; what it cannot repair (a version let
+          in against section 7.5, another archive's copy), and states of the
+          world (an end, a fork, a withdrawal), would make it fail for ever.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-106"><a id="d12-security-privacy-and-rights"></a>D.12 Security, privacy and rights<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why one's own storage root is untrusted.</strong> An archive
+          checks signatures, not intentions: a path or a text is as dangerous
+          in a signed version as in a forged one.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why object files never run in an archive's origin.</strong>
+          A script served from an origin acts as that site: it reads what its
+          pages store, and presents forged pages under a trusted address.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why owners are pseudonymous.</strong> Owner names, key logs
+          and signatures travel with every copy and can never be removed; if
+          they named persons, no takedown could erase them.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why metadata is under CC0.</strong> Pins, signatures and key
+          logs are checked only where they can be copied; a licence would make
+          every copy, index and reference a question of rights.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-107"><a id="d13-versioning"></a>D.13 Versioning<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why MAJOR.MINOR in files.</strong> A patch changes no
+          requirement; recording it would make equal files differ.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why unknown properties are ignored only from 1.0.</strong>
+          Before 1.0 a minor version may change the meaning of what a reader
+          knows.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-108"><a id="d14-profiles-and-schemas"></a>D.14 Profiles and schemas<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <strong>Why profiles.</strong> Services and tools differ between
+          archives, and the core needs none; a profile states what an archive
+          using one promises, so that it can be checked.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a Zenodo deposit is signed before publication.</strong>
+          The reserved DOI is then under the owner's signature, and no record
+          is published for a version the line cannot take.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why Zenodo files never change.</strong> The archive keeps
+          each version fixed, so the 30-day window is not used, and
+          description-only versions edit metadata, keeping one DOI per
+          document version. MD5 is recorded because Zenodo reports only MD5.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why some schemas are closed.</strong> Genesis records, key
+          logs and keeper files decide names and keys, and a signature file
+          holds exactly what it signs; an extra property there would seem
+          committed to.
+        </p>
+      </li>
+      <li>
+        <p>
+          **Why <tt class="verbatim">datacite.json</tt> is validated through XML.** It
+          keeps the form of the REST API, and DataCite publishes no JSON
+          Schema.
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-109"><a id="appendix-e-references"></a>Appendix E. References<span style="margin-left: 1em"></span></h2>
+    <ul>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc2119">RFC 2119</a> and <a href="https://www.rfc-editor.org/rfc/rfc8174">RFC 8174</a>, together <a href="https://www.rfc-editor.org/info/bcp14">BCP
+          14</a>: key words
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc8259">RFC 8259</a>: JSON; <a href="https://www.rfc-editor.org/rfc/rfc3629">RFC 3629</a>: UTF-8; <a href="https://www.unicode.org/reports/tr15/">Unicode
+          Standard Annex #15</a>: normalisation form C
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc3339">RFC 3339</a>: dates and times (the <tt class="verbatim">date-time</tt>
+          format of JSON Schema)
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc3986">RFC 3986</a>: URIs and percent-encoding; <a href="https://www.rfc-editor.org/rfc/rfc7595">RFC
+          7595</a> and the <a href="https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml">IANA registry of URI schemes</a>:
+          registering <tt class="verbatim">sheaf</tt>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc4648">RFC 4648</a>: base32 and base64
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final">FIPS 180-4</a>: SHA-256, SHA-512 and SHA-1; <a href="https://www.rfc-editor.org/rfc/rfc1321">RFC
+          1321</a>: MD5
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc8032">RFC 8032</a>: Ed25519
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://w3c-ccg.github.io/did-key-spec/">The did:key method</a> (W3C Credentials Community Group),
+          with <a href="https://github.com/multiformats/multibase">multibase</a> and <a href="https://github.com/multiformats/multicodec">multicodec</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc3161">RFC 3161</a>: time-stamp protocol; <a href="https://opentimestamps.org/">OpenTimestamps</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.rfc-editor.org/rfc/rfc9110">RFC 9110</a>: HTTP semantics, redirects; <a href="https://www.rfc-editor.org/rfc/rfc8615">RFC
+          8615</a>: well-known URIs; <a href="https://fetch.spec.whatwg.org/">Fetch</a>: cross-origin
+          requests; <a href="https://www.w3.org/TR/CSP3/">Content Security Policy Level 3</a>: <tt class="verbatim">sandbox</tt>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://ocfl.io/1.1/spec/">OCFL 1.1 specification</a> and <a href="https://ocfl.github.io/extensions/">OCFL
+          extensions</a>, among them <a href="https://ocfl.github.io/extensions/0003-hash-and-id-n-tuple-storage-layout.html">0003-hash-and-id-n-tuple-storage-layout</a>
+          and <a href="https://ocfl.github.io/extensions/0005-mutable-head.html">0005-mutable-head</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://schema.datacite.org/meta/kernel-4.7/">DataCite Metadata Schema 4.7</a>, <a href="https://support.datacite.org/docs/api">DataCite REST
+          API</a>, <a href="https://support.datacite.org/docs/datacite-xml-to-json-mapping">its mapping between JSON and XML</a>, <a href="https://support.datacite.org/docs/datacite-rest-api-affiliation-and-publisher-default-change">the
+          change for publisher and affiliation</a> and <a href="https://support.datacite.org/docs/preprints-post-prints-and-author-manuscripts">guidance on
+          preprints</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://json-schema.org/draft/2020-12">JSON Schema 2020-12</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://orcid.org/">ORCID</a>, <a href="https://ror.org/">ROR</a>, <a href="https://spdx.org/licenses/">SPDX License
+          List</a>, <a href="https://msc2020.org/">MSC2020</a>, <a href="https://www.niso.org/publications/niso-rp-8-2008-jav">NISO Journal Article
+          Versions (NISO RP-8-2008)</a>, <a href="https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html">Software Heritage
+          identifiers (SWHID)</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a> and <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://arxiv.org/">arXiv</a> and its <a href="https://arxiv.org/licenses/nonexclusive-distrib/1.0/">default licence</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://ctan.org/pkg/amsmath">amsmath</a> and <a href="https://ctan.org/pkg/amsfonts">amssymb</a> (CTAN); <a href="https://www.texmacs.org/">TeXmacs</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://developers.zenodo.org/">Zenodo developer documentation</a>, <a href="https://inveniordm.docs.cern.ch/reference/rest_api_drafts_records/">InvenioRDM
+          records API</a>, <a href="https://support.zenodo.org/help/en-gb/1-upload-deposit/74-can-i-upload-folders-directories">Zenodo on folders</a>, <a href="https://help.zenodo.org/docs/deposit/manage-files/">managing
+          files</a>, <a href="https://zenodo.org/api/vocabularies/resourcetypes">resource types</a>, <a href="https://zenodo.org/help/versioning">versioning</a> and
+          <a href="https://sandbox.zenodo.org/">the sandbox</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://scholar.google.com/intl/en/scholar/inclusion.html">Google Scholar inclusion guidelines</a>, <a href="https://schema.org/ScholarlyArticle">schema.org
+          ScholarlyArticle</a>, <a href="https://www.w3.org/TR/json-ld11/">JSON-LD 1.1</a>, <a href="https://signposting.org/FAIR/">FAIR
+          Signposting</a>, <a href="https://www.bibtex.org/">BibTeX</a>, <a href="https://github.com/citation-style-language/schema">CSL-JSON</a>, <a
+          href="https://www.rfc-editor.org/rfc/rfc4287">Atom (RFC 4287)</a>, <a href="https://www.sitemaps.org/protocol.html">Sitemaps</a>, <a href="https://www.openarchives.org/OAI/2.0/guidelines-static-repository.htm">OAI-PMH
+          static repositories</a> and <a href="https://www.openarchives.org/rs/toc">ResourceSync</a>
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="https://radicle.xyz/guides/protocol">Radicle protocol guide</a> and <a href="https://theupdateframework.io/">The Update
+          Framework</a>: identities and key logs compared in appendix D
+        </p>
+      </li>
+    </ul>
     <p>
-      Appendices: D. rationale; E. references.
+      <strong>Companion documents.</strong> <a href="opensheaf-git-0.1.html">OpenSheaf archives in
+      git</a>, for archives kept in git repositories, and the <a href="opensheaf-timestamps-0.1.html">timestamps
+      extension</a>, for dating signatures with RFC 3161 tokens and
+      OpenTimestamps proofs.
     </p>
   </body>
 </html>

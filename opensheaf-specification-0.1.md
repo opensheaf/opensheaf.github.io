@@ -3,7 +3,7 @@
 *Specification, version 0.1 (draft), 19 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).*
 
 > [!WARNING]
-> **Draft, being rebuilt.** This text is being rebuilt, concept by concept, from the [reference text](reference/opensheaf-specification-0.1-full.md) of PR #30, into a shorter and coherent whole. A concept not yet rebuilt is read in the reference text. Until version 1.0, any revision may change the format in incompatible ways.
+> **Draft.** Until version 1.0, any revision may change the format in incompatible ways. The text before its rebuild, with the changelog of every revision of the draft, is kept as the [reference text](reference/opensheaf-specification-0.1-full.md).
 
 ## 1. Introduction (non-normative)
 
@@ -247,7 +247,7 @@ Every version of the key log holds, besides the files of section 4.1, the file `
 
 In the genesis record of an owner and in every `keys.json`, `threshold` MUST NOT exceed the number of `keys`.
 
-Key-log versions are the OCFL versions of the owner object (`v1`, `v2`, ...); an owner object has no document versions. The first version holds the genesis record and the first `keys.json`, whose `keys` (compared as a set) and `threshold` MUST be those of the genesis record; it MAY add `keeper` and `extensions`. Its authority comes from the genesis record: another first version under the same owner name would need other keys, and so another name. It is signed by `threshold` of its own keys. Every later version vN+1 MUST be signed by at least `threshold` distinct keys of vN, `threshold` being that of vN. Signature files, and when a signature is good, are defined in section 7.
+Key-log versions are the OCFL versions of the owner object (`v1`, `v2`, ...); an owner object has no document versions. The first version holds the genesis record and the first `keys.json`, whose `keys` (compared as a set) and `threshold` MUST be those of the genesis record; it MAY add `keeper` and `extensions`. Its authority comes from the genesis record: another first version under the same owner name would need other keys, and so another name. It is signed by `threshold` of its own keys. Every later version vN+1, except a fork record (section 6.3), MUST be signed by at least `threshold` distinct keys of vN, `threshold` being that of vN. Signature files, and when a signature is good, are defined in section 7.
 
 A key is added or retired, the threshold or the data of an extension changed, a keeper named, or the owner ended, by a new version of the key log; the owner name never changes. Changing the keys or the threshold affects only signatures naming the new version or a later one: signatures naming earlier versions stay good (section 7), and nothing is signed again.
 
@@ -707,7 +707,7 @@ An owner withdraws a line, which keeps its versions; an archive takes down an ob
 
 ### 13.1 Withdrawal
 
-A document or a collection is <dfn>withdrawn</dfn> by a description-only version (section 4.2) whose `object.json` has `status` `withdrawn` and `withdrawal` (section 4.3), and whose `datacite.json` has `withdrawal.date` as `Withdrawn` (section 4.4). The status is the line's, read from its latest signed version (section 7.3), whatever document version that holds; a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
+A document or a collection is <dfn>withdrawn</dfn> by a description-only version (section 4.2) whose `object.json` has `status` `withdrawn` and `withdrawal` (section 4.3), and whose `datacite.json` has `withdrawal.date` as `Withdrawn` (section 4.4). The status is the line's, read from its latest signed version (section 7.3), or, without the key log, its latest unchecked version (section 3.1), whatever document version that holds; a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
 
 A withdrawn line keeps every version, signed, pinned and copied as before. Presentations showing a version of a line they know to be withdrawn MUST show the withdrawal, also when the version shown is earlier.
 
@@ -1321,9 +1321,131 @@ ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpb
 
 The fork record's `genesis.json` and `object.json` are those of `v1`, to which its inventory refers, and it has no `keys.json`. The owner heals with its spare key, which signed neither version: a healing version 3 carrying both, whose `keys.json` lists the spare key and a new one, not the stolen key (section 6.3). The signatures made with the stolen key stay good, and readers weigh them as section 6.4 says.
 
-## Plan of the rebuilt text
+## Appendix D. Rationale (non-normative)
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 16 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+The reasons for the main choices, in the order of the sections.
 
+### D.1 Archives and objects
 
-Appendices: D. rationale; E. references.
+- **Why OCFL and DataCite.** OCFL is a published specification for versioned objects as plain files with digests, with independent validators; DataCite is the metadata of DOIs, with relations for versions and collections, and its REST API form lets `datacite.json` be sent to a DOI service as it is.
+- **Why a minimal core.** Richer structures (a proof and its detailed argument, a dataset and its analyses) are built on top, by links, DataCite relations or extensions, whose data the pins and signatures fix with each version (section 2), leaving room for designs not yet imagined.
+- **Why archives are hosts.** Once owners sign their lines, a name for an archive identifies no authority and ties lines to places (#52, #55); every location is a hint, checked by pins and signatures. `replicas` was dropped for that reason, and because it is read from the very site that may be gone.
+- **Why identifiers from lines, and two layouts.** Identifiers chosen by archives clash once an archive keeps copies of another's objects; lines never clash (#52). The owner-name layout keeps each owner in one folder, which moves by copying; the hashed layout serves archives too large for that, mostly in git.
+- **Why document and object versions.** Readers and DOI services see versions of the work; the storage keeps every change, a corrected description or a notice included, each fixed by its pin.
+- **Why the owner numbers its document versions.** External numberings have gaps and miss versions never public there; external labels are kept beside the owner's numbers.
+- **Why an explicit history.** Dates may be approximate or unknown, and fixed versions cannot correct pointers to their predecessors when a version is found later. A list of object versions, read from the latest signed version, can be corrected; it cannot list digests, since a version cannot contain the digest of its own inventory.
+- **Why the deposit is read from the inventory.** OCFL already records it; repeating it in `object.json` would let the two disagree.
+
+### D.2 Names
+
+- **Why names from genesis records.** A digest of a file every copy carries is checked by anyone, needs no registry and names no archive; its nonce makes it unique in practice, and taking the bytes as stored needs no canonical form of JSON.
+- **Why algorithm numbers.** Clashes are resolved where lines are made, and a branch, sharing its parent's record, is renamed by another algorithm. The number fills the four bits that RFC 4648 leaves zero, so names of algorithm 0 are plain digests and algorithms never coincide.
+- **Why signatures decide reused genesis records.** Only the originator signs the originator's line, and every other line carries signed parents back to it, the whole chain, since one level would let a chain of branches pass. A reused record is useless to anyone else, and no archive keeps a first-come register of names (section 5.4).
+
+### D.3 Owners
+
+- **Why keyed owners with key logs.** An owner asserted by a name (an ORCID iD, an archive's identifier) cannot stop others writing under it; signatures make every version checkable anywhere, also after its archives have gone (#55). A key cannot change, so the owner keeps its keys in a log, each version signed by the keys of the one before, as Radicle's identity documents and The Update Framework do.
+- **Why the owner name fixes the first keys.** Otherwise anyone could write a first key-log version under a published owner name; as Radicle's repository identifier commits to its first delegates, the name commits to the first keys.
+- **Why one threshold.** As in Radicle, an owner decides once how many keys act in its name, for its key log and its lines alike.
+- **Why exposed keys are nullified, never revoked.** Signatures carry no time, so nothing tells what a key signed before it leaked from what a thief signs after; revocation would need trusted time to decide which signatures count. So no signature is undone: the owner ends (Radicle's answer: a compromised key means a new identity) or nullifies the keys and heals, and readers weigh the past by other evidence (section 6.4).
+- **Why fork records.** The format cannot tell the owner's side of a fork from a thief's, so it follows neither: a fork record carries both, as the checkable fact of two signed versions of one number, in a version of the key log that travels with every copy and nullifies their keys wherever it arrives. Healing, with spare keys that took no part, supersedes it. Versions are replaced only in key logs, which hold no work (provisional, #58).
+- **Why key logs travel beside objects.** A key log checks itself from its owner name, so any copy will do; as an owner object it is copied once per storage root and grows without changing the lines it signs.
+- **Why timestamps are an extension.** A single researcher needs none, since signatures stay good; an institution may want signatures dated by a provider it names, to tell what came before an exposure. The extension keeps the trade-offs of RFC 3161 authorities and OpenTimestamps out of the core, and changes no status.
+- **Why keepers confirm.** A key log could name anyone as keeper; the keeper confirms the link where only it can, and can withdraw it without touching anything signed (#41).
+
+### D.4 Lines and signatures
+
+- **Why signatures name the key-log version.** A signature of a checksum file alone could be paired with any key-log version. Judged against the version it names, a signature survives retired keys: an owner cannot find every copy of its lines to sign them again.
+- **Why a signed version vouches for its past.** An inventory fixes every earlier version, so one signature covers them all, as Radicle's canonical head vouches for the commits it reaches.
+- **Where witnesses live.** A witness follows its version, so it cannot be in it, and a new version for each would mix evidence with the work. OCFL closes the object folder, and its `logs/` are not covered by digests; extension folders hold data outside every version, as the mutable-head extension does.
+- **Why no list of an owner's lines.** Copies are compared through the inventories they share, so a copy that stops early is only older.
+- **Why versions held are never removed.** If a host or a thief could cause a removal, it could remove the owner's own versions; keeping everything costs at most one blocked version number in one archive.
+
+### D.5 Collections
+
+- **Why pins by inventory digest.** One digest fixes a whole object version, so collections are hash trees across archives, any matching copy will do, and locations are equal hints.
+- **Why catalogues and selections.** Keeping and vetting are different acts. A catalogue keeps every version without judging it; a selection attests particular revisions, so a later version cannot enter by itself, and a change of what is vetted is an editorial act in the selection's history.
+- **Why `follow` is a setting.** A collection version states exactly what it contains; a floating "latest" would change its meaning over time.
+
+### D.6 Branches and accepted copies
+
+- **Why every branch is a new object.** A journal needs only the version it vetted, a co-author perhaps the whole past, which a copy of the parent's line beside the branch gives. A branch continuing the parent's object would hold inventories naming the parent's identifier, and collide with that copy; Radicle likewise keeps forks beside their sources.
+- **Why the evidence carries signatures and the whole chain.** Without the parent owner's signatures a branch shows only a parent inventory that agrees with itself; the chain lets a branch of a branch be checked back to the originator's line after its parents' archives have gone (#22).
+- **Why accepted copies are branches, not mirrors.** A mirror grows only by its owner's versions; an accepted copy continues one revision under the selection's responsibility, and OCFL cannot hold part of an object.
+
+### D.7 Drafts and sealing
+
+- **Why drafts.** A version that has left its owner's hands may be cited, pinned or copied, and must stay fixed and signed; a draft keeps unfinished work in the usual format, marked, outside its content, as something on which nothing may rely.
+- **Why sealing makes a new object.** Continuing the draft would start the line with unsigned history that may have changed; a new object starts it at its first signed version.
+- **Why only at the owner's request.** Sealing fixes a name and signs for ever; a tool sealing as a side effect would make the owner answer for a version it did not choose to share.
+
+### D.8 Copies and mirrors
+
+- **Why a mirror is not marked.** It is the same line, checked by its owner's signatures, so a mark would add nothing a reader could rely on; identifiers from lines made the earlier `mirrorOf` unnecessary (#52).
+- **Why mirrors grow only by the owner's versions.** Like catalogues they are impartial; and OCFL objects only grow, so a copy that departs from a mirror is a fork, never a correction.
+
+### D.9 Identifiers
+
+- **Why `sheaf:` URIs.** Earlier global names built on an archive's identifier (`tag:` or ARK URIs) tied lines to places (#14, #52). One scheme writes lines, versions, pins and owners, and signatures name key-log versions with it.
+- **Why the owner part defaults to the originator.** The genesis record every copy carries names the originator, so the URI is fixed by the work; "the latest" line would depend on what a resolver knows.
+- **Why `/v<n>` is a document version.** Readers cite versions of the work; object versions change at every notice, and a citation that must not move carries the digest.
+- **Why short forms are only for people.** Eight characters are 40 bits: another owner can make a short form ambiguous, never take it over, and resolvers may know different lines.
+- **Why gateways redirect only temporarily, and only to checked copies.** Copies move and are taken down, so a permanent redirect would fix a stale location in browsers' caches; a gateway that serves only what it checked cannot send readers to a forged copy.
+- **Why external records do not resolve pins.** A deposit or a snapshot keeps a version's files but not its inventory or signatures, so nothing ties them to the pin or the owner (#22).
+
+### D.10 Withdrawal, takedown and tombstones
+
+- **Why a withdrawal keeps the content.** A retracted paper stays part of the record, cited and collected; deleting it would break every pin and signature that includes it.
+- **Why a takedown deletes the whole object.** OCFL 1.1 cannot remove a file without changing the inventories, and so every pin and signature; deleting the object leaves all else valid, which is also why erasure is a takedown. Every removal is one, so nothing leaves an archive silently.
+- **Why a tombstone is not signed.** Takedowns are often made against the owner's will, and a host can add a tombstone falsely; it speaks for one archive only.
+- **Why a tombstone keeps the genesis name.** A work taken down cannot then return there under a reused record (section 5.4).
+- **Why owner objects outlive takedowns of lines.** Every other line, branch and copy the owner signed needs the key log; and since a thief can sign a takedown request, the keeper is heard.
+
+### D.11 Verification
+
+- **Why errors, warnings and results.** An error is a breach the archive can repair; what it cannot repair (a version let in against section 7.5, another archive's copy), and states of the world (an end, a fork, a withdrawal), would make it fail for ever.
+
+### D.12 Security, privacy and rights
+
+- **Why one's own storage root is untrusted.** An archive checks signatures, not intentions: a path or a text is as dangerous in a signed version as in a forged one.
+- **Why object files never run in an archive's origin.** A script served from an origin acts as that site: it reads what its pages store, and presents forged pages under a trusted address.
+- **Why owners are pseudonymous.** Owner names, key logs and signatures travel with every copy and can never be removed; if they named persons, no takedown could erase them.
+- **Why metadata is under CC0.** Pins, signatures and key logs are checked only where they can be copied; a licence would make every copy, index and reference a question of rights.
+
+### D.13 Versioning
+
+- **Why MAJOR.MINOR in files.** A patch changes no requirement; recording it would make equal files differ.
+- **Why unknown properties are ignored only from 1.0.** Before 1.0 a minor version may change the meaning of what a reader knows.
+
+### D.14 Profiles and schemas
+
+- **Why profiles.** Services and tools differ between archives, and the core needs none; a profile states what an archive using one promises, so that it can be checked.
+- **Why a Zenodo deposit is signed before publication.** The reserved DOI is then under the owner's signature, and no record is published for a version the line cannot take.
+- **Why Zenodo files never change.** The archive keeps each version fixed, so the 30-day window is not used, and description-only versions edit metadata, keeping one DOI per document version. MD5 is recorded because Zenodo reports only MD5.
+- **Why some schemas are closed.** Genesis records, key logs and keeper files decide names and keys, and a signature file holds exactly what it signs; an extra property there would seem committed to.
+- **Why `datacite.json` is validated through XML.** It keeps the form of the REST API, and DataCite publishes no JSON Schema.
+
+## Appendix E. References
+
+- [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174), together [BCP 14](https://www.rfc-editor.org/info/bcp14): key words
+- [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259): JSON; [RFC 3629](https://www.rfc-editor.org/rfc/rfc3629): UTF-8; [Unicode Standard Annex #15](https://www.unicode.org/reports/tr15/): normalisation form C
+- [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339): dates and times (the `date-time` format of JSON Schema)
+- [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986): URIs and percent-encoding; [RFC 7595](https://www.rfc-editor.org/rfc/rfc7595) and the [IANA registry of URI schemes](https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml): registering `sheaf`
+- [RFC 4648](https://www.rfc-editor.org/rfc/rfc4648): base32 and base64
+- [FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final): SHA-256, SHA-512 and SHA-1; [RFC 1321](https://www.rfc-editor.org/rfc/rfc1321): MD5
+- [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032): Ed25519
+- [The did:key method](https://w3c-ccg.github.io/did-key-spec/) (W3C Credentials Community Group), with [multibase](https://github.com/multiformats/multibase) and [multicodec](https://github.com/multiformats/multicodec)
+- [RFC 3161](https://www.rfc-editor.org/rfc/rfc3161): time-stamp protocol; [OpenTimestamps](https://opentimestamps.org/)
+- [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110): HTTP semantics, redirects; [RFC 8615](https://www.rfc-editor.org/rfc/rfc8615): well-known URIs; [Fetch](https://fetch.spec.whatwg.org/): cross-origin requests; [Content Security Policy Level 3](https://www.w3.org/TR/CSP3/): `sandbox`
+- [OCFL 1.1 specification](https://ocfl.io/1.1/spec/) and [OCFL extensions](https://ocfl.github.io/extensions/), among them [0003-hash-and-id-n-tuple-storage-layout](https://ocfl.github.io/extensions/0003-hash-and-id-n-tuple-storage-layout.html) and [0005-mutable-head](https://ocfl.github.io/extensions/0005-mutable-head.html)
+- [DataCite Metadata Schema 4.7](https://schema.datacite.org/meta/kernel-4.7/), [DataCite REST API](https://support.datacite.org/docs/api), [its mapping between JSON and XML](https://support.datacite.org/docs/datacite-xml-to-json-mapping), [the change for publisher and affiliation](https://support.datacite.org/docs/datacite-rest-api-affiliation-and-publisher-default-change) and [guidance on preprints](https://support.datacite.org/docs/preprints-post-prints-and-author-manuscripts)
+- [JSON Schema 2020-12](https://json-schema.org/draft/2020-12)
+- [ORCID](https://orcid.org/), [ROR](https://ror.org/), [SPDX License List](https://spdx.org/licenses/), [MSC2020](https://msc2020.org/), [NISO Journal Article Versions (NISO RP-8-2008)](https://www.niso.org/publications/niso-rp-8-2008-jav), [Software Heritage identifiers (SWHID)](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html)
+- [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) and [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+- [arXiv](https://arxiv.org/) and its [default licence](https://arxiv.org/licenses/nonexclusive-distrib/1.0/)
+- [amsmath](https://ctan.org/pkg/amsmath) and [amssymb](https://ctan.org/pkg/amsfonts) (CTAN); [TeXmacs](https://www.texmacs.org/)
+- [Zenodo developer documentation](https://developers.zenodo.org/), [InvenioRDM records API](https://inveniordm.docs.cern.ch/reference/rest_api_drafts_records/), [Zenodo on folders](https://support.zenodo.org/help/en-gb/1-upload-deposit/74-can-i-upload-folders-directories), [managing files](https://help.zenodo.org/docs/deposit/manage-files/), [resource types](https://zenodo.org/api/vocabularies/resourcetypes), [versioning](https://zenodo.org/help/versioning) and [the sandbox](https://sandbox.zenodo.org/)
+- [Google Scholar inclusion guidelines](https://scholar.google.com/intl/en/scholar/inclusion.html), [schema.org ScholarlyArticle](https://schema.org/ScholarlyArticle), [JSON-LD 1.1](https://www.w3.org/TR/json-ld11/), [FAIR Signposting](https://signposting.org/FAIR/), [BibTeX](https://www.bibtex.org/), [CSL-JSON](https://github.com/citation-style-language/schema), [Atom (RFC 4287)](https://www.rfc-editor.org/rfc/rfc4287), [Sitemaps](https://www.sitemaps.org/protocol.html), [OAI-PMH static repositories](https://www.openarchives.org/OAI/2.0/guidelines-static-repository.htm) and [ResourceSync](https://www.openarchives.org/rs/toc)
+- [Radicle protocol guide](https://radicle.xyz/guides/protocol) and [The Update Framework](https://theupdateframework.io/): identities and key logs compared in appendix D
+
+**Companion documents.** [OpenSheaf archives in git](opensheaf-git-0.1.md), for archives kept in git repositories, and the [timestamps extension](opensheaf-timestamps-0.1.md), for dating signatures with RFC 3161 tokens and OpenTimestamps proofs.
