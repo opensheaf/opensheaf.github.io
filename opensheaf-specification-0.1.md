@@ -381,11 +381,103 @@ Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in th
 - The field names and the format of signature files (#55).
 - Whether owners should survive the exposure of a key (revocation dated by trusted time), which the core leaves to ending the owner (#55; section 6).
 
+## 8. Collections
+
+A <dfn>collection</dfn> is an object of kind `collection` (section 4) whose versions hold a list of members, `members.json`. Each <dfn>member</dfn> is a line (section 7) of a document or of another collection, in any archive, pinned (section 4). A collection is a line like any other, signed by its owner (section 7), its <dfn>curator</dfn>; what it contains changes only by a new version.
+
+### 8.1 Catalogues and selections
+
+Collections are of two types, which treat the versions of their members differently; `type` in `members.json` states which.
+
+- A <dfn>catalogue</dfn> keeps objects whole and is impartial about their versions. Each member pins an object with all its versions up to the pin, and the catalogue may follow it as it grows (section 8.3): the owner of each member decides what its versions are.
+- A <dfn>selection</dfn> vets particular versions: a journal the version it accepted, a digest or a review journal the version it reviewed, a reading list the version it recommends. Each member pins a revision set (section 8.4); earlier and later versions of the same member are not part of the selection unless its curator adds them, by a new version of the selection.
+
+Both types may have collections as members (an archive of archives, a selection of issues).
+
+**An archive's collections.** An archive has no identity of its own (section 3); an archive that makes collections does so as an owner, with a key log like any other (section 6). Its <dfn>main catalogue</dfn>, named by `mainCollection` in its discovery document (section 3.1), is a catalogue of the documents of the lines its owners write in the archive, not of the copies it holds. It MAY also keep a catalogue of the lines it holds as copies (section 11). A selection is kept by the owner of the body that vets (a journal, a review journal), which also owns the accepted copies the selection keeps (section 9).
+
+### 8.2 The member list: members.json
+
+Every collection version MUST contain, besides the files of section 4.1, `members.json`, and no other files of its own, with:
+
+- `format`: `"opensheaf-collection/0.1"`;
+- `type`: `catalogue` or `selection`;
+- `members`: the list of members, in the order in which they are presented. This order is authoritative: presentations MUST present members in it.
+
+It MAY contain `order`, the rule by which tools maintaining the collection place members: `manual`, the default (tools append new members and never reorder); `issued-desc` or `issued-asc`, by the members' `Issued` date (section 4.4), then their `Available` date, members with neither last, ties broken by `name` and then `owner`, so that the result is reproducible.
+
+Each member MUST have:
+
+- `kind`: `document` or `collection`;
+- `name` and `owner`: its line (sections 5 and 6), by which copies are found (section 12) and checked against its owner's signatures; never a label (section 3.1) or a location;
+- `at`: a non-empty list of base URLs where copies of the line may be found, also of one URL: equal hints, which need no signature (section 3), read as the `at` parameter of a `sheaf:` URI (section 12). They locate copies of the member's own line, mirrors included (section 11), never a branch of it (section 9).
+
+Each member MAY have `doi`, the version DOI, and `conceptDoi`, the concept DOI, of the member; and `cite`, a cached citation, not authoritative, so that the collection can be read and ordered without resolving its members, also when they become unavailable: `title`, `creators` (a list of names), `year`, and `issued`, the member's `Issued` date.
+
+### 8.3 Members of a catalogue
+
+Each member of a catalogue MUST have `version`, the object version pinned, and `inventorySha512`, the SHA-512 digest of its inventory file: a pin (section 4), which fixes the object with all its versions up to that one. It MUST NOT have `revisions`.
+
+A member MAY have `follow`, `"latest"`: a setting of the curator, not a floating reference. A followed member pins the latest signed version of its line (section 7.3) when the collection version was made; a member without `follow` keeps the version its curator pinned, which MAY be earlier, until the curator changes it. A tool maintaining the catalogue reads the member's archive (its discovery document or feed) and, when a followed line has a new signed version, writes a new collection version pinning it, whatever that version holds (a new document version, a description, a notice, a withdrawal): a catalogue does not judge the versions of its members. A tool follows only a signed version that extends the version pinned; a copy that does not is a fork of the line (section 7.4), which it reports, keeping the pin.
+
+A withdrawn member stays, and presentations show the withdrawal (section 13). Presentations show the current version of each member as read from the history of the version pinned (section 4.2), not from later versions of its line: a pin that is not followed is the curator's choice.
+
+### 8.4 Members of a selection
+
+A <dfn>revision</dfn> is a document version of a member as a selection vetted it, pinned by the object version that held it when it was vetted. A <dfn>revision set</dfn> is the revisions of one member vetted by a selection: usually one, more after a correction is accepted.
+
+Each member of a selection MUST have `revisions`, its revision set: a non-empty list, in the order of the member's history (section 4.2), no two revisions with the same `documentVersion`, each with:
+
+- `documentVersion`: the document version vetted;
+- `version`: the object version vetted, which holds that document version; when several do, the last of them when the revision was vetted, which is its entry in the history (section 4.2);
+- `inventorySha512`: the SHA-512 digest of that version's inventory file;
+- `doi`, OPTIONAL: the version DOI of that document version.
+
+A member of a selection MUST NOT have `version`, `inventorySha512` or `follow`. The revision presented as the selection's is the last of the list.
+
+A revision pins what was vetted, and keeps its pin in later versions of the selection. Descriptions and notices added later by the member's owner are not vetted by the selection, and presentations that show them SHOULD say where they come from. If the member's owner withdraws it, its revisions stay vetted, and presentations show the withdrawal as section 13 asks, saying that it comes from the member's owner.
+
+Tools MUST NOT change revision sets on their own. Adding a revision (a corrected version accepted after review), removing one, or adding or removing a member is a new version of the selection, made by its curator, whose deposit (section 4.1) records who and when, with a message saying what was decided.
+
+A selection MAY also keep its own copy of a revision it vetted, an accepted copy, which is a branch of the member's line under the selection's owner, and lists it as a member (section 9).
+
+### 8.5 Pins and statuses of members
+
+Every member is pinned: a collection version states exactly which object versions it contains, whole objects up to a version in a catalogue, revisions in a selection. Since a pin fixes an inventory, which fixes every file and earlier version, a collection version fixes everything it contains, also across archives: collections are hash trees, and pins cannot form cycles. A pin fixes one history: a fork of a member's line found later (section 7.4) does not change the member, and is reported.
+
+A collection pins only signed versions (section 7.3), never a draft (section 10). The `kind`, `name` and `owner` of a member are those of the `object.json` of every version pinned, and the `documentVersion` of a revision is the one its pinned version holds.
+
+**Members of other archives.** A member may be kept in another archive. Nothing is copied: it is resolved from its `at` as section 12 says, and any copy whose bytes match the pin will do. A reference, a pin without a copy, needs no permission. An archive that also keeps a copy keeps it as a mirror (section 11) or a branch (section 9).
+
+**Statuses.** A member, or in a selection each revision, is, as read by a verifier (section 14):
+
+- **verified**, when a copy of the version pinned is found, matches the pin, and is signed (section 7.3);
+- **mismatch**, when a copy is found and does not match the pin;
+- **unchecked**, when the version pinned is unchecked (section 7.3), shown with its status until the key log is found;
+- **not a version** (section 7.3): the collection pinned what it MUST NOT;
+- **unavailable**, when no copy is found;
+- **removed**, when the line is taken down (section 13).
+
+### 8.6 Description and rights
+
+**Description.** A collection version's `datacite.json` (section 4.4) has `resourceTypeGeneral` `Collection`, and MUST have in `relatedIdentifiers` a `HasPart` relation to the version DOI of each member of a catalogue (its `doi`) and of each revision of a selection (the revision's `doi`) that has one; members without a DOI are listed only in `members.json`. Members never name the collections that include them (section 4.4).
+
+**Document versions.** A collection makes a new document version exactly when its member list changes (section 4.2); `object.json` of a collection has none of the fields of a document (section 4.3).
+
+**Rights.** A collection version holds only metadata, placed under CC0 (section 15), and its `rightsList` SHOULD say so. The licence of a collection never extends to its members.
+
+**Open questions.**
+
+- Whether `follow` applies to every object version of a catalogue or only to its document versions, so that a catalogue with followed members can still have description-only versions, notices and a withdrawal (#45).
+- What counts as a change of the member list: every change of `members.json` (`cite` and a reorder included), or of the members and pins only (#27).
+- Ordering by `Available` without resolving members, which `cite` does not cache (#27).
+- Which status a member has when the checksum file of its inventory is missing or wrong (#48).
+- What a collection may state about its members (volume, acceptance, the journal's own DOI, a retraction by the journal) (#40).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 7 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 8 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-8. Collections: catalogues, selections, members (with `HasPart` in `datacite.json`, moved from section 4).
 9. Branches and accepted copies.
 10. Drafts and sealing.
 11. Copies and mirrors (moving an owner is in section 6.5).

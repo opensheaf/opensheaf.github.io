@@ -1636,18 +1636,353 @@ keylog &lt;the value of keyLog&gt;</pre>
         </p>
       </li>
     </ul>
-    <h2 id="auto-31"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-31"><a id="8-collections"></a>8. Collections<span style="margin-left: 1em"></span></h2>
+    <p>
+      A <dfn>collection</dfn> is an object of kind <tt class="verbatim">collection</tt>
+      (section 4) whose versions hold a list of members, <tt class="verbatim">members.json</tt>.
+      Each <dfn>member</dfn> is a line (section 7) of a document or of another
+      collection, in any archive, pinned (section 4). A collection is a line
+      like any other, signed by its owner (section 7), its <dfn>curator</dfn>;
+      what it contains changes only by a new version.
+    </p>
+    <h3 id="auto-32"><a id="81-catalogues-and-selections"></a>8.1 Catalogues and selections<span style="margin-left: 1em"></span></h3>
+    <p>
+      Collections are of two types, which treat the versions of their members
+      differently; <tt class="verbatim">type</tt> in <tt class="verbatim">members.json</tt> states
+      which.
+    </p>
+    <ul>
+      <li>
+        <p>
+          A <dfn>catalogue</dfn> keeps objects whole and is impartial about
+          their versions. Each member pins an object with all its versions up
+          to the pin, and the catalogue may follow it as it grows (section
+          8.3): the owner of each member decides what its versions are.
+        </p>
+      </li>
+      <li>
+        <p>
+          A <dfn>selection</dfn> vets particular versions: a journal the
+          version it accepted, a digest or a review journal the version it
+          reviewed, a reading list the version it recommends. Each member pins
+          a revision set (section 8.4); earlier and later versions of the same
+          member are not part of the selection unless its curator adds them,
+          by a new version of the selection.
+        </p>
+      </li>
+    </ul>
+    <p>
+      Both types may have collections as members (an archive of archives, a
+      selection of issues).
+    </p>
+    <p>
+      <strong>An archive's collections.</strong> An archive has no identity of
+      its own (section 3); an archive that makes collections does so as an
+      owner, with a key log like any other (section 6). Its <dfn>main
+      catalogue</dfn>, named by <tt class="verbatim">mainCollection</tt> in its
+      discovery document (section 3.1), is a catalogue of the documents of the
+      lines its owners write in the archive, not of the copies it holds. It
+      MAY also keep a catalogue of the lines it holds as copies (section 11).
+      A selection is kept by the owner of the body that vets (a journal, a
+      review journal), which also owns the accepted copies the selection keeps
+      (section 9).
+    </p>
+    <h3 id="auto-33"><a id="82-the-member-list-membersjson"></a>8.2 The member list: members.json<span style="margin-left: 1em"></span></h3>
+    <p>
+      Every collection version MUST contain, besides the files of section 4.1,
+      <tt class="verbatim">members.json</tt>, and no other files of its own, with:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">format</tt>: <tt class="verbatim">&quot;opensheaf-collection/0.1&quot;</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">type</tt>: <tt class="verbatim">catalogue</tt> or <tt class="verbatim">selection</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">members</tt>: the list of members, in the order in which
+          they are presented. This order is authoritative: presentations MUST
+          present members in it.
+        </p>
+      </li>
+    </ul>
+    <p>
+      It MAY contain <tt class="verbatim">order</tt>, the rule by which tools
+      maintaining the collection place members: <tt class="verbatim">manual</tt>, the
+      default (tools append new members and never reorder); <tt class="verbatim">issued-desc</tt>
+      or <tt class="verbatim">issued-asc</tt>, by the members' <tt class="verbatim">Issued</tt>
+      date (section 4.4), then their <tt class="verbatim">Available</tt> date, members
+      with neither last, ties broken by <tt class="verbatim">name</tt> and then <tt
+      class="verbatim">owner</tt>, so that the result is reproducible.
+    </p>
+    <p>
+      Each member MUST have:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">kind</tt>: <tt class="verbatim">document</tt> or <tt class="verbatim">collection</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>: its line (sections 5
+          and 6), by which copies are found (section 12) and checked against
+          its owner's signatures; never a label (section 3.1) or a location;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">at</tt>: a non-empty list of base URLs where copies of
+          the line may be found, also of one URL: equal hints, which need no
+          signature (section 3), read as the <tt class="verbatim">at</tt> parameter of a
+          <tt class="verbatim">sheaf:</tt> URI (section 12). They locate copies of the
+          member's own line, mirrors included (section 11), never a branch of
+          it (section 9).
+        </p>
+      </li>
+    </ul>
+    <p>
+      Each member MAY have <tt class="verbatim">doi</tt>, the version DOI, and <tt
+      class="verbatim">conceptDoi</tt>, the concept DOI, of the member; and <tt class="verbatim">cite</tt>,
+      a cached citation, not authoritative, so that the collection can be read
+      and ordered without resolving its members, also when they become
+      unavailable: <tt class="verbatim">title</tt>, <tt class="verbatim">creators</tt> (a list of
+      names), <tt class="verbatim">year</tt>, and <tt class="verbatim">issued</tt>, the member's
+      <tt class="verbatim">Issued</tt> date.
+    </p>
+    <h3 id="auto-34"><a id="83-members-of-a-catalogue"></a>8.3 Members of a catalogue<span style="margin-left: 1em"></span></h3>
+    <p>
+      Each member of a catalogue MUST have <tt class="verbatim">version</tt>, the object
+      version pinned, and <tt class="verbatim">inventorySha512</tt>, the SHA-512 digest
+      of its inventory file: a pin (section 4), which fixes the object with
+      all its versions up to that one. It MUST NOT have <tt class="verbatim">revisions</tt>.
+    </p>
+    <p>
+      A member MAY have <tt class="verbatim">follow</tt>, <tt class="verbatim">&quot;latest&quot;</tt>:
+      a setting of the curator, not a floating reference. A followed member
+      pins the latest signed version of its line (section 7.3) when the
+      collection version was made; a member without <tt class="verbatim">follow</tt>
+      keeps the version its curator pinned, which MAY be earlier, until the
+      curator changes it. A tool maintaining the catalogue reads the member's
+      archive (its discovery document or feed) and, when a followed line has a
+      new signed version, writes a new collection version pinning it, whatever
+      that version holds (a new document version, a description, a notice, a
+      withdrawal): a catalogue does not judge the versions of its members. A
+      tool follows only a signed version that extends the version pinned; a
+      copy that does not is a fork of the line (section 7.4), which it
+      reports, keeping the pin.
+    </p>
+    <p>
+      A withdrawn member stays, and presentations show the withdrawal (section
+      13). Presentations show the current version of each member as read from
+      the history of the version pinned (section 4.2), not from later versions
+      of its line: a pin that is not followed is the curator's choice.
+    </p>
+    <h3 id="auto-35"><a id="84-members-of-a-selection"></a>8.4 Members of a selection<span style="margin-left: 1em"></span></h3>
+    <p>
+      A <dfn>revision</dfn> is a document version of a member as a selection
+      vetted it, pinned by the object version that held it when it was vetted.
+      A <dfn>revision set</dfn> is the revisions of one member vetted by a
+      selection: usually one, more after a correction is accepted.
+    </p>
+    <p>
+      Each member of a selection MUST have <tt class="verbatim">revisions</tt>, its
+      revision set: a non-empty list, in the order of the member's history
+      (section 4.2), no two revisions with the same <tt class="verbatim">documentVersion</tt>,
+      each with:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">documentVersion</tt>: the document version vetted;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">version</tt>: the object version vetted, which holds that
+          document version; when several do, the last of them when the
+          revision was vetted, which is its entry in the history (section
+          4.2);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">inventorySha512</tt>: the SHA-512 digest of that
+          version's inventory file;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">doi</tt>, OPTIONAL: the version DOI of that document
+          version.
+        </p>
+      </li>
+    </ul>
+    <p>
+      A member of a selection MUST NOT have <tt class="verbatim">version</tt>, <tt
+      class="verbatim">inventorySha512</tt> or <tt class="verbatim">follow</tt>. The revision
+      presented as the selection's is the last of the list.
+    </p>
+    <p>
+      A revision pins what was vetted, and keeps its pin in later versions of
+      the selection. Descriptions and notices added later by the member's
+      owner are not vetted by the selection, and presentations that show them
+      SHOULD say where they come from. If the member's owner withdraws it, its
+      revisions stay vetted, and presentations show the withdrawal as section
+      13 asks, saying that it comes from the member's owner.
+    </p>
+    <p>
+      Tools MUST NOT change revision sets on their own. Adding a revision (a
+      corrected version accepted after review), removing one, or adding or
+      removing a member is a new version of the selection, made by its
+      curator, whose deposit (section 4.1) records who and when, with a
+      message saying what was decided.
+    </p>
+    <p>
+      A selection MAY also keep its own copy of a revision it vetted, an
+      accepted copy, which is a branch of the member's line under the
+      selection's owner, and lists it as a member (section 9).
+    </p>
+    <h3 id="auto-36"><a id="85-pins-and-statuses-of-members"></a>8.5 Pins and statuses of members<span style="margin-left: 1em"></span></h3>
+    <p>
+      Every member is pinned: a collection version states exactly which object
+      versions it contains, whole objects up to a version in a catalogue,
+      revisions in a selection. Since a pin fixes an inventory, which fixes
+      every file and earlier version, a collection version fixes everything it
+      contains, also across archives: collections are hash trees, and pins
+      cannot form cycles. A pin fixes one history: a fork of a member's line
+      found later (section 7.4) does not change the member, and is reported.
+    </p>
+    <p>
+      A collection pins only signed versions (section 7.3), never a draft
+      (section 10). The <tt class="verbatim">kind</tt>, <tt class="verbatim">name</tt> and <tt
+      class="verbatim">owner</tt> of a member are those of the <tt class="verbatim">object.json</tt>
+      of every version pinned, and the <tt class="verbatim">documentVersion</tt> of a
+      revision is the one its pinned version holds.
+    </p>
+    <p>
+      <strong>Members of other archives.</strong> A member may be kept in
+      another archive. Nothing is copied: it is resolved from its <tt class="verbatim">at</tt>
+      as section 12 says, and any copy whose bytes match the pin will do. A
+      reference, a pin without a copy, needs no permission. An archive that
+      also keeps a copy keeps it as a mirror (section 11) or a branch (section
+      9).
+    </p>
+    <p>
+      <strong>Statuses.</strong> A member, or in a selection each revision,
+      is, as read by a verifier (section 14):
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>verified</strong>, when a copy of the version pinned is
+          found, matches the pin, and is signed (section 7.3);
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>mismatch</strong>, when a copy is found and does not match
+          the pin;
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>unchecked</strong>, when the version pinned is unchecked
+          (section 7.3), shown with its status until the key log is found;
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>not a version</strong> (section 7.3): the collection pinned
+          what it MUST NOT;
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>unavailable</strong>, when no copy is found;
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>removed</strong>, when the line is taken down (section 13).
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-37"><a id="86-description-and-rights"></a>8.6 Description and rights<span style="margin-left: 1em"></span></h3>
+    <p>
+      <strong>Description.</strong> A collection version's <tt class="verbatim">datacite.json</tt>
+      (section 4.4) has <tt class="verbatim">resourceTypeGeneral</tt> <tt class="verbatim">Collection</tt>,
+      and MUST have in <tt class="verbatim">relatedIdentifiers</tt> a <tt class="verbatim">HasPart</tt>
+      relation to the version DOI of each member of a catalogue (its <tt
+      class="verbatim">doi</tt>) and of each revision of a selection (the revision's <tt
+      class="verbatim">doi</tt>) that has one; members without a DOI are listed only in
+      <tt class="verbatim">members.json</tt>. Members never name the collections that
+      include them (section 4.4).
+    </p>
+    <p>
+      <strong>Document versions.</strong> A collection makes a new document
+      version exactly when its member list changes (section 4.2); <tt class="verbatim">object.json</tt>
+      of a collection has none of the fields of a document (section 4.3).
+    </p>
+    <p>
+      <strong>Rights.</strong> A collection version holds only metadata,
+      placed under CC0 (section 15), and its <tt class="verbatim">rightsList</tt> SHOULD
+      say so. The licence of a collection never extends to its members.
+    </p>
+    <p>
+      <strong>Open questions.</strong>
+    </p>
+    <ul>
+      <li>
+        <p>
+          Whether <tt class="verbatim">follow</tt> applies to every object version of a
+          catalogue or only to its document versions, so that a catalogue with
+          followed members can still have description-only versions, notices
+          and a withdrawal (#45).
+        </p>
+      </li>
+      <li>
+        <p>
+          What counts as a change of the member list: every change of <tt
+          class="verbatim">members.json</tt> (<tt class="verbatim">cite</tt> and a reorder
+          included), or of the members and pins only (#27).
+        </p>
+      </li>
+      <li>
+        <p>
+          Ordering by <tt class="verbatim">Available</tt> without resolving members,
+          which <tt class="verbatim">cite</tt> does not cache (#27).
+        </p>
+      </li>
+      <li>
+        <p>
+          Which status a member has when the checksum file of its inventory is
+          missing or wrong (#48).
+        </p>
+      </li>
+      <li>
+        <p>
+          What a collection may state about its members (volume, acceptance,
+          the journal's own DOI, a retraction by the journal) (#40).
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-38"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
     <p>
       Each part is rebuilt in turn, from the reference text and an audit of
-      the concept, and agreed before the next. Sections 1 to 7 are rebuilt;
+      the concept, and agreed before the next. Sections 1 to 8 are rebuilt;
       the others are planned as follows, and read meanwhile in the reference
       text.
     </p>
     <p>
-      8. Collections: catalogues, selections, members (with <tt class="verbatim">HasPart</tt>
-      in <tt class="verbatim">datacite.json</tt>, moved from section 4). 9. Branches and
-      accepted copies. 10. Drafts and sealing. 11. Copies and mirrors (moving
-      an owner is in section 6.5). 12. Identifiers: <tt class="verbatim">sheaf:</tt>
+      9. Branches and accepted copies. 10. Drafts and sealing. 11. Copies and
+      mirrors (moving an owner is in section 6.5). 12. Identifiers: <tt class="verbatim">sheaf:</tt>
       URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14.
       Verification. 15. Security, privacy and rights (with: after a fork of a
       line, whether to end is the owner's call). 16. Versioning of this

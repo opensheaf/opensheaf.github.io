@@ -96,6 +96,10 @@
                 "inventorySha512": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{128}$"
+                },
+                "doi": {
+                  "type": "string",
+                  "$comment": "optional (section 8.4): the version DOI of the document version vetted"
                 }
               }
             }
