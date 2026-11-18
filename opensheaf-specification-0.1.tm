@@ -293,7 +293,7 @@
 
   <strong|Origin.> The <dfn|originator> of a work is the owner its genesis record names in <verbatim|originator>; an owner is its own originator. The originator's line is the origin of the name: it has no parent, and its first version MUST be signed by the originator (section 7). Every other line of the genesis record is a branch and MUST declare its parent (section 9); a line of another owner that declares none is not a valid line of the name. A tool refuses a branch owned by the originator (how the originator takes in another line's work is open, #57).
 
-  <strong|Clashes.> An owner has one line of each name, and no two objects of a storage root have the same line (section 4). A clash can arise only when a line is made, and the tool that makes it resolves it against the archive where it writes and the lines of the same owner it knows elsewhere whose signatures hold (section 7):
+  <strong|Clashes.> An owner has one line of each name, and no two objects of a storage root have the same line (section 4). A clash can arise only when a line is made, and the tool that makes it resolves it against the archive where it writes and the lines of the same owner it knows elsewhere that are signed (section 7):
 
   <\itemize>
     <item><strong|Sealing.> If the line is taken, the tool draws a new nonce, so that an originator's line is always named by algorithm 0. A work sealed elsewhere that meets, when deposited, a taken line with another genesis record (a collision) is refused, and its owner seals it anew; with the same genesis record, it is a copy (below), or a reused record (section 5.4).
@@ -395,11 +395,119 @@
     <item>The form of a keeper's confirmation on ORCID, which depends on an <verbatim|https> form of <verbatim|sheaf:\<less\>owner\<gtr\>>, and so on the gateway (section 12; #13, #35).
   </itemize>
 
+  <section*|7. Lines and signatures><label|7-lines-and-signatures>
+
+  A <dfn|line> is the history of a work as decided by one owner, identified by the pair (name, owner) and so by the identifier <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> (section 4). Its object versions form a single sequence, signed by its owner. <strong|A line is its signed versions, wherever they are stored>: in an archive where its owner writes, in a mirror (section 11), in any other archive. Lines of other owners with the same genesis record are branches (section 9). An owner's key log is the line of its owner object (section 6).
+
+  <subsection*|7.1 Signing><label|71-signing>
+
+  Every sealed object version of a line MUST be signed by its owner when it is made: by at least <verbatim|threshold> distinct keys of one version of the owner's key log, <verbatim|threshold> being that version's, each key signing in its own signature file (section 7.2), which names that key-log version. The key-log version named SHOULD be the latest its signer knows. A signature is judged against the key-log version it names alone (section 6.1), and nothing is ever signed again. An owner MAY add signatures to a version later, with keys that have not signed it. Versions of a key log are signed in the same way, by the keys of the version before, or for the first version by its own (section 6.1).
+
+  <subsection*|7.2 Witnesses and signature files><label|72-witnesses-and-signature-files>
+
+  A <dfn|witness> is evidence about an object version made after it: a signature, a timestamp, an external deposit (appendix A), a software archive snapshot. The witnesses kept with an object are in its <dfn|witness folder>, the OCFL object extension folder <verbatim|extensions/opensheaf-witnesses/> (not yet registered with OCFL, so validators may warn), which is part of no version, is not covered by the inventory digests, and travels with the object. Witnesses MAY be added at any time, by the owner of the line or by others; they are kept, never re-serialised or replaced once made, since some (timestamps) are made of their bytes, and MUST NOT be removed except by a takedown (section 13).
+
+  <strong|Signature files.> A <dfn|signature file> holds one signature of an object version by the owner of its line. The signature of version <verbatim|\<less\>version\<gtr\>> by a key is the JSON file <verbatim|\<less\>version\<gtr\>/signature-\<less\>k\<gtr\>.json> in the witness folder, where <verbatim|\<less\>k\<gtr\>> is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the key's <verbatim|did:key> URI, as UTF-8, so that a reader that knows the keys builds every name without listing the folder. It has:
+
+  <\itemize>
+    <item><verbatim|format>: <verbatim|"opensheaf-signature/0.1">;
+
+    <item><verbatim|object>: the identifier of the object, <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>>;
+
+    <item><verbatim|version>: the object version signed, <verbatim|\<less\>version\<gtr\>>;
+
+    <item><verbatim|inventorySha512>: the SHA-512 digest of that version's inventory file, as its checksum file states it;
+
+    <item><verbatim|signer>: the owner name of the signer, which MUST be the owner part of <verbatim|object>;
+
+    <item><verbatim|key>: the <verbatim|did:key> URI of the key that signs, one of the <verbatim|keys> of the key-log version named;
+
+    <item><verbatim|keyLog>: that key-log version, as a pin of the owner object written as a <verbatim|sheaf:> URI, <verbatim|sheaf:\<less\>owner\<gtr\>/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>> (section 12), whose owner MUST be <verbatim|signer>; for a signature of a key-log version vN+1 it names vN, and for the first version the first version itself;
+
+    <item><verbatim|signature>: the Ed25519 signature (RFC 8032) of the signed message, 64 bytes in base64 (RFC 4648, with padding).
+  </itemize>
+
+  <strong|The signed message.> What is signed is not a file but the message made of these five lines, each ended by a line feed (LF, <verbatim|0x0A>), in UTF-8, with no other characters, spaces or blank lines:
+
+  <\verbatim-code>
+    opensheaf-signature/0.1
+
+    object \<less\>the value of object\<gtr\>
+
+    version \<less\>the value of version\<gtr\>
+
+    inventory \<less\>the value of inventorySha512\<gtr\>
+
+    keylog \<less\>the value of keyLog\<gtr\>
+  </verbatim-code>
+
+  The first line keeps these signatures apart from any other use of the key; the others bind the signature to one object version, its inventory and one key-log version. A verifier rebuilds the message from the fields of the signature file and verifies the signature.
+
+  <strong|Others' witnesses.> A signature by someone other than the owner of the line, attesting a version, is a witness, not a signature of the line, and never a signature file: it is <verbatim|\<less\>version\<gtr\>/witness-\<less\>label\<gtr\>.json>, where <verbatim|\<less\>label\<gtr\>> is chosen by whoever adds it and matches <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>. It has the fields and the signed message of a signature file, with <verbatim|signer> and <verbatim|keyLog> naming the signer's own owner object, which MUST NOT be the line's owner; its key log MAY be copied beside the object (section 6.5).
+
+  <strong|Other witnesses.> The <hlink|timestamps extension|opensheaf-timestamps-0.1.tm> keeps timestamps of signature files beside them, dates that readers may weigh; it changes no status. The witness folder of an owner object also holds the evidence of forks of its key log (section 6.3); the parent signatures a branch carries are in its content (section 9).
+
+  <strong|Files that are not witnesses.> A file of the witness folder that is not a witness (a stray file, a malformed or invalid signature file) is ignored, reported, never fatal, and kept; a file a reader does not recognise, stray or of an extension it does not know, is reported as an unknown file, not as an error: a host cannot break a version by adding a file. A copy MAY leave such files out (section 11).
+
+  <subsection*|7.3 Statuses><label|73-statuses>
+
+  A signature file is:
+
+  <\itemize>
+    <item><dfn|invalid> when it is malformed; its name does not match the digest of its key; its signature does not verify; its <verbatim|object>, <verbatim|version> and <verbatim|inventorySha512> are not those of the version whose folder holds it (the digest also as its checksum file states it; in <verbatim|parent.signatures/>, those of the parent version, section 9); its <verbatim|signer> is not the line's owner; the reader reaches the key-log version named, with that digest, and the key is not in its <verbatim|keys>; or the version named follows one with <verbatim|ended>, or, for a signature of a line, has <verbatim|ended> itself (section 6.3);
+
+    <item><dfn|unchecked> when it is not invalid but the reader cannot reach the key-log version it names, with that digest (the key log is absent, taken down, or shorter, or the reader holds another version of that number, which verifiers report as a sign of a fork of the key log, section 6.3); nothing is added on such signatures (section 7.5);
+
+    <item>otherwise <dfn|good>, for ever: later versions of the key log, an end or a fork never change it.
+  </itemize>
+
+  A version of a key log is <dfn|signed> when at least <verbatim|threshold> distinct keys of the version before (for the first version, of itself), <verbatim|threshold> being that version's, sign it with good signature files. Key logs are read version by version from the first, and are never vouched for (below): each version is checked with the keys of the one before; a version after one with <verbatim|ended> is not a version of the key log, and at a fork the versions each side holds stay versions (section 6.3).
+
+  A version of a line is:
+
+  <\itemize>
+    <item><dfn|signed> when it is <dfn|signed directly>, by at least <verbatim|threshold> distinct keys of one key-log version, <verbatim|threshold> being that version's, with good signature files naming that version; or <dfn|vouched for>, when a later version of the same line signed directly extends it;
+
+    <item><dfn|unchecked> when it is not signed, but would be if its unchecked signatures were good;
+
+    <item>otherwise <dfn|not a version> of the line, wherever it is found, and never shown as one: reported as invalid if at least one signature file of the owner is invalid, and otherwise as <dfn|unsigned>.
+  </itemize>
+
+  <strong|A signed version vouches for its past.> The inventory of a version records the digests of every file of every version before it (section 4), so a version signed directly vouches for every version it extends, whatever their own signatures; a version vouched for needs no signatures of its own.
+
+  <strong|Readers use the latest signed version.> The <dfn|latest signed version> of a copy of a line gives the line's history, current version and status (section 4.2). Nothing relies on a version that is not signed: not a pin, a resolution, a collection member or a branch point. An unchecked version is shown with its status until the key log is found.
+
+  <strong|Owner tools MUST show the owner> a version that a new version would extend and that is not signed, before signing, so that an owner never takes a thief's version into its line unknowingly; for versions of its key log, see section 6.3.
+
+  <subsection*|7.4 One writer per line, and forks><label|74-one-writer-per-line-and-forks>
+
+  An owner MUST NOT sign two different object versions with the same number for the same line. Since every version directory keeps the inventory as of that version (section 4.1), two copies of a line whose heads are <verbatim|vk> and <verbatim|vm>, with k not greater than m, <dfn|agree> when <verbatim|vk/inventory.json> is the same file, byte for byte, in both. A copy that stops earlier is older: readers use the latest signed version among the copies that agree. Two copies that do not agree are a <dfn|fork of the line>, reported with the status of each side, and never recorded (an archive keeps the side it holds, section 5.3); a fork whose sides are both signed was made with keys of the owner, and is attributable to whoever holds them.
+
+  <subsection*|7.5 Adding versions><label|75-adding-versions>
+
+  An archive adds a version to a line only if, once added, it is signed against the key log the archive holds: signed directly by its owner, or vouched for by a version signed directly that is added with it from the same copy. Tools SHOULD fetch the latest version of the key log they can find before adding. An archive adds no invalid signature file. An archive that continues another owner's line makes a branch, under its own owner (section 9).
+
+  <strong|Ended owners.> For an owner that has ended, as far as the archive knows (section 6.3), the archive takes its lines only from copies found elsewhere, never as new deposits: it MAY copy a line, or extend one it holds, up to the latest signed version of a copy that agrees with it, since holding earlier versions is no reason to trust later ones less or more; when the copies found fork, it takes only the versions they share, and reports the fork. Readers weigh these versions as they weigh that owner's history (section 6.4). The key log itself is added as section 6.4 says.
+
+  <strong|Versions held stay.> Nothing that a host or a thief can produce leads to removing a version an archive holds; only a takedown does (section 13). A version let in against this section that is not signed is reported, and never shown as a version of the line. Since OCFL versions cannot be skipped, the owner's own version of that number can then never be added there: that archive's copy is one side of a fork of the line, and the owner continues the line in another archive.
+
+  <subsection*|7.6 Integrity><label|76-integrity>
+
+  Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in the inventory, every inventory by its checksum file, and every member of a collection by a pin (sections 4 and 8). Digests show that files were not changed, signatures who made them; neither shows when (section 7.2).
+
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>The field names and the format of signature files (#55).
+
+    <item>Whether owners should survive the exposure of a key (revocation dated by trusted time), which the core leaves to ending the owner (#55; section 6).
+  </itemize>
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
-  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 6 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 7 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  7. Lines and signatures: signing, statuses, adding versions. 8. Collections: catalogues, selections, members (with <verbatim|HasPart> in <verbatim|datacite.json>, moved from section 4). 9. Branches and accepted copies. 10. Drafts and sealing. 11. Copies and mirrors (moving an owner is in section 6.5). 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14. Verification. 15. Security, privacy and rights. 16. Versioning of this specification, and changelog.
+  8. Collections: catalogues, selections, members (with <verbatim|HasPart> in <verbatim|datacite.json>, moved from section 4). 9. Branches and accepted copies. 10. Drafts and sealing. 11. Copies and mirrors (moving an owner is in section 6.5). 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
 
   Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
 

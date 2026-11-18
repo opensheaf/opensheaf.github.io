@@ -212,7 +212,7 @@ A genesis record thus has 16 names of one work (section 12 searches for a work b
 
 **Origin.** The <dfn>originator</dfn> of a work is the owner its genesis record names in `originator`; an owner is its own originator. The originator's line is the origin of the name: it has no parent, and its first version MUST be signed by the originator (section 7). Every other line of the genesis record is a branch and MUST declare its parent (section 9); a line of another owner that declares none is not a valid line of the name. A tool refuses a branch owned by the originator (how the originator takes in another line's work is open, #57).
 
-**Clashes.** An owner has one line of each name, and no two objects of a storage root have the same line (section 4). A clash can arise only when a line is made, and the tool that makes it resolves it against the archive where it writes and the lines of the same owner it knows elsewhere whose signatures hold (section 7):
+**Clashes.** An owner has one line of each name, and no two objects of a storage root have the same line (section 4). A clash can arise only when a line is made, and the tool that makes it resolves it against the archive where it writes and the lines of the same owner it knows elsewhere that are signed (section 7):
 
 - **Sealing.** If the line is taken, the tool draws a new nonce, so that an originator's line is always named by algorithm 0. A work sealed elsewhere that meets, when deposited, a taken line with another genesis record (a collision) is refused, and its owner seals it anew; with the same genesis record, it is a copy (below), or a reused record (section 5.4).
 - **Branches.** A branch is named by `parent.name`, unless its line is taken by another line of its owner, in which case it is named by the smallest algorithm number greater than that of `parent.name` that gives a line free for its owner, and `parent` keeps the parent's name; if none up to 15 is free, the branch is refused. When the line taken is the owner's own branch of the same parent line, section 9 says when the owner moves that branch's branch point instead.
@@ -297,11 +297,94 @@ When a keeper is named, a verifier MAY check both directions, and reports the li
 - Whether owners should survive the exposure of a key (revocation dated by trusted time, transparency logs), which the core leaves to ending the owner (#55; `drafts/keys-and-forks.md` on `main`).
 - The form of a keeper's confirmation on ORCID, which depends on an `https` form of `sheaf:<owner>`, and so on the gateway (section 12; #13, #35).
 
+## 7. Lines and signatures
+
+A <dfn>line</dfn> is the history of a work as decided by one owner, identified by the pair (name, owner) and so by the identifier `sheaf:<name>:<owner>` (section 4). Its object versions form a single sequence, signed by its owner. **A line is its signed versions, wherever they are stored**: in an archive where its owner writes, in a mirror (section 11), in any other archive. Lines of other owners with the same genesis record are branches (section 9). An owner's key log is the line of its owner object (section 6).
+
+### 7.1 Signing
+
+Every sealed object version of a line MUST be signed by its owner when it is made: by at least `threshold` distinct keys of one version of the owner's key log, `threshold` being that version's, each key signing in its own signature file (section 7.2), which names that key-log version. The key-log version named SHOULD be the latest its signer knows. A signature is judged against the key-log version it names alone (section 6.1), and nothing is ever signed again. An owner MAY add signatures to a version later, with keys that have not signed it. Versions of a key log are signed in the same way, by the keys of the version before, or for the first version by its own (section 6.1).
+
+### 7.2 Witnesses and signature files
+
+A <dfn>witness</dfn> is evidence about an object version made after it: a signature, a timestamp, an external deposit (appendix A), a software archive snapshot. The witnesses kept with an object are in its <dfn>witness folder</dfn>, the OCFL object extension folder `extensions/opensheaf-witnesses/` (not yet registered with OCFL, so validators may warn), which is part of no version, is not covered by the inventory digests, and travels with the object. Witnesses MAY be added at any time, by the owner of the line or by others; they are kept, never re-serialised or replaced once made, since some (timestamps) are made of their bytes, and MUST NOT be removed except by a takedown (section 13).
+
+**Signature files.** A <dfn>signature file</dfn> holds one signature of an object version by the owner of its line. The signature of version `<version>` by a key is the JSON file `<version>/signature-<k>.json` in the witness folder, where `<k>` is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the key's `did:key` URI, as UTF-8, so that a reader that knows the keys builds every name without listing the folder. It has:
+
+- `format`: `"opensheaf-signature/0.1"`;
+- `object`: the identifier of the object, `sheaf:<name>:<owner>`;
+- `version`: the object version signed, `<version>`;
+- `inventorySha512`: the SHA-512 digest of that version's inventory file, as its checksum file states it;
+- `signer`: the owner name of the signer, which MUST be the owner part of `object`;
+- `key`: the `did:key` URI of the key that signs, one of the `keys` of the key-log version named;
+- `keyLog`: that key-log version, as a pin of the owner object written as a `sheaf:` URI, `sheaf:<owner>/v<n>?sha512=<digest>` (section 12), whose owner MUST be `signer`; for a signature of a key-log version vN+1 it names vN, and for the first version the first version itself;
+- `signature`: the Ed25519 signature (RFC 8032) of the signed message, 64 bytes in base64 (RFC 4648, with padding).
+
+**The signed message.** What is signed is not a file but the message made of these five lines, each ended by a line feed (LF, `0x0A`), in UTF-8, with no other characters, spaces or blank lines:
+
+```
+opensheaf-signature/0.1
+object <the value of object>
+version <the value of version>
+inventory <the value of inventorySha512>
+keylog <the value of keyLog>
+```
+
+The first line keeps these signatures apart from any other use of the key; the others bind the signature to one object version, its inventory and one key-log version. A verifier rebuilds the message from the fields of the signature file and verifies the signature.
+
+**Others' witnesses.** A signature by someone other than the owner of the line, attesting a version, is a witness, not a signature of the line, and never a signature file: it is `<version>/witness-<label>.json`, where `<label>` is chosen by whoever adds it and matches `^[a-z0-9]+(-[a-z0-9]+)*$`. It has the fields and the signed message of a signature file, with `signer` and `keyLog` naming the signer's own owner object, which MUST NOT be the line's owner; its key log MAY be copied beside the object (section 6.5).
+
+**Other witnesses.** The [timestamps extension](opensheaf-timestamps-0.1.md) keeps timestamps of signature files beside them, dates that readers may weigh; it changes no status. The witness folder of an owner object also holds the evidence of forks of its key log (section 6.3); the parent signatures a branch carries are in its content (section 9).
+
+**Files that are not witnesses.** A file of the witness folder that is not a witness (a stray file, a malformed or invalid signature file) is ignored, reported, never fatal, and kept; a file a reader does not recognise, stray or of an extension it does not know, is reported as an unknown file, not as an error: a host cannot break a version by adding a file. A copy MAY leave such files out (section 11).
+
+### 7.3 Statuses
+
+A signature file is:
+
+- <dfn>invalid</dfn> when it is malformed; its name does not match the digest of its key; its signature does not verify; its `object`, `version` and `inventorySha512` are not those of the version whose folder holds it (the digest also as its checksum file states it; in `parent.signatures/`, those of the parent version, section 9); its `signer` is not the line's owner; the reader reaches the key-log version named, with that digest, and the key is not in its `keys`; or the version named follows one with `ended`, or, for a signature of a line, has `ended` itself (section 6.3);
+- <dfn>unchecked</dfn> when it is not invalid but the reader cannot reach the key-log version it names, with that digest (the key log is absent, taken down, or shorter, or the reader holds another version of that number, which verifiers report as a sign of a fork of the key log, section 6.3); nothing is added on such signatures (section 7.5);
+- otherwise <dfn>good</dfn>, for ever: later versions of the key log, an end or a fork never change it.
+
+A version of a key log is <dfn>signed</dfn> when at least `threshold` distinct keys of the version before (for the first version, of itself), `threshold` being that version's, sign it with good signature files. Key logs are read version by version from the first, and are never vouched for (below): each version is checked with the keys of the one before; a version after one with `ended` is not a version of the key log, and at a fork the versions each side holds stay versions (section 6.3).
+
+A version of a line is:
+
+- <dfn>signed</dfn> when it is <dfn>signed directly</dfn>, by at least `threshold` distinct keys of one key-log version, `threshold` being that version's, with good signature files naming that version; or <dfn>vouched for</dfn>, when a later version of the same line signed directly extends it;
+- <dfn>unchecked</dfn> when it is not signed, but would be if its unchecked signatures were good;
+- otherwise <dfn>not a version</dfn> of the line, wherever it is found, and never shown as one: reported as invalid if at least one signature file of the owner is invalid, and otherwise as <dfn>unsigned</dfn>.
+
+**A signed version vouches for its past.** The inventory of a version records the digests of every file of every version before it (section 4), so a version signed directly vouches for every version it extends, whatever their own signatures; a version vouched for needs no signatures of its own.
+
+**Readers use the latest signed version.** The <dfn>latest signed version</dfn> of a copy of a line gives the line's history, current version and status (section 4.2). Nothing relies on a version that is not signed: not a pin, a resolution, a collection member or a branch point. An unchecked version is shown with its status until the key log is found.
+
+**Owner tools MUST show the owner** a version that a new version would extend and that is not signed, before signing, so that an owner never takes a thief's version into its line unknowingly; for versions of its key log, see section 6.3.
+
+### 7.4 One writer per line, and forks
+
+An owner MUST NOT sign two different object versions with the same number for the same line. Since every version directory keeps the inventory as of that version (section 4.1), two copies of a line whose heads are `vk` and `vm`, with k not greater than m, <dfn>agree</dfn> when `vk/inventory.json` is the same file, byte for byte, in both. A copy that stops earlier is older: readers use the latest signed version among the copies that agree. Two copies that do not agree are a <dfn>fork of the line</dfn>, reported with the status of each side, and never recorded (an archive keeps the side it holds, section 5.3); a fork whose sides are both signed was made with keys of the owner, and is attributable to whoever holds them.
+
+### 7.5 Adding versions
+
+An archive adds a version to a line only if, once added, it is signed against the key log the archive holds: signed directly by its owner, or vouched for by a version signed directly that is added with it from the same copy. Tools SHOULD fetch the latest version of the key log they can find before adding. An archive adds no invalid signature file. An archive that continues another owner's line makes a branch, under its own owner (section 9).
+
+**Ended owners.** For an owner that has ended, as far as the archive knows (section 6.3), the archive takes its lines only from copies found elsewhere, never as new deposits: it MAY copy a line, or extend one it holds, up to the latest signed version of a copy that agrees with it, since holding earlier versions is no reason to trust later ones less or more; when the copies found fork, it takes only the versions they share, and reports the fork. Readers weigh these versions as they weigh that owner's history (section 6.4). The key log itself is added as section 6.4 says.
+
+**Versions held stay.** Nothing that a host or a thief can produce leads to removing a version an archive holds; only a takedown does (section 13). A version let in against this section that is not signed is reported, and never shown as a version of the line. Since OCFL versions cannot be skipped, the owner's own version of that number can then never be added there: that archive's copy is one side of a fork of the line, and the owner continues the line in another archive.
+
+### 7.6 Integrity
+
+Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in the inventory, every inventory by its checksum file, and every member of a collection by a pin (sections 4 and 8). Digests show that files were not changed, signatures who made them; neither shows when (section 7.2).
+
+**Open questions.**
+
+- The field names and the format of signature files (#55).
+- Whether owners should survive the exposure of a key (revocation dated by trusted time), which the core leaves to ending the owner (#55; section 6).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 6 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 7 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-7. Lines and signatures: signing, statuses, adding versions.
 8. Collections: catalogues, selections, members (with `HasPart` in `datacite.json`, moved from section 4).
 9. Branches and accepted copies.
 10. Drafts and sealing.
@@ -309,7 +392,7 @@ Each part is rebuilt in turn, from the reference text and an audit of the concep
 12. Identifiers: `sheaf:` URIs, resolution, indexes.
 13. Withdrawal, takedown and tombstones.
 14. Verification.
-15. Security, privacy and rights.
+15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call).
 16. Versioning of this specification, and changelog.
 
 Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.

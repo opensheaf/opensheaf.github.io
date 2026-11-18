@@ -39,19 +39,19 @@
     <div class="os-alert os-warning">
       <font class="os-alert-label">Warning.</font> <strong>Proposal.</strong> This extension
       belongs to the identity proposal of the specification (owners, key logs
-      and signatures, sections 6.5 and 13.2), on the branch <tt class="verbatim">proposal/identity</tt>
+      and signatures, sections 6 and 7), on the branch <tt class="verbatim">proposal/identity</tt>
       (PR #30), not yet agreed. It is discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/55">issue #55</a>.
     </div>
     <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
       In the <a href="opensheaf-specification-0.1.html">OpenSheaf specification</a>, every version of a line is
       signed by its owner, under a version of the owner's key log, and a good
-      signature stays good (sections 6.5 and 13.2 of the specification).
-      Signatures say who made a version, not when. So when a key may have been
-      exposed, the core cannot tell the signatures made with it before from
-      those its new holder makes after: the owner ends, its signatures stay
-      good, and readers trust its history only as far as other evidence goes
-      (section 6.5 of the specification).
+      signature stays good (sections 6 and 7 of the specification). Signatures
+      say who made a version, not when. So when a key may have been exposed,
+      the core cannot tell the signatures made with it before from those its
+      new holder makes after: the owner ends, its signatures stay good, and
+      readers trust its history only as far as other evidence goes (section
+      6.4 of the specification).
     </p>
     <p>
       A timestamp is such evidence: it shows that a signature existed by a
@@ -106,8 +106,8 @@
     </ul>
     <p>
       A timestamp file of the signature file <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>
-      (section 13.2 of the specification), in the object's extension folder
-      <tt class="verbatim">extensions/opensheaf-witnesses/</tt>, is <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>
+      (section 7.2 of the specification), in the object's extension folder <tt
+      class="verbatim">extensions/opensheaf-witnesses/</tt>, is <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>
       or <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json.&lt;e&gt;.ots</tt>,
       beside it, where <tt class="verbatim">&lt;e&gt;</tt> is the first 16 characters of
       the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the
@@ -124,7 +124,7 @@
     <p>
       An owner adopts this extension in its key log: a version of the key log
       holds, in its <tt class="verbatim">keys.json</tt>, under <tt class="verbatim">extensions</tt>
-      (section 6.5 of the specification), an entry keyed by <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>,
+      (section 6.1 of the specification), an entry keyed by <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>,
       an object with:
     </p>
     <ul>
@@ -188,7 +188,7 @@
       own to date signatures before the listing. A version is
       <strong>dated</strong> by the <tt class="verbatim">threshold</tt>-th earliest of
       the dates of its good signature files naming one key-log version; a
-      version vouched for (section 13.2 of the specification) existed by the
+      version vouched for (section 7.3 of the specification) existed by the
       date of the version that vouches for it. Dates within two hours of a
       Bitcoin block time are uncertain by that much.
     </p>
@@ -196,7 +196,7 @@
     <p>
       Dates are evidence for readers; this extension draws no conclusion from
       them in the format. For an owner that has ended, or whose key log is
-      forked (section 6.5 of the specification), a reader MAY trust the
+      forked (section 6.3 of the specification), a reader MAY trust the
       versions dated before the time it believes a key was exposed, and SHOULD
       say on what evidence. The time of the version that ends the owner, and
       of the first differing version of each side of a fork, bound when the
@@ -234,7 +234,7 @@
           a signature earlier than its listing (section 5), so a thief who
           lists its own dates nothing before the theft. Authorities are never
           delisted: if a listed one is compromised, the remedy is a new owner
-          (section 6.5 of the specification). Listing a root certificate
+          (section 6.3 of the specification). Listing a root certificate
           trusts every authority that root certifies, so an owner that wants a
           single authority lists its signing certificate. An OpenTimestamps
           proof rests on no authority, only on Bitcoin, but is complete only
@@ -296,8 +296,7 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
     <ul>
       <li>
         <p>
-          <a href="opensheaf-specification-0.1.html">OpenSheaf specification 0.1</a>, sections 4, 6.5, 10.5,
-          13.2 and 14
+          <a href="opensheaf-specification-0.1.html">OpenSheaf specification 0.1</a>, sections 2, 6, 7, 9 and 14
         </p>
       </li>
       <li>
