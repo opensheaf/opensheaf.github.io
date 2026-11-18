@@ -90,7 +90,7 @@
                 "items": {
                   "type": "string",
                   "format": "uri",
-                  "pattern": "/$"
+                  "pattern": "^https://.*/$"
                 },
                 "$comment": "in indexes kept for several archives: base URLs of the archive serving the copy, equal hints (sections 3, 12.5)"
               }

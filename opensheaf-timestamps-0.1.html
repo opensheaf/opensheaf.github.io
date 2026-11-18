@@ -121,7 +121,10 @@
       block attests it; the completed proof is a new file beside the pending
       one. <strong>Anyone holding a copy MAY timestamp any signature file at
       any time</strong>: a later timestamp never harms, since the earliest one
-      dates the file.
+      dates the file. Since their names cannot be computed, a reader over HTTP
+      finds timestamp files only where folders can be listed, or in the
+      content of a branch (section 6); elsewhere it reports that it has not
+      looked (section 14.1 of the specification).
     </p>
     <h2 id="auto-5"><a id="4-the-owners-declaration"></a>4. The owner's declaration<span style="margin-left: 1em"></span></h2>
     <p>
@@ -204,9 +207,11 @@
       exposed, and SHOULD say on what evidence. The time of the version that
       ends the owner, and of each version a fork record or a healing version
       carries, bound when the owner knew. A branch keeps the timestamp files
-      of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>,
-      without the <tt class="verbatim">&lt;version&gt;/</tt> folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>),
-      complete proofs only; the timestamp files of key logs are in their owner
+      of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>
+      (section 9.2 of the specification), without the <tt class="verbatim">&lt;version&gt;/</tt>
+      folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>);
+      a pending proof kept there can never be completed, and counts for
+      nothing (section 5); the timestamp files of key logs are in their owner
       objects.
     </p>
     <p>
@@ -364,7 +369,9 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           section 2); an exposed key ends the owner or is nullified by a fork
           of its key log and healing, and dates help readers weigh the
           versions of ended and tainted owners and of nullified keys (section
-          6).
+          6); after an audit, timestamp files found over HTTP only where
+          folders can be listed (section 3), and pending proofs in a branch
+          count for nothing (section 6).
         </p>
       </li>
     </ul>

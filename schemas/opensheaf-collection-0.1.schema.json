@@ -124,7 +124,7 @@
             "items": {
               "type": "string",
               "format": "uri",
-              "pattern": "/$"
+              "pattern": "^https://.*/$"
             },
             "$comment": "base URLs where copies of the line may be found, all equal hints (sections 3, 8.2, 12.3)"
           }

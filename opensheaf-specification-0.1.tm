@@ -46,11 +46,11 @@
 
     <item><strong|collection:> section 8, with the rules on objects of sections 4 to 7;
 
-    <item><strong|owner tool>, a program that seals, signs or keeps an owner's key log: sections 5 to 7, 10 and 15;
+    <item><strong|owner tool>, a program that seals, signs or keeps an owner's key log: sections 5 to 7, 9, 10 and 15;
 
     <item><strong|verifier:> sections 14, 15.2 (on untrusted input) and 16 (as a reader), with the rules it checks;
 
-    <item><strong|resolver:> sections 12 and 15.2 (on untrusted input), with sections 6 and 7 for checking signatures and key logs; a gateway also follows the rules on gateways of section 12.
+    <item><strong|resolver:> sections 12 and 15.2 (on untrusted input), with sections 5, 6, 7 and 9.3 for checking names, signatures, key logs and branches; a gateway also follows the rules on gateways of section 12.
   </itemize>
 
   <strong|Profiles.> An archive MAY also follow the profiles of appendix A (Zenodo, TeXmacs, website), and MUST list in its discovery document those it follows.
@@ -84,7 +84,7 @@
 
     <item><verbatim|profiles>: the profiles it follows, from <verbatim|zenodo>, <verbatim|texmacs>, <verbatim|website> (appendix A), possibly none;
 
-    <item><verbatim|objects>: every object of the storage root except drafts, each with <verbatim|id> (section 4), <verbatim|kind>, <verbatim|name> and <verbatim|owner> (section 7), <verbatim|head> (its OCFL head version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as its checksum file states it) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, that of its latest version that is signed or unchecked, sections 7.3 and 13.1), and OPTIONALLY a <verbatim|label>.
+    <item><verbatim|objects>: every object of the storage root except drafts, each with <verbatim|id> (section 4), <verbatim|kind>, <verbatim|name> and <verbatim|owner> (section 7), <verbatim|head> (its OCFL head version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as its checksum file states it) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, the line's status, section 13.1), and OPTIONALLY a <verbatim|label>.
   </itemize>
 
   It SHOULD contain <verbatim|mainCollection>, the identifier of the catalogue of the archive's documents (section 8); <verbatim|contact>, a URI; and <verbatim|extensions>, the names of the extensions its objects use (section 2). It MAY contain <verbatim|owners>, the owner names of the owners it hosts (section 6); <verbatim|drafts>, the drafts it chooses to show, with <verbatim|id>, <verbatim|kind> and <verbatim|head>, as unfinished work on which nothing may rely (section 10); <verbatim|indexes>, which maps each index kept to the length of the prefixes of its files (section 12.5); and <verbatim|feed>, the URL of an Atom feed of new object versions. It MUST contain <verbatim|tombstones> once an object has been taken down (section 13.3).
@@ -131,7 +131,7 @@
 
   <strong|Deposits.> Each version in the inventory MUST have a <verbatim|user> with a <verbatim|name>, SHOULD give its <verbatim|address> (an ORCID iD, a <verbatim|mailto:> URI or another URI identifying the depositor), and MUST have a <verbatim|message> describing the change. The <verbatim|created> date and <verbatim|user> of an object version record its <dfn|deposit>, not repeated in <verbatim|object.json>; the deposit of a document version is that of the first object version holding it.
 
-  <strong|Content.> Every object version MUST contain, at the top level of its content, <verbatim|object.json> (section 4.3); <verbatim|datacite.json> (section 4.4), except in an owner object; and the genesis record <verbatim|genesis.json> (section 5), except in a draft. Every version of a branch also holds the evidence of its branch point: <verbatim|parent.inventory.json>, <verbatim|parent.object.json>, <verbatim|parent.signatures/> and, for a branch of a branch, <verbatim|parent.chain/> (section 9). The genesis record and this evidence are the <dfn|identity files> of the object, never files of the document's own. The names of every file this specification defines at the top level of the content (<verbatim|object.json>, <verbatim|datacite.json>, <verbatim|genesis.json>, <verbatim|members.json>, <verbatim|keys.json>, <verbatim|forked>, <verbatim|parent.inventory.json>, <verbatim|parent.object.json>, <verbatim|parent.signatures>, <verbatim|parent.chain>) are reserved for those files. A collection version also holds <verbatim|members.json> (section 8). An owner object holds <verbatim|genesis.json> and <verbatim|keys.json> (section 6), a fork record <verbatim|forked/> instead of <verbatim|keys.json> (section 6.3), and no <verbatim|datacite.json>; it has no document versions, and is never withdrawn or branched. Signatures and other witnesses are kept outside every version, in the object's extension folder <verbatim|extensions/opensheaf-witnesses/> (section 7).
+  <strong|Content.> Every object version MUST contain, at the top level of its content, <verbatim|object.json> (section 4.3); <verbatim|datacite.json> (section 4.4), except in an owner object; and the genesis record <verbatim|genesis.json> (section 5), except in a draft. Every version of a branch also holds the evidence of its branch point: <verbatim|parent.inventory.json>, <verbatim|parent.object.json>, <verbatim|parent.signatures/> and, for a branch of a branch, <verbatim|parent.chain/> (section 9). The genesis record and this evidence are the <dfn|identity files> of the object, never files of the document's own. The names of every file this specification defines at the top level of the content (<verbatim|object.json>, <verbatim|datacite.json>, <verbatim|genesis.json>, <verbatim|members.json>, <verbatim|keys.json>, <verbatim|forked>, <verbatim|parent.inventory.json>, <verbatim|parent.object.json>, <verbatim|parent.signatures>, <verbatim|parent.chain>) are reserved for those files. A collection version also holds <verbatim|members.json> (section 8). An owner object holds <verbatim|genesis.json> and <verbatim|keys.json> (section 6), a fork record <verbatim|forked/> instead of <verbatim|keys.json>, and a healing version both (section 6.3), and no <verbatim|datacite.json>; it has no document versions, and is never withdrawn or branched. Signatures and other witnesses are kept outside every version, in the object's extension folder <verbatim|extensions/opensheaf-witnesses/> (section 7).
 
   <subsection*|4.2 Documents and document versions><label|42-documents-and-document-versions>
 
@@ -287,7 +287,7 @@
 
   Algorithm k, for k from 0 to 15, takes the SHA-256 digest of the seed <verbatim|opensheaf-name-\<less\>k\<gtr\>> (ASCII, k in decimal, followed by a line feed) followed by the bytes of <verbatim|genesis.json>, and writes it in lowercase base32 (RFC 4648, without padding): 52 characters, the last of which holds the last bit of the digest and four zero bits, which are set to k. A name thus matches <verbatim|^[a-z2-7]{52}$>, and its last character gives its algorithm (<verbatim|a> or <verbatim|q> for algorithm 0), so names made by different algorithms never coincide. Names are compared as strings, never decoded. <verbatim|object.json> records a line's name as <verbatim|name>; appendix C gives examples.
 
-  A genesis record thus has 16 names of one work (section 12 searches for a work by all of them). Its <dfn|genesis name>, made by algorithm 0, is the same for every line of the work. Every line is named by its genesis name, except a branch renamed after a clash (section 5.3).
+  A genesis record thus has 16 names of one work (section 12 searches for a work by all of them). Its <dfn|genesis name>, made by algorithm 0, is the same for every line of the work. Every line is named by its genesis name, except a branch renamed after a clash, and branches named after it (section 5.3).
 
   <subsection*|5.3 Origin and clashes><label|53-origin-and-clashes>
 
@@ -302,10 +302,10 @@
 
     <item><strong|Copies.> A copy whose line is taken in a storage root by a different history of it is a fork of the line (section 7): the archive keeps the history it holds, and reports the other.
 
-    <item><strong|Takedowns.> A line stays taken in an archive after a takedown, since its tombstone keeps its identifier (section 13).
+    <item><strong|Takedowns.> A line stays taken in an archive after a takedown (section 13.3).
   </itemize>
 
-  Lines of different owners never clash. A renamed branch is always written with its owner part, since a <verbatim|sheaf:> URI without one names the originator's line (section 12).
+  Lines of different owners never clash. A branch is always written with its owner part (section 12.1).
 
   <subsection*|5.4 Reused genesis records><label|54-reused-genesis-records>
 
@@ -343,7 +343,7 @@
 
   Key-log versions are the OCFL versions of the owner object (<verbatim|v1>, <verbatim|v2>, ...); an owner object has no document versions. The first version holds the genesis record and the first <verbatim|keys.json>, whose <verbatim|keys> (compared as a set) and <verbatim|threshold> MUST be those of the genesis record; it MAY add <verbatim|keeper> and <verbatim|extensions>. Its authority comes from the genesis record: another first version under the same owner name would need other keys, and so another name. It is signed by <verbatim|threshold> of its own keys. Every later version vN+1, except a fork record (section 6.3), MUST be signed by at least <verbatim|threshold> distinct keys of vN, <verbatim|threshold> being that of vN. Signature files, and when a signature is good, are defined in section 7.
 
-  A key is added or retired, the threshold or the data of an extension changed, a keeper named, or the owner ended, by a new version of the key log; the owner name never changes. Changing the keys or the threshold affects only signatures naming the new version or a later one: signatures naming earlier versions stay good (section 7), and nothing is signed again.
+  A key is added or retired, the threshold or the data of an extension changed, a keeper named, or the owner ended, by a new version of the key log; the owner name never changes. Changing the keys or the threshold affects only signatures naming the new version or a later one: signatures naming earlier versions stay good (section 7.1).
 
   <subsection*|6.2 Creating an owner and choosing its keys><label|62-creating-an-owner-and-choosing-its-keys>
 
@@ -359,27 +359,27 @@
 
   <strong|Exposed keys.> An owner whose keys may have been exposed (stolen, leaked, copied), and could together reach the <verbatim|threshold> of some version of its key log that lists them, MUST end, or nullify them by a fork of its key log and heal it (below); otherwise retiring them is enough (a threshold of 2 from the first version, and one key exposed).
 
-  <strong|Forks of a key log.> Two different versions of a key log with the same number, each signed by <verbatim|threshold> keys of the version before, are a <dfn|fork of the key log>; that number is the <dfn|fork point>. Whoever holds <verbatim|threshold> keys of the version before can make one: a thief, or the owner itself, signing two versions with keys it wants nullified. The format cannot tell which side is the owner's, so it trusts neither: an archive that holds one side and meets the other replaces, in its copy, the version it holds at the fork point by a fork record, and drops every later version.
+  <strong|Forks of a key log.> Two different versions of a key log with the same number, each signed by <verbatim|threshold> keys of the version before, are a <dfn|fork of the key log>; that number is the <dfn|fork point>. Whoever holds <verbatim|threshold> keys of the version before can make one: a thief, or the owner itself, signing two versions with keys it wants nullified. The format cannot tell which side is the owner's, so it trusts neither: an archive that holds one side and meets the other replaces, in its copy, the version it holds at the fork point and every later version by a fork record, which carries them (provisional, #58).
 
-  <strong|Fork records.> A <dfn|fork record> is a version of the key log at the fork point, made by the archive that records the fork (its deposit, section 4.1), and not signed: besides <verbatim|genesis.json> and <verbatim|object.json>, it holds only the conflicting versions it <dfn|carries>, each under <verbatim|forked/\<less\>d\<gtr\>/>, where <verbatim|\<less\>d\<gtr\>> is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of its inventory file: that inventory file as <verbatim|inventory.json>, its checksum file as <verbatim|inventory.json.sha512>, its <verbatim|keys.json>, and its signature files <verbatim|signature-\<less\>k\<gtr\>.json> with the witnesses beside them (section 7.2), byte for byte. It is valid when it carries at least two versions of its number, with different inventory files, each signed (section 7.3) against the version before it, which anyone checks from its content and that version; otherwise it is not a version of the key log. The keys that sign the versions a fork record or a healing version carries, and the keys those nullify, are <dfn|nullified>. A key log whose latest version is a fork record is <dfn|tainted>: no version follows a fork record but by healing, no signature names one, and owner tools sign nothing for a tainted owner but a healing version. Fork records are copied with the key log like any version, so that every copy shows the fork.
+  <strong|Fork records.> A <dfn|fork record> is a version of the key log at the fork point, made by the archive that records the fork (its deposit, section 4.1), and not signed: besides <verbatim|genesis.json> and <verbatim|object.json>, it holds only the versions it <dfn|carries>: each side of the fork, from the fork point to the latest signed version of that side as held, every version of it under <verbatim|forked/\<less\>d\<gtr\>/>, where <verbatim|\<less\>d\<gtr\>> is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of its inventory file: that inventory file as <verbatim|inventory.json>, its checksum file as <verbatim|inventory.json.sha512>, its <verbatim|keys.json>, and its signature files <verbatim|signature-\<less\>k\<gtr\>.json> with the witnesses beside them (section 7.2), byte for byte. It is valid when it carries at least two versions of its number, with different inventory files, each signed (section 7.3) against the version before it, and every later version it carries is signed against the version before it on its side, which anyone checks from its content and the version before the fork point; otherwise it is not a version of the key log. The keys that sign the versions at the fork point that a fork record or a healing version carries, and the keys nullified by the fork records and healing versions it carries, are <dfn|nullified> (provisional, #58). A key log whose latest version is a fork record is <dfn|tainted>: no version follows a fork record, which only a healing version replaces; no signature names one; and owner tools sign nothing for a tainted owner but a healing version. Fork records are copied with the key log like any version, so that every copy shows the fork.
 
-  <strong|Healing.> A <dfn|healing version> is a version of the key log at a fork point that carries, as a fork record does, one or more versions of its number, each signed against the version before; that holds a <verbatim|keys.json> listing none of the keys it nullifies; and that is signed by <verbatim|threshold> keys of the version before, none of them nullified by it. It is otherwise a version like any other, and the key log continues from it. The owner heals a tainted key log by a healing version carrying every version the fork record carries; it answers a thief directly by a healing version carrying the thief's version. An owner that cannot heal, having too few keys left, stays tainted, which is treated as an end (section 6.4); its keeper MAY name a successor (section 6.6). Owner tools SHOULD keep, besides the keys in daily use, at least <verbatim|threshold> spare keys kept apart and used only to heal, and MUST show the owner a version of its key log that the owner did not make before signing anything.
+  <strong|Healing.> A <dfn|healing version> is a version of the key log at a fork point that carries, as a fork record does, one or more versions of its number, each signed against the version before, with the later versions of their sides; that holds a <verbatim|keys.json> listing none of the keys it nullifies; and that is signed by <verbatim|threshold> keys of the version before, none of them nullified by it. It is otherwise a version like any other, and the key log continues from it; an owner whose key log has a healing version is <dfn|healed>. The owner heals a tainted key log by a healing version carrying every version the fork record carries; it answers a thief directly by a healing version carrying the thief's version. An owner that cannot heal, having too few keys left, stays tainted, which is treated as an end (section 6.4); its keeper MAY name a successor (section 6.6). Owner tools SHOULD keep, besides the keys in daily use, at least <verbatim|threshold> spare keys kept apart and used only to heal, and MUST show the owner a version of its key log that the owner did not make before signing anything.
 
-  <strong|When versions meet.> When a reader or an archive holding a version of a key log meets a different version of the same number, after the same versions: a fork record or a healing version <dfn|supersedes> a version it carries, a version signed by a key it nullifies, and a fork record that carries no version it does not carry; the version superseded is replaced by the one that supersedes it. Otherwise the two are replaced by a fork record carrying every version they are or, for fork records and healing versions, carry. The versions after a version replaced are dropped; signatures naming them are unchecked there (section 7.3). The files of the witness folder of a version replaced or dropped go with it, those of a carried version into <verbatim|forked/\<less\>d\<gtr\>/>. These replacements are made only to key logs, and are the only changes of an object version outside drafts (section 4).
+  <strong|When versions meet.> When a reader or an archive holding a version of a key log meets a different version of the same number, after the same versions: a fork record or a healing version <dfn|supersedes> a version it carries, a version signed by a key it nullifies, and a fork record each of whose versions it carries or supersedes; two fork records carrying the same versions are equivalent, and an archive keeps the one it holds. The version superseded, with the versions after it, is replaced by the one that supersedes it. Otherwise the two, with the versions after them, are replaced by a fork record carrying every version they are or, for fork records and healing versions, carry, with the versions after them. Nothing is dropped: signatures naming a carried version reach it there (section 7.3). The files of the witness folder of a version replaced go with it into <verbatim|forked/\<less\>d\<gtr\>/>. These replacements are made only to key logs, and are the only changes of an object version outside drafts (section 4).
 
   <subsection*|6.4 After an end, a fork or healing><label|64-after-an-end-a-fork-or-healing>
 
   The signatures of an ended or tainted owner, and the signatures made with nullified keys, stay good, since the format does not date signatures; but versions signed after a key was exposed cannot be told from a thief's, so readers trust them only as far as other evidence goes: copies held before, the pins of collections (section 8), timestamps (the <hlink|timestamps extension|opensheaf-timestamps-0.1.tm>).
 
-  <strong|Nullified keys.> An archive adds no version, of a line or of a key log, that is signed only thanks to a signature made with a nullified key or naming a version carried by a fork record or a healing version (section 7.5); the versions it holds stay. Since fork records and healing versions travel with key logs, every archive that receives one applies this rule from then on.
+  <strong|Nullified keys.> A version, of a line or of a key log, <dfn|needs a nullified key> when it is signed only thanks to a signature made with a nullified key or naming a version carried by a fork record or a healing version. It is taken as the lines of an ended owner are, only from copies found elsewhere (section 7.5), and is never signed again (section 7.1); readers weigh it as above. Since fork records and healing versions travel with key logs, every archive that receives one applies this from then on (provisional, #58).
 
-  <strong|Ended and tainted owners.> An archive that knows an owner is ended or tainted adds that owner's key log up to the ending version, or up to the fork record and any healing version after it, and takes that owner's lines only from copies found elsewhere, never as new deposits; section 7 gives the rule for adding their versions. The work of an ended owner continues under its successor, by branches of its versions (section 9); a healed owner continues its own lines. Resolvers and verifiers report ended, tainted and healed owners, and successors (sections 12 and 14).
+  <strong|Ended and tainted owners.> An archive that knows an owner is ended or tainted adds that owner's key log up to the ending version, or up to the fork record, and takes that owner's lines as section 7.5 says. The work of an ended owner continues under its successor, by branches of its versions (section 9); a healed owner continues its own lines. Resolvers and verifiers report ended, tainted and healed owners, and successors (sections 12 and 14).
 
   <subsection*|6.5 Key logs travel with the objects they sign><label|65-key-logs-travel-with-the-objects-they-sign>
 
   A key log checks itself from its owner name: the genesis record of its first version lists the first keys, and each later version is signed by the keys of the one before. A copy from any source is therefore as good as the original, and a line can be checked without trusting any host, also after the archives that served it have gone.
 
-  Every copy of an object, in any archive, MUST hold beside it, as owner objects in the same storage root at their paths (section 3.2), the key logs of the owner of its line and, for a branch, of the owner of each parent whose signatures its evidence holds, in <verbatim|parent.signatures/> and at every level of <verbatim|parent.chain/> (section 9). Each is copied up to the latest version that whoever makes the copy knows, and at least up to the versions its signatures name. The key logs of third parties whose witnesses a copy holds (section 7) MAY be copied too. Key logs are never copied into an object's content. An archive MUST keep an owner object as long as it keeps an object whose signatures need it, unless the owner object is itself taken down; a tombstone then stands in for it, and a takedown of a line leaves its owner objects in place (section 13). An owner object MAY also be copied on its own, to keep a fresher copy of its key log.
+  Every copy of an object, in any archive, MUST hold beside it, as owner objects in the same storage root at their paths (section 3.2), the key logs of the owner of its line and, for a branch, of the owner of each parent whose signatures its evidence holds, in <verbatim|parent.signatures/> and at every level of <verbatim|parent.chain/> (section 9). Each is copied up to the latest version that whoever makes the copy knows, and at least up to the versions its signatures name, or up to a fork record or a healing version that carries them (section 6.3). The key logs of third parties whose witnesses a copy holds (section 7) MAY be copied too. Key logs are never copied into an object's content. An archive MUST keep an owner object as long as it keeps an object whose signatures need it, unless the owner object is itself taken down; a tombstone then stands in for it, and a takedown of a line leaves its owner objects in place (section 13). An owner object MAY also be copied on its own, to keep a fresher copy of its key log.
 
   Of two copies of a key log, either one extends the other, and readers use the longer, or they meet at a fork point, as section 6.3 says. No one can prove offline that a key log is complete: a copy that stops early may hide that the owner has ended.
 
@@ -396,7 +396,7 @@
   <\itemize>
     <item>The field names of <verbatim|keys.json> (#55).
 
-    <item>Fork records and healing, provisional: the rule for versions that meet, spare keys, and what a reader holding only one side can know (#58; <verbatim|drafts/keys-and-forks.md> on <verbatim|main>).
+    <item>Fork records and healing, provisional: the rule for versions that meet, among them two healing versions each nullifying the keys that signed the other, and versions of a side held beyond those a superseding version carries; spare keys; versions that need a nullified key; and what a reader holding only one side can know (#58; <verbatim|drafts/keys-and-forks.md> on <verbatim|main>).
 
     <item>Whether nullifying keys from when an archive learns of it, rather than dating signatures (revocation dated by trusted time, transparency logs), is enough against backdating (#55, #58).
 
@@ -409,7 +409,7 @@
 
   <subsection*|7.1 Signing><label|71-signing>
 
-  Every sealed object version of a line MUST be signed by its owner when it is made: by at least <verbatim|threshold> distinct keys of one version of the owner's key log, <verbatim|threshold> being that version's, each key signing in its own signature file (section 7.2), which names that key-log version. The key-log version named SHOULD be the latest its signer knows. A signature is judged against the key-log version it names alone (section 6.1), and nothing is ever signed again. An owner MAY add signatures to a version later, with keys that have not signed it. Versions of a key log are signed in the same way, by the keys of the version before, or for the first version by its own (section 6.1).
+  Every sealed object version of a line MUST be signed by its owner when it is made: by at least <verbatim|threshold> distinct keys of one version of the owner's key log, <verbatim|threshold> being that version's, each key signing in its own signature file (section 7.2), which names that key-log version. The key-log version named SHOULD be the latest its signer knows. A signature is judged against the key-log version it names alone (section 6.1), and nothing is ever signed again. An owner MAY add signatures to a version later, with keys that have not signed it, except to a version that needs a nullified key (section 6.4). Versions of a key log are signed in the same way, by the keys of the version before, or for the first version by its own (section 6.1).
 
   <subsection*|7.2 Witnesses and signature files><label|72-witnesses-and-signature-files>
 
@@ -469,14 +469,14 @@
     <item>otherwise <dfn|good>, for ever: later versions of the key log, an end or a fork never change it.
   </itemize>
 
-  A version of a key log is <dfn|signed> when at least <verbatim|threshold> distinct keys of the version before (for the first version, of itself), <verbatim|threshold> being that version's, sign it with good signature files. Key logs are read version by version from the first, and are never vouched for (below): each version is checked with the keys of the one before; a version after one with <verbatim|ended> is not a version of the key log; a fork record is a version when it is valid, though not signed, and a healing version is signed only when it is valid (section 6.3).
+  A version of a key log is signed when at least <verbatim|threshold> distinct keys of the version before (for the first version, of itself), <verbatim|threshold> being that version's, sign it with good signature files. Key logs are read version by version from the first, and are never vouched for (below): each version is checked with the keys of the one before; a version after one with <verbatim|ended> is not a version of the key log; a fork record is a version when it is valid, though not signed, and a healing version is signed only when it is valid (section 6.3).
 
   A version of a line is:
 
   <\itemize>
     <item><dfn|signed> when it is <dfn|signed directly>, by at least <verbatim|threshold> distinct keys of one key-log version, <verbatim|threshold> being that version's, with good signature files naming that version; or <dfn|vouched for>, when a later version of the same line signed directly extends it;
 
-    <item><dfn|unchecked> when it is not signed, but would be if its unchecked signatures were good;
+    <item>unchecked when it is not signed, but would be if its unchecked signatures were good;
 
     <item>otherwise <dfn|not a version> of the line, wherever it is found, and never shown as one: reported as invalid if at least one signature file of the owner is invalid, and otherwise as <dfn|unsigned>.
   </itemize>
@@ -489,13 +489,13 @@
 
   <subsection*|7.4 One writer per line, and forks><label|74-one-writer-per-line-and-forks>
 
-  An owner MUST NOT sign two different object versions with the same number for the same line. Since every version directory keeps the inventory as of that version (section 4.1), two copies of a line whose heads are <verbatim|vk> and <verbatim|vm>, with k not greater than m, <dfn|agree> when <verbatim|vk/inventory.json> is the same file, byte for byte, in both. A copy that stops earlier is older: readers use the latest signed version among the copies that agree. Two copies that do not agree are a <dfn|fork of the line>, reported with the status of each side, and never recorded (an archive keeps the side it holds, section 5.3); a fork whose sides are both signed was made with keys of the owner, and is attributable to whoever holds them.
+  An owner MUST NOT sign two different object versions with the same number for the same line, except versions of its key log made to nullify keys (section 6.3). Since every version directory keeps the inventory as of that version (section 4.1), two copies of a line whose heads are <verbatim|vk> and <verbatim|vm>, with k not greater than m, <dfn|agree> when <verbatim|vk/inventory.json> is the same file, byte for byte, in both. A copy that stops earlier is older: readers use the latest signed version among the copies that agree. Two copies that do not agree are a <dfn|fork of the line>, reported with the status of each side, and never recorded (an archive keeps the side it holds, section 5.3), except a fork of a key log, which section 6.3 records; a fork whose sides are both signed was made with keys of the owner, and is attributable to whoever holds them.
 
   <subsection*|7.5 Adding versions><label|75-adding-versions>
 
   An archive adds a version to a line only if, once added, it is signed against the key log the archive holds: signed directly by its owner, or vouched for by a version signed directly that is added with it from the same copy. Tools SHOULD fetch the latest version of the key log they can find before adding. An archive adds no invalid signature file. An archive that continues another owner's line makes a branch, under its own owner (section 9).
 
-  <strong|Ended and tainted owners.> For an owner that has ended or is tainted, as far as the archive knows (section 6.3), the archive takes its lines only from copies found elsewhere, never as new deposits: it MAY copy a line, or extend one it holds, up to the latest signed version of a copy that agrees with it, since holding earlier versions is no reason to trust later ones less or more; when the copies found fork, it takes only the versions they share, and reports the fork. Readers weigh these versions as they weigh that owner's history (section 6.4). The key log itself is added as section 6.4 says, and no version needing a nullified key is added (section 6.4).
+  <strong|Ended and tainted owners, and nullified keys.> For an owner that has ended or is tainted, as far as the archive knows (section 6.3), and for versions that need a nullified key (section 6.4), the archive takes versions only from copies found elsewhere, never as new deposits: it MAY copy a line, or extend one it holds, up to the latest signed version of a copy that agrees with it, since holding earlier versions is no reason to trust later ones less or more; when the copies found fork, it takes only the versions they share, and reports the fork. Readers weigh these versions as section 6.4 says. The key log itself is added as section 6.4 says.
 
   <strong|Versions held stay.> Nothing that a host or a thief can produce leads to removing a version an archive holds; only a takedown does (section 13), and, for a key log, a fork (section 6.3). A version let in against this section that is not signed is reported, and never shown as a version of the line. Since OCFL versions cannot be skipped, the owner's own version of that number can then never be added there: that archive's copy is one side of a fork of the line, and the owner continues the line in another archive.
 
@@ -613,16 +613,14 @@
 
   <subsection*|8.6 Description and rights><label|86-description-and-rights>
 
-  <strong|Description.> A collection version's <verbatim|datacite.json> (section 4.4) has <verbatim|resourceTypeGeneral> <verbatim|Collection>, and MUST have in <verbatim|relatedIdentifiers> a <verbatim|HasPart> relation to the version DOI of each member of a catalogue (its <verbatim|doi>) and of each revision of a selection (the revision's <verbatim|doi>) that has one; members without a DOI are listed only in <verbatim|members.json>. Members never name the collections that include them (section 4.4).
-
-  <strong|Document versions.> A collection makes a new document version exactly when its member list changes (section 4.2); <verbatim|object.json> of a collection has none of the fields of a document (section 4.3).
+  <strong|Description.> A collection version's <verbatim|datacite.json> (section 4.4) has <verbatim|resourceTypeGeneral> <verbatim|Collection>, and MUST have in <verbatim|relatedIdentifiers> a <verbatim|HasPart> relation to the version DOI of each member of a catalogue (its <verbatim|doi>) and of each revision of a selection (the revision's <verbatim|doi>) that has one; members without a DOI are listed only in <verbatim|members.json>. Its document versions and the fields of its <verbatim|object.json> are as sections 4.2 and 4.3 say.
 
   <strong|Rights.> A collection version holds only metadata, placed under CC0 (section 15.6), and its <verbatim|rightsList> SHOULD say so. The licence of a collection never extends to its members.
 
   <strong|Open questions.>
 
   <\itemize>
-    <item>Whether <verbatim|follow> applies to every object version of a catalogue or only to its document versions, so that a catalogue with followed members can still have description-only versions, notices and a withdrawal (#45).
+    <item>Whether <verbatim|follow> applies to every object version of a catalogue or only to its document versions, so that a catalogue with followed members can still have description-only versions and a withdrawal (#45).
 
     <item>What counts as a change of the member list: every change of <verbatim|members.json> (<verbatim|cite> and a reorder included), or of the members and pins only (#27).
 
@@ -684,7 +682,7 @@
 
     <item><strong|the signatures:> the parent version is signed (section 7.3), by the signature files of <verbatim|parent.signatures/> against the parent owner's key log kept beside the branch, or vouched for by a signed version of the parent's line that the verifier finds; or it is unchecked;
 
-    <item><strong|the chain:> when <verbatim|parent.object.json> has a <verbatim|parent>, <verbatim|parent.chain/> holds that evidence, each file with the digest <verbatim|parent.inventory.json> records for it, and it passes these checks in turn, level by level, up to the originator's line.
+    <item><strong|the chain:> when <verbatim|parent.object.json> has a <verbatim|parent>, <verbatim|parent.chain/> holds that evidence, each file with the digest <verbatim|parent.inventory.json> records for it, and it passes these checks in turn, level by level, up to the originator's line, except the files, checked at the first level only (a parent version may be a later version of its own branch).
   </itemize>
 
   A chain is finite, since each level is fixed by a digest in the level below. Verifiers MAY bound the depth they follow, and report where they stop; a branch point checked only down to that bound is unchecked.
@@ -696,7 +694,7 @@
 
     <item><dfn|confirmed> when the parent version, at every level, is signed;
 
-    <item>otherwise <dfn|unchecked>: consistent, but a parent version is unchecked.
+    <item>otherwise unchecked: consistent, but a parent version is unchecked.
   </itemize>
 
   The verdict of a branch is the weakest of those of its branch points. Verifiers report apart whether the parent's line is found, unavailable or removed (section 13), and whether it is withdrawn.
@@ -731,7 +729,7 @@
 
   <strong|Description.> A branch's <verbatim|datacite.json> has as <verbatim|publisher> its owner, or for a selection the body behind it, and keeps the relations of the parent version. Its first version, and every version that moves its branch point, SHOULD link the parent version with <verbatim|IsIdenticalTo>: its DOI if it has one, otherwise <verbatim|parent.url> as a <verbatim|URL>.
 
-  <strong|Rights.> A branch needs only the right to redistribute its parent versions, and the files it copies keep their licence; a copy of the parent's line beside it needs the right to redistribute every version copied (section 11). The evidence is metadata, under CC0 (section 15.6).
+  <strong|Rights.> A branch needs only the right to redistribute its parent versions (section 15.6); a copy of the parent's line beside it follows section 11.2. The evidence is metadata, under CC0 (section 15.6).
 
   <strong|Open questions.>
 
@@ -753,7 +751,7 @@
 
   <strong|Format.> A draft is a <verbatim|document> or a <verbatim|collection>, in the format of any object of its kind (section 4). It has no genesis record and no other identity files (section 4.1), and its <verbatim|object.json> has no <verbatim|name>, <verbatim|owner> or <verbatim|parent> (section 4.3). Its document versions are numbered by whoever keeps it, by the rules of section 4.2.
 
-  <strong|A draft is its archive's alone.> A draft is never signed (section 7), pinned (sections 8, 9 and 12), copied out of its archive (section 11), indexed or named by a <verbatim|sheaf:> URI (section 12). The archive keeps its drafts when it moves to another site (section 3). The discovery document does not list drafts in <verbatim|objects>; it MAY list them apart, in <verbatim|drafts>, as unfinished work on which nothing may rely, or not at all (section 3.1).
+  <strong|A draft is its archive's alone.> A draft is never signed (section 7), pinned (sections 8, 9 and 12), copied out of its archive (section 11), indexed or named by a <verbatim|sheaf:> URI (section 12). The discovery document does not list drafts in <verbatim|objects>; it MAY list them apart, in <verbatim|drafts>, as unfinished work on which nothing may rely, or not at all (section 3.1).
 
   <strong|A draft may change.> A draft is the only object that MAY be rewritten or deleted: the rule that object versions never change (section 4) does not apply to it, and a draft deleted leaves no tombstone (section 13).
 
@@ -775,15 +773,15 @@
 
   <subsection*|11.1 Mirrors><label|111-mirrors>
 
-  <strong|What a mirror holds.> An archive MAY keep a mirror of a line written elsewhere: the object's versions up to the latest signed version of the copy it copies (section 7.3), with their inventories, files and witnesses, byte for byte, at the path its layout gives the line's identifier (section 3.2), and beside it the key logs its signatures need (section 6.5). Files of the witness folder that are not witnesses need not be copied (section 7.2): not copying them is not removing them. When a copy holds, under the same name, a witness file other than the mirror's, the mirror keeps its own and reports the other.
+  <strong|What a mirror holds.> An archive MAY keep a mirror of a line written elsewhere: the object's versions up to the latest signed version of the copy it copies (section 7.3), with their inventories, files and the witnesses it can find (over HTTP, only those whose names it can compute, section 14.1), byte for byte, at the path its layout gives the line's identifier (section 3.2), and beside it the key logs its signatures need (section 6.5). Files of the witness folder that are not witnesses need not be copied (section 7.2): not copying them is not removing them. When a copy holds, under the same name, a witness file other than the mirror's, the mirror keeps its own and reports the other.
 
-  <strong|How a mirror grows.> A mirror is the same line, signed by its owner, never a new one. It MUST NOT be changed except by adding the owner's signed versions as section 7.5 allows, from a copy that agrees with it (section 7.4); by adding witnesses (section 7.2); for a key log, by the replacements at a fork (section 6.3); or by a takedown (section 13). It keeps every version it holds (section 7.5). A copy that does not agree with it is a fork of the line: the archive keeps the side it holds, and reports the other (sections 5.3 and 7.4). The lines of an ended owner are added only in this way, from copies found elsewhere (section 7.5).
+  <strong|How a mirror grows.> A mirror is the same line, signed by its owner, never a new one. It MUST NOT be changed except by adding the owner's signed versions as section 7.5 allows, from a copy that agrees with it (section 7.4); by adding witnesses (section 7.2); for a key log, by the replacements at a fork (section 6.3); or by a takedown (section 13). It keeps every version it holds (section 7.5). A copy that does not agree with it is a fork of the line: the archive keeps the side it holds, and reports the other (sections 5.3 and 7.4).
 
   <strong|Elsewhere.> A mirror may be listed in a catalogue of copies, never in the main catalogue (section 8.1), and located by the <verbatim|at> of collection members (section 8.2). A copy of a parent's line kept beside a branch is a mirror (section 9.5); an accepted copy is a branch, not a mirror (section 9.6). Drafts are never mirrored (section 10.1).
 
   <subsection*|11.2 Rights><label|112-rights>
 
-  An archive MUST NOT keep a mirror unless the licences of every object version it copies (<verbatim|rightsList>, section 4.4, which a description-only version may change) allow redistribution. A copy keeps the licences of what it copies. A copy of a parent's line beside a branch follows this rule for every version it copies (section 9.7). Key logs, inventories, signature files and the other metadata are under CC0 (section 15.6), and are copied freely; a reference, a pin without a copy, needs no permission (section 8.5).
+  An archive MUST NOT keep a mirror unless the licences of every object version it copies (<verbatim|rightsList>, section 4.4, which a description-only version may change) allow redistribution. A copy of a parent's line beside a branch follows this rule for every version it copies (section 9.7). Key logs, inventories, signature files and the other metadata are under CC0 (section 15.6), and are copied freely; a reference needs no permission (section 8.5).
 
   <strong|Open questions.>
 
@@ -837,7 +835,7 @@
 
   <subsection*|12.2 Short forms><label|122-short-forms>
 
-  For people, the name and the owner name MAY be shortened to a prefix of at least 8 characters (<verbatim|sheaf:lvfmiq2z:iztwg6bj/v3>); a part of 52 characters is complete. A resolver expands a short form among the lines it knows that pass the checks of section 12.3. The candidates are the lines whose name and owner name start with the parts given (without an owner part, the originators' lines; with <verbatim|:*>, every name starting with the name part, whose work is then searched for, section 12.4). If they all have the same owner, the short form names the one whose first object version of that owner has the earliest <verbatim|created> in its inventory, compared as instants; otherwise (several owners or genesis records, or a tie), it is ambiguous, and the resolver MUST NOT choose but lists the candidates with their full forms and originators.
+  For people, the name and the owner name MAY be shortened to a prefix of at least 8 characters (<verbatim|sheaf:lvfmiq2z:iztwg6bj/v3>); a part of 52 characters is complete. A resolver expands a short form among the lines it knows that pass the checks of section 12.3. The candidates are the lines whose name and owner name start with the parts given (without an owner part, the originators' lines; with <verbatim|:*>, every name starting with the name part, whose work is then searched for, section 12.4). If exactly one line (with <verbatim|:*>, one genesis record) is a candidate, the short form names it; otherwise it is ambiguous, and the resolver MUST NOT choose but lists the candidates with their full forms and originators.
 
   Expansions may differ between resolvers and over time, so every file defined by this specification MUST use complete parts. A resolver SHOULD show the full form of what it resolved; landing pages and citation metadata SHOULD give the full form, and MAY add a short one. A short form printed where it cannot be corrected (a paper, a slide) SHOULD have at least 16 characters in each part.
 
@@ -911,7 +909,7 @@
 
   <subsection*|13.1 Withdrawal><label|131-withdrawal>
 
-  A document or a collection is <dfn|withdrawn> by a description-only version (section 4.2) whose <verbatim|object.json> has <verbatim|status> <verbatim|withdrawn> and <verbatim|withdrawal> (section 4.3), and whose <verbatim|datacite.json> has <verbatim|withdrawal.date> as <verbatim|Withdrawn> (section 4.4). The status is the line's, read from its latest signed version (section 7.3), or, without the key log, its latest unchecked version (section 3.1), whatever document version that holds; a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
+  A document or a collection is <dfn|withdrawn> by a description-only version (section 4.2) whose <verbatim|object.json> has <verbatim|status> <verbatim|withdrawn> and <verbatim|withdrawal> (section 4.3), and whose <verbatim|datacite.json> has <verbatim|withdrawal.date> as <verbatim|Withdrawn> (section 4.4). The status is the line's, read from its latest signed version or, failing that, its latest unchecked version (section 7.3), whatever document version that holds; a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
 
   A withdrawn line keeps every version, signed, pinned and copied as before. Presentations showing a version of a line they know to be withdrawn MUST show the withdrawal, also when the version shown is earlier.
 
@@ -921,7 +919,7 @@
 
   <strong|Owner objects.> A takedown of a line leaves in place the owner objects its copy carries (section 6.5). An owner object that an object of the archive needs is taken down only for itself: at its owner's request, signed by <verbatim|threshold> keys of the latest version of its key log that the archive holds, or by law; for an ended or tainted owner (section 6.3), only at its keeper's request (section 6.6) or by law. An archive SHOULD also hear the keeper, when one is named, before acting on a signed request, which a thief can make. The owner's signatures in what the archive keeps are then unchecked there (section 7.3), and the tombstone stands in for the owner object in the rule of section 6.5.
 
-  <strong|Returning.> A line taken down (an owner object found elsewhere, for instance) MAY return to the archive only from a copy holding the version its tombstone pins or, when that version is not signed, the latest signed version before it, added as section 7.5 says: it is the same line, not a reuse of its identifier (section 4), and its tombstone is dropped.
+  <strong|Returning.> A line taken down (an owner object found elsewhere, for instance) MAY return to the archive only from a copy holding the version its tombstone pins or, when that version is not signed, the latest signed version before it, or, for a key log, a copy in which that version is carried by a fork record or a healing version (section 6.3, provisional, #58), added as section 7.5 says: it is the same line, not a reuse of its identifier (section 4), and its tombstone is dropped.
 
   <subsection*|13.3 Tombstones><label|133-tombstones>
 
@@ -939,7 +937,7 @@
     <item><verbatim|reason>: a plain text, which SHOULD NOT repeat what was taken down.
   </itemize>
 
-  A tombstone is never removed, except when its line returns: it keeps the line taken (section 5.3), and <verbatim|objects> never lists its <verbatim|id>. It is not signed: a resolver keeps looking past it (section 12.3). A line, or a version of it no later than <verbatim|lastVersion>, of which no copy is found but a tombstone is, is reported as removed (sections 8.5 and 9.3).
+  A tombstone is never removed, except when its line returns: it keeps the line taken (section 5.3), and <verbatim|objects> never lists its <verbatim|id>. It is not signed (section 12.3). A line, or a version of it no later than <verbatim|lastVersion>, of which no copy is found but a tombstone is, is reported as removed (sections 8.5 and 9.3).
 
   <strong|Open questions.>
 
@@ -1002,7 +1000,7 @@
 
     <item><strong|its identity:> the genesis record, the name and the identifier in every version (sections 4 and 5), and that the objects and tombstones of the archive with the same genesis name are its originator's line and branches of it (section 5.4);
 
-    <item><strong|its signatures:> the status of every signature file and version, and the latest signed version (section 7.3), against key logs kept beside it as section 6.5 asks. A key log missing, or shorter than the versions its signatures name, is an error, one taken down a warning (section 13.2); the signatures that need it are unchecked. A version that is not a version of its line is a warning (section 7.5);
+    <item><strong|its signatures:> the status of every signature file and version, and the latest signed version (section 7.3), against key logs kept beside it as section 6.5 asks. A key log missing, or not reaching the versions its signatures name (section 7.3), is an error, one taken down a warning (section 13.2); the signatures that need it are unchecked. A version that is not a version of its line is a warning (section 7.5);
 
     <item><strong|a branch:> the verdict of each branch point (section 9.3), at its first version and at every version that moves it, with the continuity of section 9.4, and that the identity files are unchanged between them. An inconsistent branch point is an error, an unchecked one a warning; the branch's verdict, and whether its parent's line is found, unavailable, removed or withdrawn, are results. A rename whose algorithm number is not greater than that of <verbatim|parent.name> is an error (section 9.3); one that neither the objects nor the tombstones of the archive justify, or not by the smallest number free there, is a warning (section 5.3);
 
@@ -1018,7 +1016,7 @@
   The verifier then checks, against the objects:
 
   <\itemize>
-    <item><strong|the discovery document> (section 3.1): that <verbatim|objects> lists every object of the storage root except drafts, each entry with the values its object gives (<verbatim|status> that of its latest version that is signed or unchecked, section 7.3), with distinct labels; that <verbatim|mainCollection> names a catalogue it lists; that <verbatim|drafts> lists only drafts of the storage root, with their heads; and, a breach being a warning, that <verbatim|owners> lists only owner objects it holds and <verbatim|extensions> every extension its objects use;
+    <item><strong|the discovery document> (section 3.1): that <verbatim|objects> lists every object of the storage root except drafts, each entry with the values its object gives (<verbatim|status> as section 13.1 says), with distinct labels; that <verbatim|mainCollection> names a catalogue it lists; that <verbatim|drafts> lists only drafts of the storage root, with their heads; and, a breach being a warning, that <verbatim|owners> lists only owner objects it holds and <verbatim|extensions> every extension its objects use;
 
     <item><strong|the tombstones> (section 13.3): that each is well formed, with <verbatim|id> the line of its <verbatim|name> and <verbatim|owner>; that no two have the same <verbatim|id>; and that no object of the storage root, and no entry of <verbatim|objects>, has the <verbatim|id> of one;
 
@@ -1049,7 +1047,7 @@
 
   Pins and signatures make every copy checkable wherever it is fetched (sections 4 and 7); discovery documents, indexes, locations and tombstones are maps and hints (sections 3, 12.3 and 13.3). A host or a network therefore cannot forge a version, nor add one to another owner's line (section 7.5), nor make a valid line from a reused genesis record (section 5.4), nor take over a short form (section 12.2). It can withhold: serve an older copy, or a key log that stops before an end or a fork record, which looks complete (sections 6.5 and 12.3); and it can delete what it serves, never a copy held elsewhere (section 13).
 
-  Whoever holds <verbatim|threshold> keys of an owner acts as that owner until they are nullified or the owner ends (section 6.3), and the format cannot tell what was signed before an exposure from what was signed after (section 6.4).
+  Whoever holds <verbatim|threshold> keys of an owner acts as that owner until the owner ends, or until the keys are nullified, after which archives aware of it take what they alone sign only from copies (sections 6.4 and 7.5), though readers still find their signatures good. The format cannot tell what was signed before an exposure from what was signed after (section 6.4).
 
   <strong|Forks of a line.> A fork of a line whose sides are both signed (section 7.4) ends nothing by itself; whether to end is the owner's call. If the owner did not make both sides, its keys may have been exposed, and section 6.3 applies; if it did (two tools, a version made again), it continues from one side, and archives holding the other keep it (section 7.5).
 
@@ -1143,6 +1141,8 @@
     <item><strong|0.1 (draft), 18 November 2026, rebuilt (PR #30):> the text rebuilt concept by concept into a shorter whole, from the reference text. Decided in the rebuild: archives are named by no file, and <verbatim|replicas> is dropped (section 3); external records are witnesses, not copies (section 12.3); index declarations name only <verbatim|names>, <verbatim|owners> and <verbatim|sha512> (section 12.5); every removal is a takedown, and tombstones are required once an object is taken down (section 13); drafts are never withdrawn; key-log forks are recorded by fork records, which nullify the keys involved, and healed by the owner, versions of key logs being replaced only there (section 6.3, provisional, #58); findings are errors, warnings or results (section 14.1); security, privacy and rights rewritten (section 15); <verbatim|licence> for documents only; logical paths exclude empty segments, a final <verbatim|/> and <verbatim|\\> (section 4.1).
 
     <item><strong|0.1 (draft), 19 November 2026, rebuilt (PR #30):> appendices A (profiles), B (JSON Schemas) and C (examples, checked against the schemas) rebuilt; DOIs written bare; signature files closed to other properties; fork records carry the witnesses of the versions they carry, under named files (section 6.3, provisional, #58); a threshold of 1 with a spare key survives the theft of the daily key by healing (section 6.2).
+
+    <item><strong|0.1 (draft), 19 November 2026, after an audit of the rebuilt text (PR #30):> an owner may sign two versions of its key log to nullify keys (section 7.4); a branch of a branch checks files at the first level only (section 9.3); a healing version replaces a fork record, never follows it, and <verbatim|healed> is defined (section 6.3); one status rule for lines (section 13.1); short forms without a tie-break by date (section 12.2); conformance classes, the Zenodo MD5 of <verbatim|sources.zip>, <verbatim|https> hints in the schemas, and duplicated rules cut. Provisional (#58): a fork record or a healing version carries each side from the fork point to its end, nothing is dropped, and only the keys signing at the fork point are nullified; two fork records carrying the same versions are equivalent; versions that need a nullified key are taken only from copies, like the lines of an ended owner, and never signed again (sections 6.3, 6.4 and 7.5); a key log taken down may return from a copy carrying its version (section 13.2).
   </itemize>
 
   <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>
@@ -1162,9 +1162,9 @@
 
     <item><strong|Files.> The record version holds the content files of the object version. Records have no folders and a limited number of files: sources with sub-folders, or too many, are uploaded as one file <verbatim|sources.zip>, at their logical paths, its entries in the byte order of their names, dated 1980-01-01 00:00:00, without extra fields. The inventories of the line MUST record in <verbatim|fixity> the MD5 digest of every content file (section 4.1), to be compared with the checksums Zenodo reports.
 
-    <item><strong|The deposit recorded.> The object version deposited has its DOI in <verbatim|datacite.json> and, in <verbatim|external> of <verbatim|object.json> (section 4.3), an entry with <verbatim|role> <verbatim|deposit>, <verbatim|service> <verbatim|Zenodo>, <verbatim|record> the URL of the record version, <verbatim|doi> and, for <verbatim|sources.zip>, <verbatim|files>.
+    <item><strong|The deposit recorded.> The object version deposited has its DOI in <verbatim|datacite.json> and, in <verbatim|external> of <verbatim|object.json> (section 4.3), an entry with <verbatim|role> <verbatim|deposit>, <verbatim|service> <verbatim|Zenodo>, <verbatim|record> the URL of the record version, <verbatim|doi> and, for <verbatim|sources.zip>, <verbatim|files>, with its <verbatim|md5>.
 
-    <item><strong|Order of operations.> (1) Create an unpublished version of the record (a new version inherits the files of the previous one, which are deleted). (2) Reserve its DOI. (3) Build the object version in a staging area, with that DOI, and have its owner sign it (section 7.1). (4) Upload the files, and compare their MD5 checksums with the fixity block. (5) Publish. (6) Add the object version with its signature files (section 7.5), and update the discovery document. If a step fails before publication, the unpublished version is discarded; if step 6 fails after it, the tool MUST complete step 6 from the staging area before any other deposit of the line. A tool SHOULD hold a lock per line during a deposit, since Zenodo allows one unpublished version per record. DOIs of Zenodo's sandbox are not registered, and MUST NOT be recorded in an archive.
+    <item><strong|Order of operations.> (1) Create an unpublished version of the record (a new version inherits the files of the previous one, which are deleted). (2) Reserve its DOI. (3) Build the object version in a staging area, with that DOI, and have its owner sign it (section 7.1). (4) Upload the files, and compare their MD5 checksums with the fixity block, and that of <verbatim|sources.zip> with its <verbatim|md5> in <verbatim|external>. (5) Publish. (6) Add the object version with its signature files (section 7.5), and update the discovery document. If a step fails before publication, the unpublished version is discarded; if step 6 fails after it, the tool MUST complete step 6 from the staging area before any other deposit of the line. A tool SHOULD hold a lock per line during a deposit, since Zenodo allows one unpublished version per record. DOIs of Zenodo's sandbox are not registered, and MUST NOT be recorded in an archive.
 
     <item><strong|Metadata.> Zenodo's DataCite record of a DOI has Zenodo's landing page as <verbatim|url>, Zenodo as <verbatim|publisher> (which <verbatim|datacite.json> MAY also name, section 4.4), relations of its own, and only the properties Zenodo keeps. <verbatim|datacite.json> stays authoritative; verifiers compare the DOI, <verbatim|titles>, <verbatim|creators>, <verbatim|publicationYear> and <verbatim|version> of the two, a difference being a warning.
 
@@ -1855,7 +1855,7 @@
 
   <subsection*|C.8 A fork of a key log (provisional, #58)><label|c8-a-fork-of-a-key-log-provisional-58>
 
-  Later, the new laptop is stolen. The thief signs with its key a version 3 of the key log listing only a key of its own; the owner, not yet aware, has signed with the same key another version 3, adding a domain to <verbatim|keeper>. Both are signed against version 2, so an archive holding one that meets the other replaces its version 3 by a fork record (section 6.3), which nullifies the stolen key. The owner object there:
+  Later, the new laptop is stolen. The thief signs with its key a version 3 of the key log listing only a key of its own; the owner, not yet aware, has signed with the same key another version 3, adding a domain to <verbatim|keeper>. Both are signed against version 2, so an archive holding one that meets the other replaces its version 3 by a fork record (section 6.3), which carries both sides and nullifies the stolen key, which signed them. Each side is here version 3 alone; had the owner gone on to a version 4, the fork record would carry it too, in a folder <verbatim|forked/\<less\>d\<gtr\>/> of its own. The owner object there:
 
   <\verbatim-code>
     ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
@@ -1895,7 +1895,7 @@
     \ \ \ \ \ \ signature-4hz7zgsiazl6hx7i.json
   </verbatim-code>
 
-  The fork record's <verbatim|genesis.json> and <verbatim|object.json> are those of <verbatim|v1>, to which its inventory refers, and it has no <verbatim|keys.json>. The owner heals with its spare key, which signed neither version: a healing version 3 carrying both, whose <verbatim|keys.json> lists the spare key and a new one, not the stolen key (section 6.3). The signatures made with the stolen key stay good, and readers weigh them as section 6.4 says.
+  The fork record's <verbatim|genesis.json> and <verbatim|object.json> are those of <verbatim|v1>, to which its inventory refers, and it has no <verbatim|keys.json>. The owner heals with its spare key, which signed neither version: a healing version 3 carrying both, whose <verbatim|keys.json> lists the spare key and a new one, not the stolen key (section 6.3). The signatures made with the stolen key stay good, and readers weigh them as section 6.4 says; the versions that need them, the paper's version 2 among them, are taken by other archives only from copies (section 7.5), until a later version signed with a new key vouches for them.
 
   <section*|Appendix D. Rationale (non-normative)><label|appendix-d-rationale-non-normative>
 
@@ -1942,7 +1942,7 @@
 
     <item><strong|Why exposed keys are nullified, never revoked.> Signatures carry no time, so nothing tells what a key signed before it leaked from what a thief signs after; revocation would need trusted time to decide which signatures count. So no signature is undone: the owner ends (Radicle's answer: a compromised key means a new identity) or nullifies the keys and heals, and readers weigh the past by other evidence (section 6.4).
 
-    <item><strong|Why fork records.> The format cannot tell the owner's side of a fork from a thief's, so it follows neither: a fork record carries both, as the checkable fact of two signed versions of one number, in a version of the key log that travels with every copy and nullifies their keys wherever it arrives. Healing, with spare keys that took no part, supersedes it. Versions are replaced only in key logs, which hold no work (provisional, #58).
+    <item><strong|Why fork records.> The format cannot tell the owner's side of a fork from a thief's, so it follows neither: a fork record carries both sides, from the fork point on, as the checkable fact of two signed versions of one number, in a version of the key log that travels with every copy and nullifies the keys that signed them wherever it arrives. Nothing is dropped, so every signature stays checkable; what needs a nullified key is taken only from copies, as for an ended owner, and is never signed again. Healing, with spare keys that took no part, supersedes it. Versions are replaced only in key logs, which hold no work (provisional, #58).
 
     <item><strong|Why key logs travel beside objects.> A key log checks itself from its owner name, so any copy will do; as an owner object it is copied once per storage root and grows without changing the lines it signs.
 

@@ -360,11 +360,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       supersedes the version held, the removal of every later version folder,
       the replacement of the root inventory and its checksum file by those of
       the new head, and the removal of the witness files of the versions
-      replaced or removed (those of a version the new one carries are in its
-      <tt class="verbatim">forked/&lt;d&gt;/</tt>). It is made only by a commit that
-      adds that fork record or healing version, valid and carrying the version
-      held or superseding it as section 6.3 says. These replacements are the
-      only changes of a sealed version folder besides repairs.
+      replaced (they are carried, with their witnesses, in <tt class="verbatim">forked/&lt;d&gt;/</tt>
+      of the new version; provisional, #58). It is made only by a commit that
+      adds that fork record or healing version, valid and carrying, or
+      superseding, the version held and the versions after it as section 6.3
+      says. These replacements are the only changes of a sealed version folder
+      besides repairs.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
@@ -373,25 +374,24 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     </p>
     <p>
       <strong>Only signed versions are added.</strong> Every object version
-      added by items 1, 2 and 9, other than a draft's, MUST be a version once
+      added by items 1, 2 and 9, other than a draft's, MUST be signed once
       added (sections 6.3, 7.3 and 7.5 of the specification). A version of a
       line is signed with good signatures of its owner, against the key log of
       the owner object kept at its path, which the same commit adds or extends
       if needed, or is vouched for by a version so signed that the same commit
       adds. A version of a key log is signed by keys of the version before, or
       is a valid fork record or healing version; none follows an ending
-      version, nor a fork record except a healing version. No version is added
-      that is signed only thanks to a signature made with a key nullified in
-      the commit's tree, or naming a version that a fork record or a healing
-      version carries (section 6.4). For an owner that the commit's tree shows
-      to be ended or tainted, versions of its lines are added only from a copy
-      found elsewhere, up to the latest signed version of a copy that agrees
-      with the published line, never as a new deposit (section 7.5). Since
-      OCFL cannot skip a version and nothing is removed from a line but by a
-      takedown, a version let in that is not signed would hold its number for
-      good, and the owner's own version of that number could never be added to
-      this archive. Versions already published stay, whatever happens later,
-      except versions of a key log replaced at a fork (item 9).
+      version or a fork record, which only a healing version replaces.
+      Versions of the lines of an owner that the commit's tree shows to be
+      ended or tainted, and versions that need a key nullified in the commit's
+      tree (section 6.4 of the specification), are added only from copies
+      found elsewhere, never as new deposits, as section 7.5 of the
+      specification says. Since OCFL cannot skip a version and nothing is
+      removed from a line but by a takedown, a version let in that is not
+      signed would hold its number for good, and the owner's own version of
+      that number could never be added to this archive. Versions already
+      published stay, whatever happens later, except versions of a key log
+      replaced at a fork (item 9).
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -736,18 +736,17 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       <li>
         <p>
           <strong>signed additions</strong>: every object version added, other
-          than a draft's, is a version once added, as section 5.1 says,
-          against key logs that are owner objects at their paths in the
-          commit's tree. An added version that is not signed (unsigned,
-          invalid, or unchecked: a key-log version not found), unless a signed
-          version added in the same commit extends it; a version of a key log
-          after an ending version or a fork record, other than a healing
-          version; a fork record or healing version that is not valid; a
-          version signed only thanks to a nullified key; a new deposit to a
-          line of an ended or tainted owner, when the commit's tree shows it;
-          and an added signature file of the owner that is invalid, are errors
-          (section 14.1 of the specification), so that a pull request adding
-          them cannot pass;
+          than a draft's, is signed once added, as section 5.1 says, against
+          key logs that are owner objects at their paths in the commit's tree.
+          An added version that is not signed (unsigned, invalid, or
+          unchecked: a key-log version not found), unless a signed version
+          added in the same commit extends it; a version of a key log after an
+          ending version or a fork record; a fork record or healing version
+          that is not valid; a new deposit of a version that needs a nullified
+          key, or to a line of an ended or tainted owner, when the commit's
+          tree shows it; and an added signature file of the owner that is
+          invalid, are errors (section 14.1 of the specification), so that a
+          pull request adding them cannot pass;
         </p>
       </li>
       <li>
@@ -755,10 +754,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           <strong>reported, never failing</strong>: as warnings, versions
           already published that are not signed (a breach of section 5.1 that
           cannot be undone), files that are not witnesses, and versions added
-          to the lines of ended or tainted owners (which come only from
-          copies, a rule the check cannot always see); as results, forks of
-          lines and of key logs, nullified keys, and ended, tainted and healed
-          owners (sections 6.3 and 7.4 of the specification);
+          to the lines of ended or tainted owners, or needing a nullified key
+          (which come only from copies, a rule the check cannot always see);
+          as results, forks of lines and of key logs, nullified keys, and
+          ended, tainted and healed owners (sections 6.3 and 7.4 of the
+          specification);
         </p>
       </li>
       <li>
@@ -956,7 +956,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           versions are added, none signed only thanks to a nullified key, and
           the lines of ended or tainted owners only from copies (sections 5.1
           and 10); every removal is a takedown (section 9); checks reported as
-          errors, warnings and results (section 10).
+          errors, warnings and results (section 10); after an audit of the
+          specification: a healing version replaces a fork record, never
+          follows it; added versions MUST be signed; fork records and healing
+          versions carry the versions after the fork point, and versions
+          needing a nullified key are added only from copies, like the lines
+          of ended or tainted owners (sections 5.1 and 10; provisional, #58).
         </p>
       </li>
     </ul>
