@@ -229,20 +229,87 @@ When an object is created or deposited, an archive that holds an object or a tom
 
 **Open question.** Whether aliases, new genesis records wrapping an old one, are needed if refusing reused genesis records proves too strict (#44).
 
+## 6. Owners
+
+An <dfn>owner</dfn> is a keyed identity: a person, a group or an institution that decides the versions of its lines and signs them (section 7), wherever they are stored. It is an object of kind `owner` (section 4), named by its genesis record (section 5): its <dfn>owner name</dfn> is the name of that record, the name that genesis records (`originator`), `object.json` (`owner`, and `owner` in `parent`) and `sheaf:` URIs (section 12) record. The owner object is the owner's own line, `(owner name, owner name)`, at `<owner>/<owner>/` in the owner-name layout (section 3.2). Its object versions are the owner's <dfn>key log</dfn>.
+
+### 6.1 The key log
+
+Every version of the key log holds, besides the files of section 4.1, the file `keys.json`, with:
+
+- `format`: `"opensheaf-keys/0.1"`;
+- `keys`: the public keys of the owner, at least one, each distinct, each an Ed25519 key written as a `did:key` URI (W3C CCG; multibase base58btc, multicodec `ed25519-pub`, code `0xed`, written as the varint bytes `0xed 0x01`);
+- `threshold`: the number of distinct keys of this version that must sign, a positive integer;
+- `extensions`, OPTIONAL: the data of extensions concerning the key log, keyed by their names (section 2), each an object; for instance the declaration of the [timestamps extension](opensheaf-timestamps-0.1.md);
+- `keeper`, OPTIONAL: `https` URLs of whoever answers for the owner (section 6.6);
+- `ended`, OPTIONAL: `true` in the last version of the key log of an owner that ends (section 6.3);
+- `successor`, OPTIONAL, only with `ended`: the owner name of the owner that continues its work (section 6.3).
+
+In the genesis record of an owner and in every `keys.json`, `threshold` MUST NOT exceed the number of `keys`.
+
+Key-log versions are the OCFL versions of the owner object (`v1`, `v2`, ...); an owner object has no document versions. The first version holds the genesis record and the first `keys.json`, whose `keys` (compared as a set) and `threshold` MUST be those of the genesis record; it MAY add `keeper` and `extensions`. Its authority comes from the genesis record: another first version under the same owner name would need other keys, and so another name. It is signed by `threshold` of its own keys. Every later version vN+1 MUST be signed by at least `threshold` distinct keys of vN, `threshold` being that of vN. Signature files, and when a signature is good, are defined in section 7.
+
+A key is added or retired, the threshold or the data of an extension changed, a keeper named, or the owner ended, by a new version of the key log; the owner name never changes. Changing the keys or the threshold affects only signatures naming the new version or a later one: signatures naming earlier versions stay good (section 7), and nothing is signed again.
+
+### 6.2 Creating an owner and choosing its keys
+
+An owner tool creates an owner by writing its genesis record, with `kind` `owner` and the first `keys` and `threshold` (section 5.1), and the first version of its key log, signed as above. An owner is its own originator, and its owner object has no parent, so its owner name is made by algorithm 0 (section 5.2). If the owner name is taken, in the archive where the tool writes or among the owners it knows elsewhere, the tool draws a new nonce (section 5.3).
+
+**Choosing a threshold.** One `threshold` governs the key log and every line of the owner. Owners choose between two risks: a threshold of 1 with a spare key kept apart (on a hardware token, for instance) survives the loss of a key but not its theft; a threshold of 2 with three keys kept apart, from the first version of the key log, survives the loss of one key and the theft of one. Owner tools SHOULD offer both, and SHOULD NOT create an owner with a single key, since an owner that loses every key of the latest version of its key log cannot recover.
+
+**Retiring a key.** An owner retires a key it no longer uses (a replaced laptop, a member who leaves the group) by leaving it out of `keys` in a new version of its key log. Signatures made with it stay good, and a retired key in someone else's hands still makes good signatures naming the versions that list it; so retiring is enough after an exposure only when the exposed keys cannot reach a threshold (section 6.3).
+
+### 6.3 Ending an owner, and forks
+
+**Ending.** An owner whose keys may have been exposed (stolen, leaked, copied) MUST end when those keys could together reach the `threshold` of some version of its key log that lists them; otherwise retiring them is enough (a threshold of 2 from the first version, and one key exposed). It signs, as usual, a last version of its key log with `ended` `true` and, OPTIONALLY, `successor`, the owner name of a new owner that continues its work, which MUST differ from its own owner name. The ending version only ends: a version after one with `ended` is not a version of the key log, and no signature of a line may name the ending version (section 7). Signatures made before it name earlier versions, and stay good. Owner tools MUST NOT sign anything for an ended owner. A successor is a hint, never followed automatically; its keeper MAY confirm it (section 6.6). An owner is <dfn>ended</dfn> when its key log has an ending version, or is forked (below).
+
+**Forks of a key log.** Two different versions of a key log with the same number, each signed by `threshold` keys of the version before, are a <dfn>fork of the key log</dfn>; that number, the number of the first differing versions, is the <dfn>fork point</dfn>. Whoever holds `threshold` keys of the version before can make one. The format cannot tell which side is the owner's: the versions each side holds stay versions of the key log, and signatures naming them stay good, but the owner is treated as ended at the fork point, and no archive that knows the fork adds a version of the key log after it; an archive whose copy stops before the fork point records every side as evidence (below) and adds none. Two successors named on two sides of a fork are reported, and settled outside the format.
+
+**Answering a thief.** Owner tools MUST show the owner a version of its key log that the owner did not make before signing anything. If someone else makes a version of its key log, ending or not, the owner signs a competing ending version of the same number, with its own `successor` if any; this makes a fork, so that readers see that the owner has ended, and every successor named.
+
+**Evidence of forks.** An archive holds one copy of each key log, since identifiers are unique in a storage root (section 4). When it learns of a fork, it keeps the side it holds, and records the first differing version of each other side in the owner object's extension folder, under `extensions/opensheaf-witnesses/fork/<n>/<d>/`, where `<n>` is that version (`v3`) and `<d>` the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of its inventory file. It records, byte for byte, the inventory file, its checksum file, its `keys.json` (checked against the inventory), and its signature files with the witnesses beside them, so that readers holding one side see the fork, and whether the other side ended and names a successor. A fork of a line is reported, not recorded (section 7).
+
+### 6.4 After an end or a fork
+
+The signatures of an ended owner stay good, since the format does not date signatures; but versions signed after a key was exposed cannot be told from a thief's, so readers trust the owner's history only as far as other evidence goes: copies held before, the pins of collections (section 8), timestamps (the [timestamps extension](opensheaf-timestamps-0.1.md)).
+
+An archive that knows an owner is ended adds that owner's key log up to and including the end (for a fork, up to the fork point on the side it keeps, with the evidence of the other sides), and takes that owner's lines only from copies found elsewhere, never as new deposits; section 7 gives the rule for adding their versions. The owner's work continues under its successor, by branches of its versions (section 9). Resolvers and verifiers report ended owners and their successors (sections 12 and 14).
+
+### 6.5 Key logs travel with the objects they sign
+
+A key log checks itself from its owner name: the genesis record of its first version lists the first keys, and each later version is signed by the keys of the one before. A copy from any source is therefore as good as the original, and a line can be checked without trusting any host, also after the archives that served it have gone.
+
+Every copy of an object, in any archive, MUST hold beside it, as owner objects in the same storage root at their paths (section 3.2), the key logs of the owner of its line and, for a branch, of the owner of each parent whose signatures its evidence holds, in `parent.signatures/` and at every level of `parent.chain/` (section 9). Each is copied up to the latest version that whoever makes the copy knows, and at least up to the versions its signatures name; for a forked key log, the side the archive keeps, with the evidence of the fork. The key logs of third parties whose witnesses a copy holds (section 7) MAY be copied too. Key logs are never copied into an object's content. An archive MUST keep an owner object as long as it keeps an object whose signatures need it, unless the owner object is itself taken down; a tombstone then stands in for it, and a takedown of a line leaves its owner objects in place (section 13). An owner object MAY also be copied on its own, to keep a fresher copy of its key log.
+
+Of two copies of a key log, either one extends the other, and readers use the longer, or they fork (section 6.3). No one can prove offline that a key log is complete: a copy that stops early may hide that the owner has ended.
+
+**Moving.** An owner moving to another archive copies its owner object there, with the lines it wants to keep there, and continues its lines in the new archive: the same owner and the same lines, not branches. The old copies stay valid where they are, as older copies of the same lines (section 7). In the owner-name layout this is one folder (section 3.2).
+
+### 6.6 Keepers
+
+An owner MAY name, in `keeper` of its key log, the person or institution who answers for it: an ORCID iD (`https://orcid.org/...`) or a domain written as `https://<domain>/`. The keeper MAY confirm it, in a place only the keeper controls: a link naming the owner in its ORCID record, or the file `https://<domain>/.well-known/opensheaf` on its domain, a JSON object with `format` `"opensheaf-keeper/0.1"`, `owners`, the owner names it answers for, and OPTIONALLY `successors`, an object mapping owner names it answers for to their successors (on ORCID, a link naming both). A successor the keeper names confirms the owner's own `successor`; for an owner that cannot sign any more (every key lost), the keeper MAY name one alone, which is reported as named by the keeper, and does not end the owner.
+
+When a keeper is named, a verifier MAY check both directions, and reports the link as confirmed, claimed only (the keeper does not confirm it) or absent. A confirmation is read as it is now: a keeper who withdraws it ends the link, and what the owner signed stays authentic. The link says who answers for an owner, not who owns its lines, which only its keys decide, nor who wrote its documents, which `creators` in `datacite.json` say (#41). The keeper's other roles, in takedowns and for privacy, are in sections 13 and 15.
+
+**Open questions.**
+
+- The field names of `keys.json` (#55).
+- Whether owners should survive the exposure of a key (revocation dated by trusted time, transparency logs), which the core leaves to ending the owner (#55; `drafts/keys-and-forks.md` on `main`).
+- The form of a keeper's confirmation on ORCID, which depends on an `https` form of `sheaf:<owner>`, and so on the gateway (section 12; #13, #35).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 5 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 6 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-6. Owners: key logs, retiring keys, ending, forks (with: creating an owner whose name is taken draws a new nonce; `threshold` at most the number of keys, for the genesis record and `keys.json`).
 7. Lines and signatures: signing, statuses, adding versions.
 8. Collections: catalogues, selections, members (with `HasPart` in `datacite.json`, moved from section 4).
 9. Branches and accepted copies.
 10. Drafts and sealing.
-11. Copies, mirrors and moving.
+11. Copies and mirrors (moving an owner is in section 6.5).
 12. Identifiers: `sheaf:` URIs, resolution, indexes.
 13. Withdrawal, takedown and tombstones.
 14. Verification.
 15. Security, privacy and rights.
 16. Versioning of this specification, and changelog.
 
-Appendices: A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas; C. examples; D. rationale; E. references.
+Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.

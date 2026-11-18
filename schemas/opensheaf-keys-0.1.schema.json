@@ -2,8 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json",
   "title": "OpenSheaf key log version (keys.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity; field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys, and that no version follows one with ended, are checked by verifiers.",
+  "$comment": "Section 6 of the specification (field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys, and that no version follows one with ended, are checked by verifiers.",
   "type": "object",
+  "additionalProperties": false,
   "required": [
     "format",
     "keys",
@@ -31,13 +32,13 @@
       "items": {
         "type": "string",
         "format": "uri",
-        "pattern": "^https://"
+        "pattern": "^https://(orcid\\.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]|[a-z0-9.-]+/)$"
       },
-      "$comment": "optional: who answers for the owner (an ORCID iD, a web address, a domain)"
+      "$comment": "optional (section 6.6): who answers for the owner, an ORCID iD or a domain"
     },
     "extensions": {
       "type": "object",
-      "$comment": "proposal (sections 4, 6.5): the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.1; each value is an object, validated by the schema of its extension",
+      "$comment": "sections 2 and 6.1: the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.1; each value is an object, validated by the schema of its extension",
       "propertyNames": {
         "format": "uri",
         "minLength": 1
@@ -48,12 +49,12 @@
     },
     "ended": {
       "const": true,
-      "$comment": "optional (section 6.5): the owner ends with this version, after a key may have been exposed; no later version is valid"
+      "$comment": "optional (section 6.3): the owner ends with this version; no later version is valid, and no line signature names it"
     },
     "successor": {
       "type": "string",
       "pattern": "^[a-z2-7]{52}$",
-      "$comment": "optional, only with ended: the owner name of the owner that continues the work"
+      "$comment": "optional, only with ended (section 6.3): the owner name of the owner that continues the work, other than this owner"
     }
   },
   "$defs": {
