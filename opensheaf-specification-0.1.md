@@ -853,10 +853,33 @@ What an archive serves is public, its drafts included (section 10.1); a sealed v
 - Tying owners to ORCID iDs and domains beyond the keeper (#41).
 - What a reader holding only one side of a fork of a key log can know, and whether nullifying keys from when an archive learns of it is enough against backdating (#55, #58).
 
+## 16. Versioning of this specification
+
+### 16.1 Versions
+
+This specification is versioned MAJOR.MINOR.PATCH:
+
+- a **major** version (1.0, 2.0) MAY make incompatible changes;
+- a **minor** version (1.1, 1.2) only adds: every file valid under 1.x stays valid under 1.y, for y greater than x, with the same meaning;
+- a **patch** version (1.1.1) corrects or clarifies the text, and changes no requirement.
+
+Before 1.0, every minor version MAY be incompatible. A draft MAY change in any way; archives made with a draft are rebuilt when its version is final. Drafts are told apart by the date in the heading and by the changelog (section 16.2).
+
+**In files.** Files record the version as MAJOR.MINOR only, since a patch changes nothing that is valid: in the name of every format (`"opensheaf-object/0.1"`), and in `specification` of the discovery document and of every `object.json` (sections 3.1 and 4.3).
+
+**Readers.** A reader that finds a major version it does not know, or before 1.0 a minor version it does not know, SHOULD report it, and MUST NOT treat the files as valid. From 1.0, a reader that finds a later minor version of a major version it knows reads the files as of that major version, ignores the properties it does not know, and SHOULD report the version; it does not validate such files against the schemas of its own version (section 2).
+
+**Publication.** The text of each version is published at `https://opensheaf.org/opensheaf-specification-<MAJOR.MINOR>.md`, with its schemas (appendix B), and is not changed once final, except by patch versions, listed in its changelog.
+
+### 16.2 Changelog
+
+- **0.1 (draft), 13 November 2026:** first version.
+- **0.1 (draft), 13 to 18 November 2026:** revisions, and the proposal of PR #30 (names from genesis records, owners and key logs, lines, branches, `sheaf:` URIs, signatures), each listed in the changelog of the [reference text](reference/opensheaf-specification-0.1-full.md).
+- **0.1 (draft), 18 November 2026, rebuilt (PR #30):** the text rebuilt concept by concept into a shorter whole, from the reference text. Decided in the rebuild: archives are named by no file, and `replicas` is dropped (section 3); external records are witnesses, not copies (section 12.3); index declarations name only `names`, `owners` and `sha512` (section 12.5); every removal is a takedown, and tombstones are required once an object is taken down (section 13); drafts are never withdrawn; key-log forks are recorded by fork records, which nullify the keys involved, and healed by the owner, versions of key logs being replaced only there (section 6.3, provisional, #58); findings are errors, warnings or results (section 14.1); security, privacy and rights rewritten (section 15); `licence` for documents only; logical paths exclude empty segments, a final `/` and `\` (section 4.1).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 15 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 16 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-16. Versioning of this specification, and changelog.
 
 Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
