@@ -37,7 +37,7 @@
 
   The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals. Sections marked non-normative, examples and notes are informative.
 
-  JSON means RFC 8259 JSON in UTF-8 without a byte order mark. URLs are absolute unless stated otherwise; a relative URL in a JSON file is resolved against the URL of that file. Digests are written in lowercase hexadecimal unless stated otherwise. Terms are defined where they are first introduced, written <dfn|thus>.
+  JSON means RFC 8259 JSON in UTF-8 without a byte order mark. URLs are absolute unless stated otherwise; a relative URL in a JSON file is resolved against the URL of that file. Digests are written in lowercase hexadecimal unless stated otherwise. DOIs are written bare (<verbatim|10.5281/zenodo.123>), without a resolver prefix. Terms are defined where they are first introduced, written <dfn|thus>.
 
   <strong|Conformance classes.> An archive, an object or a program conforms to a class when it meets every MUST and MUST NOT of the sections listed for it:
 
@@ -135,7 +135,7 @@
 
   <subsection*|4.2 Documents and document versions><label|42-documents-and-document-versions>
 
-  A document version holds, at the top level of its content unless a profile says otherwise, besides the files of section 4.1:
+  A document version holds, at the top level of its content, besides the files of section 4.1:
 
   <\itemize>
     <item>the <dfn|sources>: the main source and every file needed to produce the renditions that is not part of the toolchain (images, bibliography databases, local style files); they SHOULD be flat (no sub-folders) when possible;
@@ -198,7 +198,7 @@
   <\itemize>
     <item><verbatim|agreement>: a minimal record that the authors agreed to the deposit and the licence: <verbatim|by> (names only), <verbatim|date> and <verbatim|method> ("by e-mail"), all REQUIRED. It MUST NOT contain e-mail addresses, correspondence or signatures of persons;
 
-    <item><verbatim|external>: the external records of this version, each with <verbatim|role> (<verbatim|deposit> for a deposit by the archive, appendix A; <verbatim|source> for the record it was imported from), <verbatim|service> (its name) and <verbatim|record> (its URL), all REQUIRED, and OPTIONALLY <verbatim|doi>, <verbatim|label> (the service's label for the version, such as <verbatim|v3>) and <verbatim|files>, the files kept there but not in the content (a deposit's source archive) or received from there, as received, each with <verbatim|name> and <verbatim|sha512> (REQUIRED), <verbatim|md5> and <verbatim|bytes>;
+    <item><verbatim|external>: the external records of this version, each with <verbatim|role> (<verbatim|deposit> for a deposit of this version made under a profile, appendix A; <verbatim|source> for the record it was imported from), <verbatim|service> (its name) and <verbatim|record> (its URL), all REQUIRED, and OPTIONALLY <verbatim|doi>, <verbatim|label> (the service's label for the version, such as <verbatim|v3>) and <verbatim|files>, the files kept there but not in the content (a deposit's source archive) or received from there, as received, each with <verbatim|name> and <verbatim|sha512> (REQUIRED), <verbatim|md5> and <verbatim|bytes>;
 
     <item><verbatim|withdrawal>, REQUIRED when <verbatim|status> is <verbatim|withdrawn>: a <verbatim|date> and a <verbatim|reason>, a note (section 13);
 
@@ -453,7 +453,7 @@
 
   <strong|Others' witnesses.> A signature by someone other than the owner of the line, attesting a version, is a witness, not a signature of the line, and never a signature file: it is <verbatim|\<less\>version\<gtr\>/witness-\<less\>label\<gtr\>.json>, where <verbatim|\<less\>label\<gtr\>> is chosen by whoever adds it and matches <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>. It has the fields and the signed message of a signature file, with <verbatim|signer> and <verbatim|keyLog> naming the signer's own owner object, which MUST NOT be the line's owner; its key log MAY be copied beside the object (section 6.5).
 
-  <strong|Other witnesses.> The <hlink|timestamps extension|opensheaf-timestamps-0.1.tm> keeps timestamps of signature files beside them, dates that readers may weigh; it changes no status.  the parent signatures a branch carries are in its content (section 9).
+  <strong|Other witnesses.> The <hlink|timestamps extension|opensheaf-timestamps-0.1.tm> keeps timestamps of signature files beside them, dates that readers may weigh; it changes no status. The parent signatures a branch carries are in its content (section 9).
 
   <strong|Files that are not witnesses.> A file of the witness folder that is not a witness (a stray file, a malformed or invalid signature file) is ignored, reported, never fatal, and kept; a file a reader does not recognise, stray or of an extension it does not know, is reported as an unknown file, not as an error: a host cannot break a version by adding a file. A copy MAY leave such files out (section 11).
 
@@ -871,7 +871,7 @@
     <item><verbatim|sha512/>, by inventory digest: for each sealed object version, <verbatim|inventorySha512>, <verbatim|id>, <verbatim|version> and <verbatim|status>.
   </itemize>
 
-  <strong|Content.> An archive's indexes list every object with a genesis record and every sealed version of it, never drafts. <verbatim|status> is the object's, <verbatim|active> or <verbatim|withdrawn>, or <verbatim|removed> after a takedown (section 13): a tombstoned object keeps its entries in <verbatim|names/> and <verbatim|sha512/>, of which those in <verbatim|names/> MAY drop <verbatim|originator> and <verbatim|genesis>, while a takedown removes the name from <verbatim|owners/>, and the entry once it lists none. In indexes kept for several archives, every entry has <verbatim|at>, the base URL of the archive serving the copy, and <verbatim|owners/> has an entry for each owner and archive.
+  <strong|Content.> An archive's indexes list every object with a genesis record and every sealed version of it, never drafts. <verbatim|status> is the object's, <verbatim|active> or <verbatim|withdrawn>, or <verbatim|removed> after a takedown (section 13): a tombstoned object keeps its entries in <verbatim|names/> and <verbatim|sha512/>, of which those in <verbatim|names/> MAY drop <verbatim|originator> and <verbatim|genesis>, while a takedown removes the name from <verbatim|owners/>, and the entry once it lists none. In indexes kept for several archives, every entry has <verbatim|at>, a list of base URLs of the archive serving the copy, equal hints (section 3), and <verbatim|owners/> has an entry for each owner and archive.
 
   <strong|Lookups.> A resolver looks a line up in <verbatim|names/>, starting from <verbatim|at>, keeping the entries whose <verbatim|owner> matches the owner part, or without one, whose <verbatim|owner> is their <verbatim|originator>; a removed entry without <verbatim|originator> is matched against the originator of any copy of the genesis record, or reported as a removed line of that name, originator unknown. It looks a pin up in <verbatim|sha512/> and an owner's lines in <verbatim|owners/>. At an archive without indexes, it MAY read <verbatim|objects> of the discovery document and fetch <verbatim|genesis.json> and <verbatim|object.json> from the objects.
 
@@ -1143,11 +1143,107 @@
     <item><strong|0.1 (draft), 18 November 2026, rebuilt (PR #30):> the text rebuilt concept by concept into a shorter whole, from the reference text. Decided in the rebuild: archives are named by no file, and <verbatim|replicas> is dropped (section 3); external records are witnesses, not copies (section 12.3); index declarations name only <verbatim|names>, <verbatim|owners> and <verbatim|sha512> (section 12.5); every removal is a takedown, and tombstones are required once an object is taken down (section 13); drafts are never withdrawn; key-log forks are recorded by fork records, which nullify the keys involved, and healed by the owner, versions of key logs being replaced only there (section 6.3, provisional, #58); findings are errors, warnings or results (section 14.1); security, privacy and rights rewritten (section 15); <verbatim|licence> for documents only; logical paths exclude empty segments, a final <verbatim|/> and <verbatim|\\> (section 4.1).
   </itemize>
 
+  <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>
+
+  A <dfn|profile> is a set of rules for an external service or a tool, normative for an archive that lists it in <verbatim|profiles> (sections 2 and 3.1), and checked by verifiers (section 14.6). A profile only adds rules. They apply to the versions that owners make in the archive, never to copies of lines made elsewhere (section 11); only sealed, signed versions are deposited (sections 7.3 and 10.1).
+
+  <subsection*|A.1 Zenodo (<verbatim|zenodo>)><label|a1-zenodo-zenodo>
+
+  Zenodo registers DataCite DOIs (prefix <verbatim|10.5281>) and keeps files permanently. A record is a witness of the versions it holds, not a copy (section 12.3).
+
+  <\itemize>
+    <item><strong|Records.> Each line of a document is one record, whose concept DOI stands for the line. Each document version is one version of the record, with its own DOI, the document version as Zenodo's version, and the Zenodo type <verbatim|publication-preprint> or the one matching <verbatim|resourceTypeGeneral>. A branch is a record of its own, and deposits a version holding the files of its branch point only when the parent version has no DOI (section 9.7).
+
+    <item><strong|Fixed files.> A description-only version (section 4.2) edits the metadata of the record version of the document version it holds; the files it adds, and the sources added by a completion (section 4.2), are not uploaded, since the files of a published record version are fixed. Archives MUST NOT use Zenodo's 30-day window for changing them: a correction is a new document version.
+
+    <item><strong|Versions out of order.> Zenodo orders the versions of a record by publication, and its concept DOI leads to the latest. A document version deposited out of order (section 4.2) MAY be deposited only as a record of its own, with <verbatim|IsVersionOf> the concept DOI.
+
+    <item><strong|Files.> The record version holds the content files of the object version. Records have no folders and a limited number of files: sources with sub-folders, or too many, are uploaded as one file <verbatim|sources.zip>, at their logical paths, its entries in the byte order of their names, dated 1980-01-01 00:00:00, without extra fields. The inventories of the line MUST record in <verbatim|fixity> the MD5 digest of every content file (section 4.1), to be compared with the checksums Zenodo reports.
+
+    <item><strong|The deposit recorded.> The object version deposited has its DOI in <verbatim|datacite.json> and, in <verbatim|external> of <verbatim|object.json> (section 4.3), an entry with <verbatim|role> <verbatim|deposit>, <verbatim|service> <verbatim|Zenodo>, <verbatim|record> the URL of the record version, <verbatim|doi> and, for <verbatim|sources.zip>, <verbatim|files>.
+
+    <item><strong|Order of operations.> (1) Create an unpublished version of the record (a new version inherits the files of the previous one, which are deleted). (2) Reserve its DOI. (3) Build the object version in a staging area, with that DOI, and have its owner sign it (section 7.1). (4) Upload the files, and compare their MD5 checksums with the fixity block. (5) Publish. (6) Add the object version with its signature files (section 7.5), and update the discovery document. If a step fails before publication, the unpublished version is discarded; if step 6 fails after it, the tool MUST complete step 6 from the staging area before any other deposit of the line. A tool SHOULD hold a lock per line during a deposit, since Zenodo allows one unpublished version per record. DOIs of Zenodo's sandbox are not registered, and MUST NOT be recorded in an archive.
+
+    <item><strong|Metadata.> Zenodo's DataCite record of a DOI has Zenodo's landing page as <verbatim|url>, Zenodo as <verbatim|publisher> (which <verbatim|datacite.json> MAY also name, section 4.4), relations of its own, and only the properties Zenodo keeps. <verbatim|datacite.json> stays authoritative; verifiers compare the DOI, <verbatim|titles>, <verbatim|creators>, <verbatim|publicationYear> and <verbatim|version> of the two, a difference being a warning.
+
+    <item><strong|Collections.> A collection MAY be deposited when its curator releases it, not at every change, as a record of type <verbatim|other> whose files include <verbatim|members.json>. A Zenodo community MAY group an archive's records for browsing; it is not authoritative.
+  </itemize>
+
+  <subsection*|A.2 TeXmacs (<verbatim|texmacs>)><label|a2-texmacs-texmacs>
+
+  For a document whose main source is a TeXmacs document:
+
+  <\itemize>
+    <item><verbatim|sourceFormat> is <verbatim|application/x-texmacs> (not a registered media type; the type TeXmacs uses);
+
+    <item><verbatim|toolchain> has an entry for TeXmacs with its version, whose <verbatim|packages> list the style packages and plugins used that are not part of the TeXmacs distribution;
+
+    <item>renditions are produced without regenerating bibliographies or tables of contents, so that the sources, with the references stored in them, reproduce the renditions; the sources SHOULD nevertheless include the bibliography databases used;
+
+    <item>HTML presentation files are exported from a copy of the sources, with presentation packages added to its style, and the deposited sources are never changed.
+  </itemize>
+
+  An archive kept inside a website built with the TeXmacs website converter SHOULD place an empty file <verbatim|.texmacs-noconvert> at its top (honoured by the <verbatim|max-html> plugin), so that the converter never rewrites its files.
+
+  <subsection*|A.3 Website (<verbatim|website>)><label|a3-website-website>
+
+  Presentation files (section 3) are generated from the storage root, never edited by hand, and regenerated after every change, a takedown included (section 13.2). Under this profile:
+
+  <\itemize>
+    <item><strong|Index.> An index page presents the latest signed version (section 7.3) of the main catalogue (section 8.1), in its order, possibly over several pages; other collections MAY have pages of their own. A flattened list, not authoritative, for programs that do not read OCFL MAY be published as <verbatim|catalog.json>.
+
+    <item><strong|Landing pages.> Each line of the main catalogue has one landing page, for its current version (section 4.2), giving the full <verbatim|sheaf:> URI of the line (section 12.2) and every signed document version in the order of the history, each with its external labels, stage, change note, notices, renditions, sources and DOI, and the withdrawal if any (sections 4.2, 4.3 and 13.1).
+
+    <item><strong|Search engines.> Landing pages MUST carry the meta tags read by Google Scholar: <verbatim|citation_title>, <verbatim|citation_author> (one per creator), <verbatim|citation_publication_date> (the <verbatim|Issued> date, or else the <verbatim|Available> date of the current version) and <verbatim|citation_pdf_url>, a PDF on the landing page's host (served with <verbatim|Content-Security-Policy: sandbox>, section 15.3). They SHOULD carry schema.org <verbatim|ScholarlyArticle> JSON-LD and FAIR Signposting links (<verbatim|cite-as>, <verbatim|describedby>, <verbatim|item>, <verbatim|license>), and offer BibTeX and CSL-JSON entries made from <verbatim|datacite.json>.
+
+    <item><strong|Feed and harvesters.> The feed (<verbatim|feed>, section 3.1) lists the signed object versions the archive holds, by the <verbatim|created> date of their inventories. The website SHOULD publish a <verbatim|sitemap.xml>, and MAY publish an OAI-PMH static repository or a ResourceSync description.
+  </itemize>
+
+  <section*|Appendix B. JSON Schemas (normative)><label|appendix-b-json-schemas-normative>
+
+  The schemas are written in JSON Schema 2020-12, published at <verbatim|https://opensheaf.org/schemas/\<less\>file\<gtr\>>, their <verbatim|$id>, and dedicated to the public domain under CC0 1.0 (section 15.6). They validate:
+
+  <\itemize>
+    <item><verbatim|opensheaf-archive-0.1.schema.json>: <verbatim|opensheaf.json> (section 3.1);
+
+    <item><verbatim|opensheaf-object-0.1.schema.json>: <verbatim|object.json>, also as <verbatim|parent.object.json> and in <verbatim|parent.chain/> (sections 4.3 and 9.2);
+
+    <item><verbatim|opensheaf-collection-0.1.schema.json>: <verbatim|members.json> (section 8.2);
+
+    <item><verbatim|opensheaf-genesis-0.1.schema.json>: <verbatim|genesis.json> (section 5.1);
+
+    <item><verbatim|opensheaf-keys-0.1.schema.json>: <verbatim|keys.json>, also as carried by fork records and healing versions (section 6);
+
+    <item><verbatim|opensheaf-signature-0.1.schema.json>: signature files, wherever kept or carried, and others' <verbatim|witness-\<less\>label\<gtr\>.json> (sections 7.2 and 9.2);
+
+    <item><verbatim|opensheaf-keeper-0.1.schema.json>: <verbatim|/.well-known/opensheaf> (section 6.6);
+
+    <item><verbatim|opensheaf-index-0.1.schema.json>: index files and <verbatim|indexes.json> (section 12.5).
+  </itemize>
+
+  <strong|Validation.> A file is valid when it validates against its schema with <verbatim|format> asserted (section 14.2). The schemas of <verbatim|genesis.json>, <verbatim|keys.json> and the keeper's file allow no other properties; the others do, and such properties carry no meaning here (the data of extensions goes under <verbatim|extensions>, section 2). Where a schema and the text disagree, the text prevails.
+
+  <strong|Other files.> <verbatim|datacite.json> is validated by converting it to XML, following DataCite's mapping between the JSON of its REST API and XML, against the DataCite 4.7 XML Schema, with the requirements of section 4.4. Inventories, their checksum files and <verbatim|ocfl_layout.json> are OCFL's (section 14.2). The schema of the <hlink|timestamps extension|opensheaf-timestamps-0.1.tm> is published with it.
+
+  <strong|Beyond the schemas.> A schema checks one file alone; whatever relates it to another file, its place, a digest or a key (names and identifiers, <verbatim|documentVersion> and <verbatim|datacite.json>, thresholds, signatures, fork records, uniqueness across entries, index prefixes) is checked by verifiers (section 14).
+
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>Registering DOIs with an archive's own DataCite prefix (a <verbatim|datacite> profile), and documents that already have a DOI elsewhere (#8).
+
+    <item>Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
+
+    <item>Whether a takedown reaches the records of external services (#33).
+
+    <item>The field names of <verbatim|keys.json>, signature files and the evidence of branches, which the schemas follow (#55); the files of fork records and healing versions, provisional (#58).
+  </itemize>
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
   Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 16 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
+  Appendices (the worked key log of appendix C creates its owner with two keys from v1): C. examples; D. rationale; E. references.
 
 </body>
 

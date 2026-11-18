@@ -126,8 +126,9 @@
       JSON means RFC 8259 JSON in UTF-8 without a byte order mark. URLs are
       absolute unless stated otherwise; a relative URL in a JSON file is
       resolved against the URL of that file. Digests are written in lowercase
-      hexadecimal unless stated otherwise. Terms are defined where they are
-      first introduced, written <dfn>thus</dfn>.
+      hexadecimal unless stated otherwise. DOIs are written bare (<tt class="verbatim">10.5281/zenodo.123</tt>),
+      without a resolver prefix. Terms are defined where they are first
+      introduced, written <dfn>thus</dfn>.
     </p>
     <p>
       <strong>Conformance classes.</strong> An archive, an object or a program
@@ -477,8 +478,8 @@
     </p>
     <h3 id="auto-9"><a id="42-documents-and-document-versions"></a>4.2 Documents and document versions<span style="margin-left: 1em"></span></h3>
     <p>
-      A document version holds, at the top level of its content unless a
-      profile says otherwise, besides the files of section 4.1:
+      A document version holds, at the top level of its content, besides the
+      files of section 4.1:
     </p>
     <ul>
       <li>
@@ -690,14 +691,14 @@
       <li>
         <p>
           <tt class="verbatim">external</tt>: the external records of this version, each
-          with <tt class="verbatim">role</tt> (<tt class="verbatim">deposit</tt> for a deposit by
-          the archive, appendix A; <tt class="verbatim">source</tt> for the record it
-          was imported from), <tt class="verbatim">service</tt> (its name) and <tt
-          class="verbatim">record</tt> (its URL), all REQUIRED, and OPTIONALLY <tt
-          class="verbatim">doi</tt>, <tt class="verbatim">label</tt> (the service's label for the
-          version, such as <tt class="verbatim">v3</tt>) and <tt class="verbatim">files</tt>, the
-          files kept there but not in the content (a deposit's source archive)
-          or received from there, as received, each with <tt class="verbatim">name</tt>
+          with <tt class="verbatim">role</tt> (<tt class="verbatim">deposit</tt> for a deposit of
+          this version made under a profile, appendix A; <tt class="verbatim">source</tt>
+          for the record it was imported from), <tt class="verbatim">service</tt> (its
+          name) and <tt class="verbatim">record</tt> (its URL), all REQUIRED, and
+          OPTIONALLY <tt class="verbatim">doi</tt>, <tt class="verbatim">label</tt> (the service's
+          label for the version, such as <tt class="verbatim">v3</tt>) and <tt class="verbatim">files</tt>,
+          the files kept there but not in the content (a deposit's source
+          archive) or received from there, as received, each with <tt class="verbatim">name</tt>
           and <tt class="verbatim">sha512</tt> (REQUIRED), <tt class="verbatim">md5</tt> and <tt
           class="verbatim">bytes</tt>;
         </p>
@@ -1509,7 +1510,7 @@ keylog &lt;the value of keyLog&gt;</pre>
     <p>
       <strong>Other witnesses.</strong> The <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>
       keeps timestamps of signature files beside them, dates that readers may
-      weigh; it changes no status. the parent signatures a branch carries are
+      weigh; it changes no status. The parent signatures a branch carries are
       in its content (section 9).
     </p>
     <p>
@@ -2750,9 +2751,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       of which those in <tt class="verbatim">names/</tt> MAY drop <tt class="verbatim">originator</tt>
       and <tt class="verbatim">genesis</tt>, while a takedown removes the name from <tt
       class="verbatim">owners/</tt>, and the entry once it lists none. In indexes kept
-      for several archives, every entry has <tt class="verbatim">at</tt>, the base URL
-      of the archive serving the copy, and <tt class="verbatim">owners/</tt> has an
-      entry for each owner and archive.
+      for several archives, every entry has <tt class="verbatim">at</tt>, a list of base
+      URLs of the archive serving the copy, equal hints (section 3), and <tt
+      class="verbatim">owners/</tt> has an entry for each owner and archive.
     </p>
     <p>
       <strong>Lookups.</strong> A resolver looks a line up in <tt class="verbatim">names/</tt>,
@@ -3545,7 +3546,320 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         </p>
       </li>
     </ul>
-    <h2 id="auto-80"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
+    them)<span style="margin-left: 1em"></span></h2>
+    <p>
+      A <dfn>profile</dfn> is a set of rules for an external service or a
+      tool, normative for an archive that lists it in <tt class="verbatim">profiles</tt>
+      (sections 2 and 3.1), and checked by verifiers (section 14.6). A profile
+      only adds rules. They apply to the versions that owners make in the
+      archive, never to copies of lines made elsewhere (section 11); only
+      sealed, signed versions are deposited (sections 7.3 and 10.1).
+    </p>
+    <h3 id="auto-81"><a id="a1-zenodo-zenodo"></a>A.1 Zenodo (<tt class="verbatim">zenodo</tt>)<span style="margin-left: 1em"></span></h3>
+    <p>
+      Zenodo registers DataCite DOIs (prefix <tt class="verbatim">10.5281</tt>) and
+      keeps files permanently. A record is a witness of the versions it holds,
+      not a copy (section 12.3).
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>Records.</strong> Each line of a document is one record,
+          whose concept DOI stands for the line. Each document version is one
+          version of the record, with its own DOI, the document version as
+          Zenodo's version, and the Zenodo type <tt class="verbatim">publication-preprint</tt>
+          or the one matching <tt class="verbatim">resourceTypeGeneral</tt>. A branch is
+          a record of its own, and deposits a version holding the files of its
+          branch point only when the parent version has no DOI (section 9.7).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Fixed files.</strong> A description-only version (section
+          4.2) edits the metadata of the record version of the document
+          version it holds; the files it adds, and the sources added by a
+          completion (section 4.2), are not uploaded, since the files of a
+          published record version are fixed. Archives MUST NOT use Zenodo's
+          30-day window for changing them: a correction is a new document
+          version.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Versions out of order.</strong> Zenodo orders the versions
+          of a record by publication, and its concept DOI leads to the latest.
+          A document version deposited out of order (section 4.2) MAY be
+          deposited only as a record of its own, with <tt class="verbatim">IsVersionOf</tt>
+          the concept DOI.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Files.</strong> The record version holds the content files
+          of the object version. Records have no folders and a limited number
+          of files: sources with sub-folders, or too many, are uploaded as one
+          file <tt class="verbatim">sources.zip</tt>, at their logical paths, its
+          entries in the byte order of their names, dated 1980-01-01 00:00:00,
+          without extra fields. The inventories of the line MUST record in <tt
+          class="verbatim">fixity</tt> the MD5 digest of every content file (section
+          4.1), to be compared with the checksums Zenodo reports.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>The deposit recorded.</strong> The object version deposited
+          has its DOI in <tt class="verbatim">datacite.json</tt> and, in <tt class="verbatim">external</tt>
+          of <tt class="verbatim">object.json</tt> (section 4.3), an entry with <tt
+          class="verbatim">role</tt> <tt class="verbatim">deposit</tt>, <tt class="verbatim">service</tt>
+          <tt class="verbatim">Zenodo</tt>, <tt class="verbatim">record</tt> the URL of the record
+          version, <tt class="verbatim">doi</tt> and, for <tt class="verbatim">sources.zip</tt>,
+          <tt class="verbatim">files</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Order of operations.</strong> (1) Create an unpublished
+          version of the record (a new version inherits the files of the
+          previous one, which are deleted). (2) Reserve its DOI. (3) Build the
+          object version in a staging area, with that DOI, and have its owner
+          sign it (section 7.1). (4) Upload the files, and compare their MD5
+          checksums with the fixity block. (5) Publish. (6) Add the object
+          version with its signature files (section 7.5), and update the
+          discovery document. If a step fails before publication, the
+          unpublished version is discarded; if step 6 fails after it, the tool
+          MUST complete step 6 from the staging area before any other deposit
+          of the line. A tool SHOULD hold a lock per line during a deposit,
+          since Zenodo allows one unpublished version per record. DOIs of
+          Zenodo's sandbox are not registered, and MUST NOT be recorded in an
+          archive.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Metadata.</strong> Zenodo's DataCite record of a DOI has
+          Zenodo's landing page as <tt class="verbatim">url</tt>, Zenodo as <tt class="verbatim">publisher</tt>
+          (which <tt class="verbatim">datacite.json</tt> MAY also name, section 4.4),
+          relations of its own, and only the properties Zenodo keeps. <tt
+          class="verbatim">datacite.json</tt> stays authoritative; verifiers compare the
+          DOI, <tt class="verbatim">titles</tt>, <tt class="verbatim">creators</tt>, <tt class="verbatim">publicationYear</tt>
+          and <tt class="verbatim">version</tt> of the two, a difference being a
+          warning.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Collections.</strong> A collection MAY be deposited when its
+          curator releases it, not at every change, as a record of type <tt
+          class="verbatim">other</tt> whose files include <tt class="verbatim">members.json</tt>.
+          A Zenodo community MAY group an archive's records for browsing; it
+          is not authoritative.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-82"><a id="a2-texmacs-texmacs"></a>A.2 TeXmacs (<tt class="verbatim">texmacs</tt>)<span style="margin-left: 1em"></span></h3>
+    <p>
+      For a document whose main source is a TeXmacs document:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">sourceFormat</tt> is <tt class="verbatim">application/x-texmacs</tt>
+          (not a registered media type; the type TeXmacs uses);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">toolchain</tt> has an entry for TeXmacs with its version,
+          whose <tt class="verbatim">packages</tt> list the style packages and plugins
+          used that are not part of the TeXmacs distribution;
+        </p>
+      </li>
+      <li>
+        <p>
+          renditions are produced without regenerating bibliographies or
+          tables of contents, so that the sources, with the references stored
+          in them, reproduce the renditions; the sources SHOULD nevertheless
+          include the bibliography databases used;
+        </p>
+      </li>
+      <li>
+        <p>
+          HTML presentation files are exported from a copy of the sources,
+          with presentation packages added to its style, and the deposited
+          sources are never changed.
+        </p>
+      </li>
+    </ul>
+    <p>
+      An archive kept inside a website built with the TeXmacs website
+      converter SHOULD place an empty file <tt class="verbatim">.texmacs-noconvert</tt>
+      at its top (honoured by the <tt class="verbatim">max-html</tt> plugin), so that
+      the converter never rewrites its files.
+    </p>
+    <h3 id="auto-83"><a id="a3-website-website"></a>A.3 Website (<tt class="verbatim">website</tt>)<span style="margin-left: 1em"></span></h3>
+    <p>
+      Presentation files (section 3) are generated from the storage root,
+      never edited by hand, and regenerated after every change, a takedown
+      included (section 13.2). Under this profile:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>Index.</strong> An index page presents the latest signed
+          version (section 7.3) of the main catalogue (section 8.1), in its
+          order, possibly over several pages; other collections MAY have pages
+          of their own. A flattened list, not authoritative, for programs that
+          do not read OCFL MAY be published as <tt class="verbatim">catalog.json</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Landing pages.</strong> Each line of the main catalogue has
+          one landing page, for its current version (section 4.2), giving the
+          full <tt class="verbatim">sheaf:</tt> URI of the line (section 12.2) and every
+          signed document version in the order of the history, each with its
+          external labels, stage, change note, notices, renditions, sources
+          and DOI, and the withdrawal if any (sections 4.2, 4.3 and 13.1).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Search engines.</strong> Landing pages MUST carry the meta
+          tags read by Google Scholar: <tt class="verbatim">citation_title</tt>, <tt
+          class="verbatim">citation_author</tt> (one per creator), <tt class="verbatim">citation_publication_date</tt>
+          (the <tt class="verbatim">Issued</tt> date, or else the <tt class="verbatim">Available</tt>
+          date of the current version) and <tt class="verbatim">citation_pdf_url</tt>, a
+          PDF on the landing page's host (served with <tt class="verbatim">Content-Security-Policy:
+          sandbox</tt>, section 15.3). They SHOULD carry schema.org <tt class="verbatim">ScholarlyArticle</tt>
+          JSON-LD and FAIR Signposting links (<tt class="verbatim">cite-as</tt>, <tt
+          class="verbatim">describedby</tt>, <tt class="verbatim">item</tt>, <tt class="verbatim">license</tt>),
+          and offer BibTeX and CSL-JSON entries made from <tt class="verbatim">datacite.json</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Feed and harvesters.</strong> The feed (<tt class="verbatim">feed</tt>,
+          section 3.1) lists the signed object versions the archive holds, by
+          the <tt class="verbatim">created</tt> date of their inventories. The website
+          SHOULD publish a <tt class="verbatim">sitemap.xml</tt>, and MAY publish an
+          OAI-PMH static repository or a ResourceSync description.
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-84"><a id="appendix-b-json-schemas-normative"></a>Appendix B. JSON Schemas (normative)<span style="margin-left: 1em"></span></h2>
+    <p>
+      The schemas are written in JSON Schema 2020-12, published at <tt class="verbatim">https://opensheaf.org/schemas/&lt;file&gt;</tt>,
+      their <tt class="verbatim">$id</tt>, and dedicated to the public domain under CC0
+      1.0 (section 15.6). They validate:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-archive-0.1.schema.json</tt>: <tt class="verbatim">opensheaf.json</tt>
+          (section 3.1);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-object-0.1.schema.json</tt>: <tt class="verbatim">object.json</tt>,
+          also as <tt class="verbatim">parent.object.json</tt> and in <tt class="verbatim">parent.chain/</tt>
+          (sections 4.3 and 9.2);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-collection-0.1.schema.json</tt>: <tt class="verbatim">members.json</tt>
+          (section 8.2);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-genesis-0.1.schema.json</tt>: <tt class="verbatim">genesis.json</tt>
+          (section 5.1);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-keys-0.1.schema.json</tt>: <tt class="verbatim">keys.json</tt>,
+          also as carried by fork records and healing versions (section 6);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-signature-0.1.schema.json</tt>: signature
+          files, wherever kept or carried, and others' <tt class="verbatim">witness-&lt;label&gt;.json</tt>
+          (sections 7.2 and 9.2);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-keeper-0.1.schema.json</tt>: <tt class="verbatim">/.well-known/opensheaf</tt>
+          (section 6.6);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-index-0.1.schema.json</tt>: index files and <tt
+          class="verbatim">indexes.json</tt> (section 12.5).
+        </p>
+      </li>
+    </ul>
+    <p>
+      <strong>Validation.</strong> A file is valid when it validates against
+      its schema with <tt class="verbatim">format</tt> asserted (section 14.2). The
+      schemas of <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">keys.json</tt> and
+      the keeper's file allow no other properties; the others do, and such
+      properties carry no meaning here (the data of extensions goes under <tt
+      class="verbatim">extensions</tt>, section 2). Where a schema and the text
+      disagree, the text prevails.
+    </p>
+    <p>
+      <strong>Other files.</strong> <tt class="verbatim">datacite.json</tt> is validated
+      by converting it to XML, following DataCite's mapping between the JSON
+      of its REST API and XML, against the DataCite 4.7 XML Schema, with the
+      requirements of section 4.4. Inventories, their checksum files and <tt
+      class="verbatim">ocfl_layout.json</tt> are OCFL's (section 14.2). The schema of
+      the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> is published with it.
+    </p>
+    <p>
+      <strong>Beyond the schemas.</strong> A schema checks one file alone;
+      whatever relates it to another file, its place, a digest or a key (names
+      and identifiers, <tt class="verbatim">documentVersion</tt> and <tt class="verbatim">datacite.json</tt>,
+      thresholds, signatures, fork records, uniqueness across entries, index
+      prefixes) is checked by verifiers (section 14).
+    </p>
+    <p>
+      <strong>Open questions.</strong>
+    </p>
+    <ul>
+      <li>
+        <p>
+          Registering DOIs with an archive's own DataCite prefix (a <tt class="verbatim">datacite</tt>
+          profile), and documents that already have a DOI elsewhere (#8).
+        </p>
+      </li>
+      <li>
+        <p>
+          Whether a Zenodo record version also uploads the version's inventory
+          file, its checksum file and its signature files, so that it can be
+          checked against a pin (#22; section 12.6).
+        </p>
+      </li>
+      <li>
+        <p>
+          Whether a takedown reaches the records of external services (#33).
+        </p>
+      </li>
+      <li>
+        <p>
+          The field names of <tt class="verbatim">keys.json</tt>, signature files and
+          the evidence of branches, which the schemas follow (#55); the files
+          of fork records and healing versions, provisional (#58).
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-85"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
     <p>
       Each part is rebuilt in turn, from the reference text and an audit of
       the concept, and agreed before the next. Sections 1 to 16 are rebuilt;
@@ -3554,8 +3868,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     </p>
     <p>
       Appendices (the worked key log of appendix C creates its owner with two
-      keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas
-      (with the new keeper schema); C. examples; D. rationale; E. references.
+      keys from v1): C. examples; D. rationale; E. references.
     </p>
   </body>
 </html>

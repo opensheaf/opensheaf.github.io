@@ -49,5 +49,6 @@
       "pattern": "^[a-z2-7]{52}$",
       "$comment": "the owner name of the signer"
     }
-  }
+  },
+  "additionalProperties": false
 }

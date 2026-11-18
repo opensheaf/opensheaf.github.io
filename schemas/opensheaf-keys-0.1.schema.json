@@ -49,7 +49,7 @@
     },
     "ended": {
       "const": true,
-      "$comment": "optional (section 6.3): the owner ends with this version; no later version is valid, and no line signature names it"
+      "$comment": "optional (section 6.3): the owner ends with this version; no later version is a version of the key log, and no line signature names it"
     },
     "successor": {
       "type": "string",

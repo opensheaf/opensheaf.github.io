@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-collection-0.1.schema.json",
   "title": "OpenSheaf member list (members.json), format opensheaf-collection/0.1",
-  "$comment": "Part of OpenSheaf 0.1 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
+  "$comment": "Section 8.2 of the specification. Part of OpenSheaf 0.1 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
   "type": "object",
   "required": [
     "format",
@@ -46,10 +46,12 @@
             "pattern": "^[0-9a-f]{128}$"
           },
           "doi": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$"
           },
           "conceptDoi": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$"
           },
           "follow": {
             "const": "latest"
@@ -99,6 +101,7 @@
                 },
                 "doi": {
                   "type": "string",
+                  "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$",
                   "$comment": "optional (section 8.4): the version DOI of the document version vetted"
                 }
               }

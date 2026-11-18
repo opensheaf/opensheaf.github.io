@@ -24,7 +24,7 @@ The name: a sheaf is a bundle of papers and, in mathematics, the structure in wh
 
 The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals. Sections marked non-normative, examples and notes are informative.
 
-JSON means RFC 8259 JSON in UTF-8 without a byte order mark. URLs are absolute unless stated otherwise; a relative URL in a JSON file is resolved against the URL of that file. Digests are written in lowercase hexadecimal unless stated otherwise. Terms are defined where they are first introduced, written <dfn>thus</dfn>.
+JSON means RFC 8259 JSON in UTF-8 without a byte order mark. URLs are absolute unless stated otherwise; a relative URL in a JSON file is resolved against the URL of that file. Digests are written in lowercase hexadecimal unless stated otherwise. DOIs are written bare (`10.5281/zenodo.123`), without a resolver prefix. Terms are defined where they are first introduced, written <dfn>thus</dfn>.
 
 **Conformance classes.** An archive, an object or a program conforms to a class when it meets every MUST and MUST NOT of the sections listed for it:
 
@@ -101,7 +101,7 @@ Every object MUST be a valid OCFL 1.1 object, and:
 
 ### 4.2 Documents and document versions
 
-A document version holds, at the top level of its content unless a profile says otherwise, besides the files of section 4.1:
+A document version holds, at the top level of its content, besides the files of section 4.1:
 
 - the <dfn>sources</dfn>: the main source and every file needed to produce the renditions that is not part of the toolchain (images, bibliography databases, local style files); they SHOULD be flat (no sub-folders) when possible;
 - the <dfn>renditions</dfn>, files produced from the sources (a PDF, an EPUB): OPTIONAL, but RECOMMENDED, at least a PDF for a document meant to be read and cited;
@@ -147,7 +147,7 @@ A document MUST have `mainSource` (a logical path) and `sourceFormat` (its media
 A collection has none of these fields of a document, and its notes are text only (section 8.2). A document or a collection MAY have:
 
 - `agreement`: a minimal record that the authors agreed to the deposit and the licence: `by` (names only), `date` and `method` ("by e-mail"), all REQUIRED. It MUST NOT contain e-mail addresses, correspondence or signatures of persons;
-- `external`: the external records of this version, each with `role` (`deposit` for a deposit by the archive, appendix A; `source` for the record it was imported from), `service` (its name) and `record` (its URL), all REQUIRED, and OPTIONALLY `doi`, `label` (the service's label for the version, such as `v3`) and `files`, the files kept there but not in the content (a deposit's source archive) or received from there, as received, each with `name` and `sha512` (REQUIRED), `md5` and `bytes`;
+- `external`: the external records of this version, each with `role` (`deposit` for a deposit of this version made under a profile, appendix A; `source` for the record it was imported from), `service` (its name) and `record` (its URL), all REQUIRED, and OPTIONALLY `doi`, `label` (the service's label for the version, such as `v3`) and `files`, the files kept there but not in the content (a deposit's source archive) or received from there, as received, each with `name` and `sha512` (REQUIRED), `md5` and `bytes`;
 - `withdrawal`, REQUIRED when `status` is `withdrawn`: a `date` and a `reason`, a note (section 13);
 - `extensions`: the data of extensions (section 2), keyed by the names of the extensions.
 
@@ -341,7 +341,7 @@ The first line keeps these signatures apart from any other use of the key; the o
 
 **Others' witnesses.** A signature by someone other than the owner of the line, attesting a version, is a witness, not a signature of the line, and never a signature file: it is `<version>/witness-<label>.json`, where `<label>` is chosen by whoever adds it and matches `^[a-z0-9]+(-[a-z0-9]+)*$`. It has the fields and the signed message of a signature file, with `signer` and `keyLog` naming the signer's own owner object, which MUST NOT be the line's owner; its key log MAY be copied beside the object (section 6.5).
 
-**Other witnesses.** The [timestamps extension](opensheaf-timestamps-0.1.md) keeps timestamps of signature files beside them, dates that readers may weigh; it changes no status.  the parent signatures a branch carries are in its content (section 9).
+**Other witnesses.** The [timestamps extension](opensheaf-timestamps-0.1.md) keeps timestamps of signature files beside them, dates that readers may weigh; it changes no status. The parent signatures a branch carries are in its content (section 9).
 
 **Files that are not witnesses.** A file of the witness folder that is not a witness (a stray file, a malformed or invalid signature file) is ignored, reported, never fatal, and kept; a file a reader does not recognise, stray or of an extension it does not know, is reported as an unknown file, not as an error: a host cannot break a version by adding a file. A copy MAY leave such files out (section 11).
 
@@ -679,7 +679,7 @@ An archive SHOULD keep three <dfn>indexes</dfn> of its objects, by name, by owne
 - `owners/`, by owner name: for each owner with lines in the storage root, `owner` and `names`, the names of those lines, its key log among them when kept there (section 6.5);
 - `sha512/`, by inventory digest: for each sealed object version, `inventorySha512`, `id`, `version` and `status`.
 
-**Content.** An archive's indexes list every object with a genesis record and every sealed version of it, never drafts. `status` is the object's, `active` or `withdrawn`, or `removed` after a takedown (section 13): a tombstoned object keeps its entries in `names/` and `sha512/`, of which those in `names/` MAY drop `originator` and `genesis`, while a takedown removes the name from `owners/`, and the entry once it lists none. In indexes kept for several archives, every entry has `at`, the base URL of the archive serving the copy, and `owners/` has an entry for each owner and archive.
+**Content.** An archive's indexes list every object with a genesis record and every sealed version of it, never drafts. `status` is the object's, `active` or `withdrawn`, or `removed` after a takedown (section 13): a tombstoned object keeps its entries in `names/` and `sha512/`, of which those in `names/` MAY drop `originator` and `genesis`, while a takedown removes the name from `owners/`, and the entry once it lists none. In indexes kept for several archives, every entry has `at`, a list of base URLs of the archive serving the copy, equal hints (section 3), and `owners/` has an entry for each owner and archive.
 
 **Lookups.** A resolver looks a line up in `names/`, starting from `at`, keeping the entries whose `owner` matches the owner part, or without one, whose `owner` is their `originator`; a removed entry without `originator` is matched against the originator of any copy of the genesis record, or reported as a removed line of that name, originator unknown. It looks a pin up in `sha512/` and an owner's lines in `owners/`. At an archive without indexes, it MAY read `objects` of the discovery document and fetch `genesis.json` and `object.json` from the objects.
 
@@ -877,9 +877,72 @@ Before 1.0, every minor version MAY be incompatible. A draft MAY change in any w
 - **0.1 (draft), 13 to 18 November 2026:** revisions, and the proposal of PR #30 (names from genesis records, owners and key logs, lines, branches, `sheaf:` URIs, signatures), each listed in the changelog of the [reference text](reference/opensheaf-specification-0.1-full.md).
 - **0.1 (draft), 18 November 2026, rebuilt (PR #30):** the text rebuilt concept by concept into a shorter whole, from the reference text. Decided in the rebuild: archives are named by no file, and `replicas` is dropped (section 3); external records are witnesses, not copies (section 12.3); index declarations name only `names`, `owners` and `sha512` (section 12.5); every removal is a takedown, and tombstones are required once an object is taken down (section 13); drafts are never withdrawn; key-log forks are recorded by fork records, which nullify the keys involved, and healed by the owner, versions of key logs being replaced only there (section 6.3, provisional, #58); findings are errors, warnings or results (section 14.1); security, privacy and rights rewritten (section 15); `licence` for documents only; logical paths exclude empty segments, a final `/` and `\` (section 4.1).
 
+## Appendix A. Profiles (normative for archives declaring them)
+
+A <dfn>profile</dfn> is a set of rules for an external service or a tool, normative for an archive that lists it in `profiles` (sections 2 and 3.1), and checked by verifiers (section 14.6). A profile only adds rules. They apply to the versions that owners make in the archive, never to copies of lines made elsewhere (section 11); only sealed, signed versions are deposited (sections 7.3 and 10.1).
+
+### A.1 Zenodo (`zenodo`)
+
+Zenodo registers DataCite DOIs (prefix `10.5281`) and keeps files permanently. A record is a witness of the versions it holds, not a copy (section 12.3).
+
+- **Records.** Each line of a document is one record, whose concept DOI stands for the line. Each document version is one version of the record, with its own DOI, the document version as Zenodo's version, and the Zenodo type `publication-preprint` or the one matching `resourceTypeGeneral`. A branch is a record of its own, and deposits a version holding the files of its branch point only when the parent version has no DOI (section 9.7).
+- **Fixed files.** A description-only version (section 4.2) edits the metadata of the record version of the document version it holds; the files it adds, and the sources added by a completion (section 4.2), are not uploaded, since the files of a published record version are fixed. Archives MUST NOT use Zenodo's 30-day window for changing them: a correction is a new document version.
+- **Versions out of order.** Zenodo orders the versions of a record by publication, and its concept DOI leads to the latest. A document version deposited out of order (section 4.2) MAY be deposited only as a record of its own, with `IsVersionOf` the concept DOI.
+- **Files.** The record version holds the content files of the object version. Records have no folders and a limited number of files: sources with sub-folders, or too many, are uploaded as one file `sources.zip`, at their logical paths, its entries in the byte order of their names, dated 1980-01-01 00:00:00, without extra fields. The inventories of the line MUST record in `fixity` the MD5 digest of every content file (section 4.1), to be compared with the checksums Zenodo reports.
+- **The deposit recorded.** The object version deposited has its DOI in `datacite.json` and, in `external` of `object.json` (section 4.3), an entry with `role` `deposit`, `service` `Zenodo`, `record` the URL of the record version, `doi` and, for `sources.zip`, `files`.
+- **Order of operations.** (1) Create an unpublished version of the record (a new version inherits the files of the previous one, which are deleted). (2) Reserve its DOI. (3) Build the object version in a staging area, with that DOI, and have its owner sign it (section 7.1). (4) Upload the files, and compare their MD5 checksums with the fixity block. (5) Publish. (6) Add the object version with its signature files (section 7.5), and update the discovery document. If a step fails before publication, the unpublished version is discarded; if step 6 fails after it, the tool MUST complete step 6 from the staging area before any other deposit of the line. A tool SHOULD hold a lock per line during a deposit, since Zenodo allows one unpublished version per record. DOIs of Zenodo's sandbox are not registered, and MUST NOT be recorded in an archive.
+- **Metadata.** Zenodo's DataCite record of a DOI has Zenodo's landing page as `url`, Zenodo as `publisher` (which `datacite.json` MAY also name, section 4.4), relations of its own, and only the properties Zenodo keeps. `datacite.json` stays authoritative; verifiers compare the DOI, `titles`, `creators`, `publicationYear` and `version` of the two, a difference being a warning.
+- **Collections.** A collection MAY be deposited when its curator releases it, not at every change, as a record of type `other` whose files include `members.json`. A Zenodo community MAY group an archive's records for browsing; it is not authoritative.
+
+### A.2 TeXmacs (`texmacs`)
+
+For a document whose main source is a TeXmacs document:
+
+- `sourceFormat` is `application/x-texmacs` (not a registered media type; the type TeXmacs uses);
+- `toolchain` has an entry for TeXmacs with its version, whose `packages` list the style packages and plugins used that are not part of the TeXmacs distribution;
+- renditions are produced without regenerating bibliographies or tables of contents, so that the sources, with the references stored in them, reproduce the renditions; the sources SHOULD nevertheless include the bibliography databases used;
+- HTML presentation files are exported from a copy of the sources, with presentation packages added to its style, and the deposited sources are never changed.
+
+An archive kept inside a website built with the TeXmacs website converter SHOULD place an empty file `.texmacs-noconvert` at its top (honoured by the `max-html` plugin), so that the converter never rewrites its files.
+
+### A.3 Website (`website`)
+
+Presentation files (section 3) are generated from the storage root, never edited by hand, and regenerated after every change, a takedown included (section 13.2). Under this profile:
+
+- **Index.** An index page presents the latest signed version (section 7.3) of the main catalogue (section 8.1), in its order, possibly over several pages; other collections MAY have pages of their own. A flattened list, not authoritative, for programs that do not read OCFL MAY be published as `catalog.json`.
+- **Landing pages.** Each line of the main catalogue has one landing page, for its current version (section 4.2), giving the full `sheaf:` URI of the line (section 12.2) and every signed document version in the order of the history, each with its external labels, stage, change note, notices, renditions, sources and DOI, and the withdrawal if any (sections 4.2, 4.3 and 13.1).
+- **Search engines.** Landing pages MUST carry the meta tags read by Google Scholar: `citation_title`, `citation_author` (one per creator), `citation_publication_date` (the `Issued` date, or else the `Available` date of the current version) and `citation_pdf_url`, a PDF on the landing page's host (served with `Content-Security-Policy: sandbox`, section 15.3). They SHOULD carry schema.org `ScholarlyArticle` JSON-LD and FAIR Signposting links (`cite-as`, `describedby`, `item`, `license`), and offer BibTeX and CSL-JSON entries made from `datacite.json`.
+- **Feed and harvesters.** The feed (`feed`, section 3.1) lists the signed object versions the archive holds, by the `created` date of their inventories. The website SHOULD publish a `sitemap.xml`, and MAY publish an OAI-PMH static repository or a ResourceSync description.
+
+## Appendix B. JSON Schemas (normative)
+
+The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.org/schemas/<file>`, their `$id`, and dedicated to the public domain under CC0 1.0 (section 15.6). They validate:
+
+- `opensheaf-archive-0.1.schema.json`: `opensheaf.json` (section 3.1);
+- `opensheaf-object-0.1.schema.json`: `object.json`, also as `parent.object.json` and in `parent.chain/` (sections 4.3 and 9.2);
+- `opensheaf-collection-0.1.schema.json`: `members.json` (section 8.2);
+- `opensheaf-genesis-0.1.schema.json`: `genesis.json` (section 5.1);
+- `opensheaf-keys-0.1.schema.json`: `keys.json`, also as carried by fork records and healing versions (section 6);
+- `opensheaf-signature-0.1.schema.json`: signature files, wherever kept or carried, and others' `witness-<label>.json` (sections 7.2 and 9.2);
+- `opensheaf-keeper-0.1.schema.json`: `/.well-known/opensheaf` (section 6.6);
+- `opensheaf-index-0.1.schema.json`: index files and `indexes.json` (section 12.5).
+
+**Validation.** A file is valid when it validates against its schema with `format` asserted (section 14.2). The schemas of `genesis.json`, `keys.json` and the keeper's file allow no other properties; the others do, and such properties carry no meaning here (the data of extensions goes under `extensions`, section 2). Where a schema and the text disagree, the text prevails.
+
+**Other files.** `datacite.json` is validated by converting it to XML, following DataCite's mapping between the JSON of its REST API and XML, against the DataCite 4.7 XML Schema, with the requirements of section 4.4. Inventories, their checksum files and `ocfl_layout.json` are OCFL's (section 14.2). The schema of the [timestamps extension](opensheaf-timestamps-0.1.md) is published with it.
+
+**Beyond the schemas.** A schema checks one file alone; whatever relates it to another file, its place, a digest or a key (names and identifiers, `documentVersion` and `datacite.json`, thresholds, signatures, fork records, uniqueness across entries, index prefixes) is checked by verifiers (section 14).
+
+**Open questions.**
+
+- Registering DOIs with an archive's own DataCite prefix (a `datacite` profile), and documents that already have a DOI elsewhere (#8).
+- Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
+- Whether a takedown reaches the records of external services (#33).
+- The field names of `keys.json`, signature files and the evidence of branches, which the schemas follow (#55); the files of fork records and healing versions, provisional (#58).
+
 ## Plan of the rebuilt text
 
 Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 16 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
 
-Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
+Appendices (the worked key log of appendix C creates its owner with two keys from v1): C. examples; D. rationale; E. references.
