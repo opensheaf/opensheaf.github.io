@@ -14,6 +14,14 @@ rules does not repeat them. Where it describes the rules, it describes those
 of PR #30 after the commit in which an exposed key ends its owner (section
 3.9); the specification is right where they differ.*
 
+> **Superseded in part.** Since this paper, the rebuilt specification of PR
+> #30 (19 November 2026) no longer ends an owner at a fork of its key log:
+> an archive records the fork by an unsigned fork record, which nullifies the
+> keys involved, and the owner may heal by a signed version made with other
+> keys (section 6.3, provisional; issue
+> [#58](https://github.com/opensheaf/opensheaf.github.io/issues/58)). The
+> difficulties told here are the reasons for that design.
+
 ## 1. What keys are for
 
 An owner, in the proposal, is a keyed identity: a person, a group or an

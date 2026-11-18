@@ -20,6 +20,12 @@ the proposal of [PR #56](https://github.com/opensheaf/opensheaf.github.io/pull/5
 keyed identities with key logs, archives as hosts, storage keyed by lines,
 and branches as new objects.*
 
+> **Note.** The comparison of keys and forks here predates the rebuilt
+> specification of PR #30 (19 November 2026), where a fork of a key log is
+> recorded by an unsigned fork record that nullifies the keys involved, and
+> the owner may heal (section 6.3, provisional; issue
+> [#58](https://github.com/opensheaf/opensheaf.github.io/issues/58)).
+
 ## 1. The question
 
 The [git paper](git-as-implementation.md) asks whether git's own structures
