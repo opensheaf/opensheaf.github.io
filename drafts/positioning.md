@@ -17,6 +17,13 @@ compares it with the infrastructure of scholarly communication and with
 federated and distributed systems, weighs what separating the functions
 costs, and makes proposals.*
 
+> [!NOTE]
+> Written before the rebuild of the specification (18 and 19 November 2026)
+> and not updated: its section numbers are those of the earlier text. Archives
+> have no identifiers: objects are named by their lines,
+> `sheaf:<name>:<owner>`, and archives are hosts found at their addresses
+> (sections 3 and 4, #52). Where they differ, the specification holds.
+
 ## 1. The functions
 
 A classic analysis of scientific communication (Roosendaal and Geurts,

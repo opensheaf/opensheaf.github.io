@@ -45,7 +45,7 @@
     <p>
       Both are excellent services, and OpenSheaf works with them: a document
       can also be on arXiv (linked with <tt class="verbatim">IsIdenticalTo</tt>), and
-      the Zenodo binding gives every version a DOI on Zenodo. What OpenSheaf
+      the Zenodo profile gives every version a DOI on Zenodo. What OpenSheaf
       adds is an archive that you keep and control, that stores sources (not
       only PDFs) in a documented layout, that anyone can verify file by file,
       and that can be combined with other archives into collections and
@@ -55,8 +55,8 @@
     <p>
       No. The core of the format is an OCFL storage root and a discovery
       document served over HTTPS. Zenodo, TeXmacs and the website are optional
-      profiles (appendices A, B and C). Git and GitHub Pages are convenient
-      ways to keep and serve an archive, but any static web server will do.
+      profiles (appendix A). Git and GitHub Pages are convenient ways to keep
+      and serve an archive, but any static web server will do.
     </p>
     <h2 id="auto-5"><a id="can-an-archive-be-served-straight-from-github-without-github-pages"></a>Can an archive be served straight from GitHub, without
     GitHub Pages?<span style="margin-left: 1em"></span></h2>
@@ -68,9 +68,10 @@
       verify an archive from it. It does not serve a website: it sends pages
       as plain text and PDFs as downloads, so landing pages are neither shown
       nor read by search engines, and it serves the pointers of Git LFS, not
-      the files. It is best listed as a second location in <tt class="verbatim">mirrors</tt>
-      of the discovery document, next to a GitHub Pages site or another web
-      server. See section 7.4 of <a href="opensheaf-git-0.1.html">OpenSheaf archives in git</a>.
+      the files. It is best used as a second location of the archive, beside a
+      GitHub Pages site or another web server: an archive's files may be
+      served at several base URLs, each a location of the same archive. See
+      section 7.4 of <a href="opensheaf-git-0.1.html">OpenSheaf archives in git</a>.
     </p>
     <h2 id="auto-6"><a id="why-ocfl-isnt-git-enough"></a>Why OCFL? Isn't git enough?<span style="margin-left: 1em"></span></h2>
     <p>
@@ -171,11 +172,12 @@
       completely, and a collection becomes a hash tree over everything it
       contains. If the member's archive moves or disappears, the member can be
       fetched from a mirror or any other copy: any copy that matches the pin
-      is the right one. External copies, such as a DOI deposit or a Software
-      Heritage snapshot, are a last resort: they keep the files but not the
-      inventory, so they cannot be checked against the pin (#22). A collection
-      also keeps a cached citation of each member, so that it stays readable
-      even if no copy is found.
+      is the right one. External records, such as a DOI deposit or a Software
+      Heritage snapshot, are witnesses, not copies: they keep the files but
+      not the inventory, so they cannot be checked against the pin, and only
+      tell a reader where the files may be found (#22). A collection also
+      keeps a cached citation of each member, so that it stays readable even
+      if no copy is found.
     </p>
     <h2 id="auto-15"><a id="why-both-archives-and-collections"></a>Why both archives and collections?<span style="margin-left: 1em"></span></h2>
     <p>
@@ -198,7 +200,7 @@
     <p>
       The two are kept apart because an archive changes at every deposit and
       holds facts that are nobody's claim (which objects it holds, their
-      heads, mirrors, tombstones), while a collection changes by the rules its
+      heads, its tombstones), while a collection changes by the rules its
       curator set (adding members, following them as they grow, vetting their
       versions), and each of its versions can be cited and verified as it
       stood. When an archive's documents should be cited as they stood, that
@@ -236,11 +238,6 @@
       collection (CC0 for the list) never extends to its members.
     </p>
     <h2 id="auto-18"><a id="who-owns-an-object-and-what-is-a-branch"></a>Who owns an object, and what is a branch?<span style="margin-left: 1em"></span></h2>
-    <div class="os-alert os-note">
-      <font class="os-alert-label">Note.</font> This answer describes the identity proposal
-      (sections 6.5 and 10.5 of the specification; issues #55 and #52), not
-      yet agreed.
-    </div>
     <p>
       A work has a <dfn>name</dfn>, the digest of the genesis record written
       when it is sealed, at its owner's request, before it is first shared.
@@ -261,23 +258,30 @@
       is good for ever. A version signed with good keys vouches for every
       version before it, since its inventory fixes them. A threshold binds
       only the signatures naming its version, so owners choose it at the start
-      (1 with a spare key against loss, 2 of 3 keys against theft); a group of
-      co-authors can share one owner with a threshold, for instance two
-      signatures out of three. If a key may have been exposed, the owner
-      <dfn>ends</dfn>: a last version of its key log says so and may name a
-      successor, which continues the work by branches; the old signatures stay
-      good, but readers trust them only as far as other evidence goes, since
-      nothing tells the owner's signatures from a thief's, and archives take
-      its lines only from copies, never as new deposits. Every version of
-      every line is signed, and the key logs travel with the objects they
-      sign, so a line can be checked from any copy, even when the archives
-      that served it have gone. An owner may name who answers for it (an ORCID
-      iD, an institution), which the keeper may confirm in a place only it
-      controls; nothing requires it. Drafts are a sandbox: objects of a
-      reserved owner, <tt class="verbatim">draft</tt>, kept by one archive, never
-      signed, pinned or copied out of it, and free to be rewritten or deleted.
-      Sealing makes a new object, the first version of the line; the draft's
-      versions are not part of it.
+      (1 with a spare key kept apart, or 2 of 3 keys); a group of co-authors
+      can share one owner with a threshold, for instance two signatures out of
+      three. If keys that could reach the threshold may have been exposed, the
+      owner either <dfn>ends</dfn>, by a last version of its key log that may
+      name a successor, which continues the work by branches; or it nullifies
+      those keys by a fork of its key log and <dfn>heals</dfn> it with keys
+      that took no part, and continues its lines (fork records and healing are
+      provisional, #58). Two versions of a key log with one number, both
+      signed, are a fork: since no one can tell the owner's side from a
+      thief's, an archive that meets both keeps neither, but a fork record
+      carrying both, and the keys that signed them are nullified wherever the
+      record travels. Either way the old signatures stay good, but readers
+      trust them only as far as other evidence goes, since nothing tells the
+      owner's signatures from a thief's; an ended owner, or one that cannot
+      heal, signs nothing more, and archives take its lines only from copies,
+      never as new deposits. Every version of every line is signed, and the
+      key logs travel with the objects they sign, so a line can be checked
+      from any copy, even when the archives that served it have gone. An owner
+      may name who answers for it (an ORCID iD, an institution), which the
+      keeper may confirm in a place only it controls; nothing requires it.
+      Drafts are a sandbox: objects of a reserved owner, <tt class="verbatim">draft</tt>,
+      kept by one archive, never signed, pinned or copied out of it, and free
+      to be rewritten or deleted. Sealing makes a new object, the first
+      version of the line; the draft's versions are not part of it.
     </p>
     <p>
       Anyone can copy a genesis record, so the name alone cannot say whose
@@ -314,7 +318,7 @@
       every archive needs to keep, cite, compose and verify documents. Other
       relations are built from it: by links inside the documents and DataCite
       relations, which need nothing more, or by <strong>extensions</strong>
-      (section 4 of the specification), published separately, whose data an
+      (section 2 of the specification), published separately, whose data an
       object version records in its <tt class="verbatim">object.json</tt>, so that tools
       that know them can follow the relation when they copy, verify or present
       documents. Extensions never change the core: an archive is read and
@@ -347,14 +351,13 @@
       tokens from authorities the owner trusts, OpenTimestamps proofs, or
       both. An owner that wants its signatures dated, a journal or an
       institution for instance, adopts it in its key log, from the first
-      version, so that if it ever ends because a key may have been stolen,
-      readers can tell which of its versions were signed before. The extension
-      changes no status: dates are evidence that readers weigh. A single
-      researcher may not need it. Anyone holding a copy may add timestamps
-      later; the earliest is what counts. Witnesses are not covered by the
-      inventory digests, and need not be: a signature is checked against the
-      version it names, which the pins fix, and a timestamp against the
-      signature file it stamps.
+      version, so that if a key is ever stolen, readers can tell which of its
+      versions were signed before. The extension changes no status: dates are
+      evidence that readers weigh. A single researcher may not need it. Anyone
+      holding a copy may add timestamps later; the earliest is what counts.
+      Witnesses are not covered by the inventory digests, and need not be: a
+      signature is checked against the version it names, which the pins fix,
+      and a timestamp against the signature file it stamps.
     </p>
     <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>
@@ -365,15 +368,19 @@
     </p>
     <h2 id="auto-22"><a id="how-do-i-withdraw-or-take-down-a-document"></a>How do I withdraw or take down a document?<span style="margin-left: 1em"></span></h2>
     <p>
-      To withdraw a document (for instance a retraction), make a new version
-      with a withdrawal notice: the content and its history stay, and
-      presentations show the notice. If content must be removed (by law, or
-      for a breach of rights), the object is deleted and a tombstone is left
-      in the discovery document, so that collections pinning it report it as
-      removed rather than corrupt. The owners' key logs stay, since other
-      objects need them to be checked; an owner's key log is removed only for
-      itself. OCFL version 2 is expected to add a native mechanism for
-      deleting single files; OpenSheaf will adopt it when it is published.
+      To withdraw a document (for instance a retraction), its owner makes a
+      new object version that only marks it withdrawn, with a date and a
+      reason: the content and its history stay, and presentations show the
+      withdrawal. Content is removed only by a <dfn>takedown</dfn> (by law,
+      for a breach of rights, or because the archive stops keeping it): the
+      object is deleted and a tombstone is left in the discovery document, so
+      that collections pinning it report it as removed rather than corrupt.
+      Every removal is a takedown, so nothing leaves an archive silently. The
+      owners' key logs stay, since other objects need them to be checked; an
+      owner's key log is taken down only for itself. Drafts are neither
+      withdrawn nor taken down: they are simply deleted. OCFL version 2 is
+      expected to add a native mechanism for deleting single files; whether
+      OpenSheaf uses it is open (#32).
     </p>
     <h2 id="auto-23"><a id="can-i-use-all-rights-reserved"></a>Can I use &quot;All rights reserved&quot;?<span style="margin-left: 1em"></span></h2>
     <p>
@@ -387,8 +394,8 @@
     <p>
       If the archive follows the website profile: each document then has a
       landing page with the <tt class="verbatim">citation_*</tt> meta tags Google
-      Scholar reads, and a PDF on the same host. Appendix C also recommends a
-      sitemap and FAIR Signposting links.
+      Scholar reads, and a PDF on the same host. The profile (appendix A.3)
+      also recommends a sitemap and FAIR Signposting links.
     </p>
     <h2 id="auto-25"><a id="how-do-i-check-an-archive"></a>How do I check an archive?<span style="margin-left: 1em"></span></h2>
     <p>
@@ -397,8 +404,11 @@
       class="verbatim">ocfl-py</tt>), checks that the discovery document matches the
       storage root, checks the key logs and the owners' signatures of every
       version, and resolves and checks the members of the head of every
-      collection (and, optionally, those of earlier versions). The
-      specification (section 14) lists the checks.
+      collection (and, optionally, those of earlier versions). It reports
+      errors (breaches of what the specification requires), warnings, and
+      results that are neither (the status of each signature and member,
+      forks, ended owners, withdrawals). The specification (section 14) lists
+      the checks.
     </p>
     <h2 id="auto-26"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
     <p>

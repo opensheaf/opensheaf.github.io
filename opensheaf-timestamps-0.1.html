@@ -28,19 +28,20 @@
     </div>
     <h1 id="auto-1">OpenSheaf timestamps<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 18
+      Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 19
       November 2026. How an owner dates its signatures with RFC 3161 tokens or
       OpenTimestamps proofs, and declares in its key log that it does so, so
       that readers can tell which versions existed by a date, for instance
-      before an owner ended. The extension is named by the URI <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>.
+      before a key was exposed. The extension is named by the URI <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>.
       The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to
       the public domain under CC0 1.0.
     </div>
     <div class="os-alert os-warning">
-      <font class="os-alert-label">Warning.</font> <strong>Proposal.</strong> This extension
-      belongs to the identity proposal of the specification (owners, key logs
-      and signatures, sections 6 and 7), on the branch <tt class="verbatim">proposal/identity</tt>
-      (PR #30), not yet agreed. It is discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/55">issue #55</a>.
+      <font class="os-alert-label">Warning.</font> <strong>Draft.</strong> This extension
+      rests on the owners, key logs and signatures of the specification
+      (sections 6 and 7), whose field names are open (<a href="https://github.com/opensheaf/opensheaf.github.io/issues/55">issue #55</a>),
+      and on its fork records and healing, provisional (<a href="https://github.com/opensheaf/opensheaf.github.io/issues/58">issue
+      #58</a>).
     </div>
     <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
@@ -49,9 +50,10 @@
       signature stays good (sections 6 and 7 of the specification). Signatures
       say who made a version, not when. So when a key may have been exposed,
       the core cannot tell the signatures made with it before from those its
-      new holder makes after: the owner ends, its signatures stay good, and
-      readers trust its history only as far as other evidence goes (section
-      6.4 of the specification).
+      new holder makes after: the owner ends, or nullifies the keys by a fork
+      of its key log and heals it (section 6.3 of the specification); its
+      signatures stay good, and readers trust its history only as far as other
+      evidence goes (section 6.4 of the specification).
     </p>
     <p>
       A timestamp is such evidence: it shows that a signature existed by a
@@ -67,10 +69,11 @@
       to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when,
       and only when, they appear in all capitals. Terms are those of the
       specification: owner, key log, key-log version, signature file, witness,
-      line, branch, ended owner.
+      line, branch, ended owner, fork record, nullified key, tainted owner,
+      healing version.
     </p>
     <p>
-      This extension follows the extension mechanism of section 4 of the
+      This extension follows the extension mechanism of section 2 of the
       specification: it never changes the meaning of what the specification
       defines, nor relaxes its requirements, never changes the status of a
       signature or a version, never ends an owner or decides a fork, and never
@@ -352,6 +355,16 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           later dates nothing before its listing; a version vouched for
           existed by the date of the version that vouches for it; a
           compromised authority means a new owner; repetitions cut.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, for the rebuilt specification
+          (PR #30):</strong> section references updated (extensions are in
+          section 2); an exposed key ends the owner or is nullified by a fork
+          of its key log and healing, and dates help readers weigh the
+          versions of ended and tainted owners and of nullified keys (section
+          6).
         </p>
       </li>
     </ul>

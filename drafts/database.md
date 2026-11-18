@@ -9,6 +9,13 @@ re-serialising metadata, an index published as a static SQLite file for large
 archives, what Fedora, the repository software of libraries, can and cannot
 do for an archive, and experiments.*
 
+> [!NOTE]
+> Written before the rebuild of the specification (18 and 19 November 2026)
+> and not updated: its section numbers are those of the earlier text. The
+> `mirrors` field of the discovery document is gone: a copy served elsewhere
+> is the same archive at another location (section 3). Where they differ, the
+> specification holds.
+
 ## 1. The question
 
 The specification describes an archive as plain files on a static website, and

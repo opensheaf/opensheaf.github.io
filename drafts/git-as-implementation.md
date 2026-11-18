@@ -10,6 +10,13 @@ git provides, describes three designs, from git replacing OCFL, through git as
 a view derived from it, to git as transport only, weighs what each gains and
 costs, and proposes experiments.*
 
+> [!NOTE]
+> Written before the rebuild of the specification (18 and 19 November 2026)
+> and not updated: its section numbers are those of the earlier text. The deep
+> and shallow branches of PR #30 became branches holding only their branch
+> point with its evidence (section 9). Where they differ, the specification
+> holds.
+
 ## 1. The question
 
 Git and OCFL solve related problems. Both keep versioned trees of files; both

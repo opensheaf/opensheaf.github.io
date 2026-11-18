@@ -28,7 +28,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 18
+      Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 19
       November 2026. How to keep an OpenSheaf archive in a git repository,
       publish it from there and copy it, without git changing a byte of what
       the archive holds. It adds nothing to the format: readers of an archive
@@ -43,10 +43,10 @@
     <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
       The <a href="opensheaf-specification-0.1.html">OpenSheaf specification</a> allows an archive to be kept in
-      git and served by any static web server (section 5 of the
+      git and served by any static web server (section 3 of the
       specification), and says that git hashes are not part of its integrity
-      (section 13.2). This document says how, for those who keep an archive in
-      git and for the tools that write to such a repository.
+      (sections 7.6 and 15.2). This document says how, for those who keep an
+      archive in git and for the tools that write to such a repository.
     </p>
     <p>
       Git gives an archive what the format leaves to its maintainer:
@@ -57,7 +57,7 @@
           <strong>a history of the whole archive</strong>: every state of the
           discovery document, so every state the archive published, which the
           format itself does not keep (the discovery document is a mutable
-          map, section 6.1 of the specification);
+          map, section 3.1 of the specification);
         </p>
       </li>
       <li>
@@ -120,7 +120,8 @@
       The principle: git is a store and a transport for the files of the
       archive. The archive is what is on the published branch. Git never
       changes those bytes, and the published branch never rewrites what it has
-      published.
+      published, except at a fork of a key log, as the specification requires
+      (section 5.1).
     </p>
     <h2 id="auto-3"><a id="2-conventions-and-terms"></a>2. Conventions and terms<span style="margin-left: 1em"></span></h2>
     <p>
@@ -129,8 +130,9 @@
       RFC 8174) when, and only when, they appear in all capitals. Terms of the
       specification (archive, storage root, discovery document, object, object
       version, pin, mirror, witness, takedown, tombstone, owner, owner object,
-      key log, draft, signed version, not a version, ended owner, fork) keep
-      their meaning.
+      key log, draft, signed version, not a version, ended owner, fork of a
+      line, fork of a key log, fork record, healing version, nullified key,
+      tainted owner) keep their meaning.
     </p>
     <ul>
       <li>
@@ -147,13 +149,13 @@
           and <tt class="verbatim">sha512/</tt>, which an archive declares in its
           discovery document, and <tt class="verbatim">indexes.json</tt>, only in a
           repository that serves indexes for several archives, as a custodian
-          or a resolver does; section 6.6 of the specification).
+          or a resolver does; section 12.5 of the specification).
         </p>
       </li>
       <li>
         <p>
           <dfn>Presentation files</dfn>: the website of the archive (appendix
-          C of the specification), generated from the archive files.
+          A.3 of the specification), generated from the archive files.
         </p>
       </li>
       <li>
@@ -202,9 +204,9 @@
       The archive files MUST NOT contain symbolic links or git submodules.
       Members of collections that belong to other archives are reached through
       the discovery documents of those archives and checked by their pins
-      (section 10.3 of the specification), never included as submodules;
-      copies of lines kept elsewhere are mirrors (section 10.4 of the
-      specification), copied byte for byte into the storage root.
+      (section 8.5 of the specification), never included as submodules; copies
+      of lines kept elsewhere are mirrors (section 11 of the specification),
+      copied byte for byte into the storage root.
     </p>
     <h2 id="auto-5"><a id="4-storing-bytes"></a>4. Storing bytes<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-6"><a id="41-attributes"></a>4.1 Attributes<span style="margin-left: 1em"></span></h3>
@@ -317,75 +319,86 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       class="verbatim">&lt;path&gt;</tt> is the object's path in the layout of the
       storage root (<tt class="verbatim">&lt;owner&gt;/&lt;name&gt;</tt> in the
       owner-name layout, or the folders of the hash and the encoded identifier
-      in the hashed layout, section 5 of the specification), with the folders
-      above it that it needs (a new owner's folder, or folders of the hash),
-      and the files of a complete OCFL object: a new object, or the copy of a
-      line kept elsewhere, up to its latest signed version (its root inventory
-      then that of this version, section 10.4 of the specification); 2. new
-      version folders <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt> to <tt
-      class="verbatim">ocfl/&lt;path&gt;/v&lt;M&gt;/</tt>, M not less than N, where <tt
-      class="verbatim">v&lt;N-1&gt;</tt> is the head of the object in C, with the
+      in the hashed layout, section 3.2 of the specification), with the
+      folders above it that it needs (a new owner's folder, or folders of the
+      hash), and the files of a complete OCFL object: a new object, or the
+      copy of a line kept elsewhere, up to its latest signed version (its root
+      inventory then that of this version, section 11.1 of the specification);
+      2. new version folders <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;N&gt;/</tt> to
+      <tt class="verbatim">ocfl/&lt;path&gt;/v&lt;M&gt;/</tt>, M not less than N, where
+      <tt class="verbatim">v&lt;N-1&gt;</tt> is the head of the object in C, with the
       replacement of the object's root <tt class="verbatim">inventory.json</tt> and its
       checksum file by those of <tt class="verbatim">v&lt;M&gt;</tt>, and the versions'
       signature files in item 3; 3. files added in an object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
       folder: signature files <tt class="verbatim">&lt;version&gt;/signature-&lt;k&gt;.json</tt>
-      of the line's owner that are not invalid (section 13.2 of the
-      specification), their timestamp files, others' witnesses and, in an
-      owner object, the evidence of forks of its key log under <tt class="verbatim">fork/</tt>
-      (section 6.5 of the specification). A file there, once published, is
-      never replaced or removed, except with its object by a takedown, even
-      when it is not a witness (a stray or malformed file, which is reported
-      and kept): timestamps are made of the bytes of signature files, and a
-      completed timestamp proof is a new file beside the pending one; 4. the
-      replacement of <tt class="verbatim">opensheaf.json</tt>, and files added, replaced
-      or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt class="verbatim">names/</tt>,
-      <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>), which are rewritten
-      at every deposit and takedown (section 6.6 of the specification,
-      proposal); 5. at the creation of the storage root, its own files (<tt
-      class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
+      of the line's owner that are not invalid (section 7.3 of the
+      specification), their timestamp files, and others' witnesses. A file
+      there, once published, is never replaced or removed, even when it is not
+      a witness (a stray or malformed file, which is reported and kept),
+      except with its object by a takedown, or with its version at a fork of a
+      key log (item 9): timestamps are made of the bytes of signature files,
+      and a completed timestamp proof is a new file beside the pending one; 4.
+      the replacement of <tt class="verbatim">opensheaf.json</tt>, and files added,
+      replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt
+      class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
+      which are rewritten at every deposit and takedown (section 12.5 of the
+      specification); 5. at the creation of the storage root, its own files
+      (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
       configuration of the layout extension, and the loose files allowed by
-      section 5 of the specification); 6. the removal of an object folder,
+      section 3.2 of the specification); 6. the removal of an object folder,
       with the folders above it that it leaves empty (an owner's folder, or
       folders of the hash), by a takedown (section 9); 7. the repair of a file
       whose bytes do not match the digest its inventory records (section 5.3);
-      8. any change inside the folder of a draft (section 6.5 of the
+      8. any change inside the folder of a draft (section 10.1 of the
       specification; <tt class="verbatim">ocfl/draft/&lt;id&gt;/</tt> in the owner-name
       layout), including its removal, with the creation of the <tt class="verbatim">draft/</tt>
       folder and its removal when it is left empty: drafts are the only
       objects that may be rewritten or deleted, and are never copied out of
-      the archive.
+      the archive; 9. at a fork of a key log (section 6.3 of the
+      specification), in an owner object: the replacement of the version
+      folder at the fork point by a fork record or a healing version that
+      supersedes the version held, the removal of every later version folder,
+      the replacement of the root inventory and its checksum file by those of
+      the new head, and the removal of the witness files of the versions
+      replaced or removed (those of a version the new one carries are in its
+      <tt class="verbatim">forked/&lt;d&gt;/</tt>). It is made only by a commit that
+      adds that fork record or healing version, valid and carrying the version
+      held or superseding it as section 6.3 says. These replacements are the
+      only changes of a sealed version folder besides repairs.
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
-      folder is changed, renamed or removed, except by a repair. Several
-      changes MAY be made in one commit.
+      folder is changed, renamed or removed, except by a repair or at a fork
+      of a key log (item 9). Several changes MAY be made in one commit.
     </p>
     <p>
       <strong>Only signed versions are added.</strong> Every object version
-      added by items 1 and 2, other than a draft's, MUST be signed once added
-      (sections 6.5 and 13.2 of the specification): signed with good
-      signatures of its line's owner, against the key log of the owner object
-      kept at its path, which the same commit adds or extends if needed, or
-      extended by a version so signed that the same commit adds; and, for an
-      owner that has ended, or whose key log is forked, as the commit's tree
-      shows (by <tt class="verbatim">ended</tt>, or by the evidence of a fork), versions
-      of its lines are added only from a copy found elsewhere, up to the
-      latest signed version of a copy that agrees with the published line,
-      never as a new deposit (section 6.5 of the specification). A version of
-      a key log added is signed with good signatures of keys of the version
-      before, up to and including one with <tt class="verbatim">ended</tt>, and none
-      after it, nor after the point of a fork whose evidence the tree holds.
-      Since nothing is removed from the published branch afterwards and OCFL
-      cannot skip a version, a version let in that is not signed would hold
-      its number for good, and the owner's own version of that number could
-      never be added to this archive. Versions already published stay,
-      whatever happens later.
+      added by items 1, 2 and 9, other than a draft's, MUST be a version once
+      added (sections 6.3, 7.3 and 7.5 of the specification). A version of a
+      line is signed with good signatures of its owner, against the key log of
+      the owner object kept at its path, which the same commit adds or extends
+      if needed, or is vouched for by a version so signed that the same commit
+      adds. A version of a key log is signed by keys of the version before, or
+      is a valid fork record or healing version; none follows an ending
+      version, nor a fork record except a healing version. No version is added
+      that is signed only thanks to a signature made with a key nullified in
+      the commit's tree, or naming a version that a fork record or a healing
+      version carries (section 6.4). For an owner that the commit's tree shows
+      to be ended or tainted, versions of its lines are added only from a copy
+      found elsewhere, up to the latest signed version of a copy that agrees
+      with the published line, never as a new deposit (section 7.5). Since
+      OCFL cannot skip a version and nothing is removed from a line but by a
+      takedown, a version let in that is not signed would hold its number for
+      good, and the owner's own version of that number could never be added to
+      this archive. Versions already published stay, whatever happens later,
+      except versions of a key log replaced at a fork (item 9).
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
-      (section 9). Repositories SHOULD use the protection of their host to
-      refuse force-pushes to the published branch and its deletion (on GitHub:
-      a branch protection rule or a ruleset).
+      (section 9); the replacements of item 9 are new commits, not a rewrite.
+      Repositories SHOULD use the protection of their host to refuse
+      force-pushes to the published branch and its deletion (on GitHub: a
+      branch protection rule or a ruleset).
     </p>
     <h3 id="auto-12"><a id="52-every-published-commit-is-an-archive"></a>5.2 Every published commit is an archive<span style="margin-left: 1em"></span></h3>
     <p>
@@ -420,7 +433,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       If no copy with the right bytes can be found, the file is lost. It MUST
       NOT be replaced by other bytes, and verifiers keep reporting it as
       missing or corrupt. (Lost and corrupted files are in scope for OCFL
-      version 2; see section 11.3 of the specification.)
+      version 2; see section 13.3 of the specification, #32.)
     </p>
     <h2 id="auto-14"><a id="6-commits-working-branches-and-merging"></a>6. Commits, working branches and merging<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-15"><a id="61-commits"></a>6.1 Commits<span style="margin-left: 1em"></span></h3>
@@ -440,20 +453,20 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     </p>
     <p>
       Commits and tags MAY be signed. They are witnesses of who published a
-      state of the archive, not part of its integrity (section 13.2 of the
+      state of the archive, not part of its integrity (section 7.6 of the
       specification).
     </p>
     <h3 id="auto-16"><a id="62-working-branches"></a>6.2 Working branches<span style="margin-left: 1em"></span></h3>
     <p>
       Git branches other than the published branch are <dfn>working
-      branches</dfn>: working space, not branches of an object (section 10.5
-      of the specification, proposal). They MAY be rewritten, but only drafts
-      may be rebuilt on them: a sealed version is signed by its owner, and is
-      never rebuilt, on any branch, since a new version with other bytes would
-      be a fork of its line (section 6.5 of the specification). Drafts, under
-      the reserved owner <tt class="verbatim">draft</tt>, may change freely; sealing
-      makes a new, fixed object from a draft; private states of archives are
-      discussed in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.
+      branches</dfn>: working space, not branches of an object (section 9 of
+      the specification). They MAY be rewritten, but only drafts may be
+      rebuilt on them: a sealed version is signed by its owner, and is never
+      rebuilt, on any branch, since a new version with other bytes would be a
+      fork of its line (section 7.4 of the specification). Drafts, under the
+      reserved owner <tt class="verbatim">draft</tt>, may change freely; sealing makes a
+      new, fixed object from a draft; private states of archives are discussed
+      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.
     </p>
     <h3 id="auto-17"><a id="63-merging"></a>6.3 Merging<span style="margin-left: 1em"></span></h3>
     <p>
@@ -471,7 +484,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           <tt class="verbatim">v&lt;N&gt;</tt> of the same draft, the second to be
           merged MUST be redone by the tool as <tt class="verbatim">v&lt;N+1&gt;</tt>,
           with a new inventory; it MUST NOT be resolved by editing files. A
-          sealed version is signed when it is made (section 6.5 of the
+          sealed version is signed when it is made (section 7.1 of the
           specification), and never rebuilt (section 6.2): two versions <tt
           class="verbatim">v&lt;N&gt;</tt> of one line are a fork of the line, never
           redone by a merge; only one is published, and the other is reported.
@@ -500,16 +513,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       request is merged: a contributor proposes versions of its own lines, or
       copies of other owners' lines up to their latest signed versions, and
       continues another owner's line only by a branch under its own owner
-      (section 10.5 of the specification). The object version is created (its
-      <tt class="verbatim">created</tt> date in the inventory) before it is published.
-      (When a version becomes public, and how this is recorded, is discussed
-      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
+      (section 9 of the specification). The object version is created (its <tt
+      class="verbatim">created</tt> date in the inventory) before it is published. (When
+      a version becomes public, and how this is recorded, is discussed in <a
+      href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
     </p>
     <h2 id="auto-18"><a id="7-publishing"></a>7. Publishing<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-19"><a id="71-what-is-served"></a>7.1 What is served<span style="margin-left: 1em"></span></h3>
     <p>
       A deployment MUST serve the archive files of one published commit, byte
-      for byte (section 5 of the specification), and MAY serve presentation
+      for byte (section 3 of the specification), and MAY serve presentation
       files. It SHOULD NOT serve working files. A deployment SHOULD be made
       only from a commit whose verification (section 10) has passed.
     </p>
@@ -555,7 +568,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       or commit&gt;/</tt>. With the attributes of section 4.1, it serves the
       archive files byte for byte, and it allows cross-origin requests (<tt
       class="verbatim">Access-Control-Allow-Origin: *</tt>): it meets the requirements
-      of section 5 of the specification, and tools, including those running in
+      of section 3 of the specification, and tools, including those running in
       a browser, can read and verify the archive from it.
     </p>
     <p>
@@ -569,9 +582,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       a fixed state).
     </p>
     <p>
-      Its base URL MAY be listed in <tt class="verbatim">mirrors</tt> of the discovery
-      document, as a second location; it is not independent of the forge, and
-      does not replace a copy kept elsewhere (section 11).
+      Its base URL is then a second location of the archive (section 3 of the
+      specification), given wherever locations are given (the <tt class="verbatim">at</tt>
+      of collection members and <tt class="verbatim">sheaf:</tt> URIs); it is not
+      independent of the forge, and does not replace a copy kept elsewhere
+      (section 11).
     </p>
     <h2 id="auto-23"><a id="8-size-and-limits"></a>8. Size and limits<span style="margin-left: 1em"></span></h2>
     <p>
@@ -613,7 +628,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
         <p>
           keep only working files and presentation files in git, and the
           storage root in object storage, whose URL the discovery document
-          gives (<tt class="verbatim">storageRoot</tt>, section 6.1 of the
+          gives (<tt class="verbatim">storageRoot</tt>, section 3.1 of the
           specification); git then no longer keeps the archive, and this
           document no longer applies to its storage root;
         </p>
@@ -639,7 +654,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       of that owner, and the tree of <tt class="verbatim">ocfl/</tt>, which lists every
       owner, and the web views of forges show at most about a thousand entries
       of a folder. An archive expected to hold tens of thousands of objects or
-      more SHOULD therefore be created with the hashed layout (section 5 of
+      more SHOULD therefore be created with the hashed layout (section 3.2 of
       the specification), which spreads the objects over folders of a few
       entries each. (Indexes for archives of millions of objects are discussed
       in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a>.)
@@ -647,26 +662,27 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     <h2 id="auto-24"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
     <p>
       A takedown deletes an object from the storage root and adds a tombstone
-      to the discovery document (section 11.2 of the specification). In git, a
+      to the discovery document (section 13.2 of the specification). In git, a
       commit that deletes the object folder removes it from what is served,
       but not from the history: the files remain in every earlier commit,
       every clone, every fork and every archive of the repository.
     </p>
     <p>
-      When content must be removed (by law, or for a breach of rights), the
-      maintainer MUST:
+      Every removal from the storage root is a takedown, made by step 1 below.
+      When content must also be removed from the history (by law, or for a
+      breach of rights), the maintainer MUST:
     </p>
     <p>
       1. commit the removal of the object folder and the tombstone, and the
       update of the indexes if the archive keeps them (the object's entries
       kept with <tt class="verbatim">status</tt> <tt class="verbatim">removed</tt>, its name
-      removed from <tt class="verbatim">owners/</tt>, section 6.6 of the specification,
-      proposal), as in section 5.1, items 4 and 6; owner objects whose key
-      logs other objects of the archive need are not removed with the line,
-      and an owner object is taken down only for itself (section 11.2 of the
-      specification); 2. rewrite the history of every branch of the repository
-      to remove the object's files from every commit (for instance with <tt
-      class="verbatim">git filter-repo &ndash;invert-paths &ndash;path
+      removed from <tt class="verbatim">owners/</tt>, section 12.5 of the
+      specification), as in section 5.1, items 4 and 6; owner objects whose
+      key logs other objects of the archive need are not removed with the
+      line, and an owner object is taken down only for itself (section 13.2 of
+      the specification); 2. rewrite the history of every branch of the
+      repository to remove the object's files from every commit (for instance
+      with <tt class="verbatim">git filter-repo &ndash;invert-paths &ndash;path
       ocfl/&lt;path&gt;/</tt>, with the object's path in the layout); 3.
       force-push the rewritten branches, and delete tags that point to commits
       holding the files; 4. ask the host to remove what it keeps of the old
@@ -681,8 +697,8 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       it. The rewrite changes the hash of every commit after the first that
       held the object: signatures of those commits and tags no longer verify,
       and clones must be made again. Copies of the repository elsewhere
-      (forks, other clones, Software Heritage) follow their own rules, as
-      external copies do (section 11.3 of the specification).
+      (forks, other clones, Software Heritage) follow their own rules (section
+      13.3 of the specification, #33).
     </p>
     <h2 id="auto-25"><a id="10-verification"></a>10. Verification<span style="margin-left: 1em"></span></h2>
     <p>
@@ -710,34 +726,39 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           <strong>append-only</strong>: between each published commit and the
           next, only the changes of section 5.1 (for a pull request: between
           its base and its head); nothing is removed from an object's version
-          folders or witness folder except by a takedown, and a change to a
-          file of an existing version folder is accepted only as a repair,
-          when the new bytes have the digest its inventory records and the old
-          bytes did not;
+          folders or witness folder except by a takedown or, in an owner
+          object, at a fork (item 9), and a change to a file of an existing
+          version folder is accepted only as a repair, when the new bytes have
+          the digest its inventory records and the old bytes did not, or at a
+          fork;
         </p>
       </li>
       <li>
         <p>
           <strong>signed additions</strong>: every object version added, other
-          than a draft's, is signed once added, as section 5.1 says, against
-          key logs that are owner objects at their paths in the commit's tree;
-          an added version that is not signed (unsigned, invalid, or
-          unchecked: a key-log version not found), unless a signed version
-          added in the same commit extends it; a version of a key log after
-          one with <tt class="verbatim">ended</tt>, or after the point of a fork whose
-          evidence the tree holds; and an added signature file of the owner
-          that is invalid, are failures, so that a pull request adding them
-          cannot pass;
+          than a draft's, is a version once added, as section 5.1 says,
+          against key logs that are owner objects at their paths in the
+          commit's tree. An added version that is not signed (unsigned,
+          invalid, or unchecked: a key-log version not found), unless a signed
+          version added in the same commit extends it; a version of a key log
+          after an ending version or a fork record, other than a healing
+          version; a fork record or healing version that is not valid; a
+          version signed only thanks to a nullified key; a new deposit to a
+          line of an ended or tainted owner, when the commit's tree shows it;
+          and an added signature file of the owner that is invalid, are errors
+          (section 14.1 of the specification), so that a pull request adding
+          them cannot pass;
         </p>
       </li>
       <li>
         <p>
-          <strong>reported, never failing</strong>: versions already published
-          that are not signed (a breach of section 5.1 that cannot be undone),
-          files that are not witnesses, ended owners and the versions added to
-          their lines (which come only from copies, a rule the check cannot
-          see), forks of lines and of key logs (section 6.5 of the
-          specification);
+          <strong>reported, never failing</strong>: as warnings, versions
+          already published that are not signed (a breach of section 5.1 that
+          cannot be undone), files that are not witnesses, and versions added
+          to the lines of ended or tainted owners (which come only from
+          copies, a rule the check cannot always see); as results, forks of
+          lines and of key logs, nullified keys, and ended, tainted and healed
+          owners (sections 6.3 and 7.4 of the specification);
         </p>
       </li>
       <li>
@@ -762,10 +783,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     <p>
       A clone of the published branch is a complete copy of the archive. A
       clone that is served (for instance a fork published with GitHub Pages)
-      is a copy at another base URL; the archive MAY list it in <tt class="verbatim">mirrors</tt>
-      of its discovery document (section 6.1 of the specification). It is not
-      a mirror in the sense of section 10.4 of the specification, which copies
-      one line kept elsewhere into an archive's own storage root.
+      is a copy at another base URL; it is the same archive at another
+      location (section 3 of the specification), not a mirror in the sense of
+      section 11 of the specification, which copies one line kept elsewhere
+      into an archive's own storage root.
     </p>
     <p>
       Mirroring a line kept elsewhere is copying its files and checking them
@@ -773,25 +794,26 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       other archive's repository.
     </p>
     <p>
-      A mirror is a copy of a line (section 10.4 of the specification), at the
+      A mirror is a copy of a line (section 11.1 of the specification), at the
       path of its identifier, with the owner objects of every owner whose
       signatures it carries (its own, and for a branch its parents' owners) at
       their own paths; signatures are in each object's <tt class="verbatim">extensions/opensheaf-witnesses/</tt>.
       Copying a line is copying those object folders, up to the latest signed
       version of the line (section 5.1); an owner moving to another archive
-      copies its folder of the owner-name layout (section 5 of the
+      copies its folder of the owner-name layout (sections 3.2 and 6.5 of the
       specification). A branch holds the evidence of its parent version as
-      content files (section 10.5 of the specification), so it never shares an
+      content files (section 9.2 of the specification), so it never shares an
       object folder with a copy of its parent's line.
     </p>
     <p>
       A public repository SHOULD be archived by <a href="https://www.softwareheritage.org/">Software
       Heritage</a>, which keeps dated snapshots of it named by SWHIDs. A
-      snapshot is a witness that the archive held these files at that date, as
-      other external copies are (section 13.2 of the specification); its
-      identifiers are git hashes, not part of the integrity of the archive.
-      Together with the history of the published branch, snapshots also
-      witness the successive states of the discovery document.
+      snapshot is a witness that the archive held these files at that date,
+      not a copy, though it can be read as the archive it holds (section 12.3
+      of the specification); its identifiers are git hashes, not part of the
+      integrity of the archive. Together with the history of the published
+      branch, snapshots also witness the successive states of the discovery
+      document.
     </p>
     <h2 id="auto-27"><a id="12-security-and-privacy"></a>12. Security and privacy<span style="margin-left: 1em"></span></h2>
     <ul>
@@ -836,7 +858,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
         <p>
           <strong>Pull requests</strong> are checked before they are merged
           (section 10): a version that is not signed cannot pass, and once
-          merged nothing can remove it (section 5.1).
+          merged nothing but a takedown can remove it (section 5.1).
         </p>
       </li>
     </ul>
@@ -849,9 +871,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       URL), or the website link to it? 2. <strong>Takedown without rewriting
       history.</strong> Section 9 makes takedown a rewrite of history.
       Alternatives: content files outside git, one repository per object, or
-      the deletion mechanism expected in OCFL 2 (section 11.3 of the
-      specification). Archives that hold documents of others (a journal, an
-      institution) need it most. 3. <strong>Portable content paths</strong>
+      the deletion mechanism expected in OCFL 2 (section 13.3 of the
+      specification, #32). Archives that hold documents of others (a journal,
+      an institution) need it most. 3. <strong>Portable content paths</strong>
       (section 4.3): a recommendation here, or a rule of the specification
       itself, since it matters for any copy made on another system? 4.
       <strong>Drafts and publication dates</strong> (sections 6.2 and 6.3):
@@ -919,6 +941,22 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           line, and reported; no key-log version after the point of a known
           fork; the exception for versions extended in the same commit applies
           to unsigned versions only (sections 5.1 and 10).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, for the rebuilt specification
+          (PR #30):</strong> section references updated; <tt class="verbatim">mirrors</tt>
+          dropped, a raw file server or a served clone being another location
+          of the same archive (sections 7.4 and 11); witness files no longer
+          hold evidence of forks under <tt class="verbatim">fork/</tt>: a fork of a key
+          log is recorded by a fork record or a healing version, which
+          replaces the versions held from the fork point, with their witness
+          files, the one exception to append-only (section 5.1, item 9); only
+          versions are added, none signed only thanks to a nullified key, and
+          the lines of ended or tainted owners only from copies (sections 5.1
+          and 10); every removal is a takedown (section 9); checks reported as
+          errors, warnings and results (section 10).
         </p>
       </li>
     </ul>

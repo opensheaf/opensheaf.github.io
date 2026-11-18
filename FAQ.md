@@ -16,7 +16,7 @@ metadata, and collections that combine documents from several archives.
 ## Why not just use arXiv, or Zenodo?
 
 Both are excellent services, and OpenSheaf works with them: a document can
-also be on arXiv (linked with `IsIdenticalTo`), and the Zenodo binding gives
+also be on arXiv (linked with `IsIdenticalTo`), and the Zenodo profile gives
 every version a DOI on Zenodo. What OpenSheaf adds is an archive that you keep
 and control, that stores sources (not only PDFs) in a documented layout, that
 anyone can verify file by file, and that can be combined with other archives
@@ -26,7 +26,7 @@ into collections and selections without asking any central service.
 
 No. The core of the format is an OCFL storage root and a discovery document
 served over HTTPS. Zenodo, TeXmacs and the website are optional profiles
-(appendices A, B and C). Git and GitHub Pages are convenient ways to keep and
+(appendix A). Git and GitHub Pages are convenient ways to keep and
 serve an archive, but any static web server will do.
 
 ## Can an archive be served straight from GitHub, without GitHub Pages?
@@ -38,9 +38,10 @@ Explorer, and other tools that read archives over HTTP, can read and verify an
 archive from it. It does not serve a website: it sends pages as plain text and
 PDFs as downloads, so landing pages are neither shown nor read by search
 engines, and it serves the pointers of Git LFS, not the files. It is best
-listed as a second location in `mirrors` of the discovery document, next to a
-GitHub Pages site or another web server. See section 7.4 of [OpenSheaf
-archives in git](opensheaf-git-0.1.md).
+used as a second location of the archive, beside a GitHub Pages site or
+another web server: an archive's files may be served at several base URLs,
+each a location of the same archive. See section 7.4 of [OpenSheaf archives
+in git](opensheaf-git-0.1.md).
 
 ## Why OCFL? Isn't git enough?
 
@@ -131,9 +132,10 @@ copies may be found, and a version with the SHA-512 digest of its inventory
 its files, the pin fixes the member completely, and a collection becomes a
 hash tree over everything it contains. If the member's archive moves or
 disappears, the member can be fetched from a mirror or any other copy: any
-copy that matches the pin is the right one. External copies, such as a DOI
-deposit or a Software Heritage snapshot, are a last resort: they keep the
-files but not the inventory, so they cannot be checked against the pin (#22).
+copy that matches the pin is the right one. External records, such as a DOI
+deposit or a Software Heritage snapshot, are witnesses, not copies: they keep
+the files but not the inventory, so they cannot be checked against the pin,
+and only tell a reader where the files may be found (#22).
 A collection also keeps a cached citation of each member, so that it stays
 readable even if no copy is found.
 
@@ -155,7 +157,7 @@ Collections are objects themselves, so they can be pinned, nested and included
 in other collections, across archives.
 
 The two are kept apart because an archive changes at every deposit and holds
-facts that are nobody's claim (which objects it holds, their heads, mirrors,
+facts that are nobody's claim (which objects it holds, their heads, its
 tombstones), while a collection changes by the rules its curator set (adding
 members, following them as they grow, vetting their versions), and each of its
 versions can be cited and verified as it stood. When an archive's documents
@@ -191,10 +193,6 @@ changes are the curator's acts (for a journal). The licence of a collection
 
 ## Who owns an object, and what is a branch?
 
-> [!NOTE]
-> This answer describes the identity proposal (sections 6.5 and 10.5 of the
-> specification; issues #55 and #52), not yet agreed.
-
 A work has a <dfn>name</dfn>, the digest of the genesis record written when it
 is sealed, at its owner's request, before it is first shared. Each history of
 it has an <dfn>owner</dfn>: a person, a group or an institution, which decides
@@ -212,13 +210,20 @@ stays the same, and what was signed stays signed: a signature that verifies
 against the key-log version it names is good for ever. A version signed with
 good keys vouches for every version before it, since its inventory fixes them.
 A threshold binds only the signatures naming its version, so owners choose it
-at the start (1 with a spare key against loss, 2 of 3 keys against theft); a
-group of co-authors can share one owner with a threshold, for instance two
-signatures out of three. If a key may have been exposed, the owner
-<dfn>ends</dfn>: a last version of its key log says so and may name a
-successor, which continues the work by branches; the old signatures stay good,
-but readers trust them only as far as other evidence goes, since nothing tells
-the owner's signatures from a thief's, and archives take its lines only from
+at the start (1 with a spare key kept apart, or 2 of 3 keys); a group of
+co-authors can share one owner with a threshold, for instance two signatures
+out of three. If keys that could reach the threshold may have been exposed,
+the owner either <dfn>ends</dfn>, by a last version of its key log that may
+name a successor, which continues the work by branches; or it nullifies those
+keys by a fork of its key log and <dfn>heals</dfn> it with keys that took no
+part, and continues its lines (fork records and healing are provisional,
+#58). Two versions of a key log with one number, both signed, are a fork:
+since no one can tell the owner's side from a thief's, an archive that meets
+both keeps neither, but a fork record carrying both, and the keys that signed
+them are nullified wherever the record travels. Either way the old signatures
+stay good, but readers trust them only as far as other evidence goes, since
+nothing tells the owner's signatures from a thief's; an ended owner, or one
+that cannot heal, signs nothing more, and archives take its lines only from
 copies, never as new deposits.
 Every version of every line is signed, and the key logs travel with the
 objects they sign, so a line can be checked from any copy, even when the
@@ -257,7 +262,7 @@ branch, the same holds for each parent in turn, back to the originator's line.
 Yes, on top of the format rather than in it. The core keeps only what every
 archive needs to keep, cite, compose and verify documents. Other relations are
 built from it: by links inside the documents and DataCite relations, which
-need nothing more, or by **extensions** (section 4 of the specification),
+need nothing more, or by **extensions** (section 2 of the specification),
 published separately, whose data an object version records in its
 `object.json`, so that tools that know them can follow the relation when they
 copy, verify or present documents. Extensions never change the core: an
@@ -285,9 +290,9 @@ required, and timestamps and others' signatures, optional. Timestamps are
 defined by an extension, [OpenSheaf timestamps](opensheaf-timestamps-0.1.md):
 RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or
 both. An owner that wants its signatures dated, a journal or an institution
-for instance, adopts it in its key log, from the first version, so that if it
-ever ends because a key may have been stolen, readers can tell which of its
-versions were signed before. The extension changes no status: dates are
+for instance, adopts it in its key log, from the first version, so that if a
+key is ever stolen, readers can tell which of its versions were signed
+before. The extension changes no status: dates are
 evidence that readers weigh. A single researcher may not need it. Anyone
 holding a copy may add timestamps later; the earliest is what counts.
 Witnesses are not covered by the inventory digests, and need not be: a
@@ -302,15 +307,18 @@ regenerated from the sources whenever the presentation changes.
 
 ## How do I withdraw or take down a document?
 
-To withdraw a document (for instance a retraction), make a new version with a
-withdrawal notice: the content and its history stay, and presentations show
-the notice. If content must be removed (by law, or for a breach of rights),
-the object is deleted and a tombstone is left in the discovery document, so
-that collections pinning it report it as removed rather than corrupt. The
-owners' key logs stay, since other objects need them to be checked; an owner's
-key log is removed only for itself. OCFL version 2 is expected to add a native
-mechanism for deleting single files; OpenSheaf will adopt it when it is
-published.
+To withdraw a document (for instance a retraction), its owner makes a new
+object version that only marks it withdrawn, with a date and a reason: the
+content and its history stay, and presentations show the withdrawal. Content
+is removed only by a <dfn>takedown</dfn> (by law, for a breach of rights, or
+because the archive stops keeping it): the object is deleted and a tombstone
+is left in the discovery document, so that collections pinning it report it
+as removed rather than corrupt. Every removal is a takedown, so nothing leaves
+an archive silently. The owners' key logs stay, since other objects need them
+to be checked; an owner's key log is taken down only for itself. Drafts are
+neither withdrawn nor taken down: they are simply deleted. OCFL version 2 is
+expected to add a native mechanism for deleting single files; whether
+OpenSheaf uses it is open (#32).
 
 ## Can I use "All rights reserved"?
 
@@ -324,7 +332,8 @@ entered as a custom licence.
 
 If the archive follows the website profile: each document then has a landing
 page with the `citation_*` meta tags Google Scholar reads, and a PDF on the
-same host. Appendix C also recommends a sitemap and FAIR Signposting links.
+same host. The profile (appendix A.3) also recommends a sitemap and FAIR
+Signposting links.
 
 ## How do I check an archive?
 
@@ -333,8 +342,10 @@ A verifier validates the JSON files against the schemas in
 validator (such as `ocfl-py`), checks that the discovery document matches the
 storage root, checks the key logs and the owners' signatures of every version,
 and resolves and checks the members of the head of every collection (and,
-optionally, those of earlier versions). The specification (section 14) lists
-the checks.
+optionally, those of earlier versions). It reports errors (breaches of what
+the specification requires), warnings, and results that are neither (the
+status of each signature and member, forks, ended owners, withdrawals). The
+specification (section 14) lists the checks.
 
 ## Is the format stable?
 

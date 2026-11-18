@@ -133,10 +133,10 @@ on GitHub, and archives made with them.
   a companion to the specification: how to keep, publish and copy an archive
   in a git repository without changing its bytes.
 - [`opensheaf-timestamps-0.1.md`](opensheaf-timestamps-0.1.md): OpenSheaf
-  timestamps, an extension to the identity proposal: how an owner dates its
+  timestamps, an extension of the specification: how an owner dates its
   signatures (RFC 3161, OpenTimestamps) and declares it in its key log, so
   that readers can tell which versions existed by a date, for instance before
-  a key was exposed and the owner ended.
+  a key was exposed.
 - [`README.md`](https://github.com/opensheaf/opensheaf.github.io/blob/main/README.md): this text, also the home page of the site.
 - [`schemas/`](https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas): the JSON Schemas of the files defined by the
   specification, also published at `https://opensheaf.org/schemas/`:
@@ -145,13 +145,15 @@ on GitHub, and archives made with them.
   [`opensheaf-object-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-object-0.1.schema.json)
   for `object.json`,
   [`opensheaf-collection-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-collection-0.1.schema.json)
-  for `members.json`, and, for the identity proposal,
+  for `members.json`,
   [`opensheaf-genesis-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json)
   for `genesis.json`,
   [`opensheaf-keys-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json)
   for `keys.json`,
   [`opensheaf-signature-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-signature-0.1.schema.json)
-  for signature files and
+  for signature files,
+  [`opensheaf-keeper-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-keeper-0.1.schema.json)
+  for a keeper's `/.well-known/opensheaf` and
   [`opensheaf-index-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json)
   for the index files; and, for the timestamps extension,
   [`opensheaf-timestamps-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json)

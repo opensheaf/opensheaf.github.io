@@ -279,7 +279,7 @@ The signatures of an ended or tainted owner, and the signatures made with nullif
 
 **Nullified keys.** An archive adds no version, of a line or of a key log, that is signed only thanks to a signature made with a nullified key or naming a version carried by a fork record or a healing version (section 7.5); the versions it holds stay. Since fork records and healing versions travel with key logs, every archive that receives one applies this rule from then on.
 
-**Ended and tainted owners.** An archive that knows an owner is ended or tainted adds that owner's key log up to the ending version or the fork record, and takes that owner's lines only from copies found elsewhere, never as new deposits; section 7 gives the rule for adding their versions. The work of an ended owner continues under its successor, by branches of its versions (section 9); a healed owner continues its own lines. Resolvers and verifiers report ended, tainted and healed owners, and successors (sections 12 and 14).
+**Ended and tainted owners.** An archive that knows an owner is ended or tainted adds that owner's key log up to the ending version, or up to the fork record and any healing version after it, and takes that owner's lines only from copies found elsewhere, never as new deposits; section 7 gives the rule for adding their versions. The work of an ended owner continues under its successor, by branches of its versions (section 9); a healed owner continues its own lines. Resolvers and verifiers report ended, tainted and healed owners, and successors (sections 12 and 14).
 
 ### 6.5 Key logs travel with the objects they sign
 
@@ -750,7 +750,7 @@ A verifier reports every finding with its place (the archive, an object, a versi
 
 - an <dfn>error</dfn>: a breach of a MUST or MUST NOT, except where this section makes it a warning. An archive or an object without errors <dfn>passes</dfn> verification;
 - a <dfn>warning</dfn>: a breach of a SHOULD; a breach that the archive cannot repair, where this section says so; a check not made or not completed;
-- a <dfn>result</dfn>, neither: the statuses of signature files, versions and members (sections 7.3 and 8.5), the verdicts of branches (section 9.3), forks of lines and of key logs (sections 6.3 and 7.4), ended owners and their successors (sections 6.3 and 6.6), withdrawals (section 13.1) and removals (section 13.3).
+- a <dfn>result</dfn>, neither: the statuses of signature files, versions and members (sections 7.3 and 8.5), the verdicts of branches (section 9.3), forks of lines and of key logs (sections 6.3 and 7.4), ended, tainted and healed owners, nullified keys and successors (sections 6.3 and 6.6), withdrawals (section 13.1) and removals (section 13.3).
 
 **Checks not made.** A verifier reading an archive over HTTP cannot list folders: it checks the objects the discovery document lists, and warns that it has not checked that the storage root holds no others, nor the files of witness folders whose names it cannot compute; one with access to the files checks them. A verifier MAY bound the depth of the chains and collections it follows (section 9.3), SHOULD bound the size of what it fetches (section 15.2), and warns where it stops.
 

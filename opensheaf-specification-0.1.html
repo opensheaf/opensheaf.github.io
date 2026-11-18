@@ -1280,12 +1280,13 @@
     <p>
       <strong>Ended and tainted owners.</strong> An archive that knows an
       owner is ended or tainted adds that owner's key log up to the ending
-      version or the fork record, and takes that owner's lines only from
-      copies found elsewhere, never as new deposits; section 7 gives the rule
-      for adding their versions. The work of an ended owner continues under
-      its successor, by branches of its versions (section 9); a healed owner
-      continues its own lines. Resolvers and verifiers report ended, tainted
-      and healed owners, and successors (sections 12 and 14).
+      version, or up to the fork record and any healing version after it, and
+      takes that owner's lines only from copies found elsewhere, never as new
+      deposits; section 7 gives the rule for adding their versions. The work
+      of an ended owner continues under its successor, by branches of its
+      versions (section 9); a healed owner continues its own lines. Resolvers
+      and verifiers report ended, tainted and healed owners, and successors
+      (sections 12 and 14).
     </p>
     <h3 id="auto-22"><a id="65-key-logs-travel-with-the-objects-they-sign"></a>6.5 Key logs travel with the objects they sign<span
     style="margin-left: 1em"></span></h3>
@@ -3046,8 +3047,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           a <dfn>result</dfn>, neither: the statuses of signature files,
           versions and members (sections 7.3 and 8.5), the verdicts of
           branches (section 9.3), forks of lines and of key logs (sections 6.3
-          and 7.4), ended owners and their successors (sections 6.3 and 6.6),
-          withdrawals (section 13.1) and removals (section 13.3).
+          and 7.4), ended, tainted and healed owners, nullified keys and
+          successors (sections 6.3 and 6.6), withdrawals (section 13.1) and
+          removals (section 13.3).
         </p>
       </li>
     </ul>

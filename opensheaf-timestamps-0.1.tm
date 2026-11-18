@@ -7,21 +7,21 @@
 
   <chapter*|OpenSheaf timestamps>
 
-  <notes-abstract|Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 18 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that it does so, so that readers can tell which versions existed by a date, for instance before an owner ended. The extension is named by the URI <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.>
+  <notes-abstract|Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 19 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that it does so, so that readers can tell which versions existed by a date, for instance before a key was exposed. The extension is named by the URI <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.>
 
-  <os-alert|warning|Warning.|<strong|Proposal.> This extension belongs to the identity proposal of the specification (owners, key logs and signatures, sections 6 and 7), on the branch <verbatim|proposal/identity> (PR #30), not yet agreed. It is discussed in <hlink|issue #55|https://github.com/opensheaf/opensheaf.github.io/issues/55>.>
+  <os-alert|warning|Warning.|<strong|Draft.> This extension rests on the owners, key logs and signatures of the specification (sections 6 and 7), whose field names are open (<hlink|issue #55|https://github.com/opensheaf/opensheaf.github.io/issues/55>), and on its fork records and healing, provisional (<hlink|issue #58|https://github.com/opensheaf/opensheaf.github.io/issues/58>).>
 
   <section*|1. Introduction (non-normative)><label|1-introduction-non-normative>
 
-  In the <hlink|OpenSheaf specification|opensheaf-specification-0.1.tm>, every version of a line is signed by its owner, under a version of the owner's key log, and a good signature stays good (sections 6 and 7 of the specification). Signatures say who made a version, not when. So when a key may have been exposed, the core cannot tell the signatures made with it before from those its new holder makes after: the owner ends, its signatures stay good, and readers trust its history only as far as other evidence goes (section 6.4 of the specification).
+  In the <hlink|OpenSheaf specification|opensheaf-specification-0.1.tm>, every version of a line is signed by its owner, under a version of the owner's key log, and a good signature stays good (sections 6 and 7 of the specification). Signatures say who made a version, not when. So when a key may have been exposed, the core cannot tell the signatures made with it before from those its new holder makes after: the owner ends, or nullifies the keys by a fork of its key log and heals it (section 6.3 of the specification); its signatures stay good, and readers trust its history only as far as other evidence goes (section 6.4 of the specification).
 
   A timestamp is such evidence: it shows that a signature existed by a date. A single researcher needs none. A journal, an institution, or anyone who wants its history to be trusted after a key is lost to others adopts this extension in its key log, from its first version, so that every signature it makes is dated.
 
   <section*|2. Conventions><label|2-conventions>
 
-  The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL in this document are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals. Terms are those of the specification: owner, key log, key-log version, signature file, witness, line, branch, ended owner.
+  The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL in this document are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals. Terms are those of the specification: owner, key log, key-log version, signature file, witness, line, branch, ended owner, fork record, nullified key, tainted owner, healing version.
 
-  This extension follows the extension mechanism of section 4 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes the status of a signature or a version, never ends an owner or decides a fork, and never lets a version into an archive. A reader that does not know it ignores the files and data it defines.
+  This extension follows the extension mechanism of section 2 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes the status of a signature or a version, never ends an owner or decides a fork, and never lets a version into an archive. A reader that does not know it ignores the files and data it defines.
 
   <section*|3. Timestamps><label|3-timestamps>
 
@@ -143,6 +143,8 @@
     <item><strong|0.1 (draft), 17 November 2026, after a thirteenth review of PR #30:> the declaration is the entry itself, with only <verbatim|timestampAuthorities>; the authorities trusted for a signature are those listed up to the key-log version it names, not later ones; guidance for tools merged into section 6.
 
     <item><strong|0.1 (draft), 18 November 2026, after a fourteenth review of PR #30:> a date counts only if not earlier than the date of the key-log version the signature names, so that an authority listed later dates nothing before its listing; a version vouched for existed by the date of the version that vouches for it; a compromised authority means a new owner; repetitions cut.
+
+    <item><strong|0.1 (draft), 19 November 2026, for the rebuilt specification (PR #30):> section references updated (extensions are in section 2); an exposed key ends the owner or is nullified by a fork of its key log and healing, and dates help readers weigh the versions of ended and tainted owners and of nullified keys (section 6).
   </itemize>
 
 </body>

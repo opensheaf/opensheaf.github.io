@@ -40,7 +40,7 @@ notes are for anyone, person or agent, changing it.
   `opensheaf-object/0.1` and so on. Archives built with the draft are
   rebuilt when 0.1 is final.
 - Each change of the specification gets a line in its changelog (section
-  17), dated, and the date in the heading is updated; the same holds for the
+  16.2), dated, and the date in the heading is updated; the same holds for the
   timestamps extension and the git companion, which have changelogs of
   their own.
 - Open design questions are discussed in the
