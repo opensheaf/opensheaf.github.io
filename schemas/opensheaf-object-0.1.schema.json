@@ -257,16 +257,16 @@
     "name": {
       "type": "string",
       "pattern": "^[a-z2-7]{52}$",
-      "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
+      "$comment": "section 5.2: a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
     },
     "owner": {
       "type": "string",
       "pattern": "^[a-z2-7]{52}$",
-      "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+      "$comment": "section 6: an owner name, the name of the owner's genesis record (52 characters of base32)"
     },
     "parent": {
       "type": "object",
-      "$comment": "proposal (section 10.5): the parent version of a branch",
+      "$comment": "section 9.1: the parent version of a branch",
       "required": [
         "owner",
         "name",
@@ -278,12 +278,12 @@
         "owner": {
           "type": "string",
           "pattern": "^[a-z2-7]{52}$",
-          "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+          "$comment": "section 6: an owner name, the name of the owner's genesis record (52 characters of base32)"
         },
         "name": {
           "type": "string",
           "pattern": "^[a-z2-7]{52}$",
-          "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
+          "$comment": "section 5.2: a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
         },
         "objectVersion": {
           "$ref": "#/$defs/objectVersion"
@@ -499,7 +499,7 @@
         }
       },
       "then": {
-        "$comment": "proposal (section 7.5): an owner object records only format, specification, kind, name, owner and status, and optionally extensions",
+        "$comment": "section 4.3: an owner object records only format, specification, kind, name, owner and status, and optionally extensions",
         "required": [
           "name",
           "owner"

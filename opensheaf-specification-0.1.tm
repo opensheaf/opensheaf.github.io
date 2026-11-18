@@ -625,11 +625,121 @@
     <item>What a collection may state about its members (volume, acceptance, the journal's own DOI, a retraction by the journal) (#40).
   </itemize>
 
+  <section*|9. Branches and accepted copies><label|9-branches-and-accepted-copies>
+
+  A <dfn|branch> is a line of another owner that continues a work from a signed version of another line, its <dfn|branch point> or <dfn|parent version>: a co-author carrying the work on, the successor of an ended owner (section 6.4), a journal keeping the version it vetted. It has the work's genesis record, and so its name, or after a clash another name of the same record (section 5.3). It is a new object, with its own identifier <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> (section 4), holding the branch point and its own versions, never the parent's other versions. An originator never owns a branch of its own work (section 5.3).
+
+  <subsection*|9.1 The parent: parent in object.json><label|91-the-parent-parent-in-objectjson>
+
+  Every version of a branch MUST have in <verbatim|object.json> (section 4.3) <verbatim|parent>, its branch point, with:
+
+  <\itemize>
+    <item><verbatim|owner> and <verbatim|name>: the line of the parent version;
+
+    <item><verbatim|objectVersion> and <verbatim|inventorySha512>: the parent version and the SHA-512 digest of its inventory file, a pin (section 4);
+
+    <item><verbatim|documentVersion>: the document version it holds;
+
+    <item><verbatim|url>, which it SHOULD have: the URL of that object version, <verbatim|\<less\>storage root URL\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/>, where <verbatim|\<less\>path\<gtr\>> is the parent object's path in the layout of that storage root (section 3.2). It is a hint (section 3), used in resolution (section 12), and MAY point to a copy of the parent's line kept beside the branch (section 9.5).
+  </itemize>
+
+  The branch's <verbatim|owner> MUST differ from <verbatim|parent.owner>. Only a signed version is branched (section 7.3).
+
+  <subsection*|9.2 The first version and its evidence><label|92-the-first-version-and-its-evidence>
+
+  The first object version of a branch holds exactly the files of the parent version, the genesis record included, except its <verbatim|datacite.json>, its <verbatim|object.json> and its own evidence; the branch's own <verbatim|datacite.json> and <verbatim|object.json>; and the <dfn|evidence> of the branch point, as files of its content:
+
+  <\itemize>
+    <item><verbatim|parent.inventory.json>: the inventory of the parent version;
+
+    <item><verbatim|parent.object.json>: its <verbatim|object.json>;
+
+    <item><verbatim|parent.signatures/>: the parent owner's signature files of the parent version, named as in its witness folder without the <verbatim|\<less\>version\<gtr\>/> folder (<verbatim|parent.signatures/signature-\<less\>k\<gtr\>.json>, section 7.2), with the witnesses kept beside them, if any (timestamps); other witnesses of the parent version (a third party's signature) MAY be kept with them;
+
+    <item><verbatim|parent.chain/>, when the parent is itself a branch: the parent version's own evidence, so that the grandparent's is at <verbatim|parent.chain/parent.inventory.json>, the great-grandparent's at <verbatim|parent.chain/parent.chain/parent.inventory.json>, and so on back to a version of the originator's line.
+  </itemize>
+
+  Every file copied is copied byte for byte, and never re-serialised or replaced. A branch MUST hold <verbatim|parent.signatures/> at every branch point, and <verbatim|parent.chain/> when its parent is a branch. The evidence is covered by the branch's own inventories and signatures; with the genesis record it forms the branch's identity files (section 4.1). The key logs that the evidence needs are kept beside every copy of the branch, never in it (section 6.5).
+
+  <subsection*|9.3 Checking a branch><label|93-checking-a-branch>
+
+  The evidence shows, without access to the parent's line, that a branch point is the parent owner's. A branch point is consistent when:
+
+  <\itemize>
+    <item><strong|the name:> the branch's <verbatim|name> and <verbatim|parent.name> are names of <verbatim|genesis.json> (section 5.2), and the branch's <verbatim|name> is <verbatim|parent.name> unless it was renamed after a clash, by a greater algorithm number (section 5.3);
+
+    <item><strong|the pin:> the SHA-512 digest of <verbatim|parent.inventory.json> is <verbatim|parent.inventorySha512>, and its <verbatim|head> is <verbatim|parent.objectVersion>;
+
+    <item><strong|the files:> every file of the head state of <verbatim|parent.inventory.json>, <verbatim|genesis.json> included, except <verbatim|datacite.json>, <verbatim|object.json> and the parent's evidence, is present at the same logical path with the same digest; no other file is present besides the branch's <verbatim|datacite.json>, <verbatim|object.json> and evidence; and <verbatim|parent.object.json> has the digest of <verbatim|object.json> in that state;
+
+    <item><strong|the parent:> <verbatim|parent.owner>, <verbatim|parent.name> and <verbatim|parent.documentVersion> are those of <verbatim|parent.object.json>; the branch's owner is neither the parent's owner nor the originator; and either the parent's owner is the originator and <verbatim|parent.object.json> has no <verbatim|parent>, or it has one;
+
+    <item><strong|the signatures:> the parent version is signed (section 7.3), by the signature files of <verbatim|parent.signatures/> against the parent owner's key log kept beside the branch, or vouched for by a signed version of the parent's line that the verifier finds; or it is unchecked;
+
+    <item><strong|the chain:> when <verbatim|parent.object.json> has a <verbatim|parent>, <verbatim|parent.chain/> holds that evidence, each file with the digest <verbatim|parent.inventory.json> records for it, and it passes these checks in turn, level by level, up to the originator's line.
+  </itemize>
+
+  A chain is finite, since each level is fixed by a digest in the level below. Verifiers MAY bound the depth they follow, and report where they stop; a branch point checked only down to that bound is unchecked.
+
+  <strong|Verdicts.> A branch point is, in this order:
+
+  <\itemize>
+    <item><dfn|inconsistent> when a check fails, a parent version is not a version (section 7.3), or the parent version, resolved, does not match the pin;
+
+    <item><dfn|confirmed> when the parent version, at every level, is signed;
+
+    <item>otherwise <dfn|unchecked>: consistent, but a parent version is unchecked.
+  </itemize>
+
+  The verdict of a branch is the weakest of those of its branch points. Verifiers report apart whether the parent's line is found, unavailable or removed (section 13), and whether it is withdrawn.
+
+  <strong|Ended owners.> A branch point stays confirmed when its parent's owner ends or its key log forks afterwards, since signatures stay good; readers weigh it as they weigh that owner's history (section 6.4). A signature naming an ending version is invalid (section 7.3), and cannot sign a parent version.
+
+  <subsection*|9.4 Later versions and moving the branch point><label|94-later-versions-and-moving-the-branch-point>
+
+  The later versions of a branch are its owner's, signed like those of any line (section 7). They MUST keep the identity files unchanged, byte for byte, until a version that moves the branch point.
+
+  <strong|Moving the branch point.> A branch MAY take as a new branch point a later version of the same parent line (a journal vetting the authors' corrected version): with the same <verbatim|owner> and <verbatim|name>, a higher object version, and a document version later than the previous branch point's in the history of the new parent version (section 4.2). A parent version holding the same document version (a DOI added) is not a new branch point; a branch point never moves back and is never dropped. The version whose <verbatim|parent> differs from the one before holds exactly the files of the new parent version with new evidence, and is checked as a first version is (section 9.3), and also for continuity: the two parent inventories have the same <verbatim|id>, every entry of <verbatim|versions> of the previous one is equal, as a JSON value, to the entry of the same version in the new one, and every digest in those entries is in the manifest of the new one. The branch's own notes and notices then lose their files (#57).
+
+  <strong|Numbering.> The first version of a branch holds the document version of its branch point. Provisionally, later versions continue from it without gaps (section 4.2), a version that moves the branch point taking the next number, while <verbatim|parent.documentVersion> keeps the parent's (#57).
+
+  <strong|Naming.> A branch is named as section 5.3 says. When the line it would take is its owner's branch of the same parent line, and the new branch point is later in that line's history than that branch's current one, the owner moves that branch's branch point instead; otherwise the new branch is renamed.
+
+  <subsection*|9.5 Continuing another owner's work><label|95-continuing-another-owners-work>
+
+  A line is not handed over. When another owner continues the work (an author leaving an institution whose line it was, a journal handing a report to its referee), the new owner makes a branch, and the previous owner MAY add a notice to its line pointing to it. An owner moving its lines to another archive hands nothing over: they stay its lines (section 6.5).
+
+  A branch holds none of the parent's earlier versions. An owner who wants them at hand keeps beside the branch a copy of the parent's line (section 11), at the parent's identifier, with its signatures and key log.
+
+  <subsection*|9.6 Accepted copies><label|96-accepted-copies>
+
+  An <dfn|accepted copy> is a branch kept by the owner of a selection (section 8.4) from a revision it vetted. Selections that keep copies of the same document MUST have different owners, also in one archive, so that their accepted copies are different lines, never renamed against each other. The later versions of an accepted copy are acts of the selection's curator (a corrected version accepted, by moving the branch point; a notice; a withdrawal); the authors' later versions change nothing in it.
+
+  The selection lists the accepted copy as a member; it MAY also list the original revision set. An accepted copy is not a mirror: a location holding only it is never given in <verbatim|at> for the parent's line (section 8.2).
+
+  A version the selection makes itself, such as a typeset version of record, is a later version of its accepted copy, with the selection as <verbatim|publisher>, the authors' <verbatim|agreement> (section 4.3), and relations to the authors' versions (section 4.4). A branch carries versions of the same work; a derived work (a translation, a review, a collected edition) is a new object, with its own genesis record and a relation to its source.
+
+  <subsection*|9.7 Description and rights><label|97-description-and-rights>
+
+  <strong|Description.> A branch's <verbatim|datacite.json> has as <verbatim|publisher> its owner, or for a selection the body behind it, and keeps the relations of the parent version. Its first version, and every version that moves its branch point, SHOULD link the parent version with <verbatim|IsIdenticalTo>: its DOI if it has one, otherwise <verbatim|parent.url> as a <verbatim|URL>.
+
+  <strong|Rights.> A branch needs only the right to redistribute its parent versions, and the files it copies keep their licence; a copy of the parent's line beside it needs the right to redistribute every version copied (section 11). The evidence is metadata, under CC0 (section 15).
+
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>The numbering of document versions on a branch: continued from the branch point (provisional), or numbered from it (3.1, 3.2), which makes <verbatim|documentVersion> more than an integer; <verbatim|/v\<less\>n\<gtr\>> of a <verbatim|sheaf:> URI follows it (#57).
+
+    <item>Moving a branch point when the branch has files of its own (of its notes, a withdrawal, a version of record): probably a merge keeping both, with evidence that tells them apart (#57).
+
+    <item>The field and folder names of the evidence (#55).
+  </itemize>
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
-  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 8 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 9 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  9. Branches and accepted copies. 10. Drafts and sealing. 11. Copies and mirrors (moving an owner is in section 6.5). 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
+  10. Drafts and sealing. 11. Copies and mirrors (moving an owner is in section 6.5). 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
 
   Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
 
