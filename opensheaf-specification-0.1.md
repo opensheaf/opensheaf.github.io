@@ -40,11 +40,46 @@ JSON means RFC 8259 JSON in UTF-8 without a byte order mark. URLs are absolute u
 
 **Schemas.** The JSON files defined here MUST validate against the JSON Schemas of appendix B for their declared format version.
 
+## 3. Archives
+
+An <dfn>archive</dfn> is a host of objects, served at a <dfn>base URL</dfn> ending with `/`. It holds the lines that owners write there (section 7) and copies of lines written elsewhere (section 11). It has no identity of its own and owns nothing by hosting: what is authentic is decided by the owners' signatures (section 7), and an archive decides only which owners it hosts and how they deposit (a university admitting its staff, a journal its editors). Its base URL is a location, not a name, and may change.
+
+An archive consists of a **discovery document**, REQUIRED (section 3.1); a **storage root**, REQUIRED (section 3.2); **indexes**, RECOMMENDED (section 12); and **presentation files**, OPTIONAL: web pages and other files generated for readers, never authoritative, kept outside the storage root (appendix A).
+
+**Serving.** The discovery document, the storage root and the indexes MUST be served byte for byte, as stored: no conversion of line endings or character sets, and no compression that changes the bytes delivered after decoding. Archives SHOULD be served over HTTPS, and SHOULD allow cross-origin requests to these files (`Access-Control-Allow-Origin: *`), so that tools in a browser can read them. Any static web server will do; an archive kept in git follows [OpenSheaf archives in git](opensheaf-git-0.1.md).
+
+**Moving.** An archive moving to another site copies its files; nothing in them changes, so every pin, signature and witness stays valid. Its base URL, and every location of a copy given elsewhere (in collections, `sheaf:` URIs, discovery documents), is a hint that needs no signature: whatever is fetched from it is checked against pins and signatures, so a wrong or stale location gives a reader nothing, or an older valid copy, never a forged one.
+
+### 3.1 The discovery document
+
+The <dfn>discovery document</dfn> is the JSON file `opensheaf.json` at the base URL. Static web servers cannot list folders; this one file makes an archive's objects known. It MUST contain:
+
+- `format`: `"opensheaf-archive/0.1"`, and `specification`: `"0.1"`;
+- `name`: a readable name of the archive;
+- `storageRoot`: the URL of the storage root, ending with `/` (it may be relative);
+- `storageLayout`: its layout, `"opensheaf-owner-name-storage-layout"` or `"0003-hash-and-id-n-tuple-storage-layout"` (section 3.2);
+- `profiles`: the profiles it follows, from `zenodo`, `texmacs`, `website` (appendix A), possibly none;
+- `objects`: every object of the storage root except drafts, each with `id` (section 4), `kind`, `name` and `owner` (section 7), `head` (its OCFL head version), `inventorySha512` (the SHA-512 digest of the head inventory, as its checksum file states it) and `status` (`active` or `withdrawn`, section 13), and OPTIONALLY a `label`.
+
+It SHOULD contain `mainCollection`, the identifier of the catalogue of the archive's documents (section 8); `contact`, a URI; and `extensions`, the names of the extensions its objects use (section 2). It MAY contain `owners`, the owner names of the owners it hosts (section 6); `drafts`, the drafts it chooses to show, with `id`, `kind` and `head`, as unfinished work on which nothing may rely (section 10); `replicas`, base URLs of complete copies of the whole archive (distinct from mirrors of lines, section 11); `tombstones` (section 13); `indexes` (section 12); and `feed`, the URL of an Atom feed of new object versions.
+
+The discovery document is rewritten whenever an object is added or changed. It is a map, not a witness: everything it states about objects MUST agree with the storage root, which verifiers check (section 14), and it lists what the archive holds, not every line an owner has elsewhere.
+
+**Labels.** A <dfn>label</dfn> is a short readable name an archive MAY give a line it holds, for readable URLs on its website: it matches `^[a-z0-9]+(-[a-z0-9]+)*$`, has at most 64 characters, and is unique in the discovery document. It is the archive's choice, may change, and is not an identifier; permanent links use `sheaf:` URIs (section 12). Labels SHOULD be chosen by the depositor, not derived from the title.
+
+### 3.2 The storage root
+
+The <dfn>storage root</dfn> is an OCFL 1.1 storage root at the URL `storageRoot`, holding the archive's objects (section 4). Since OCFL allows in it only the folders that lead to objects, and extensions, it SHOULD be a dedicated folder (by convention `ocfl/`), and presentation files MUST NOT be placed in it. It MAY contain, as loose files, copies of the OCFL specification and of this one. Its `ocfl_layout.json` names its storage layout, which MUST be the one given by `storageLayout`:
+
+- **The owner-name layout**, `opensheaf-owner-name-storage-layout`, the default, defined here (not yet registered with OCFL, so validators may warn about it). The object whose identifier is `sheaf:<name>:<owner>` (section 4) is at `<owner>/<name>/`, and a draft `sheaf:draft:<id>` at `draft/<id>/`; any other identifier is an error. An owner's object is thus at `<owner>/<owner>/`, and the folder of an owner holds its key log and every line of it in the archive, so that an owner moving elsewhere copies one folder. The layout has no parameters; `ocfl_layout.json` describes it as `"Lines at <owner>/<name>, drafts at draft/<id>"`.
+- **The hashed layout**, for large archives: OCFL's `0003-hash-and-id-n-tuple-storage-layout` with its default parameters (`sha256`, tuples of 3 characters, 3 tuples), which a configuration file, if present, MUST NOT change. An object is at `<t1>/<t2>/<t3>/<encoded id>/`, where `<t1>`, `<t2>`, `<t3>` are the first three groups of three characters of the hexadecimal SHA-256 digest of its identifier, and `<encoded id>` is the identifier percent-encoded as the extension says (every character but `A-Z`, `a-z`, `0-9`, `-` and `_`), shortened, when longer than 100 characters, to its first 100 characters, `-` and the full digest; identifiers of lines are always shortened so (appendix C). Readers compute the path; they never decode it.
+
+Archives SHOULD use the owner-name layout, unless one folder per owner or per name becomes impractical (tens of thousands of lines, fewer in a git repository). The layout is chosen when the archive is created and SHOULD NOT be changed: pins stay valid, since readers compute paths from `storageLayout`, but every URL into the storage root changes.
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 and 2 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 3 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-3. Archives: the discovery document, addresses, the layout of the storage root.
 4. Objects: OCFL rules, documents and document versions, `object.json`, `datacite.json`.
 5. Names: genesis records and names.
 6. Owners: key logs, retiring keys, ending, forks.

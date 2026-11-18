@@ -55,7 +55,7 @@
       },
       "uniqueItems": true
     },
-    "mirrors": {
+    "replicas": {
       "type": "array",
       "items": {
         "type": "string",
