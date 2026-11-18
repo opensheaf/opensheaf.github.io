@@ -364,21 +364,534 @@
       <tt class="verbatim">storageLayout</tt>, but every URL into the storage root
       changes.
     </p>
-    <h2 id="auto-7"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-7"><a id="4-objects"></a>4. Objects<span style="margin-left: 1em"></span></h2>
+    <p>
+      An <dfn>object</dfn> is an OCFL 1.1 object in a storage root. Its
+      <dfn>kind</dfn>, given by its <tt class="verbatim">object.json</tt> and never by
+      its identifier, is <tt class="verbatim">document</tt>, one work (an article,
+      notes, a thesis, a book) with its sources and renditions; <tt class="verbatim">collection</tt>,
+      a list of members (section 8); or <tt class="verbatim">owner</tt>, the key log of
+      an owner (section 6).
+    </p>
+    <p>
+      <strong>Identifier.</strong> The <dfn>identifier</dfn> of an object, its
+      OCFL <tt class="verbatim">id</tt>, is <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>,
+      the name of the work (section 5) and the owner name of its line's owner
+      (section 6), which <tt class="verbatim">object.json</tt> records as <tt class="verbatim">name</tt>
+      and <tt class="verbatim">owner</tt>. It names the line (section 7), in every
+      archive. A branch is a new object with its own identifier (section 9); a
+      draft is <tt class="verbatim">sheaf:draft:&lt;id&gt;</tt> (section 10). The
+      identifier MUST be unique in the storage root, and that of a sealed
+      object MUST NOT be reused there, also after a takedown (section 13).
+    </p>
+    <p>
+      <strong>Versions.</strong> An <dfn>object version</dfn> is an OCFL
+      version of an object (<tt class="verbatim">v1</tt>, <tt class="verbatim">v2</tt>, &hellip;):
+      every change of the object makes one, and none changes once made. A
+      <dfn>document version</dfn> is a version of the work, a positive integer
+      numbered by the owner of the line and recorded in <tt class="verbatim">object.json</tt>
+      and <tt class="verbatim">datacite.json</tt>; it changes only when the document's
+      own files change (section 4.2), so several object versions may hold one
+      document version, with different descriptions or notices.
+    </p>
+    <p>
+      <strong>Pins.</strong> A <dfn>pin</dfn> is the pair (object version,
+      SHA-512 digest of that version's inventory file, as its checksum file
+      states it). An inventory records the digests of the files of its version
+      and of every earlier one, so a pin fixes the object up to that version,
+      in any copy. Collections (section 8), branches (section 9) and <tt
+      class="verbatim">sheaf:</tt> URIs (section 12) refer to object versions by pins,
+      and pin only signed versions (section 7).
+    </p>
+    <h3 id="auto-8"><a id="41-common-rules"></a>4.1 Common rules<span style="margin-left: 1em"></span></h3>
+    <p>
+      Every object MUST be a valid OCFL 1.1 object, and:
+    </p>
+    <ul>
+      <li>
+        <p>
+          its inventories MUST use the digest algorithm <tt class="verbatim">sha512</tt>;
+          they MAY also record MD5 and SHA-256 digests in <tt class="verbatim">fixity</tt>
+          (the Zenodo profile requires MD5, appendix A);
+        </p>
+      </li>
+      <li>
+        <p>
+          every version directory MUST contain the inventory as of that
+          version, with its checksum file, so that each version can be pinned
+          and fetched on its own;
+        </p>
+      </li>
+      <li>
+        <p>
+          version directories MUST NOT be zero-padded (<tt class="verbatim">v1</tt>, not
+          <tt class="verbatim">v001</tt>);
+        </p>
+      </li>
+      <li>
+        <p>
+          logical paths MUST be in UTF-8 and Unicode normalisation form C, and
+          MUST NOT begin with <tt class="verbatim">/</tt> or contain <tt class="verbatim">.</tt>
+          or <tt class="verbatim">..</tt> segments.
+        </p>
+      </li>
+    </ul>
+    <p>
+      <strong>Deposits.</strong> Each version in the inventory MUST have a <tt
+      class="verbatim">user</tt> with a <tt class="verbatim">name</tt>, SHOULD give its <tt class="verbatim">address</tt>
+      (an ORCID iD, a <tt class="verbatim">mailto:</tt> URI or another URI identifying
+      the depositor), and MUST have a <tt class="verbatim">message</tt> describing the
+      change. The <tt class="verbatim">created</tt> date and <tt class="verbatim">user</tt> of an
+      object version record its <dfn>deposit</dfn>, not repeated in <tt class="verbatim">object.json</tt>;
+      the deposit of a document version is that of the first object version
+      holding it.
+    </p>
+    <p>
+      <strong>Content.</strong> Every object version MUST contain, at the top
+      level of its content, <tt class="verbatim">object.json</tt> (section 4.3); <tt
+      class="verbatim">datacite.json</tt> (section 4.4), except in an owner object; and
+      the genesis record <tt class="verbatim">genesis.json</tt> (section 5), except in a
+      draft. Every version of a branch also holds the evidence of its branch
+      point: <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
+      <tt class="verbatim">parent.signatures/</tt> and, for a branch of a branch, <tt
+      class="verbatim">parent.chain/</tt> (section 9). The genesis record and this
+      evidence are the <dfn>identity files</dfn> of the object, never files of
+      the document's own. The names of every file this specification defines
+      at the top level of the content (<tt class="verbatim">object.json</tt>, <tt class="verbatim">datacite.json</tt>,
+      <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">members.json</tt>, <tt class="verbatim">keys.json</tt>,
+      <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
+      <tt class="verbatim">parent.signatures</tt>, <tt class="verbatim">parent.chain</tt>) are
+      reserved for those files. A collection version also holds <tt class="verbatim">members.json</tt>
+      (section 8). An owner object holds <tt class="verbatim">genesis.json</tt> and <tt
+      class="verbatim">keys.json</tt> (section 6) and no <tt class="verbatim">datacite.json</tt>;
+      it has no document versions, and is never withdrawn or branched.
+      Signatures and other witnesses are kept outside every version, in the
+      object's extension folder <tt class="verbatim">extensions/opensheaf-witnesses/</tt>
+      (section 7).
+    </p>
+    <h3 id="auto-9"><a id="42-documents-and-document-versions"></a>4.2 Documents and document versions<span style="margin-left: 1em"></span></h3>
+    <p>
+      A document version holds, at the top level of its content unless a
+      profile says otherwise, besides the files of section 4.1:
+    </p>
+    <ul>
+      <li>
+        <p>
+          the <dfn>sources</dfn>: the main source and every file needed to
+          produce the renditions that is not part of the toolchain (images,
+          bibliography databases, local style files); they SHOULD be flat (no
+          sub-folders) when possible;
+        </p>
+      </li>
+      <li>
+        <p>
+          the <dfn>renditions</dfn>, files produced from the sources (a PDF,
+          an EPUB): OPTIONAL, but RECOMMENDED, at least a PDF for a document
+          meant to be read and cited;
+        </p>
+      </li>
+      <li>
+        <p>
+          the files of its notes, if any (section 4.3).
+        </p>
+      </li>
+    </ul>
+    <p>
+      The sources, the renditions and the change note (<tt class="verbatim">changes</tt>,
+      section 4.3) are the document's own files. HTML versions and other
+      presentation files SHOULD NOT be deposited.
+    </p>
+    <p>
+      <strong>Numbering.</strong> The owner of the line numbers document
+      versions from 1, without gaps, independently of any external numbering:
+      a work whose versions 1, 3 and 4 are on arXiv has document versions 1, 2
+      and 3. External labels (arXiv's <tt class="verbatim">v3</tt>) are recorded in <tt
+      class="verbatim">external</tt> (section 4.3); presentations SHOULD show them with
+      the document version. Branches number as section 9 says.
+    </p>
+    <p>
+      <strong>New versions.</strong> A new document version is made exactly
+      when the document's own files change (a file added, changed or removed,
+      the change note included), except when a version without sources is
+      completed (below); an object version holding the same own files as an
+      earlier document version keeps its number. A collection makes a new
+      document version exactly when its member list changes (section 8). A
+      version not public at the time (the manuscript submitted to a journal),
+      deposited later, is a document version like any other; a version
+      published by someone else (the journal's version of record) is not, and
+      is linked by a relation (section 4.4).
+    </p>
+    <p>
+      <strong>Description-only versions.</strong> A <dfn>description-only
+      version</dfn> holds an existing document version with its files
+      unchanged, and changes only its description (<tt class="verbatim">datacite.json</tt>:
+      a DOI, a link to the published article), its <tt class="verbatim">stage</tt>, the
+      state of the object or its notices. It MAY hold any document version, so
+      that an earlier one can be described; tools otherwise hold the current
+      version. If the object has <tt class="verbatim">history</tt>, the entry of that
+      document version becomes the new object version.
+    </p>
+    <p>
+      <strong>Completion.</strong> A document version deposited with <tt
+      class="verbatim">sourcesMissing</tt> (section 4.3) MAY be completed, keeping its
+      number, by object versions that add its sources, possibly with
+      renditions made from them, and change or remove no file of the version.
+      It keeps <tt class="verbatim">sourcesMissing</tt> until the sources are complete;
+      the object version that completes them names the main source and drops
+      <tt class="verbatim">sourcesMissing</tt>, and the version is then fixed like any
+      other.
+    </p>
+    <p>
+      <strong>History.</strong> The <dfn>history</dfn> of a document is the
+      order of its document versions in the history of the work: the order of
+      their numbers, unless <tt class="verbatim">object.json</tt> has <tt class="verbatim">history</tt>,
+      the list, in that order, of the last object version holding each
+      document version. An object version that deposits a document version out
+      of order (an earlier version found later) MUST write <tt class="verbatim">history</tt>,
+      and every later object version MUST keep it. A version whose place is
+      unknown goes just before the current version, and its change note SHOULD
+      say so. The history is read from the latest signed version of the line
+      (section 7); earlier object versions keep it as it was then known. Dates
+      never order document versions.
+    </p>
+    <p>
+      <strong>Current version.</strong> The <dfn>current version</dfn> of a
+      document is the last of its history. The latest signed version may hold
+      another document version, deposited out of order or newly described; the
+      current version stays where it was. Landing pages, indexes and citations
+      use the current version.
+    </p>
+    <p>
+      <strong>Notices.</strong> A <dfn>notice</dfn> is a statement about a
+      document version made after it, since the version cannot change (that a
+      theorem of version 2 is wrong as stated, and corrected in version 3).
+      Notices are added to <tt class="verbatim">notices</tt> by description-only
+      versions, and stay, unchanged, in every later object version (for a
+      branch whose branch point moves, see section 9); a notice is corrected
+      or withdrawn only by a later notice. Presentations showing a document
+      version SHOULD show the current notices about it.
+    </p>
+    <h3 id="auto-10"><a id="43-the-object-record-objectjson"></a>4.3 The object record: object.json<span style="margin-left: 1em"></span></h3>
+    <p>
+      Every object version MUST contain <tt class="verbatim">object.json</tt>, the
+      record of the object's identity, content, versions and state; it names
+      no archive. It MUST contain:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">format</tt>: <tt class="verbatim">&quot;opensheaf-object/0.1&quot;</tt>,
+          and <tt class="verbatim">specification</tt>: <tt class="verbatim">&quot;0.1&quot;</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">kind</tt>: <tt class="verbatim">document</tt>, <tt class="verbatim">collection</tt>
+          or <tt class="verbatim">owner</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">status</tt>: <tt class="verbatim">active</tt> or <tt class="verbatim">withdrawn</tt>
+          (section 13), always <tt class="verbatim">active</tt> for an owner;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">documentVersion</tt>, for a document or a collection:
+          equal to <tt class="verbatim">version</tt> in <tt class="verbatim">datacite.json</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          in every version of a line, <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt>
+          (sections 5 and 6), and in a branch <tt class="verbatim">parent</tt>, its
+          branch point (section 9); a draft has none of them.
+        </p>
+      </li>
+    </ul>
+    <p>
+      An owner object has only these fields, and MAY have <tt class="verbatim">extensions</tt>
+      (below), though data concerning its key log goes in <tt class="verbatim">keys.json</tt>
+      (section 6).
+    </p>
+    <p>
+      A <dfn>note</dfn> is an object with <tt class="verbatim">text</tt>, a short plain
+      text, or <tt class="verbatim">path</tt> and <tt class="verbatim">mediaType</tt>, a file of
+      the content of the same object version, or both.
+    </p>
+    <p>
+      A document MUST have <tt class="verbatim">mainSource</tt> (a logical path) and <tt
+      class="verbatim">sourceFormat</tt> (its media type), and SHOULD have <tt class="verbatim">renditions</tt>,
+      a list of <tt class="verbatim">path</tt> (a logical path) and <tt class="verbatim">mediaType</tt>,
+      and <tt class="verbatim">toolchain</tt>, a list of tools with <tt class="verbatim">name</tt>,
+      <tt class="verbatim">version</tt> and, OPTIONALLY, <tt class="verbatim">packages</tt>,
+      enough to reproduce the renditions. A document version without its
+      sources has instead <tt class="verbatim">sourcesMissing</tt>, a note saying why
+      (&quot;arXiv keeps only the PDF of this version&quot;), and at least one
+      rendition; a rendition is never presented as a source. A document MAY
+      have:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">changes</tt>: a note saying what changed in this document
+          version, deposited with it (like arXiv's comments);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">stage</tt>: the stage of this document version, with <tt
+          class="verbatim">scheme</tt> and <tt class="verbatim">value</tt>; for articles the
+          RECOMMENDED scheme is <tt class="verbatim">NISO-JAV</tt> (NISO Journal Article
+          Versions: <tt class="verbatim">AO</tt>, <tt class="verbatim">SMUR</tt>, <tt class="verbatim">AM</tt>,
+          <tt class="verbatim">P</tt>, <tt class="verbatim">VoR</tt>, <tt class="verbatim">CVoR</tt>, <tt
+          class="verbatim">EVoR</tt>), and other content uses other schemes (editions,
+          software releases), named by the archive;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">history</tt> and <tt class="verbatim">notices</tt> (section 4.2),
+          each notice a note with the <tt class="verbatim">documentVersion</tt> it is
+          about and a <tt class="verbatim">date</tt>.
+        </p>
+      </li>
+    </ul>
+    <p>
+      A collection has none of these fields of a document. A document or a
+      collection MAY have:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">licence</tt>: a note with the full text or terms of the
+          licence (for licences without an SPDX identifier); <tt class="verbatim">rightsList</tt>
+          in <tt class="verbatim">datacite.json</tt> remains the description for
+          readers;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">agreement</tt>: a minimal record that the authors agreed
+          to the deposit and the licence: <tt class="verbatim">by</tt> (names only), <tt
+          class="verbatim">date</tt> and <tt class="verbatim">method</tt> (&quot;by e-mail&quot;),
+          all REQUIRED. It MUST NOT contain e-mail addresses, correspondence
+          or signatures of persons;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">external</tt>: the external records of this version, each
+          with <tt class="verbatim">role</tt> (<tt class="verbatim">deposit</tt> for a deposit by
+          the archive, appendix A; <tt class="verbatim">source</tt> for the record it
+          was imported from), <tt class="verbatim">service</tt> (its name) and <tt
+          class="verbatim">record</tt> (its URL), all REQUIRED, and OPTIONALLY <tt
+          class="verbatim">doi</tt>, <tt class="verbatim">label</tt> (the service's label for the
+          version, such as <tt class="verbatim">v3</tt>) and <tt class="verbatim">files</tt>, the
+          files kept there but not in the content (a deposit's source archive)
+          or received from there, as received, each with <tt class="verbatim">name</tt>
+          and <tt class="verbatim">sha512</tt> (REQUIRED), <tt class="verbatim">md5</tt> and <tt
+          class="verbatim">bytes</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">withdrawal</tt>, REQUIRED when <tt class="verbatim">status</tt> is
+          <tt class="verbatim">withdrawn</tt>: a <tt class="verbatim">date</tt> and a <tt class="verbatim">reason</tt>,
+          a note (section 13);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">extensions</tt>: the data of extensions (section 2),
+          keyed by the names of the extensions.
+        </p>
+      </li>
+    </ul>
+    <h3 id="auto-11"><a id="44-the-description-datacitejson"></a>4.4 The description: datacite.json<span style="margin-left: 1em"></span></h3>
+    <p>
+      Every object version except in an owner object MUST contain <tt class="verbatim">datacite.json</tt>,
+      the DataCite 4.7 properties in the form of the <tt class="verbatim">attributes</tt>
+      of a DOI in the DataCite REST API: the authoritative description of the
+      object version. It MUST contain <tt class="verbatim">titles</tt>, <tt class="verbatim">creators</tt>
+      (with <tt class="verbatim">name</tt> and <tt class="verbatim">nameType</tt>; personal names
+      SHOULD also have <tt class="verbatim">givenName</tt> and <tt class="verbatim">familyName</tt>),
+      <tt class="verbatim">publicationYear</tt>, <tt class="verbatim">types</tt> (with <tt class="verbatim">resourceTypeGeneral</tt>),
+      <tt class="verbatim">version</tt> (the document version as a decimal string
+      without leading zeros, <tt class="verbatim">&quot;3&quot;</tt>) and <tt class="verbatim">publisher</tt>.
+      It SHOULD contain:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">descriptions</tt>, with an <tt class="verbatim">Abstract</tt>, and
+          <tt class="verbatim">subjects</tt>, with a <tt class="verbatim">subjectScheme</tt>
+          (MSC2020 is common in mathematics);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">dates</tt> (below);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">rightsList</tt>: for a licence with an SPDX identifier,
+          that identifier in lower case and the licence URL; for one without,
+          its name in <tt class="verbatim">rights</tt> and, REQUIRED then, the URL
+          identifying it in <tt class="verbatim">rightsUri</tt> (for arXiv's default
+          licence, <tt class="verbatim">http://arxiv.org/licenses/nonexclusive-distrib/1.0/</tt>);
+          or a statement such as &quot;All rights reserved&quot;, without URL;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">language</tt>, <tt class="verbatim">formats</tt> (the media types
+          of sources and renditions) and <tt class="verbatim">sizes</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          identifiers of creators (ORCID) and affiliations (ROR), where they
+          exist;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">relatedIdentifiers</tt> (below).
+        </p>
+      </li>
+    </ul>
+    <p>
+      <tt class="verbatim">publisher</tt> is the owner of the line, the body behind it
+      (a journal, an institution), or the service registering the version's
+      DOI (appendix A). <tt class="verbatim">publisher</tt> and <tt class="verbatim">affiliation</tt>
+      SHOULD be objects, with <tt class="verbatim">name</tt> and, where available, an
+      identifier; readers MUST also accept strings. <tt class="verbatim">doi</tt> and
+      <tt class="verbatim">url</tt> are present when the version has a DOI. <tt class="verbatim">resourceTypeGeneral</tt>
+      is from DataCite's list (<tt class="verbatim">Collection</tt> for collections),
+      with <tt class="verbatim">resourceType</tt> for detail (&quot;Lecture
+      notes&quot;). An author's versions of a work not published elsewhere,
+      the accepted manuscript included, are <tt class="verbatim">Preprint</tt>; <tt
+      class="verbatim">stage</tt> in <tt class="verbatim">object.json</tt> gives their stage.
+    </p>
+    <p>
+      <strong>Mathematics.</strong> Titles and abstracts are plain text, in
+      which mathematics MAY be written in LaTeX between single dollar signs
+      (<tt class="verbatim">$\Phi^4_3$</tt>; a literal dollar is <tt class="verbatim">\$</tt>). It
+      SHOULD use only the mathematical commands of LaTeX with <tt class="verbatim">amsmath</tt>
+      and <tt class="verbatim">amssymb</tt>, which common renderers display without the
+      document's preamble. Tools importing them SHOULD replace the authors'
+      macros (<tt class="verbatim">\R</tt>) with standard LaTeX when their definitions
+      are known, and otherwise keep them; they MUST NOT invent definitions.
+    </p>
+    <p>
+      <strong>Dates.</strong> Each date type has one meaning:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">Issued</tt>: the first public appearance of the work,
+          anywhere, the same in every version; RECOMMENDED, and tools
+          importing works published elsewhere SHOULD set it;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">Available</tt>, SHOULD be present: when this document
+          version first became public, anywhere (its date on the service it
+          was imported from, or its deposit, section 4.1, if this archive made
+          it public);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">Updated</tt>: the date of the latest description-only
+          version holding this document version, if any;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">Created</tt> (when a version not public at the time was
+          written), <tt class="verbatim">Submitted</tt> and <tt class="verbatim">Accepted</tt>,
+          OPTIONAL;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">Withdrawn</tt>: equal to <tt class="verbatim">withdrawal.date</tt>
+          in <tt class="verbatim">object.json</tt>.
+        </p>
+      </li>
+    </ul>
+    <p>
+      Dates MAY be approximate, as DataCite allows (<tt class="verbatim">2019-03</tt>,
+      <tt class="verbatim">2018/2019</tt>), with <tt class="verbatim">dateInformation</tt> saying
+      why; unknown dates are omitted.
+    </p>
+    <p>
+      <strong>Relations.</strong> In <tt class="verbatim">relatedIdentifiers</tt>:
+    </p>
+    <ul>
+      <li>
+        <p>
+          a document version with a DOI SHOULD have <tt class="verbatim">IsVersionOf</tt>
+          the concept DOI of the document, and <tt class="verbatim">IsNewVersionOf</tt>
+          the DOI of the version before it in the history, if it has one;
+          after a version is deposited out of order, the relation of the
+          version following it MAY be corrected by a description-only version;
+        </p>
+      </li>
+      <li>
+        <p>
+          the same work published elsewhere SHOULD be linked with <tt class="verbatim">IsIdenticalTo</tt>
+          (same content, such as an arXiv version) or <tt class="verbatim">IsVariantFormOf</tt>
+          (different content or form);
+        </p>
+      </li>
+      <li>
+        <p>
+          a preprint SHOULD be linked to its published article with <tt class="verbatim">IsVersionOf</tt>
+          the article's DOI, as DataCite recommends, by a description-only
+          version;
+        </p>
+      </li>
+      <li>
+        <p>
+          the sources MAY be linked to a software archive snapshot (<tt class="verbatim">SWHID</tt>);
+        </p>
+      </li>
+      <li>
+        <p>
+          a <tt class="verbatim">sheaf:</tt> URI (section 12) is recorded in its
+          canonical form as a <tt class="verbatim">URL</tt>, provisionally, until the
+          scheme is registered (#36);
+        </p>
+      </li>
+      <li>
+        <p>
+          a document MUST NOT name the collections that include it: membership
+          is stated only by collections, so that including a document never
+          changes it.
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-12"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
     <p>
       Each part is rebuilt in turn, from the reference text and an audit of
-      the concept, and agreed before the next. Sections 1 to 3 are rebuilt;
+      the concept, and agreed before the next. Sections 1 to 4 are rebuilt;
       the others are planned as follows, and read meanwhile in the reference
       text.
     </p>
     <p>
-      4. Objects: OCFL rules, documents and document versions, <tt class="verbatim">object.json</tt>,
-      <tt class="verbatim">datacite.json</tt>. 5. Names: genesis records and names. 6.
-      Owners: key logs, retiring keys, ending, forks. 7. Lines and signatures:
-      signing, statuses, adding versions. 8. Collections: catalogues,
-      selections, members. 9. Branches and accepted copies. 10. Drafts and
-      sealing. 11. Copies, mirrors and moving. 12. Identifiers: <tt class="verbatim">sheaf:</tt>
-      URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14.
+      5. Names: genesis records and names. 6. Owners: key logs, retiring keys,
+      ending, forks. 7. Lines and signatures: signing, statuses, adding
+      versions. 8. Collections: catalogues, selections, members (with <tt
+      class="verbatim">HasPart</tt> in <tt class="verbatim">datacite.json</tt>, moved from section
+      4). 9. Branches and accepted copies. 10. Drafts and sealing. 11. Copies,
+      mirrors and moving. 12. Identifiers: <tt class="verbatim">sheaf:</tt> URIs,
+      resolution, indexes. 13. Withdrawal, takedown and tombstones. 14.
       Verification. 15. Security, privacy and rights. 16. Versioning of this
       specification, and changelog.
     </p>
