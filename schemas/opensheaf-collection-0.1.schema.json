@@ -107,12 +107,12 @@
           "name": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
+            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
           },
           "owner": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
           },
           "at": {
             "type": "array",
@@ -123,7 +123,7 @@
               "format": "uri",
               "pattern": "/$"
             },
-            "$comment": "proposal (sections 6.2, 10.2): base URLs where copies may be found, all equal hints"
+            "$comment": "base URLs where copies of the line may be found, all equal hints (sections 3, 8.2, 12.3)"
           }
         }
       }

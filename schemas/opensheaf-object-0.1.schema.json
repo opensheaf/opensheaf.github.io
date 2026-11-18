@@ -589,6 +589,23 @@
           }
         }
       }
+    },
+    {
+      "$comment": "section 4.3: a draft (no name) is never withdrawn",
+      "if": {
+        "not": {
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "active"
+          }
+        }
+      }
     }
   ],
   "dependentRequired": {

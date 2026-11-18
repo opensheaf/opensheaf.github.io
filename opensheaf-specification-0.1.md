@@ -59,9 +59,9 @@ The <dfn>discovery document</dfn> is the JSON file `opensheaf.json` at the base 
 - `storageRoot`: the URL of the storage root, ending with `/` (it may be relative);
 - `storageLayout`: its layout, `"opensheaf-owner-name-storage-layout"` or `"0003-hash-and-id-n-tuple-storage-layout"` (section 3.2);
 - `profiles`: the profiles it follows, from `zenodo`, `texmacs`, `website` (appendix A), possibly none;
-- `objects`: every object of the storage root except drafts, each with `id` (section 4), `kind`, `name` and `owner` (section 7), `head` (its OCFL head version), `inventorySha512` (the SHA-512 digest of the head inventory, as its checksum file states it) and `status` (`active` or `withdrawn`, section 13), and OPTIONALLY a `label`.
+- `objects`: every object of the storage root except drafts, each with `id` (section 4), `kind`, `name` and `owner` (section 7), `head` (its OCFL head version), `inventorySha512` (the SHA-512 digest of the head inventory, as its checksum file states it) and `status` (`active` or `withdrawn`, that of its latest signed version, sections 7.3 and 13.1), and OPTIONALLY a `label`.
 
-It SHOULD contain `mainCollection`, the identifier of the catalogue of the archive's documents (section 8); `contact`, a URI; and `extensions`, the names of the extensions its objects use (section 2). It MAY contain `owners`, the owner names of the owners it hosts (section 6); `drafts`, the drafts it chooses to show, with `id`, `kind` and `head`, as unfinished work on which nothing may rely (section 10); `tombstones` (section 13); `indexes`, which maps each index kept to the length of the prefixes of its files (section 12.5); and `feed`, the URL of an Atom feed of new object versions.
+It SHOULD contain `mainCollection`, the identifier of the catalogue of the archive's documents (section 8); `contact`, a URI; and `extensions`, the names of the extensions its objects use (section 2). It MAY contain `owners`, the owner names of the owners it hosts (section 6); `drafts`, the drafts it chooses to show, with `id`, `kind` and `head`, as unfinished work on which nothing may rely (section 10); `indexes`, which maps each index kept to the length of the prefixes of its files (section 12.5); and `feed`, the URL of an Atom feed of new object versions. It MUST contain `tombstones` once an object has been taken down (section 13.3).
 
 The discovery document is rewritten whenever an object is added or changed. It is a map, not a witness: everything it states about objects MUST agree with the storage root, which verifiers check (section 14), and it lists what the archive holds, not every line an owner has elsewhere.
 
@@ -129,7 +129,7 @@ Every object version MUST contain `object.json`, the record of the object's iden
 
 - `format`: `"opensheaf-object/0.1"`, and `specification`: `"0.1"`;
 - `kind`: `document`, `collection` or `owner`;
-- `status`: `active` or `withdrawn` (section 13), always `active` for an owner;
+- `status`: `active` or `withdrawn` (section 13.1), always `active` for an owner or a draft;
 - `documentVersion`, for a document or a collection: equal to `version` in `datacite.json`;
 - in every version of a line, `name` and `owner` (sections 5 and 6), and in a branch `parent`, its branch point (section 9); a draft has none of them.
 
@@ -420,7 +420,7 @@ Each member of a catalogue MUST have `version`, the object version pinned, and `
 
 A member MAY have `follow`, `"latest"`: a setting of the curator, not a floating reference. A followed member pins the latest signed version of its line (section 7.3) when the collection version was made; a member without `follow` keeps the version its curator pinned, which MAY be earlier, until the curator changes it. A tool maintaining the catalogue reads the member's archive (its discovery document or feed) and, when a followed line has a new signed version, writes a new collection version pinning it, whatever that version holds (a new document version, a description, a notice, a withdrawal): a catalogue does not judge the versions of its members. A tool follows only a signed version that extends the version pinned; a copy that does not is a fork of the line (section 7.4), which it reports, keeping the pin.
 
-A withdrawn member stays, and presentations show the withdrawal (section 13). Presentations show the current version of each member as read from the history of the version pinned (section 4.2), not from later versions of its line: a pin that is not followed is the curator's choice.
+A withdrawn member stays, and presentations show its withdrawal (section 13.1), also one made after the version pinned. Presentations show the current version of each member as read from the history of the version pinned (section 4.2), not from later versions of its line: a pin that is not followed is the curator's choice.
 
 ### 8.4 Members of a selection
 
@@ -456,7 +456,7 @@ A collection pins only signed versions (section 7.3), never a draft (section 10)
 - **unchecked**, when the version pinned is unchecked (section 7.3), shown with its status until the key log is found;
 - **not a version** (section 7.3): the collection pinned what it MUST NOT;
 - **unavailable**, when no copy is found;
-- **removed**, when the line is taken down (section 13).
+- **removed**, when no copy is found and an archive holds a tombstone of the line (section 13.3).
 
 ### 8.6 Description and rights
 
@@ -606,7 +606,7 @@ An archive MUST NOT keep a mirror unless the licences of every object version it
 - Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what the licences allow (#39).
 - Copying by the agreement of the rights holders, besides the licences, recorded minimally (#39), and which licences allow redistribution (#34).
 - What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
-- Whether a custodian follows a takedown of a line it mirrors (section 13; #33, #39).
+- Whether a custodian follows a takedown of a line it mirrors (section 13).
 
 ## 12. Identifiers: sheaf: URIs, resolution, indexes
 
@@ -691,15 +691,53 @@ A gateway serves a URI at its base URL followed by the URI unchanged (`https://o
 - Whether the project runs a gateway, on which domain, and whether a domain used only for resolution drops `sheaf:` from the path, as `https://doi.org/` drops `doi:` (#35).
 - Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#13, #20).
 - Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's `swhid`) (#22).
-- Whether a tombstone in one archive should stop resolution at copies elsewhere (#33).
+- Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13).
 - The numbering of document versions on a branch, which `/v<n>` follows (section 9; #57).
+
+## 13. Withdrawal, takedown and tombstones
+
+An owner withdraws a line, which keeps its versions; an archive takes down an object, which leaves a tombstone. A draft is neither withdrawn nor taken down: it is deleted, and leaves no tombstone (section 10.1).
+
+### 13.1 Withdrawal
+
+A document or a collection is <dfn>withdrawn</dfn> by a description-only version (section 4.2) whose `object.json` has `status` `withdrawn` and `withdrawal` (section 4.3), and whose `datacite.json` has `withdrawal.date` as `Withdrawn` (section 4.4). The status is the line's, read from its latest signed version (section 7.3), whatever document version that holds; a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
+
+A withdrawn line keeps every version, signed, pinned and copied as before. Presentations showing a version of a line they know to be withdrawn MUST show the withdrawal, also when the version shown is earlier.
+
+### 13.2 Takedown
+
+A <dfn>takedown</dfn> deletes a sealed object, witness folder included, from an archive's storage root (with the folders the deletion leaves empty) and from its presentation files, and adds a tombstone (section 13.3). It is the only way an archive removes what it holds (sections 7.2 and 7.5), and every removal of a sealed object is one, whatever its reason: content that must not be served (by law, for a breach of rights, to erase personal data, section 15), or a line the archive stops keeping. It removes one object: others holding the same files, such as a branch holding its parent version (section 9), are taken down on their own.
+
+**Owner objects.** A takedown of a line leaves in place the owner objects its copy carries (section 6.5). An owner object that an object of the archive needs is taken down only for itself: at its owner's request, signed by `threshold` keys of the latest version of its key log that the archive holds, or by law; for an ended owner (section 6.3), only at its keeper's request (section 6.6) or by law. An archive SHOULD also hear the keeper, when one is named, before acting on a signed request, which a thief can make. The owner's signatures in what the archive keeps are then unchecked there (section 7.3), and the tombstone stands in for the owner object in the rule of section 6.5.
+
+**Returning.** A line taken down (an owner object found elsewhere, for instance) MAY return to the archive only from a copy holding the version its tombstone pins, added as section 7.5 says: it is the same line, not a reuse of its identifier (section 4), and its tombstone is dropped.
+
+### 13.3 Tombstones
+
+A <dfn>tombstone</dfn> is an entry of `tombstones` in the discovery document (section 3.1), one for each object taken down, with:
+
+- `id`, `kind`, `name` and `owner`: those of the object (section 4.3);
+- `genesisName`: the genesis name of its genesis record (sections 5.2 and 5.4);
+- `lastVersion` and `inventorySha512`: its head when taken down, and the SHA-512 digest of that version's inventory file, a pin (section 4);
+- `date`: the date of the takedown;
+- `reason`: a plain text, which SHOULD NOT repeat what was taken down.
+
+A tombstone is never removed, except when its line returns: it keeps the line taken (section 5.3), and `objects` never lists its `id`. It is not signed: a resolver keeps looking past it (section 12.3). A line, or a version of it no later than `lastVersion`, of which no copy is found but a tombstone is, is reported as removed (sections 8.5 and 9.3).
+
+**Open questions.**
+
+- Whether a tombstone in one archive stops resolution at copies elsewhere, and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
+- The form of an owner's signed request for a takedown, and of a keeper's (#33).
+- Whether a tombstone lists the inventory digests of every version taken down, so that a pin of a removed version is told from a pin that never named one; meanwhile the archive's `sha512/` index keeps them (section 12.5; #33).
+- Whether a withdrawn line takes new document versions; whether and how it is reinstated; whether `withdrawal` stays in later versions; what a verifier reports for a pin of an earlier version of a withdrawn line; and how the line of an ended owner, which signs nothing, is withdrawn (#25).
+- A retraction by a collection (a journal) of one of its members, distinct from a withdrawal by the member's owner (#40).
+- Takedowns of single files or versions, should a later OCFL provide them (#32).
 
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 12 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 13 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn).
-14. Verification.
+14. Verification (with: no entry of `objects` has the `id` of a tombstone; tombstones are well formed; removed entries of indexes are present).
 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call).
 16. Versioning of this specification, and changelog.
 

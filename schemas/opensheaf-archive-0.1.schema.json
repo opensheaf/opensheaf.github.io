@@ -42,7 +42,7 @@
     "mainCollection": {
       "type": "string",
       "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
-      "$comment": "proposal (section 6.3): the object's line, sheaf:<name>:<owner>"
+      "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
     },
     "profiles": {
       "type": "array",
@@ -76,7 +76,7 @@
           "id": {
             "type": "string",
             "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.3): the object's line, sheaf:<name>:<owner>"
+            "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
           },
           "kind": {
             "enum": [
@@ -102,18 +102,18 @@
           "name": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
+            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
           },
           "owner": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
           },
           "label": {
             "type": "string",
             "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
             "maxLength": 64,
-            "$comment": "proposal (section 6.3): a readable label, not an identifier"
+            "$comment": "a readable label (section 3.1), not an identifier"
           }
         },
         "allOf": [
@@ -155,7 +155,7 @@
           "id": {
             "type": "string",
             "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.3): the object's line, sheaf:<name>:<owner>"
+            "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
           },
           "kind": {
             "enum": [
@@ -182,17 +182,17 @@
           "name": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): a name of genesis.json: seeded SHA-256, lowercase base32, the algorithm number in the last character"
+            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
           },
           "owner": {
             "type": "string",
             "pattern": "^[a-z2-7]{52}$",
-            "$comment": "proposal (section 6.5): an owner name, the name of the owner's genesis record (52 characters of base32)"
+            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
           },
           "genesisName": {
             "type": "string",
             "pattern": "^[a-z2-7]{51}[aq]$",
-            "$comment": "proposal (section 11.3): the name of the genesis record by algorithm 0"
+            "$comment": "the genesis name, by algorithm 0 (sections 5.2, 13.3)"
           }
         }
       }
@@ -235,11 +235,11 @@
         "pattern": "^[a-z2-7]{52}$"
       },
       "uniqueItems": true,
-      "$comment": "proposal (section 6.5): the owner names of the owners the archive hosts"
+      "$comment": "the owner names (section 6) of the owners the archive hosts"
     },
     "drafts": {
       "type": "array",
-      "$comment": "proposal (sections 6.1, 6.5): drafts shown as unfinished work, on which nothing may rely",
+      "$comment": "drafts (section 10.1) shown as unfinished work, on which nothing may rely",
       "items": {
         "type": "object",
         "required": [
@@ -252,7 +252,7 @@
             "type": "string",
             "pattern": "^sheaf:draft:[a-z0-9]+(-[a-z0-9]+)*$",
             "maxLength": 76,
-            "$comment": "proposal (section 6.3): a draft's local identifier, sheaf:draft:<id>, <id> following the pattern of labels, at most 64 characters (76 in all)"
+            "$comment": "a draft's local identifier (section 10.1), sheaf:draft:<id>, <id> following the pattern of labels, at most 64 characters (76 in all)"
           },
           "kind": {
             "enum": [

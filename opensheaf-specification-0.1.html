@@ -277,7 +277,8 @@
           class="verbatim">head</tt> (its OCFL head version), <tt class="verbatim">inventorySha512</tt>
           (the SHA-512 digest of the head inventory, as its checksum file
           states it) and <tt class="verbatim">status</tt> (<tt class="verbatim">active</tt> or <tt
-          class="verbatim">withdrawn</tt>, section 13), and OPTIONALLY a <tt class="verbatim">label</tt>.
+          class="verbatim">withdrawn</tt>, that of its latest signed version, sections
+          7.3 and 13.1), and OPTIONALLY a <tt class="verbatim">label</tt>.
         </p>
       </li>
     </ul>
@@ -289,10 +290,11 @@
       owner names of the owners it hosts (section 6); <tt class="verbatim">drafts</tt>,
       the drafts it chooses to show, with <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt>
       and <tt class="verbatim">head</tt>, as unfinished work on which nothing may rely
-      (section 10); <tt class="verbatim">tombstones</tt> (section 13); <tt class="verbatim">indexes</tt>,
-      which maps each index kept to the length of the prefixes of its files
-      (section 12.5); and <tt class="verbatim">feed</tt>, the URL of an Atom feed of new
-      object versions.
+      (section 10); <tt class="verbatim">indexes</tt>, which maps each index kept to the
+      length of the prefixes of its files (section 12.5); and <tt class="verbatim">feed</tt>,
+      the URL of an Atom feed of new object versions. It MUST contain <tt
+      class="verbatim">tombstones</tt> once an object has been taken down (section
+      13.3).
     </p>
     <p>
       The discovery document is rewritten whenever an object is added or
@@ -596,7 +598,8 @@
       <li>
         <p>
           <tt class="verbatim">status</tt>: <tt class="verbatim">active</tt> or <tt class="verbatim">withdrawn</tt>
-          (section 13), always <tt class="verbatim">active</tt> for an owner;
+          (section 13.1), always <tt class="verbatim">active</tt> for an owner or a
+          draft;
         </p>
       </li>
       <li>
@@ -1781,10 +1784,11 @@ keylog &lt;the value of keyLog&gt;</pre>
       reports, keeping the pin.
     </p>
     <p>
-      A withdrawn member stays, and presentations show the withdrawal (section
-      13). Presentations show the current version of each member as read from
-      the history of the version pinned (section 4.2), not from later versions
-      of its line: a pin that is not followed is the curator's choice.
+      A withdrawn member stays, and presentations show its withdrawal (section
+      13.1), also one made after the version pinned. Presentations show the
+      current version of each member as read from the history of the version
+      pinned (section 4.2), not from later versions of its line: a pin that is
+      not followed is the curator's choice.
     </p>
     <h3 id="auto-35"><a id="84-members-of-a-selection"></a>8.4 Members of a selection<span style="margin-left: 1em"></span></h3>
     <p>
@@ -1912,7 +1916,8 @@ keylog &lt;the value of keyLog&gt;</pre>
       </li>
       <li>
         <p>
-          <strong>removed</strong>, when the line is taken down (section 13).
+          <strong>removed</strong>, when no copy is found and an archive holds
+          a tombstone of the line (section 13.3).
         </p>
       </li>
     </ul>
@@ -2458,7 +2463,7 @@ keylog &lt;the value of keyLog&gt;</pre>
       <li>
         <p>
           Whether a custodian follows a takedown of a line it mirrors (section
-          13; #33, #39).
+          13).
         </p>
       </li>
     </ul>
@@ -2787,7 +2792,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           Whether a tombstone in one archive should stop resolution at copies
-          elsewhere (#33).
+          elsewhere (section 13).
         </p>
       </li>
       <li>
@@ -2797,16 +2802,167 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         </p>
       </li>
     </ul>
-    <h2 id="auto-59"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-59"><a id="13-withdrawal-takedown-and-tombstones"></a>13. Withdrawal, takedown and tombstones<span style="margin-left: 1em"></span></h2>
+    <p>
+      An owner withdraws a line, which keeps its versions; an archive takes
+      down an object, which leaves a tombstone. A draft is neither withdrawn
+      nor taken down: it is deleted, and leaves no tombstone (section 10.1).
+    </p>
+    <h3 id="auto-60"><a id="131-withdrawal"></a>13.1 Withdrawal<span style="margin-left: 1em"></span></h3>
+    <p>
+      A document or a collection is <dfn>withdrawn</dfn> by a description-only
+      version (section 4.2) whose <tt class="verbatim">object.json</tt> has <tt class="verbatim">status</tt>
+      <tt class="verbatim">withdrawn</tt> and <tt class="verbatim">withdrawal</tt> (section 4.3),
+      and whose <tt class="verbatim">datacite.json</tt> has <tt class="verbatim">withdrawal.date</tt>
+      as <tt class="verbatim">Withdrawn</tt> (section 4.4). The status is the line's,
+      read from its latest signed version (section 7.3), whatever document
+      version that holds; a single document version is retracted by a notice
+      (section 4.2). A branch or an accepted copy is withdrawn only by its own
+      owner (section 9).
+    </p>
+    <p>
+      A withdrawn line keeps every version, signed, pinned and copied as
+      before. Presentations showing a version of a line they know to be
+      withdrawn MUST show the withdrawal, also when the version shown is
+      earlier.
+    </p>
+    <h3 id="auto-61"><a id="132-takedown"></a>13.2 Takedown<span style="margin-left: 1em"></span></h3>
+    <p>
+      A <dfn>takedown</dfn> deletes a sealed object, witness folder included,
+      from an archive's storage root (with the folders the deletion leaves
+      empty) and from its presentation files, and adds a tombstone (section
+      13.3). It is the only way an archive removes what it holds (sections 7.2
+      and 7.5), and every removal of a sealed object is one, whatever its
+      reason: content that must not be served (by law, for a breach of rights,
+      to erase personal data, section 15), or a line the archive stops
+      keeping. It removes one object: others holding the same files, such as a
+      branch holding its parent version (section 9), are taken down on their
+      own.
+    </p>
+    <p>
+      <strong>Owner objects.</strong> A takedown of a line leaves in place the
+      owner objects its copy carries (section 6.5). An owner object that an
+      object of the archive needs is taken down only for itself: at its
+      owner's request, signed by <tt class="verbatim">threshold</tt> keys of the latest
+      version of its key log that the archive holds, or by law; for an ended
+      owner (section 6.3), only at its keeper's request (section 6.6) or by
+      law. An archive SHOULD also hear the keeper, when one is named, before
+      acting on a signed request, which a thief can make. The owner's
+      signatures in what the archive keeps are then unchecked there (section
+      7.3), and the tombstone stands in for the owner object in the rule of
+      section 6.5.
+    </p>
+    <p>
+      <strong>Returning.</strong> A line taken down (an owner object found
+      elsewhere, for instance) MAY return to the archive only from a copy
+      holding the version its tombstone pins, added as section 7.5 says: it is
+      the same line, not a reuse of its identifier (section 4), and its
+      tombstone is dropped.
+    </p>
+    <h3 id="auto-62"><a id="133-tombstones"></a>13.3 Tombstones<span style="margin-left: 1em"></span></h3>
+    <p>
+      A <dfn>tombstone</dfn> is an entry of <tt class="verbatim">tombstones</tt> in the
+      discovery document (section 3.1), one for each object taken down, with:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt>, <tt class="verbatim">name</tt> and
+          <tt class="verbatim">owner</tt>: those of the object (section 4.3);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">genesisName</tt>: the genesis name of its genesis record
+          (sections 5.2 and 5.4);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">lastVersion</tt> and <tt class="verbatim">inventorySha512</tt>: its
+          head when taken down, and the SHA-512 digest of that version's
+          inventory file, a pin (section 4);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">date</tt>: the date of the takedown;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">reason</tt>: a plain text, which SHOULD NOT repeat what
+          was taken down.
+        </p>
+      </li>
+    </ul>
+    <p>
+      A tombstone is never removed, except when its line returns: it keeps the
+      line taken (section 5.3), and <tt class="verbatim">objects</tt> never lists its
+      <tt class="verbatim">id</tt>. It is not signed: a resolver keeps looking past it
+      (section 12.3). A line, or a version of it no later than <tt class="verbatim">lastVersion</tt>,
+      of which no copy is found but a tombstone is, is reported as removed
+      (sections 8.5 and 9.3).
+    </p>
+    <p>
+      <strong>Open questions.</strong>
+    </p>
+    <ul>
+      <li>
+        <p>
+          Whether a tombstone in one archive stops resolution at copies
+          elsewhere, and whether mirrors, branches holding the version taken
+          down, indexes kept by others and gateways follow a takedown (#33,
+          #39).
+        </p>
+      </li>
+      <li>
+        <p>
+          The form of an owner's signed request for a takedown, and of a
+          keeper's (#33).
+        </p>
+      </li>
+      <li>
+        <p>
+          Whether a tombstone lists the inventory digests of every version
+          taken down, so that a pin of a removed version is told from a pin
+          that never named one; meanwhile the archive's <tt class="verbatim">sha512/</tt>
+          index keeps them (section 12.5; #33).
+        </p>
+      </li>
+      <li>
+        <p>
+          Whether a withdrawn line takes new document versions; whether and
+          how it is reinstated; whether <tt class="verbatim">withdrawal</tt> stays in
+          later versions; what a verifier reports for a pin of an earlier
+          version of a withdrawn line; and how the line of an ended owner,
+          which signs nothing, is withdrawn (#25).
+        </p>
+      </li>
+      <li>
+        <p>
+          A retraction by a collection (a journal) of one of its members,
+          distinct from a withdrawal by the member's owner (#40).
+        </p>
+      </li>
+      <li>
+        <p>
+          Takedowns of single files or versions, should a later OCFL provide
+          them (#32).
+        </p>
+      </li>
+    </ul>
+    <h2 id="auto-63"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
     <p>
       Each part is rebuilt in turn, from the reference text and an audit of
-      the concept, and agreed before the next. Sections 1 to 12 are rebuilt;
+      the concept, and agreed before the next. Sections 1 to 13 are rebuilt;
       the others are planned as follows, and read meanwhile in the reference
       text.
     </p>
     <p>
-      13. Withdrawal, takedown and tombstones (a draft is deleted, never
-      withdrawn). 14. Verification. 15. Security, privacy and rights (with:
+      14. Verification (with: no entry of <tt class="verbatim">objects</tt> has the <tt
+      class="verbatim">id</tt> of a tombstone; tombstones are well formed; removed
+      entries of indexes are present). 15. Security, privacy and rights (with:
       after a fork of a line, whether to end is the owner's call). 16.
       Versioning of this specification, and changelog.
     </p>

@@ -84,10 +84,10 @@
 
     <item><verbatim|profiles>: the profiles it follows, from <verbatim|zenodo>, <verbatim|texmacs>, <verbatim|website> (appendix A), possibly none;
 
-    <item><verbatim|objects>: every object of the storage root except drafts, each with <verbatim|id> (section 4), <verbatim|kind>, <verbatim|name> and <verbatim|owner> (section 7), <verbatim|head> (its OCFL head version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as its checksum file states it) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, section 13), and OPTIONALLY a <verbatim|label>.
+    <item><verbatim|objects>: every object of the storage root except drafts, each with <verbatim|id> (section 4), <verbatim|kind>, <verbatim|name> and <verbatim|owner> (section 7), <verbatim|head> (its OCFL head version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as its checksum file states it) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, that of its latest signed version, sections 7.3 and 13.1), and OPTIONALLY a <verbatim|label>.
   </itemize>
 
-  It SHOULD contain <verbatim|mainCollection>, the identifier of the catalogue of the archive's documents (section 8); <verbatim|contact>, a URI; and <verbatim|extensions>, the names of the extensions its objects use (section 2). It MAY contain <verbatim|owners>, the owner names of the owners it hosts (section 6); <verbatim|drafts>, the drafts it chooses to show, with <verbatim|id>, <verbatim|kind> and <verbatim|head>, as unfinished work on which nothing may rely (section 10); <verbatim|tombstones> (section 13); <verbatim|indexes>, which maps each index kept to the length of the prefixes of its files (section 12.5); and <verbatim|feed>, the URL of an Atom feed of new object versions.
+  It SHOULD contain <verbatim|mainCollection>, the identifier of the catalogue of the archive's documents (section 8); <verbatim|contact>, a URI; and <verbatim|extensions>, the names of the extensions its objects use (section 2). It MAY contain <verbatim|owners>, the owner names of the owners it hosts (section 6); <verbatim|drafts>, the drafts it chooses to show, with <verbatim|id>, <verbatim|kind> and <verbatim|head>, as unfinished work on which nothing may rely (section 10); <verbatim|indexes>, which maps each index kept to the length of the prefixes of its files (section 12.5); and <verbatim|feed>, the URL of an Atom feed of new object versions. It MUST contain <verbatim|tombstones> once an object has been taken down (section 13.3).
 
   The discovery document is rewritten whenever an object is added or changed. It is a map, not a witness: everything it states about objects MUST agree with the storage root, which verifiers check (section 14), and it lists what the archive holds, not every line an owner has elsewhere.
 
@@ -170,7 +170,7 @@
 
     <item><verbatim|kind>: <verbatim|document>, <verbatim|collection> or <verbatim|owner>;
 
-    <item><verbatim|status>: <verbatim|active> or <verbatim|withdrawn> (section 13), always <verbatim|active> for an owner;
+    <item><verbatim|status>: <verbatim|active> or <verbatim|withdrawn> (section 13.1), always <verbatim|active> for an owner or a draft;
 
     <item><verbatim|documentVersion>, for a document or a collection: equal to <verbatim|version> in <verbatim|datacite.json>;
 
@@ -553,7 +553,7 @@
 
   A member MAY have <verbatim|follow>, <verbatim|"latest">: a setting of the curator, not a floating reference. A followed member pins the latest signed version of its line (section 7.3) when the collection version was made; a member without <verbatim|follow> keeps the version its curator pinned, which MAY be earlier, until the curator changes it. A tool maintaining the catalogue reads the member's archive (its discovery document or feed) and, when a followed line has a new signed version, writes a new collection version pinning it, whatever that version holds (a new document version, a description, a notice, a withdrawal): a catalogue does not judge the versions of its members. A tool follows only a signed version that extends the version pinned; a copy that does not is a fork of the line (section 7.4), which it reports, keeping the pin.
 
-  A withdrawn member stays, and presentations show the withdrawal (section 13). Presentations show the current version of each member as read from the history of the version pinned (section 4.2), not from later versions of its line: a pin that is not followed is the curator's choice.
+  A withdrawn member stays, and presentations show its withdrawal (section 13.1), also one made after the version pinned. Presentations show the current version of each member as read from the history of the version pinned (section 4.2), not from later versions of its line: a pin that is not followed is the curator's choice.
 
   <subsection*|8.4 Members of a selection><label|84-members-of-a-selection>
 
@@ -600,7 +600,7 @@
 
     <item><strong|unavailable>, when no copy is found;
 
-    <item><strong|removed>, when the line is taken down (section 13).
+    <item><strong|removed>, when no copy is found and an archive holds a tombstone of the line (section 13.3).
   </itemize>
 
   <subsection*|8.6 Description and rights><label|86-description-and-rights>
@@ -786,7 +786,7 @@
 
     <item>What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
 
-    <item>Whether a custodian follows a takedown of a line it mirrors (section 13; #33, #39).
+    <item>Whether a custodian follows a takedown of a line it mirrors (section 13).
   </itemize>
 
   <section*|12. Identifiers: sheaf: URIs, resolution, indexes><label|12-identifiers-sheaf-uris-resolution-indexes>
@@ -892,16 +892,68 @@
 
     <item>Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's <verbatim|swhid>) (#22).
 
-    <item>Whether a tombstone in one archive should stop resolution at copies elsewhere (#33).
+    <item>Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13).
 
     <item>The numbering of document versions on a branch, which <verbatim|/v\<less\>n\<gtr\>> follows (section 9; #57).
   </itemize>
 
+  <section*|13. Withdrawal, takedown and tombstones><label|13-withdrawal-takedown-and-tombstones>
+
+  An owner withdraws a line, which keeps its versions; an archive takes down an object, which leaves a tombstone. A draft is neither withdrawn nor taken down: it is deleted, and leaves no tombstone (section 10.1).
+
+  <subsection*|13.1 Withdrawal><label|131-withdrawal>
+
+  A document or a collection is <dfn|withdrawn> by a description-only version (section 4.2) whose <verbatim|object.json> has <verbatim|status> <verbatim|withdrawn> and <verbatim|withdrawal> (section 4.3), and whose <verbatim|datacite.json> has <verbatim|withdrawal.date> as <verbatim|Withdrawn> (section 4.4). The status is the line's, read from its latest signed version (section 7.3), whatever document version that holds; a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
+
+  A withdrawn line keeps every version, signed, pinned and copied as before. Presentations showing a version of a line they know to be withdrawn MUST show the withdrawal, also when the version shown is earlier.
+
+  <subsection*|13.2 Takedown><label|132-takedown>
+
+  A <dfn|takedown> deletes a sealed object, witness folder included, from an archive's storage root (with the folders the deletion leaves empty) and from its presentation files, and adds a tombstone (section 13.3). It is the only way an archive removes what it holds (sections 7.2 and 7.5), and every removal of a sealed object is one, whatever its reason: content that must not be served (by law, for a breach of rights, to erase personal data, section 15), or a line the archive stops keeping. It removes one object: others holding the same files, such as a branch holding its parent version (section 9), are taken down on their own.
+
+  <strong|Owner objects.> A takedown of a line leaves in place the owner objects its copy carries (section 6.5). An owner object that an object of the archive needs is taken down only for itself: at its owner's request, signed by <verbatim|threshold> keys of the latest version of its key log that the archive holds, or by law; for an ended owner (section 6.3), only at its keeper's request (section 6.6) or by law. An archive SHOULD also hear the keeper, when one is named, before acting on a signed request, which a thief can make. The owner's signatures in what the archive keeps are then unchecked there (section 7.3), and the tombstone stands in for the owner object in the rule of section 6.5.
+
+  <strong|Returning.> A line taken down (an owner object found elsewhere, for instance) MAY return to the archive only from a copy holding the version its tombstone pins, added as section 7.5 says: it is the same line, not a reuse of its identifier (section 4), and its tombstone is dropped.
+
+  <subsection*|13.3 Tombstones><label|133-tombstones>
+
+  A <dfn|tombstone> is an entry of <verbatim|tombstones> in the discovery document (section 3.1), one for each object taken down, with:
+
+  <\itemize>
+    <item><verbatim|id>, <verbatim|kind>, <verbatim|name> and <verbatim|owner>: those of the object (section 4.3);
+
+    <item><verbatim|genesisName>: the genesis name of its genesis record (sections 5.2 and 5.4);
+
+    <item><verbatim|lastVersion> and <verbatim|inventorySha512>: its head when taken down, and the SHA-512 digest of that version's inventory file, a pin (section 4);
+
+    <item><verbatim|date>: the date of the takedown;
+
+    <item><verbatim|reason>: a plain text, which SHOULD NOT repeat what was taken down.
+  </itemize>
+
+  A tombstone is never removed, except when its line returns: it keeps the line taken (section 5.3), and <verbatim|objects> never lists its <verbatim|id>. It is not signed: a resolver keeps looking past it (section 12.3). A line, or a version of it no later than <verbatim|lastVersion>, of which no copy is found but a tombstone is, is reported as removed (sections 8.5 and 9.3).
+
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>Whether a tombstone in one archive stops resolution at copies elsewhere, and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
+
+    <item>The form of an owner's signed request for a takedown, and of a keeper's (#33).
+
+    <item>Whether a tombstone lists the inventory digests of every version taken down, so that a pin of a removed version is told from a pin that never named one; meanwhile the archive's <verbatim|sha512/> index keeps them (section 12.5; #33).
+
+    <item>Whether a withdrawn line takes new document versions; whether and how it is reinstated; whether <verbatim|withdrawal> stays in later versions; what a verifier reports for a pin of an earlier version of a withdrawn line; and how the line of an ended owner, which signs nothing, is withdrawn (#25).
+
+    <item>A retraction by a collection (a journal) of one of its members, distinct from a withdrawal by the member's owner (#40).
+
+    <item>Takedowns of single files or versions, should a later OCFL provide them (#32).
+  </itemize>
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
-  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 12 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 13 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn). 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
+  14. Verification (with: no entry of <verbatim|objects> has the <verbatim|id> of a tombstone; tombstones are well formed; removed entries of indexes are present). 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
 
   Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
 
