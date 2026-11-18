@@ -82,7 +82,7 @@ An <dfn>object</dfn> is an OCFL 1.1 object in a storage root. Its <dfn>kind</dfn
 
 **Identifier.** The <dfn>identifier</dfn> of an object, its OCFL `id`, is `sheaf:<name>:<owner>`, the name of the work (section 5) and the owner name of its line's owner (section 6), which `object.json` records as `name` and `owner`. It names the line (section 7), in every archive. A branch is a new object with its own identifier (section 9); a draft is `sheaf:draft:<id>` (section 10). The identifier MUST be unique in the storage root, and that of a sealed object MUST NOT be reused there, also after a takedown (section 13).
 
-**Versions.** An <dfn>object version</dfn> is an OCFL version of an object (`v1`, `v2`, ...): every change of the object makes one, and none changes once made. A <dfn>document version</dfn> is a version of the work, a positive integer numbered by the owner of the line and recorded in `object.json` and `datacite.json`; it changes only when the document's own files change (section 4.2), so several object versions may hold one document version, with different descriptions or notices.
+**Versions.** An <dfn>object version</dfn> is an OCFL version of an object (`v1`, `v2`, ...): every change of the object makes one, and none changes once made, except in a draft (section 10). A <dfn>document version</dfn> is a version of the work, a positive integer numbered by the owner of the line and recorded in `object.json` and `datacite.json`; it changes only when the document's own files change (section 4.2), so several object versions may hold one document version, with different descriptions or notices.
 
 **Pins.** A <dfn>pin</dfn> is the pair (object version, SHA-512 digest of that version's inventory file, as its checksum file states it). An inventory records the digests of the files of its version and of every earlier one, so a pin fixes the object up to that version, in any copy. Collections (section 8), branches (section 9) and `sheaf:` URIs (section 12) refer to object versions by pins, and pin only signed versions (section 7).
 
@@ -559,14 +559,39 @@ A version the selection makes itself, such as a typeset version of record, is a 
 - Moving a branch point when the branch has files of its own (of its notes, a withdrawal, a version of record): probably a merge keeping both, with evidence that tells them apart (#57).
 - The field and folder names of the evidence (#55).
 
+## 10. Drafts and sealing
+
+A <dfn>draft</dfn> is a sandbox for a work not yet sealed, on which nothing may rely. <dfn>Sealing</dfn> makes from a work, under a new genesis record (section 5), the first version of its originator's line (section 7); the work's other lines are branches (section 9).
+
+### 10.1 Drafts
+
+**Identifier.** A draft belongs to the reserved owner `draft`, never a name or an owner name (52 characters, section 5.2). Its identifier is `sheaf:draft:<id>`, where `<id>` is chosen by the archive, MUST match `^[a-z0-9]+(-[a-z0-9]+)*$`, and MUST have at most 64 characters (76 for the identifier). It MUST NOT be reused in the archive while the draft exists, and MAY be once the draft is gone. It is local, never resolved. A draft is at the path its identifier gives (`draft/<id>/` in the owner-name layout, section 3.2).
+
+**Format.** A draft is a `document` or a `collection`, in the format of any object of its kind (section 4). It has no genesis record and no other identity files (section 4.1), and its `object.json` has no `name`, `owner` or `parent` (section 4.3). Its document versions are numbered by whoever keeps it, by the rules of section 4.2.
+
+**A draft is its archive's alone.** A draft is never signed (section 7), pinned (sections 8, 9 and 12), copied out of its archive (section 11), indexed or named by a `sheaf:` URI (section 12). The archive keeps its drafts when it moves to another site (section 3). The discovery document does not list drafts in `objects`; it MAY list them apart, in `drafts`, as unfinished work on which nothing may rely, or not at all (section 3.1).
+
+**A draft may change.** A draft is the only object that MAY be rewritten or deleted: the rule that object versions never change (section 4) does not apply to it, and a draft deleted leaves no tombstone (section 13).
+
+**Content.** A tool MAY read any object and recreate its files in a draft, as far as their licences allow.
+
+### 10.2 Sealing
+
+**When.** A work is sealed before a version of it first leaves its owner's hands: shared privately (submitted to a journal, sent to a co-author) or published. Sealing is done at the owner's request; tools SHOULD seal only at the owner's request, never as a side effect of another operation.
+
+**What.** An owner tool seals a work by writing its genesis record (section 5.1), with the owner as `originator`, and making a new object: the line `sheaf:<name>:<owner>`, at its path in the storage layout (section 3.2), whose first version holds the genesis record and the work as document version 1 (section 4.2), and is signed by the owner (section 7.1). If the line is taken, the tool draws a new nonce (section 5.3).
+
+**Drafts stay outside the line.** A work may be sealed from a draft or from files outside any archive. The versions of a draft are never part of the line sealed from it, and nothing in the line refers to them.
+
+**Open question.** Whether and how drafts are shared before sealing (among co-authors, with a journal under review), and how an archive serves them, which bears on when a work must be sealed (#29).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 9 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 10 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-10. Drafts and sealing.
-11. Copies and mirrors (moving an owner is in section 6.5).
+11. Copies and mirrors (moving an owner is in section 6.5; a replica of the whole archive is the same archive and may hold its drafts).
 12. Identifiers: `sheaf:` URIs, resolution, indexes.
-13. Withdrawal, takedown and tombstones.
+13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn).
 14. Verification.
 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call).
 16. Versioning of this specification, and changelog.

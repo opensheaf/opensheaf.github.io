@@ -111,7 +111,7 @@
 
   <strong|Identifier.> The <dfn|identifier> of an object, its OCFL <verbatim|id>, is <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>>, the name of the work (section 5) and the owner name of its line's owner (section 6), which <verbatim|object.json> records as <verbatim|name> and <verbatim|owner>. It names the line (section 7), in every archive. A branch is a new object with its own identifier (section 9); a draft is <verbatim|sheaf:draft:\<less\>id\<gtr\>> (section 10). The identifier MUST be unique in the storage root, and that of a sealed object MUST NOT be reused there, also after a takedown (section 13).
 
-  <strong|Versions.> An <dfn|object version> is an OCFL version of an object (<verbatim|v1>, <verbatim|v2>, ...): every change of the object makes one, and none changes once made. A <dfn|document version> is a version of the work, a positive integer numbered by the owner of the line and recorded in <verbatim|object.json> and <verbatim|datacite.json>; it changes only when the document's own files change (section 4.2), so several object versions may hold one document version, with different descriptions or notices.
+  <strong|Versions.> An <dfn|object version> is an OCFL version of an object (<verbatim|v1>, <verbatim|v2>, ...): every change of the object makes one, and none changes once made, except in a draft (section 10). A <dfn|document version> is a version of the work, a positive integer numbered by the owner of the line and recorded in <verbatim|object.json> and <verbatim|datacite.json>; it changes only when the document's own files change (section 4.2), so several object versions may hold one document version, with different descriptions or notices.
 
   <strong|Pins.> A <dfn|pin> is the pair (object version, SHA-512 digest of that version's inventory file, as its checksum file states it). An inventory records the digests of the files of its version and of every earlier one, so a pin fixes the object up to that version, in any copy. Collections (section 8), branches (section 9) and <verbatim|sheaf:> URIs (section 12) refer to object versions by pins, and pin only signed versions (section 7).
 
@@ -735,11 +735,37 @@
     <item>The field and folder names of the evidence (#55).
   </itemize>
 
+  <section*|10. Drafts and sealing><label|10-drafts-and-sealing>
+
+  A <dfn|draft> is a sandbox for a work not yet sealed, on which nothing may rely. <dfn|Sealing> makes from a work, under a new genesis record (section 5), the first version of its originator's line (section 7); the work's other lines are branches (section 9).
+
+  <subsection*|10.1 Drafts><label|101-drafts>
+
+  <strong|Identifier.> A draft belongs to the reserved owner <verbatim|draft>, never a name or an owner name (52 characters, section 5.2). Its identifier is <verbatim|sheaf:draft:\<less\>id\<gtr\>>, where <verbatim|\<less\>id\<gtr\>> is chosen by the archive, MUST match <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>, and MUST have at most 64 characters (76 for the identifier). It MUST NOT be reused in the archive while the draft exists, and MAY be once the draft is gone. It is local, never resolved. A draft is at the path its identifier gives (<verbatim|draft/\<less\>id\<gtr\>/> in the owner-name layout, section 3.2).
+
+  <strong|Format.> A draft is a <verbatim|document> or a <verbatim|collection>, in the format of any object of its kind (section 4). It has no genesis record and no other identity files (section 4.1), and its <verbatim|object.json> has no <verbatim|name>, <verbatim|owner> or <verbatim|parent> (section 4.3). Its document versions are numbered by whoever keeps it, by the rules of section 4.2.
+
+  <strong|A draft is its archive's alone.> A draft is never signed (section 7), pinned (sections 8, 9 and 12), copied out of its archive (section 11), indexed or named by a <verbatim|sheaf:> URI (section 12). The archive keeps its drafts when it moves to another site (section 3). The discovery document does not list drafts in <verbatim|objects>; it MAY list them apart, in <verbatim|drafts>, as unfinished work on which nothing may rely, or not at all (section 3.1).
+
+  <strong|A draft may change.> A draft is the only object that MAY be rewritten or deleted: the rule that object versions never change (section 4) does not apply to it, and a draft deleted leaves no tombstone (section 13).
+
+  <strong|Content.> A tool MAY read any object and recreate its files in a draft, as far as their licences allow.
+
+  <subsection*|10.2 Sealing><label|102-sealing>
+
+  <strong|When.> A work is sealed before a version of it first leaves its owner's hands: shared privately (submitted to a journal, sent to a co-author) or published. Sealing is done at the owner's request; tools SHOULD seal only at the owner's request, never as a side effect of another operation.
+
+  <strong|What.> An owner tool seals a work by writing its genesis record (section 5.1), with the owner as <verbatim|originator>, and making a new object: the line <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>>, at its path in the storage layout (section 3.2), whose first version holds the genesis record and the work as document version 1 (section 4.2), and is signed by the owner (section 7.1). If the line is taken, the tool draws a new nonce (section 5.3).
+
+  <strong|Drafts stay outside the line.> A work may be sealed from a draft or from files outside any archive. The versions of a draft are never part of the line sealed from it, and nothing in the line refers to them.
+
+  <strong|Open question.> Whether and how drafts are shared before sealing (among co-authors, with a journal under review), and how an archive serves them, which bears on when a work must be sealed (#29).
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
-  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 9 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 10 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  10. Drafts and sealing. 11. Copies and mirrors (moving an owner is in section 6.5). 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
+  11. Copies and mirrors (moving an owner is in section 6.5; a replica of the whole archive is the same archive and may hold its drafts). 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn). 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
 
   Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
 
