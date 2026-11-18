@@ -185,12 +185,55 @@ Dates MAY be approximate, as DataCite allows (`2019-03`, `2018/2019`), with `dat
 - a `sheaf:` URI (section 12) is recorded in its canonical form as a `URL`, provisionally, until the scheme is registered (#36);
 - a document MUST NOT name the collections that include it: membership is stated only by collections, so that including a document never changes it.
 
+## 5. Names
+
+A work, and an owner, has a <dfn>name</dfn>: a digest of its genesis record, the same in every archive and copy, which anyone holding a copy can check. An owner's name is its owner name (section 6).
+
+### 5.1 The genesis record
+
+The <dfn>genesis record</dfn> is the JSON file `genesis.json` at the top level of the content, written when a work is sealed (section 10) or an owner created (section 6). It contains:
+
+- `format`: `"opensheaf-genesis/0.1"`;
+- `kind`: `document`, `collection` or `owner`, the `kind` of the object;
+- `created`: the date and time it was written, in UTC (`2026-03-02T09:14:00Z`);
+- `nonce`: at least 128 bits from a cryptographically secure random generator, in lowercase hexadecimal;
+- for a document or a collection, `originator`: the owner name of the owner of the first line (section 5.3);
+- for an owner, instead, `keys` and `threshold`: its first keys and how many must sign, which the first version of its key log repeats (section 6).
+
+The genesis record MUST be part of every object version of the object and of its branches (section 9), byte for byte. It MUST be in UTF-8 without a byte order mark, and SHOULD have LF line ends. Since the name is the digest of its bytes as stored, tools MUST NOT rewrite or re-serialise it. A tool MUST NOT copy a genesis record into an object that is not a copy or a branch of the work it was written for, nor reuse a nonce.
+
+### 5.2 Computing a name
+
+Algorithm k, for k from 0 to 15, takes the SHA-256 digest of the seed `opensheaf-name-<k>` (ASCII, k in decimal, followed by a line feed) followed by the bytes of `genesis.json`, and writes it in lowercase base32 (RFC 4648, without padding): 52 characters, the last of which holds the last bit of the digest and four zero bits, which are set to k. A name thus matches `^[a-z2-7]{52}$`, and its last character gives its algorithm (`a` or `q` for algorithm 0), so names made by different algorithms never coincide. Names are compared as strings, never decoded. `object.json` records a line's name as `name`; appendix C gives examples.
+
+A genesis record thus has 16 names of one work (section 12 searches for a work by all of them). Its <dfn>genesis name</dfn>, made by algorithm 0, is the same for every line of the work. Every line is named by its genesis name, except a branch renamed after a clash (section 5.3).
+
+### 5.3 Origin and clashes
+
+**Origin.** The <dfn>originator</dfn> of a work is the owner its genesis record names in `originator`; an owner is its own originator. The originator's line is the origin of the name: it has no parent, and its first version MUST be signed by the originator (section 7). Every other line of the genesis record is a branch and MUST declare its parent (section 9); a line of another owner that declares none is not a valid line of the name. A tool refuses a branch owned by the originator (how the originator takes in another line's work is open, #57).
+
+**Clashes.** An owner has one line of each name, and no two objects of a storage root have the same line (section 4). A clash can arise only when a line is made, and the tool that makes it resolves it against the archive where it writes and the lines of the same owner it knows elsewhere whose signatures hold (section 7):
+
+- **Sealing.** If the line is taken, the tool draws a new nonce, so that an originator's line is always named by algorithm 0. A work sealed elsewhere that meets, when deposited, a taken line with another genesis record (a collision) is refused, and its owner seals it anew; with the same genesis record, it is a copy (below), or a reused record (section 5.4).
+- **Branches.** A branch is named by `parent.name`, unless its line is taken by another line of its owner, in which case it is named by the smallest algorithm number greater than that of `parent.name` that gives a line free for its owner, and `parent` keeps the parent's name; if none up to 15 is free, the branch is refused. When the line taken is the owner's own branch of the same parent line, section 9 says when the owner moves that branch's branch point instead.
+- **Copies.** A copy whose line is taken in a storage root by a different history of it is a fork of the line (section 7): the archive keeps the history it holds, and reports the other.
+- **Takedowns.** A line stays taken in an archive after a takedown, since its tombstone keeps its identifier (section 13).
+
+Lines of different owners never clash. A renamed branch is always written with its owner part, since a `sheaf:` URI without one names the originator's line (section 12).
+
+### 5.4 Reused genesis records
+
+A genesis record reused for another work gives no valid line: the originator's line needs the originator's signature, and every other line needs a chain of signed parents back to it (section 9). A second history that the originator signs under its own record is a fork of its line (section 7).
+
+When an object is created or deposited, an archive that holds an object or a tombstone with the same genesis record, compared by genesis name (`genesisName` of a tombstone, section 13), MUST refuse it unless it is signed by the originator (the originator's line) or carries a chain of parent evidence that holds back to the originator's line (a branch, section 9).
+
+**Open question.** Whether aliases, new genesis records wrapping an old one, are needed if refusing reused genesis records proves too strict (#44).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 4 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 5 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-5. Names: genesis records and names.
-6. Owners: key logs, retiring keys, ending, forks.
+6. Owners: key logs, retiring keys, ending, forks (with: creating an owner whose name is taken draws a new nonce; `threshold` at most the number of keys, for the genesis record and `keys.json`).
 7. Lines and signatures: signing, statuses, adding versions.
 8. Collections: catalogues, selections, members (with `HasPart` in `datacite.json`, moved from section 4).
 9. Branches and accepted copies.

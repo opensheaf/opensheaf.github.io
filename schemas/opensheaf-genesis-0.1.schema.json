@@ -2,8 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json",
   "title": "OpenSheaf genesis record (genesis.json), version 0.1",
-  "$comment": "Proposal (section 6.5 of the specification, branch proposal/identity). Dedicated to the public domain under CC0 1.0.",
+  "$comment": "Section 5 of the specification. Dedicated to the public domain under CC0 1.0.",
   "type": "object",
+  "additionalProperties": false,
   "required": [
     "format",
     "kind",
@@ -28,7 +29,7 @@
     "originator": {
       "type": "string",
       "pattern": "^[a-z2-7]{52}$",
-      "$comment": "proposal (section 6.5): the owner name of the owner of the first line"
+      "$comment": "section 5.3: the owner name of the owner of the first line"
     },
     "nonce": {
       "type": "string",
@@ -42,7 +43,7 @@
         "type": "string",
         "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]+$"
       },
-      "$comment": "proposal (section 6.5): an owner's first keys"
+      "$comment": "sections 5.1 and 6: an owner's first keys"
     },
     "threshold": {
       "type": "integer",

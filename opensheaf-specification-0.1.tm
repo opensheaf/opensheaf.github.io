@@ -259,11 +259,67 @@
     <item>a document MUST NOT name the collections that include it: membership is stated only by collections, so that including a document never changes it.
   </itemize>
 
+  <section*|5. Names><label|5-names>
+
+  A work, and an owner, has a <dfn|name>: a digest of its genesis record, the same in every archive and copy, which anyone holding a copy can check. An owner's name is its owner name (section 6).
+
+  <subsection*|5.1 The genesis record><label|51-the-genesis-record>
+
+  The <dfn|genesis record> is the JSON file <verbatim|genesis.json> at the top level of the content, written when a work is sealed (section 10) or an owner created (section 6). It contains:
+
+  <\itemize>
+    <item><verbatim|format>: <verbatim|"opensheaf-genesis/0.1">;
+
+    <item><verbatim|kind>: <verbatim|document>, <verbatim|collection> or <verbatim|owner>, the <verbatim|kind> of the object;
+
+    <item><verbatim|created>: the date and time it was written, in UTC (<verbatim|2026-03-02T09:14:00Z>);
+
+    <item><verbatim|nonce>: at least 128 bits from a cryptographically secure random generator, in lowercase hexadecimal;
+
+    <item>for a document or a collection, <verbatim|originator>: the owner name of the owner of the first line (section 5.3);
+
+    <item>for an owner, instead, <verbatim|keys> and <verbatim|threshold>: its first keys and how many must sign, which the first version of its key log repeats (section 6).
+  </itemize>
+
+  The genesis record MUST be part of every object version of the object and of its branches (section 9), byte for byte. It MUST be in UTF-8 without a byte order mark, and SHOULD have LF line ends. Since the name is the digest of its bytes as stored, tools MUST NOT rewrite or re-serialise it. A tool MUST NOT copy a genesis record into an object that is not a copy or a branch of the work it was written for, nor reuse a nonce.
+
+  <subsection*|5.2 Computing a name><label|52-computing-a-name>
+
+  Algorithm k, for k from 0 to 15, takes the SHA-256 digest of the seed <verbatim|opensheaf-name-\<less\>k\<gtr\>> (ASCII, k in decimal, followed by a line feed) followed by the bytes of <verbatim|genesis.json>, and writes it in lowercase base32 (RFC 4648, without padding): 52 characters, the last of which holds the last bit of the digest and four zero bits, which are set to k. A name thus matches <verbatim|^[a-z2-7]{52}$>, and its last character gives its algorithm (<verbatim|a> or <verbatim|q> for algorithm 0), so names made by different algorithms never coincide. Names are compared as strings, never decoded. <verbatim|object.json> records a line's name as <verbatim|name>; appendix C gives examples.
+
+  A genesis record thus has 16 names of one work (section 12 searches for a work by all of them). Its <dfn|genesis name>, made by algorithm 0, is the same for every line of the work. Every line is named by its genesis name, except a branch renamed after a clash (section 5.3).
+
+  <subsection*|5.3 Origin and clashes><label|53-origin-and-clashes>
+
+  <strong|Origin.> The <dfn|originator> of a work is the owner its genesis record names in <verbatim|originator>; an owner is its own originator. The originator's line is the origin of the name: it has no parent, and its first version MUST be signed by the originator (section 7). Every other line of the genesis record is a branch and MUST declare its parent (section 9); a line of another owner that declares none is not a valid line of the name. A tool refuses a branch owned by the originator (how the originator takes in another line's work is open, #57).
+
+  <strong|Clashes.> An owner has one line of each name, and no two objects of a storage root have the same line (section 4). A clash can arise only when a line is made, and the tool that makes it resolves it against the archive where it writes and the lines of the same owner it knows elsewhere whose signatures hold (section 7):
+
+  <\itemize>
+    <item><strong|Sealing.> If the line is taken, the tool draws a new nonce, so that an originator's line is always named by algorithm 0. A work sealed elsewhere that meets, when deposited, a taken line with another genesis record (a collision) is refused, and its owner seals it anew; with the same genesis record, it is a copy (below), or a reused record (section 5.4).
+
+    <item><strong|Branches.> A branch is named by <verbatim|parent.name>, unless its line is taken by another line of its owner, in which case it is named by the smallest algorithm number greater than that of <verbatim|parent.name> that gives a line free for its owner, and <verbatim|parent> keeps the parent's name; if none up to 15 is free, the branch is refused. When the line taken is the owner's own branch of the same parent line, section 9 says when the owner moves that branch's branch point instead.
+
+    <item><strong|Copies.> A copy whose line is taken in a storage root by a different history of it is a fork of the line (section 7): the archive keeps the history it holds, and reports the other.
+
+    <item><strong|Takedowns.> A line stays taken in an archive after a takedown, since its tombstone keeps its identifier (section 13).
+  </itemize>
+
+  Lines of different owners never clash. A renamed branch is always written with its owner part, since a <verbatim|sheaf:> URI without one names the originator's line (section 12).
+
+  <subsection*|5.4 Reused genesis records><label|54-reused-genesis-records>
+
+  A genesis record reused for another work gives no valid line: the originator's line needs the originator's signature, and every other line needs a chain of signed parents back to it (section 9). A second history that the originator signs under its own record is a fork of its line (section 7).
+
+  When an object is created or deposited, an archive that holds an object or a tombstone with the same genesis record, compared by genesis name (<verbatim|genesisName> of a tombstone, section 13), MUST refuse it unless it is signed by the originator (the originator's line) or carries a chain of parent evidence that holds back to the originator's line (a branch, section 9).
+
+  <strong|Open question.> Whether aliases, new genesis records wrapping an old one, are needed if refusing reused genesis records proves too strict (#44).
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
-  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 4 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 5 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  5. Names: genesis records and names. 6. Owners: key logs, retiring keys, ending, forks. 7. Lines and signatures: signing, statuses, adding versions. 8. Collections: catalogues, selections, members (with <verbatim|HasPart> in <verbatim|datacite.json>, moved from section 4). 9. Branches and accepted copies. 10. Drafts and sealing. 11. Copies, mirrors and moving. 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14. Verification. 15. Security, privacy and rights. 16. Versioning of this specification, and changelog.
+  6. Owners: key logs, retiring keys, ending, forks (with: creating an owner whose name is taken draws a new nonce; <verbatim|threshold> at most the number of keys, for the genesis record and <verbatim|keys.json>). 7. Lines and signatures: signing, statuses, adding versions. 8. Collections: catalogues, selections, members (with <verbatim|HasPart> in <verbatim|datacite.json>, moved from section 4). 9. Branches and accepted copies. 10. Drafts and sealing. 11. Copies, mirrors and moving. 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones. 14. Verification. 15. Security, privacy and rights. 16. Versioning of this specification, and changelog.
 
   Appendices: A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas; C. examples; D. rationale; E. references.
 
