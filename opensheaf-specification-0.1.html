@@ -29,7 +29,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.1 (draft), 18 November 2026. OpenSheaf is a
+      Specification, version 0.1 (draft), 19 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). The text is licensed under CC
@@ -354,10 +354,11 @@
           <tt class="verbatim">&lt;encoded id&gt;</tt> is the identifier percent-encoded
           as the extension says (every character but <tt class="verbatim">A-Z</tt>, <tt
           class="verbatim">a-z</tt>, <tt class="verbatim">0-9</tt>, <tt class="verbatim">-</tt> and <tt
-          class="verbatim">_</tt>), shortened, when longer than 100 characters, to its
-          first 100 characters, <tt class="verbatim">-</tt> and the full digest;
-          identifiers of lines are always shortened so (appendix C). Readers
-          compute the path; they never decode it.
+          class="verbatim">_</tt>, in lowercase hexadecimal, <tt class="verbatim">%3a</tt>),
+          shortened, when longer than 100 characters, to its first 100
+          characters, <tt class="verbatim">-</tt> and the full digest; identifiers of
+          lines are always shortened so (appendix C). Readers compute the
+          path; they never decode it.
         </p>
       </li>
     </ul>
@@ -1154,12 +1155,13 @@
       <strong>Choosing a threshold.</strong> One <tt class="verbatim">threshold</tt>
       governs the key log and every line of the owner. Owners choose between
       two risks: a threshold of 1 with a spare key kept apart (on a hardware
-      token, for instance) survives the loss of a key but not its theft; a
-      threshold of 2 with three keys kept apart, from the first version of the
-      key log, survives the loss of one key and the theft of one. Owner tools
-      SHOULD offer both, and SHOULD NOT create an owner with a single key,
-      since an owner that loses every key of the latest version of its key log
-      cannot recover.
+      token, for instance) survives the loss of a key, and the theft of the
+      key in daily use by healing (section 6.3), though what the thief signed
+      stays good (section 6.4); a threshold of 2 with three keys kept apart,
+      from the first version of the key log, survives the loss of one key and
+      the theft of one. Owner tools SHOULD offer both, and SHOULD NOT create
+      an owner with a single key, since an owner that loses every key of the
+      latest version of its key log cannot recover.
     </p>
     <p>
       <strong>Retiring a key.</strong> An owner retires a key it no longer
@@ -1211,18 +1213,20 @@
       it <dfn>carries</dfn>, each under <tt class="verbatim">forked/&lt;d&gt;/</tt>,
       where <tt class="verbatim">&lt;d&gt;</tt> is the first 16 characters of the
       lowercase base32 (RFC 4648, without padding) SHA-256 digest of its
-      inventory file: that inventory file, its checksum file, its <tt class="verbatim">keys.json</tt>
-      and its signature files, byte for byte. It is valid when it carries at
-      least two versions of its number, with different inventory files, each
-      signed (section 7.3) against the version before it, which anyone checks
-      from its content and that version; otherwise it is not a version of the
-      key log. The keys that sign the versions a fork record or a healing
-      version carries, and the keys those nullify, are <dfn>nullified</dfn>. A
-      key log whose latest version is a fork record is <dfn>tainted</dfn>: no
-      version follows a fork record but by healing, no signature names one,
-      and owner tools sign nothing for a tainted owner but a healing version.
-      Fork records are copied with the key log like any version, so that every
-      copy shows the fork.
+      inventory file: that inventory file as <tt class="verbatim">inventory.json</tt>,
+      its checksum file as <tt class="verbatim">inventory.json.sha512</tt>, its <tt
+      class="verbatim">keys.json</tt>, and its signature files <tt class="verbatim">signature-&lt;k&gt;.json</tt>
+      with the witnesses beside them (section 7.2), byte for byte. It is valid
+      when it carries at least two versions of its number, with different
+      inventory files, each signed (section 7.3) against the version before
+      it, which anyone checks from its content and that version; otherwise it
+      is not a version of the key log. The keys that sign the versions a fork
+      record or a healing version carries, and the keys those nullify, are
+      <dfn>nullified</dfn>. A key log whose latest version is a fork record is
+      <dfn>tainted</dfn>: no version follows a fork record but by healing, no
+      signature names one, and owner tools sign nothing for a tainted owner
+      but a healing version. Fork records are copied with the key log like any
+      version, so that every copy shows the fork.
     </p>
     <p>
       <strong>Healing.</strong> A <dfn>healing version</dfn> is a version of
@@ -1251,8 +1255,10 @@
       Otherwise the two are replaced by a fork record carrying every version
       they are or, for fork records and healing versions, carry. The versions
       after a version replaced are dropped; signatures naming them are
-      unchecked there (section 7.3). These replacements are made only to key
-      logs, and are the only changes of an object version outside drafts
+      unchecked there (section 7.3). The files of the witness folder of a
+      version replaced or dropped go with it, those of a carried version into
+      <tt class="verbatim">forked/&lt;d&gt;/</tt>. These replacements are made only to
+      key logs, and are the only changes of an object version outside drafts
       (section 4).
     </p>
     <h3 id="auto-21"><a id="64-after-an-end-a-fork-or-healing"></a>6.4 After an end, a fork or healing<span style="margin-left: 1em"></span></h3>
@@ -1414,7 +1420,8 @@
       the object. Witnesses MAY be added at any time, by the owner of the line
       or by others; they are kept, never re-serialised or replaced once made,
       since some (timestamps) are made of their bytes, and MUST NOT be removed
-      except by a takedown (section 13).
+      except by a takedown (section 13) or the replacements at a fork of a key
+      log (section 6.3).
     </p>
     <p>
       <strong>Signature files.</strong> A <dfn>signature file</dfn> holds one
@@ -1533,7 +1540,8 @@ keylog &lt;the value of keyLog&gt;</pre>
           <tt class="verbatim">version</tt> and <tt class="verbatim">inventorySha512</tt> are not
           those of the version whose folder holds it (the digest also as its
           checksum file states it; in <tt class="verbatim">parent.signatures/</tt>,
-          those of the parent version, section 9); its <tt class="verbatim">signer</tt>
+          those of the parent version, section 9; in <tt class="verbatim">forked/&lt;d&gt;/</tt>,
+          those of the version carried, section 6.3); its <tt class="verbatim">signer</tt>
           is not the line's owner; the reader reaches the key-log version
           named, with that digest (also as carried by a fork record or a
           healing version, section 6.3), and the key is not in its <tt class="verbatim">keys</tt>;
@@ -2599,7 +2607,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       thing when their canonical forms are equal byte for byte, which may need
       a copy of the genesis record to decide. Files record <tt class="verbatim">sheaf:</tt>
       URIs in canonical form (<tt class="verbatim">keyLog</tt>, section 7.2; relations,
-      section 4.4).
+      section 4.4), except identifiers (section 4), which always have the
+      owner part.
     </p>
     <h3 id="auto-54"><a id="122-short-forms"></a>12.2 Short forms<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3545,6 +3554,17 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           4.1).
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, rebuilt (PR #30):</strong>
+          appendices A (profiles), B (JSON Schemas) and C (examples, checked
+          against the schemas) rebuilt; DOIs written bare; signature files
+          closed to other properties; fork records carry the witnesses of the
+          versions they carry, under named files (section 6.3, provisional,
+          #58); a threshold of 1 with a spare key survives the theft of the
+          daily key by healing (section 6.2).
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -3808,11 +3828,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <p>
       <strong>Validation.</strong> A file is valid when it validates against
       its schema with <tt class="verbatim">format</tt> asserted (section 14.2). The
-      schemas of <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">keys.json</tt> and
-      the keeper's file allow no other properties; the others do, and such
-      properties carry no meaning here (the data of extensions goes under <tt
-      class="verbatim">extensions</tt>, section 2). Where a schema and the text
-      disagree, the text prevails.
+      schemas of <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">keys.json</tt>,
+      signature files and the keeper's file allow no other properties; the
+      others do, and such properties carry no meaning here (the data of
+      extensions goes under <tt class="verbatim">extensions</tt>, section 2). Where a
+      schema and the text disagree, the text prevails.
     </p>
     <p>
       <strong>Other files.</strong> <tt class="verbatim">datacite.json</tt> is validated
@@ -3859,7 +3879,514 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         </p>
       </li>
     </ul>
-    <h2 id="auto-85"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-85"><a id="appendix-c-examples-non-normative"></a>Appendix C. Examples (non-normative)<span style="margin-left: 1em"></span></h2>
+    <p>
+      The examples follow one paper of the first archive (section 1) through
+      an illustrative history: its owner is created, the paper is sealed and
+      revised, kept in the archive's main catalogue, and accepted by a
+      journal, which keeps an accepted copy and lists it in an issue. The
+      title and the authors are those of the archive; the dates, the journal
+      and its domain are invented, and the DOIs (with Zenodo's prefix) and the
+      ORCID iD (with a valid check digit) are placeholders. Every name, owner
+      name, <tt class="verbatim">did:key</tt>, file name derived from a key or a digest,
+      and signature is computed: names from the genesis records shown (section
+      5.2), keys from private keys made for these examples, signatures over
+      the messages shown (section 7.2), and inventory digests from inventories
+      that are not shown. Every JSON file shown validates against its schema
+      (appendix B).
+    </p>
+    <h3 id="auto-86"><a id="c1-an-owner-and-its-key-log"></a>C.1 An owner and its key log<span style="margin-left: 1em"></span></h3>
+    <p>
+      The genesis record of the authors' owner. It takes the first choice of
+      section 6.2: two keys from the first version and a threshold of 1, the
+      first key in daily use on a laptop, the second a spare kept apart on a
+      hardware token and used only to heal (section 6.3):
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-genesis/0.1&quot;,
+  &quot;kind&quot;: &quot;owner&quot;,
+  &quot;created&quot;: &quot;2026-03-01T17:40:00Z&quot;,
+  &quot;nonce&quot;: &quot;1b4d9964664d9825076eb8558af61162&quot;,
+  &quot;keys&quot;: [
+    &quot;did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW&quot;,
+    &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;
+  ],
+  &quot;threshold&quot;: 1
+}</pre>
+      </div>
+    </div>
+    <p>
+      Its name, the owner name, is <tt class="verbatim">ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq</tt>:
+      the SHA-256 digest of <tt class="verbatim">opensheaf-name-0</tt>, a line feed and
+      the bytes shown, with a final line feed, in base32 (section 5.2). The
+      owner object is at <tt class="verbatim">ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/</tt>
+      in the owner-name layout (section 3.2), and its <tt class="verbatim">object.json</tt>
+      is the same in every version:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-object/0.1&quot;,
+  &quot;specification&quot;: &quot;0.1&quot;,
+  &quot;kind&quot;: &quot;owner&quot;,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;name&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;
+}</pre>
+      </div>
+    </div>
+    <p>
+      The <tt class="verbatim">keys.json</tt> of the first version of the key log
+      repeats the keys and threshold of the genesis record, names the keeper
+      (section 6.6), and adopts the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a> with one
+      RFC 3161 authority (a placeholder fingerprint):
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
+  &quot;keys&quot;: [
+    &quot;did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW&quot;,
+    &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;
+  ],
+  &quot;threshold&quot;: 1,
+  &quot;keeper&quot;: [
+    &quot;https://orcid.org/0000-0002-1234-5677&quot;
+  ],
+  &quot;extensions&quot;: {
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
+      &quot;timestampAuthorities&quot;: [
+        &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot;
+      ]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <p>
+      It is signed by its own first key, in <tt class="verbatim">v1/signature-w7htq42yt7tllefi.json</tt>
+      of the owner object's witness folder, whose <tt class="verbatim">keyLog</tt> names
+      this version itself (section 7.2). When the laptop is replaced, the
+      second version adds the new laptop's key and retires the old one
+      (section 6.2); it is signed by the old key, listed in the first version,
+      in <tt class="verbatim">v2/signature-w7htq42yt7tllefi.json</tt>, whose <tt class="verbatim">keyLog</tt>
+      is <tt class="verbatim">sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v1?sha512=2d04f58c210a61cdf4fef1ed4300443f8a99ccb728f27c6765ffc281ff7b3c7c721f6f4421485c1e6697a68106841746f73ae8015f656e9333ac2f05d02e3cfb</tt>:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
+  &quot;keys&quot;: [
+    &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;,
+    &quot;did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn&quot;
+  ],
+  &quot;threshold&quot;: 1,
+  &quot;keeper&quot;: [
+    &quot;https://orcid.org/0000-0002-1234-5677&quot;
+  ],
+  &quot;extensions&quot;: {
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
+      &quot;timestampAuthorities&quot;: [
+        &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot;
+      ]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <p>
+      The journal's owner, <tt class="verbatim">rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba</tt>,
+      took the other choice: three keys and a threshold of 2 from its first
+      version, so that every version it makes carries two signature files.
+    </p>
+    <h3 id="auto-87"><a id="c2-a-document-version"></a>C.2 A document version<span style="margin-left: 1em"></span></h3>
+    <p>
+      The genesis record of the paper, written when the owner sealed it
+      (section 10.2):
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-genesis/0.1&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;created&quot;: &quot;2026-03-02T09:14:00Z&quot;,
+  &quot;originator&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;nonce&quot;: &quot;6f65cd32058c16d6d78b05011772ff1d&quot;
+}</pre>
+      </div>
+    </div>
+    <p>
+      Its genesis name is <tt class="verbatim">glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva</tt>;
+      by algorithm 1 its name is <tt class="verbatim">osms3d3jl3nx3qfsfb5tze2qbgtehtdrxhaylj6cd3whpk62njqr</tt>,
+      which a branch renamed after a clash would take (section 5.3). The line
+      is <tt class="verbatim">sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq</tt>.
+      The <tt class="verbatim">object.json</tt> of its first version (section 4.3),
+      which was deposited with Zenodo (appendix A.1):
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-object/0.1&quot;,
+  &quot;specification&quot;: &quot;0.1&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+  &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;documentVersion&quot;: 1,
+  &quot;mainSource&quot;: &quot;fractional-phi42-mass-gap.tm&quot;,
+  &quot;sourceFormat&quot;: &quot;application/x-texmacs&quot;,
+  &quot;renditions&quot;: [ { &quot;path&quot;: &quot;fractional-phi42-mass-gap.pdf&quot;, &quot;mediaType&quot;: &quot;application/pdf&quot; } ],
+  &quot;toolchain&quot;: [ { &quot;name&quot;: &quot;TeXmacs&quot;, &quot;version&quot;: &quot;2.1.5&quot; } ],
+  &quot;stage&quot;: { &quot;scheme&quot;: &quot;NISO-JAV&quot;, &quot;value&quot;: &quot;AO&quot; },
+  &quot;agreement&quot;: { &quot;by&quot;: [ &quot;P. Duch&quot;, &quot;M. Gubinelli&quot; ], &quot;date&quot;: &quot;2026-03-01&quot;, &quot;method&quot;: &quot;by e-mail&quot; },
+  &quot;external&quot;: [ { &quot;role&quot;: &quot;deposit&quot;, &quot;service&quot;: &quot;Zenodo&quot;,
+                  &quot;record&quot;: &quot;https://zenodo.org/records/1234567&quot;, &quot;doi&quot;: &quot;10.5281/zenodo.1234567&quot; } ],
+  &quot;status&quot;: &quot;active&quot;
+}</pre>
+      </div>
+    </div>
+    <p>
+      The <tt class="verbatim">datacite.json</tt> of the same version (section 4.4). The
+      version has a Zenodo DOI, so Zenodo is its <tt class="verbatim">publisher</tt>,
+      and <tt class="verbatim">url</tt> is its landing page (appendix A.3):
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;doi&quot;: &quot;10.5281/zenodo.1234567&quot;,
+  &quot;url&quot;: &quot;https://mgubi.org/papers/fractional-phi42-mass-gap/&quot;,
+  &quot;version&quot;: &quot;1&quot;,
+  &quot;types&quot;: { &quot;resourceTypeGeneral&quot;: &quot;Preprint&quot; },
+  &quot;titles&quot;: [ { &quot;title&quot;: &quot;Mass gap for the fractional $\\Phi^4_2$ model&quot; } ],
+  &quot;creators&quot;: [
+    { &quot;name&quot;: &quot;Duch, P.&quot;, &quot;nameType&quot;: &quot;Personal&quot;, &quot;givenName&quot;: &quot;P.&quot;, &quot;familyName&quot;: &quot;Duch&quot; },
+    { &quot;name&quot;: &quot;Gubinelli, M.&quot;, &quot;nameType&quot;: &quot;Personal&quot;, &quot;givenName&quot;: &quot;M.&quot;, &quot;familyName&quot;: &quot;Gubinelli&quot;,
+      &quot;nameIdentifiers&quot;: [ { &quot;nameIdentifier&quot;: &quot;https://orcid.org/0000-0002-1234-5677&quot;,
+                             &quot;nameIdentifierScheme&quot;: &quot;ORCID&quot; } ] } ],
+  &quot;publisher&quot;: { &quot;name&quot;: &quot;Zenodo&quot; },
+  &quot;publicationYear&quot;: 2026,
+  &quot;dates&quot;: [ { &quot;date&quot;: &quot;2026-03-02&quot;, &quot;dateType&quot;: &quot;Issued&quot; },
+             { &quot;date&quot;: &quot;2026-03-02&quot;, &quot;dateType&quot;: &quot;Available&quot; } ],
+  &quot;rightsList&quot;: [ { &quot;rights&quot;: &quot;Creative Commons Attribution 4.0 International&quot;,
+                    &quot;rightsUri&quot;: &quot;https://creativecommons.org/licenses/by/4.0/&quot;,
+                    &quot;rightsIdentifier&quot;: &quot;cc-by-4.0&quot;, &quot;rightsIdentifierScheme&quot;: &quot;SPDX&quot; } ],
+  &quot;descriptions&quot;: [ { &quot;description&quot;: &quot;We present a new, simple &hellip;&quot;,
+                      &quot;descriptionType&quot;: &quot;Abstract&quot; } ],
+  &quot;formats&quot;: [ &quot;application/x-texmacs&quot;, &quot;application/pdf&quot; ],
+  &quot;relatedIdentifiers&quot;: [ { &quot;relatedIdentifier&quot;: &quot;10.5281/zenodo.1234566&quot;,
+                            &quot;relatedIdentifierType&quot;: &quot;DOI&quot;, &quot;relationType&quot;: &quot;IsVersionOf&quot; } ]
+}</pre>
+      </div>
+    </div>
+    <p>
+      The second object version holds document version 2 (section 4.2),
+      corrected after the referee's report and accepted by the journal: its
+      <tt class="verbatim">object.json</tt> has <tt class="verbatim">documentVersion</tt> 2, <tt
+      class="verbatim">changes</tt>, <tt class="verbatim">stage</tt> <tt class="verbatim">AM</tt> and the
+      DOI <tt class="verbatim">10.5281/zenodo.1234568</tt>, and its <tt class="verbatim">datacite.json</tt>
+      has <tt class="verbatim">version</tt> <tt class="verbatim">&quot;2&quot;</tt> and <tt class="verbatim">IsNewVersionOf</tt>
+      the DOI of version 1.
+    </p>
+    <h3 id="auto-88"><a id="c3-a-signature"></a>C.3 A signature<span style="margin-left: 1em"></span></h3>
+    <p>
+      The signature of that version by the new laptop's key, <tt class="verbatim">extensions/opensheaf-witnesses/v2/signature-4hz7zgsiazl6hx7i.json</tt>
+      in the paper's object, <tt class="verbatim">4hz7zgsiazl6hx7i</tt> being the first
+      16 characters of the base32 SHA-256 digest of the <tt class="verbatim">did:key</tt>
+      (section 7.2); it names version 2 of the key log, which lists the key:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-signature/0.1&quot;,
+  &quot;object&quot;: &quot;sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;version&quot;: &quot;v2&quot;,
+  &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+  &quot;signer&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;key&quot;: &quot;did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn&quot;,
+  &quot;keyLog&quot;: &quot;sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae&quot;,
+  &quot;signature&quot;: &quot;PMhzGXcpbLdw/khQDgsrAj7Z0nuJnY6/UDXGoAekLENCBllYJY3QLERKFvBZXPTwaeGCh7z61evcUE3X9s/DBw==&quot;
+}</pre>
+      </div>
+    </div>
+    <p>
+      The message it signs, each line ended by a line feed (section 7.2):
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+opensheaf-signature/0.1
+object sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+version v2
+inventory a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
+keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae</pre>
+    </div>
+    <p>
+      With a threshold of 1, this one good signature makes the version signed
+      (section 7.3).
+    </p>
+    <h3 id="auto-89"><a id="c4-collections"></a>C.4 Collections<span style="margin-left: 1em"></span></h3>
+    <p>
+      The <tt class="verbatim">members.json</tt> of the second version of the archive's
+      main catalogue (section 8.3), owned by the authors' owner. The member is
+      followed, so that when version 2 of the paper was signed, the
+      catalogue's tool wrote this version, pinning it in place of version 1:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-collection/0.1&quot;,
+  &quot;type&quot;: &quot;catalogue&quot;,
+  &quot;order&quot;: &quot;issued-desc&quot;,
+  &quot;members&quot;: [
+    { &quot;kind&quot;: &quot;document&quot;,
+      &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+      &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;at&quot;: [ &quot;https://mgubi.org/papers/&quot; ],
+      &quot;version&quot;: &quot;v2&quot;,
+      &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+      &quot;follow&quot;: &quot;latest&quot;,
+      &quot;doi&quot;: &quot;10.5281/zenodo.1234568&quot;,
+      &quot;conceptDoi&quot;: &quot;10.5281/zenodo.1234566&quot;,
+      &quot;cite&quot;: { &quot;title&quot;: &quot;Mass gap for the fractional $\\Phi^4_2$ model&quot;,
+                &quot;creators&quot;: [ &quot;P. Duch&quot;, &quot;M. Gubinelli&quot; ], &quot;year&quot;: 2026, &quot;issued&quot;: &quot;2026-03-02&quot; } }
+  ]
+}</pre>
+      </div>
+    </div>
+    <p>
+      The <tt class="verbatim">members.json</tt> of an issue of the journal, a selection
+      owned by the journal's owner (section 8.4). Its first member is the
+      journal's accepted copy (section C.5); its second, the original revision
+      set, which a selection MAY also list (section 9.6):
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-collection/0.1&quot;,
+  &quot;type&quot;: &quot;selection&quot;,
+  &quot;members&quot;: [
+    { &quot;kind&quot;: &quot;document&quot;,
+      &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+      &quot;owner&quot;: &quot;rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba&quot;,
+      &quot;at&quot;: [ &quot;https://journal.example.org/&quot; ],
+      &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 2, &quot;version&quot;: &quot;v1&quot;,
+                       &quot;inventorySha512&quot;: &quot;fd4f4ea3c71eb9ca6d5653298771606154b1b1f665438068a80d1139cdf2c622d88d596867ef627b52aef27af51189db9d92836e06cc5cadb9480ed568792183&quot; } ],
+      &quot;cite&quot;: { &quot;title&quot;: &quot;Mass gap for the fractional $\\Phi^4_2$ model&quot;,
+                &quot;creators&quot;: [ &quot;P. Duch&quot;, &quot;M. Gubinelli&quot; ], &quot;year&quot;: 2026, &quot;issued&quot;: &quot;2026-03-02&quot; } },
+    { &quot;kind&quot;: &quot;document&quot;,
+      &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+      &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;at&quot;: [ &quot;https://mgubi.org/papers/&quot; ],
+      &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 2, &quot;version&quot;: &quot;v2&quot;,
+                       &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+                       &quot;doi&quot;: &quot;10.5281/zenodo.1234568&quot; } ] }
+  ]
+}</pre>
+      </div>
+    </div>
+    <h3 id="auto-90"><a id="c5-a-branch-an-accepted-copy"></a>C.5 A branch: an accepted copy<span style="margin-left: 1em"></span></h3>
+    <p>
+      The <tt class="verbatim">object.json</tt> of the first version of the journal's
+      accepted copy, a branch of the authors' line at their object version <tt
+      class="verbatim">v2</tt> (sections 9.1 and 9.6). No line of that name is the
+      journal's, so the branch takes the genesis name, and its line is <tt
+      class="verbatim">sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba</tt>:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-object/0.1&quot;,
+  &quot;specification&quot;: &quot;0.1&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+  &quot;owner&quot;: &quot;rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba&quot;,
+  &quot;parent&quot;: {
+    &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+    &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+    &quot;objectVersion&quot;: &quot;v2&quot;,
+    &quot;documentVersion&quot;: 2,
+    &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+    &quot;url&quot;: &quot;https://mgubi.org/papers/ocfl/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2/&quot;
+  },
+  &quot;documentVersion&quot;: 2,
+  &quot;mainSource&quot;: &quot;fractional-phi42-mass-gap.tm&quot;,
+  &quot;sourceFormat&quot;: &quot;application/x-texmacs&quot;,
+  &quot;renditions&quot;: [ { &quot;path&quot;: &quot;fractional-phi42-mass-gap.pdf&quot;, &quot;mediaType&quot;: &quot;application/pdf&quot; } ],
+  &quot;stage&quot;: { &quot;scheme&quot;: &quot;NISO-JAV&quot;, &quot;value&quot;: &quot;AM&quot; },
+  &quot;status&quot;: &quot;active&quot;
+}</pre>
+      </div>
+    </div>
+    <p>
+      Its content holds the files of the parent version except <tt class="verbatim">datacite.json</tt>
+      and <tt class="verbatim">object.json</tt> (<tt class="verbatim">genesis.json</tt>, the
+      source and the PDF), its own <tt class="verbatim">datacite.json</tt> and <tt
+      class="verbatim">object.json</tt>, and the evidence (section 9.2): <tt class="verbatim">parent.inventory.json</tt>,
+      the authors' <tt class="verbatim">v2/inventory.json</tt>; <tt class="verbatim">parent.object.json</tt>,
+      their <tt class="verbatim">object.json</tt> of that version; and <tt class="verbatim">parent.signatures/signature-4hz7zgsiazl6hx7i.json</tt>,
+      the file of section C.3, byte for byte. Its witness folder holds two
+      signature files of the journal's keys, naming the first version of the
+      journal's key log. The journal's storage root keeps beside it the owner
+      objects of the journal and of the authors (section 6.5).
+    </p>
+    <h3 id="auto-91"><a id="c6-the-archive"></a>C.6 The archive<span style="margin-left: 1em"></span></h3>
+    <p>
+      The storage root of the authors' archive in the owner-name layout
+      (section 3.2), showing the paper's witness folder, with an RFC 3161
+      token of each signature (timestamps extension; the tokens are not
+      shown):
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+ocfl/
+  0=ocfl_1.1
+  ocfl_layout.json
+  ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
+    ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/      the key log
+    glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/      the paper
+      0=ocfl_object_1.1
+      inventory.json
+      inventory.json.sha512
+      v1/
+      v2/
+      extensions/opensheaf-witnesses/
+        v1/signature-w7htq42yt7tllefi.json
+        v1/signature-w7htq42yt7tllefi.json.3mpvi64zr26ezfvh.tsr
+        v2/signature-4hz7zgsiazl6hx7i.json
+        v2/signature-4hz7zgsiazl6hx7i.json.5xjh5tk24wrufjrz.tsr
+    qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma/      the main catalogue</pre>
+    </div>
+    <p>
+      In the hashed layout, the paper would be at <tt class="verbatim">933/34d/349/sheaf%3aglncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva%3attm4koeifphkud7j5wkmqqovbpbhlycbunxav-93334d349fc19e8fbbc73330df99a0606e54fe0e3f68a1ebe117416b8f96f945/</tt>:
+      its identifier of 111 characters encodes to 115, each <tt class="verbatim">:</tt>
+      becoming <tt class="verbatim">%3a</tt>, and is shortened (section 3.2).
+    </p>
+    <p>
+      The discovery document (section 3.1). The archive hosts one owner, whose
+      key log, paper and catalogue it lists, with labels for the website; a
+      second paper of the owner was taken down, and its tombstone (section
+      13.3) keeps its line taken:
+    </p>
+    <div class="language-json">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+{
+  &quot;format&quot;: &quot;opensheaf-archive/0.1&quot;,
+  &quot;specification&quot;: &quot;0.1&quot;,
+  &quot;name&quot;: &quot;Papers of Massimiliano Gubinelli&quot;,
+  &quot;contact&quot;: &quot;https://orcid.org/0000-0002-1234-5677&quot;,
+  &quot;storageRoot&quot;: &quot;ocfl/&quot;,
+  &quot;storageLayout&quot;: &quot;opensheaf-owner-name-storage-layout&quot;,
+  &quot;mainCollection&quot;: &quot;sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;profiles&quot;: [ &quot;zenodo&quot;, &quot;texmacs&quot;, &quot;website&quot; ],
+  &quot;extensions&quot;: [ &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot; ],
+  &quot;owners&quot;: [ &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot; ],
+  &quot;indexes&quot;: { &quot;names&quot;: 2, &quot;owners&quot;: 2, &quot;sha512&quot;: 2 },
+  &quot;objects&quot;: [
+    { &quot;id&quot;: &quot;sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;kind&quot;: &quot;owner&quot;, &quot;name&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae&quot;,
+      &quot;status&quot;: &quot;active&quot; },
+    { &quot;id&quot;: &quot;sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;kind&quot;: &quot;document&quot;, &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+      &quot;status&quot;: &quot;active&quot;, &quot;label&quot;: &quot;fractional-phi42-mass-gap&quot; },
+    { &quot;id&quot;: &quot;sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;kind&quot;: &quot;collection&quot;, &quot;name&quot;: &quot;qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;29c17c0325606d503059a6276a0ff9366f9ee0f70aecd8dc5393089d2648609910b6261895533af250e89bd8c3061e564f2026b6153a5cea0dd569a85f506c50&quot;,
+      &quot;status&quot;: &quot;active&quot;, &quot;label&quot;: &quot;papers&quot; }
+  ],
+  &quot;tombstones&quot;: [
+    { &quot;id&quot;: &quot;sheaf:tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;kind&quot;: &quot;document&quot;, &quot;name&quot;: &quot;tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;genesisName&quot;: &quot;tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua&quot;,
+      &quot;lastVersion&quot;: &quot;v1&quot;, &quot;inventorySha512&quot;: &quot;ede3e9be2e8e74503af7df6408f0f43846b80ebaece2737e16019e37a8ce7e8fba0bb6945fde5973a94d6373c7d8118413fd6587d5e9a3cbade685eae2ea5ae3&quot;,
+      &quot;date&quot;: &quot;2026-05-04&quot;, &quot;reason&quot;: &quot;Taken down at the request of the holder of the rights.&quot; }
+  ]
+}</pre>
+      </div>
+    </div>
+    <h3 id="auto-92"><a id="c7-sheaf-uris"></a>C.7 sheaf: URIs<span style="margin-left: 1em"></span></h3>
+    <p>
+      URIs of the paper, of the accepted copy and of the authors' owner
+      (section 12):
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva
+    the authors' line (its owner is the originator)
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+    document version 2 of the authors' line
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
+    the authors' object version v2, which the journal vetted
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&amp;at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
+    the same, with a hint
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba/v2
+    document version 2 of the journal's line, its accepted copy
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:*
+    the work: the authors' line, the journal's and any other
+sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+    the authors' owner: its key log
+sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae
+    version 2 of its key log, as keyLog names it
+sheaf:glncddtx/v2
+sheaf:glncddtx:rvv4h5sj/v2
+    short forms of the second and fifth (section 12.2)
+https://opensheaf.org/sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+    the second, through a gateway (provisional, #35)</pre>
+    </div>
+    <h3 id="auto-93"><a id="c8-a-fork-of-a-key-log-provisional-58"></a>C.8 A fork of a key log (provisional, #58)<span style="margin-left: 1em"></span></h3>
+    <p>
+      Later, the new laptop is stolen. The thief signs with its key a version
+      3 of the key log listing only a key of its own; the owner, not yet
+      aware, has signed with the same key another version 3, adding a domain
+      to <tt class="verbatim">keeper</tt>. Both are signed against version 2, so an
+      archive holding one that meets the other replaces its version 3 by a
+      fork record (section 6.3), which nullifies the stolen key. The owner
+      object there:
+    </p>
+    <div class="tmweb-code">
+      <pre class="verbatim" xml:space="preserve">
+ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
+  inventory.json
+  inventory.json.sha512
+  v1/
+  v2/
+  v3/                                the fork record
+    inventory.json
+    inventory.json.sha512
+    content/forked/w6s5uujjs56ilzmn/          the owner's version 3
+      inventory.json
+      inventory.json.sha512
+      keys.json
+      signature-4hz7zgsiazl6hx7i.json
+    content/forked/gqqa23zsg6ehczgj/          the thief's version 3
+      inventory.json
+      inventory.json.sha512
+      keys.json
+      signature-4hz7zgsiazl6hx7i.json</pre>
+    </div>
+    <p>
+      The fork record's <tt class="verbatim">genesis.json</tt> and <tt class="verbatim">object.json</tt>
+      are those of <tt class="verbatim">v1</tt>, to which its inventory refers, and it
+      has no <tt class="verbatim">keys.json</tt>. The owner heals with its spare key,
+      which signed neither version: a healing version 3 carrying both, whose
+      <tt class="verbatim">keys.json</tt> lists the spare key and a new one, not the
+      stolen key (section 6.3). The signatures made with the stolen key stay
+      good, and readers weigh them as section 6.4 says.
+    </p>
+    <h2 id="auto-94"><a id="plan-of-the-rebuilt-text"></a>Plan of the rebuilt text<span style="margin-left: 1em"></span></h2>
     <p>
       Each part is rebuilt in turn, from the reference text and an audit of
       the concept, and agreed before the next. Sections 1 to 16 are rebuilt;
@@ -3867,8 +4394,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       text.
     </p>
     <p>
-      Appendices (the worked key log of appendix C creates its owner with two
-      keys from v1): C. examples; D. rationale; E. references.
+      Appendices: D. rationale; E. references.
     </p>
   </body>
 </html>

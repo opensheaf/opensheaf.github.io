@@ -1,6 +1,6 @@
 # OpenSheaf: an open format for document archives and collections
 
-*Specification, version 0.1 (draft), 18 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).*
+*Specification, version 0.1 (draft), 19 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).*
 
 > [!WARNING]
 > **Draft, being rebuilt.** This text is being rebuilt, concept by concept, from the [reference text](reference/opensheaf-specification-0.1-full.md) of PR #30, into a shorter and coherent whole. A concept not yet rebuilt is read in the reference text. Until version 1.0, any revision may change the format in incompatible ways.
@@ -72,7 +72,7 @@ The discovery document is rewritten whenever an object is added or changed. It i
 The <dfn>storage root</dfn> is an OCFL 1.1 storage root at the URL `storageRoot`, holding the archive's objects (section 4). Since OCFL allows in it only the folders that lead to objects, and extensions, it SHOULD be a dedicated folder (by convention `ocfl/`), and presentation files MUST NOT be placed in it. It MAY contain, as loose files, copies of the OCFL specification and of this one. Its `ocfl_layout.json` names its storage layout, which MUST be the one given by `storageLayout`:
 
 - **The owner-name layout**, `opensheaf-owner-name-storage-layout`, the default, defined here (not yet registered with OCFL, so validators may warn about it). The object whose identifier is `sheaf:<name>:<owner>` (section 4) is at `<owner>/<name>/`, and a draft `sheaf:draft:<id>` at `draft/<id>/`; any other identifier is an error. An owner's object is thus at `<owner>/<owner>/`, and the folder of an owner holds its key log and every line of it in the archive, so that an owner moving elsewhere copies one folder. The layout has no parameters; `ocfl_layout.json` describes it as `"Lines at <owner>/<name>, drafts at draft/<id>"`.
-- **The hashed layout**, for large archives: OCFL's `0003-hash-and-id-n-tuple-storage-layout` with its default parameters (`sha256`, tuples of 3 characters, 3 tuples), which a configuration file, if present, MUST NOT change. An object is at `<t1>/<t2>/<t3>/<encoded id>/`, where `<t1>`, `<t2>`, `<t3>` are the first three groups of three characters of the hexadecimal SHA-256 digest of its identifier, and `<encoded id>` is the identifier percent-encoded as the extension says (every character but `A-Z`, `a-z`, `0-9`, `-` and `_`), shortened, when longer than 100 characters, to its first 100 characters, `-` and the full digest; identifiers of lines are always shortened so (appendix C). Readers compute the path; they never decode it.
+- **The hashed layout**, for large archives: OCFL's `0003-hash-and-id-n-tuple-storage-layout` with its default parameters (`sha256`, tuples of 3 characters, 3 tuples), which a configuration file, if present, MUST NOT change. An object is at `<t1>/<t2>/<t3>/<encoded id>/`, where `<t1>`, `<t2>`, `<t3>` are the first three groups of three characters of the hexadecimal SHA-256 digest of its identifier, and `<encoded id>` is the identifier percent-encoded as the extension says (every character but `A-Z`, `a-z`, `0-9`, `-` and `_`, in lowercase hexadecimal, `%3a`), shortened, when longer than 100 characters, to its first 100 characters, `-` and the full digest; identifiers of lines are always shortened so (appendix C). Readers compute the path; they never decode it.
 
 Archives SHOULD use the owner-name layout, unless one folder per owner or per name becomes impractical (tens of thousands of lines, fewer in a git repository). The layout is chosen when the archive is created and SHOULD NOT be changed: pins stay valid, since readers compute paths from `storageLayout`, but every URL into the storage root changes.
 
@@ -255,7 +255,7 @@ A key is added or retired, the threshold or the data of an extension changed, a 
 
 An owner tool creates an owner by writing its genesis record, with `kind` `owner` and the first `keys` and `threshold` (section 5.1), and the first version of its key log, signed as above. An owner is its own originator, and its owner object has no parent, so its owner name is made by algorithm 0 (section 5.2). If the owner name is taken, in the archive where the tool writes or among the owners it knows elsewhere, the tool draws a new nonce (section 5.3).
 
-**Choosing a threshold.** One `threshold` governs the key log and every line of the owner. Owners choose between two risks: a threshold of 1 with a spare key kept apart (on a hardware token, for instance) survives the loss of a key but not its theft; a threshold of 2 with three keys kept apart, from the first version of the key log, survives the loss of one key and the theft of one. Owner tools SHOULD offer both, and SHOULD NOT create an owner with a single key, since an owner that loses every key of the latest version of its key log cannot recover.
+**Choosing a threshold.** One `threshold` governs the key log and every line of the owner. Owners choose between two risks: a threshold of 1 with a spare key kept apart (on a hardware token, for instance) survives the loss of a key, and the theft of the key in daily use by healing (section 6.3), though what the thief signed stays good (section 6.4); a threshold of 2 with three keys kept apart, from the first version of the key log, survives the loss of one key and the theft of one. Owner tools SHOULD offer both, and SHOULD NOT create an owner with a single key, since an owner that loses every key of the latest version of its key log cannot recover.
 
 **Retiring a key.** An owner retires a key it no longer uses (a replaced laptop, a member who leaves the group) by leaving it out of `keys` in a new version of its key log. Signatures made with it stay good, and a retired key in someone else's hands still makes good signatures naming the versions that list it; so retiring is enough after an exposure only when the exposed keys cannot reach a threshold (section 6.3).
 
@@ -267,11 +267,11 @@ An owner tool creates an owner by writing its genesis record, with `kind` `owner
 
 **Forks of a key log.** Two different versions of a key log with the same number, each signed by `threshold` keys of the version before, are a <dfn>fork of the key log</dfn>; that number is the <dfn>fork point</dfn>. Whoever holds `threshold` keys of the version before can make one: a thief, or the owner itself, signing two versions with keys it wants nullified. The format cannot tell which side is the owner's, so it trusts neither: an archive that holds one side and meets the other replaces, in its copy, the version it holds at the fork point by a fork record, and drops every later version.
 
-**Fork records.** A <dfn>fork record</dfn> is a version of the key log at the fork point, made by the archive that records the fork (its deposit, section 4.1), and not signed: besides `genesis.json` and `object.json`, it holds only the conflicting versions it <dfn>carries</dfn>, each under `forked/<d>/`, where `<d>` is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of its inventory file: that inventory file, its checksum file, its `keys.json` and its signature files, byte for byte. It is valid when it carries at least two versions of its number, with different inventory files, each signed (section 7.3) against the version before it, which anyone checks from its content and that version; otherwise it is not a version of the key log. The keys that sign the versions a fork record or a healing version carries, and the keys those nullify, are <dfn>nullified</dfn>. A key log whose latest version is a fork record is <dfn>tainted</dfn>: no version follows a fork record but by healing, no signature names one, and owner tools sign nothing for a tainted owner but a healing version. Fork records are copied with the key log like any version, so that every copy shows the fork.
+**Fork records.** A <dfn>fork record</dfn> is a version of the key log at the fork point, made by the archive that records the fork (its deposit, section 4.1), and not signed: besides `genesis.json` and `object.json`, it holds only the conflicting versions it <dfn>carries</dfn>, each under `forked/<d>/`, where `<d>` is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of its inventory file: that inventory file as `inventory.json`, its checksum file as `inventory.json.sha512`, its `keys.json`, and its signature files `signature-<k>.json` with the witnesses beside them (section 7.2), byte for byte. It is valid when it carries at least two versions of its number, with different inventory files, each signed (section 7.3) against the version before it, which anyone checks from its content and that version; otherwise it is not a version of the key log. The keys that sign the versions a fork record or a healing version carries, and the keys those nullify, are <dfn>nullified</dfn>. A key log whose latest version is a fork record is <dfn>tainted</dfn>: no version follows a fork record but by healing, no signature names one, and owner tools sign nothing for a tainted owner but a healing version. Fork records are copied with the key log like any version, so that every copy shows the fork.
 
 **Healing.** A <dfn>healing version</dfn> is a version of the key log at a fork point that carries, as a fork record does, one or more versions of its number, each signed against the version before; that holds a `keys.json` listing none of the keys it nullifies; and that is signed by `threshold` keys of the version before, none of them nullified by it. It is otherwise a version like any other, and the key log continues from it. The owner heals a tainted key log by a healing version carrying every version the fork record carries; it answers a thief directly by a healing version carrying the thief's version. An owner that cannot heal, having too few keys left, stays tainted, which is treated as an end (section 6.4); its keeper MAY name a successor (section 6.6). Owner tools SHOULD keep, besides the keys in daily use, at least `threshold` spare keys kept apart and used only to heal, and MUST show the owner a version of its key log that the owner did not make before signing anything.
 
-**When versions meet.** When a reader or an archive holding a version of a key log meets a different version of the same number, after the same versions: a fork record or a healing version <dfn>supersedes</dfn> a version it carries, a version signed by a key it nullifies, and a fork record that carries no version it does not carry; the version superseded is replaced by the one that supersedes it. Otherwise the two are replaced by a fork record carrying every version they are or, for fork records and healing versions, carry. The versions after a version replaced are dropped; signatures naming them are unchecked there (section 7.3). These replacements are made only to key logs, and are the only changes of an object version outside drafts (section 4).
+**When versions meet.** When a reader or an archive holding a version of a key log meets a different version of the same number, after the same versions: a fork record or a healing version <dfn>supersedes</dfn> a version it carries, a version signed by a key it nullifies, and a fork record that carries no version it does not carry; the version superseded is replaced by the one that supersedes it. Otherwise the two are replaced by a fork record carrying every version they are or, for fork records and healing versions, carry. The versions after a version replaced are dropped; signatures naming them are unchecked there (section 7.3). The files of the witness folder of a version replaced or dropped go with it, those of a carried version into `forked/<d>/`. These replacements are made only to key logs, and are the only changes of an object version outside drafts (section 4).
 
 ### 6.4 After an end, a fork or healing
 
@@ -314,7 +314,7 @@ Every sealed object version of a line MUST be signed by its owner when it is mad
 
 ### 7.2 Witnesses and signature files
 
-A <dfn>witness</dfn> is evidence about an object version made after it: a signature, a timestamp, an external deposit (appendix A), a software archive snapshot. The witnesses kept with an object are in its <dfn>witness folder</dfn>, the OCFL object extension folder `extensions/opensheaf-witnesses/` (not yet registered with OCFL, so validators may warn), which is part of no version, is not covered by the inventory digests, and travels with the object. Witnesses MAY be added at any time, by the owner of the line or by others; they are kept, never re-serialised or replaced once made, since some (timestamps) are made of their bytes, and MUST NOT be removed except by a takedown (section 13).
+A <dfn>witness</dfn> is evidence about an object version made after it: a signature, a timestamp, an external deposit (appendix A), a software archive snapshot. The witnesses kept with an object are in its <dfn>witness folder</dfn>, the OCFL object extension folder `extensions/opensheaf-witnesses/` (not yet registered with OCFL, so validators may warn), which is part of no version, is not covered by the inventory digests, and travels with the object. Witnesses MAY be added at any time, by the owner of the line or by others; they are kept, never re-serialised or replaced once made, since some (timestamps) are made of their bytes, and MUST NOT be removed except by a takedown (section 13) or the replacements at a fork of a key log (section 6.3).
 
 **Signature files.** A <dfn>signature file</dfn> holds one signature of an object version by the owner of its line. The signature of version `<version>` by a key is the JSON file `<version>/signature-<k>.json` in the witness folder, where `<k>` is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of the key's `did:key` URI, as UTF-8, so that a reader that knows the keys builds every name without listing the folder. It has:
 
@@ -349,7 +349,7 @@ The first line keeps these signatures apart from any other use of the key; the o
 
 A signature file is:
 
-- <dfn>invalid</dfn> when it is malformed; its name does not match the digest of its key; its signature does not verify; its `object`, `version` and `inventorySha512` are not those of the version whose folder holds it (the digest also as its checksum file states it; in `parent.signatures/`, those of the parent version, section 9); its `signer` is not the line's owner; the reader reaches the key-log version named, with that digest (also as carried by a fork record or a healing version, section 6.3), and the key is not in its `keys`; or the version named follows one with `ended`, or is a fork record, or, for a signature of a line, has `ended` itself (section 6.3);
+- <dfn>invalid</dfn> when it is malformed; its name does not match the digest of its key; its signature does not verify; its `object`, `version` and `inventorySha512` are not those of the version whose folder holds it (the digest also as its checksum file states it; in `parent.signatures/`, those of the parent version, section 9; in `forked/<d>/`, those of the version carried, section 6.3); its `signer` is not the line's owner; the reader reaches the key-log version named, with that digest (also as carried by a fork record or a healing version, section 6.3), and the key is not in its `keys`; or the version named follows one with `ended`, or is a fork record, or, for a signature of a line, has `ended` itself (section 6.3);
 - <dfn>unchecked</dfn> when it is not invalid but the reader cannot reach the key-log version it names, with that digest (the key log is absent, taken down, or shorter, or the reader holds another version of that number, which verifiers report as a sign of a fork of the key log, section 6.3); nothing is added on such signatures (section 7.5);
 - otherwise <dfn>good</dfn>, for ever: later versions of the key log, an end or a fork never change it.
 
@@ -645,7 +645,7 @@ sheaf:<owner>/v<n>?sha512=<digest>            a version of its key log
 
 **The hint.** `at` gives the base URL of an archive where a copy is expected, which a resolver tries first: an `https` URL ending with `/`, every character outside the unreserved characters of RFC 3986 percent-encoded, decoded once (`sheaf:<name>/v3?sha512=<digest>&at=https%3A%2F%2Fauthors.example.org%2F`). It is not part of what the URI names.
 
-**Canonical form.** The canonical form has complete parts (section 12.2), lowercase where case is folded, no owner part when the owner is the originator, the genesis name (section 5.2) with `:*`, and no `at` or unknown parameters. Two URIs name the same thing when their canonical forms are equal byte for byte, which may need a copy of the genesis record to decide. Files record `sheaf:` URIs in canonical form (`keyLog`, section 7.2; relations, section 4.4).
+**Canonical form.** The canonical form has complete parts (section 12.2), lowercase where case is folded, no owner part when the owner is the originator, the genesis name (section 5.2) with `:*`, and no `at` or unknown parameters. Two URIs name the same thing when their canonical forms are equal byte for byte, which may need a copy of the genesis record to decide. Files record `sheaf:` URIs in canonical form (`keyLog`, section 7.2; relations, section 4.4), except identifiers (section 4), which always have the owner part.
 
 ### 12.2 Short forms
 
@@ -876,6 +876,7 @@ Before 1.0, every minor version MAY be incompatible. A draft MAY change in any w
 - **0.1 (draft), 13 November 2026:** first version.
 - **0.1 (draft), 13 to 18 November 2026:** revisions, and the proposal of PR #30 (names from genesis records, owners and key logs, lines, branches, `sheaf:` URIs, signatures), each listed in the changelog of the [reference text](reference/opensheaf-specification-0.1-full.md).
 - **0.1 (draft), 18 November 2026, rebuilt (PR #30):** the text rebuilt concept by concept into a shorter whole, from the reference text. Decided in the rebuild: archives are named by no file, and `replicas` is dropped (section 3); external records are witnesses, not copies (section 12.3); index declarations name only `names`, `owners` and `sha512` (section 12.5); every removal is a takedown, and tombstones are required once an object is taken down (section 13); drafts are never withdrawn; key-log forks are recorded by fork records, which nullify the keys involved, and healed by the owner, versions of key logs being replaced only there (section 6.3, provisional, #58); findings are errors, warnings or results (section 14.1); security, privacy and rights rewritten (section 15); `licence` for documents only; logical paths exclude empty segments, a final `/` and `\` (section 4.1).
+- **0.1 (draft), 19 November 2026, rebuilt (PR #30):** appendices A (profiles), B (JSON Schemas) and C (examples, checked against the schemas) rebuilt; DOIs written bare; signature files closed to other properties; fork records carry the witnesses of the versions they carry, under named files (section 6.3, provisional, #58); a threshold of 1 with a spare key survives the theft of the daily key by healing (section 6.2).
 
 ## Appendix A. Profiles (normative for archives declaring them)
 
@@ -927,7 +928,7 @@ The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.
 - `opensheaf-keeper-0.1.schema.json`: `/.well-known/opensheaf` (section 6.6);
 - `opensheaf-index-0.1.schema.json`: index files and `indexes.json` (section 12.5).
 
-**Validation.** A file is valid when it validates against its schema with `format` asserted (section 14.2). The schemas of `genesis.json`, `keys.json` and the keeper's file allow no other properties; the others do, and such properties carry no meaning here (the data of extensions goes under `extensions`, section 2). Where a schema and the text disagree, the text prevails.
+**Validation.** A file is valid when it validates against its schema with `format` asserted (section 14.2). The schemas of `genesis.json`, `keys.json`, signature files and the keeper's file allow no other properties; the others do, and such properties carry no meaning here (the data of extensions goes under `extensions`, section 2). Where a schema and the text disagree, the text prevails.
 
 **Other files.** `datacite.json` is validated by converting it to XML, following DataCite's mapping between the JSON of its REST API and XML, against the DataCite 4.7 XML Schema, with the requirements of section 4.4. Inventories, their checksum files and `ocfl_layout.json` are OCFL's (section 14.2). The schema of the [timestamps extension](opensheaf-timestamps-0.1.md) is published with it.
 
@@ -940,9 +941,389 @@ The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.
 - Whether a takedown reaches the records of external services (#33).
 - The field names of `keys.json`, signature files and the evidence of branches, which the schemas follow (#55); the files of fork records and healing versions, provisional (#58).
 
+## Appendix C. Examples (non-normative)
+
+The examples follow one paper of the first archive (section 1) through an illustrative history: its owner is created, the paper is sealed and revised, kept in the archive's main catalogue, and accepted by a journal, which keeps an accepted copy and lists it in an issue. The title and the authors are those of the archive; the dates, the journal and its domain are invented, and the DOIs (with Zenodo's prefix) and the ORCID iD (with a valid check digit) are placeholders. Every name, owner name, `did:key`, file name derived from a key or a digest, and signature is computed: names from the genesis records shown (section 5.2), keys from private keys made for these examples, signatures over the messages shown (section 7.2), and inventory digests from inventories that are not shown. Every JSON file shown validates against its schema (appendix B).
+
+### C.1 An owner and its key log
+
+The genesis record of the authors' owner. It takes the first choice of section 6.2: two keys from the first version and a threshold of 1, the first key in daily use on a laptop, the second a spare kept apart on a hardware token and used only to heal (section 6.3):
+
+```json
+{
+  "format": "opensheaf-genesis/0.1",
+  "kind": "owner",
+  "created": "2026-03-01T17:40:00Z",
+  "nonce": "1b4d9964664d9825076eb8558af61162",
+  "keys": [
+    "did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW",
+    "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5"
+  ],
+  "threshold": 1
+}
+```
+
+Its name, the owner name, is `ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq`: the SHA-256 digest of `opensheaf-name-0`, a line feed and the bytes shown, with a final line feed, in base32 (section 5.2). The owner object is at `ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/` in the owner-name layout (section 3.2), and its `object.json` is the same in every version:
+
+```json
+{
+  "format": "opensheaf-object/0.1",
+  "specification": "0.1",
+  "kind": "owner",
+  "status": "active",
+  "name": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq"
+}
+```
+
+The `keys.json` of the first version of the key log repeats the keys and threshold of the genesis record, names the keeper (section 6.6), and adopts the [timestamps extension](opensheaf-timestamps-0.1.md) with one RFC 3161 authority (a placeholder fingerprint):
+
+```json
+{
+  "format": "opensheaf-keys/0.1",
+  "keys": [
+    "did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW",
+    "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5"
+  ],
+  "threshold": 1,
+  "keeper": [
+    "https://orcid.org/0000-0002-1234-5677"
+  ],
+  "extensions": {
+    "https://opensheaf.org/opensheaf-timestamps-0.1": {
+      "timestampAuthorities": [
+        "5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147"
+      ]
+    }
+  }
+}
+```
+
+It is signed by its own first key, in `v1/signature-w7htq42yt7tllefi.json` of the owner object's witness folder, whose `keyLog` names this version itself (section 7.2). When the laptop is replaced, the second version adds the new laptop's key and retires the old one (section 6.2); it is signed by the old key, listed in the first version, in `v2/signature-w7htq42yt7tllefi.json`, whose `keyLog` is `sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v1?sha512=2d04f58c210a61cdf4fef1ed4300443f8a99ccb728f27c6765ffc281ff7b3c7c721f6f4421485c1e6697a68106841746f73ae8015f656e9333ac2f05d02e3cfb`:
+
+```json
+{
+  "format": "opensheaf-keys/0.1",
+  "keys": [
+    "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5",
+    "did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn"
+  ],
+  "threshold": 1,
+  "keeper": [
+    "https://orcid.org/0000-0002-1234-5677"
+  ],
+  "extensions": {
+    "https://opensheaf.org/opensheaf-timestamps-0.1": {
+      "timestampAuthorities": [
+        "5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147"
+      ]
+    }
+  }
+}
+```
+
+The journal's owner, `rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba`, took the other choice: three keys and a threshold of 2 from its first version, so that every version it makes carries two signature files.
+
+### C.2 A document version
+
+The genesis record of the paper, written when the owner sealed it (section 10.2):
+
+```json
+{
+  "format": "opensheaf-genesis/0.1",
+  "kind": "document",
+  "created": "2026-03-02T09:14:00Z",
+  "originator": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "nonce": "6f65cd32058c16d6d78b05011772ff1d"
+}
+```
+
+Its genesis name is `glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva`; by algorithm 1 its name is `osms3d3jl3nx3qfsfb5tze2qbgtehtdrxhaylj6cd3whpk62njqr`, which a branch renamed after a clash would take (section 5.3). The line is `sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq`. The `object.json` of its first version (section 4.3), which was deposited with Zenodo (appendix A.1):
+
+```json
+{
+  "format": "opensheaf-object/0.1",
+  "specification": "0.1",
+  "kind": "document",
+  "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+  "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "documentVersion": 1,
+  "mainSource": "fractional-phi42-mass-gap.tm",
+  "sourceFormat": "application/x-texmacs",
+  "renditions": [ { "path": "fractional-phi42-mass-gap.pdf", "mediaType": "application/pdf" } ],
+  "toolchain": [ { "name": "TeXmacs", "version": "2.1.5" } ],
+  "stage": { "scheme": "NISO-JAV", "value": "AO" },
+  "agreement": { "by": [ "P. Duch", "M. Gubinelli" ], "date": "2026-03-01", "method": "by e-mail" },
+  "external": [ { "role": "deposit", "service": "Zenodo",
+                  "record": "https://zenodo.org/records/1234567", "doi": "10.5281/zenodo.1234567" } ],
+  "status": "active"
+}
+```
+
+The `datacite.json` of the same version (section 4.4). The version has a Zenodo DOI, so Zenodo is its `publisher`, and `url` is its landing page (appendix A.3):
+
+```json
+{
+  "doi": "10.5281/zenodo.1234567",
+  "url": "https://mgubi.org/papers/fractional-phi42-mass-gap/",
+  "version": "1",
+  "types": { "resourceTypeGeneral": "Preprint" },
+  "titles": [ { "title": "Mass gap for the fractional $\\Phi^4_2$ model" } ],
+  "creators": [
+    { "name": "Duch, P.", "nameType": "Personal", "givenName": "P.", "familyName": "Duch" },
+    { "name": "Gubinelli, M.", "nameType": "Personal", "givenName": "M.", "familyName": "Gubinelli",
+      "nameIdentifiers": [ { "nameIdentifier": "https://orcid.org/0000-0002-1234-5677",
+                             "nameIdentifierScheme": "ORCID" } ] } ],
+  "publisher": { "name": "Zenodo" },
+  "publicationYear": 2026,
+  "dates": [ { "date": "2026-03-02", "dateType": "Issued" },
+             { "date": "2026-03-02", "dateType": "Available" } ],
+  "rightsList": [ { "rights": "Creative Commons Attribution 4.0 International",
+                    "rightsUri": "https://creativecommons.org/licenses/by/4.0/",
+                    "rightsIdentifier": "cc-by-4.0", "rightsIdentifierScheme": "SPDX" } ],
+  "descriptions": [ { "description": "We present a new, simple ...",
+                      "descriptionType": "Abstract" } ],
+  "formats": [ "application/x-texmacs", "application/pdf" ],
+  "relatedIdentifiers": [ { "relatedIdentifier": "10.5281/zenodo.1234566",
+                            "relatedIdentifierType": "DOI", "relationType": "IsVersionOf" } ]
+}
+```
+
+The second object version holds document version 2 (section 4.2), corrected after the referee's report and accepted by the journal: its `object.json` has `documentVersion` 2, `changes`, `stage` `AM` and the DOI `10.5281/zenodo.1234568`, and its `datacite.json` has `version` `"2"` and `IsNewVersionOf` the DOI of version 1.
+
+### C.3 A signature
+
+The signature of that version by the new laptop's key, `extensions/opensheaf-witnesses/v2/signature-4hz7zgsiazl6hx7i.json` in the paper's object, `4hz7zgsiazl6hx7i` being the first 16 characters of the base32 SHA-256 digest of the `did:key` (section 7.2); it names version 2 of the key log, which lists the key:
+
+```json
+{
+  "format": "opensheaf-signature/0.1",
+  "object": "sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "version": "v2",
+  "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+  "signer": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "key": "did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn",
+  "keyLog": "sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae",
+  "signature": "PMhzGXcpbLdw/khQDgsrAj7Z0nuJnY6/UDXGoAekLENCBllYJY3QLERKFvBZXPTwaeGCh7z61evcUE3X9s/DBw=="
+}
+```
+
+The message it signs, each line ended by a line feed (section 7.2):
+
+```
+opensheaf-signature/0.1
+object sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+version v2
+inventory a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
+keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae
+```
+
+With a threshold of 1, this one good signature makes the version signed (section 7.3).
+
+### C.4 Collections
+
+The `members.json` of the second version of the archive's main catalogue (section 8.3), owned by the authors' owner. The member is followed, so that when version 2 of the paper was signed, the catalogue's tool wrote this version, pinning it in place of version 1:
+
+```json
+{
+  "format": "opensheaf-collection/0.1",
+  "type": "catalogue",
+  "order": "issued-desc",
+  "members": [
+    { "kind": "document",
+      "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+      "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "at": [ "https://mgubi.org/papers/" ],
+      "version": "v2",
+      "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+      "follow": "latest",
+      "doi": "10.5281/zenodo.1234568",
+      "conceptDoi": "10.5281/zenodo.1234566",
+      "cite": { "title": "Mass gap for the fractional $\\Phi^4_2$ model",
+                "creators": [ "P. Duch", "M. Gubinelli" ], "year": 2026, "issued": "2026-03-02" } }
+  ]
+}
+```
+
+The `members.json` of an issue of the journal, a selection owned by the journal's owner (section 8.4). Its first member is the journal's accepted copy (section C.5); its second, the original revision set, which a selection MAY also list (section 9.6):
+
+```json
+{
+  "format": "opensheaf-collection/0.1",
+  "type": "selection",
+  "members": [
+    { "kind": "document",
+      "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+      "owner": "rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba",
+      "at": [ "https://journal.example.org/" ],
+      "revisions": [ { "documentVersion": 2, "version": "v1",
+                       "inventorySha512": "fd4f4ea3c71eb9ca6d5653298771606154b1b1f665438068a80d1139cdf2c622d88d596867ef627b52aef27af51189db9d92836e06cc5cadb9480ed568792183" } ],
+      "cite": { "title": "Mass gap for the fractional $\\Phi^4_2$ model",
+                "creators": [ "P. Duch", "M. Gubinelli" ], "year": 2026, "issued": "2026-03-02" } },
+    { "kind": "document",
+      "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+      "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "at": [ "https://mgubi.org/papers/" ],
+      "revisions": [ { "documentVersion": 2, "version": "v2",
+                       "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+                       "doi": "10.5281/zenodo.1234568" } ] }
+  ]
+}
+```
+
+### C.5 A branch: an accepted copy
+
+The `object.json` of the first version of the journal's accepted copy, a branch of the authors' line at their object version `v2` (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is `sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba`:
+
+```json
+{
+  "format": "opensheaf-object/0.1",
+  "specification": "0.1",
+  "kind": "document",
+  "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+  "owner": "rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba",
+  "parent": {
+    "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+    "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+    "objectVersion": "v2",
+    "documentVersion": 2,
+    "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+    "url": "https://mgubi.org/papers/ocfl/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2/"
+  },
+  "documentVersion": 2,
+  "mainSource": "fractional-phi42-mass-gap.tm",
+  "sourceFormat": "application/x-texmacs",
+  "renditions": [ { "path": "fractional-phi42-mass-gap.pdf", "mediaType": "application/pdf" } ],
+  "stage": { "scheme": "NISO-JAV", "value": "AM" },
+  "status": "active"
+}
+```
+
+Its content holds the files of the parent version except `datacite.json` and `object.json` (`genesis.json`, the source and the PDF), its own `datacite.json` and `object.json`, and the evidence (section 9.2): `parent.inventory.json`, the authors' `v2/inventory.json`; `parent.object.json`, their `object.json` of that version; and `parent.signatures/signature-4hz7zgsiazl6hx7i.json`, the file of section C.3, byte for byte. Its witness folder holds two signature files of the journal's keys, naming the first version of the journal's key log. The journal's storage root keeps beside it the owner objects of the journal and of the authors (section 6.5).
+
+### C.6 The archive
+
+The storage root of the authors' archive in the owner-name layout (section 3.2), showing the paper's witness folder, with an RFC 3161 token of each signature (timestamps extension; the tokens are not shown):
+
+```
+ocfl/
+  0=ocfl_1.1
+  ocfl_layout.json
+  ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
+    ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/      the key log
+    glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/      the paper
+      0=ocfl_object_1.1
+      inventory.json
+      inventory.json.sha512
+      v1/
+      v2/
+      extensions/opensheaf-witnesses/
+        v1/signature-w7htq42yt7tllefi.json
+        v1/signature-w7htq42yt7tllefi.json.3mpvi64zr26ezfvh.tsr
+        v2/signature-4hz7zgsiazl6hx7i.json
+        v2/signature-4hz7zgsiazl6hx7i.json.5xjh5tk24wrufjrz.tsr
+    qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma/      the main catalogue
+```
+
+In the hashed layout, the paper would be at `933/34d/349/sheaf%3aglncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva%3attm4koeifphkud7j5wkmqqovbpbhlycbunxav-93334d349fc19e8fbbc73330df99a0606e54fe0e3f68a1ebe117416b8f96f945/`: its identifier of 111 characters encodes to 115, each `:` becoming `%3a`, and is shortened (section 3.2).
+
+The discovery document (section 3.1). The archive hosts one owner, whose key log, paper and catalogue it lists, with labels for the website; a second paper of the owner was taken down, and its tombstone (section 13.3) keeps its line taken:
+
+```json
+{
+  "format": "opensheaf-archive/0.1",
+  "specification": "0.1",
+  "name": "Papers of Massimiliano Gubinelli",
+  "contact": "https://orcid.org/0000-0002-1234-5677",
+  "storageRoot": "ocfl/",
+  "storageLayout": "opensheaf-owner-name-storage-layout",
+  "mainCollection": "sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "profiles": [ "zenodo", "texmacs", "website" ],
+  "extensions": [ "https://opensheaf.org/opensheaf-timestamps-0.1" ],
+  "owners": [ "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq" ],
+  "indexes": { "names": 2, "owners": 2, "sha512": 2 },
+  "objects": [
+    { "id": "sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "kind": "owner", "name": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "head": "v2", "inventorySha512": "a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae",
+      "status": "active" },
+    { "id": "sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "kind": "document", "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "head": "v2", "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+      "status": "active", "label": "fractional-phi42-mass-gap" },
+    { "id": "sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "kind": "collection", "name": "qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "head": "v2", "inventorySha512": "29c17c0325606d503059a6276a0ff9366f9ee0f70aecd8dc5393089d2648609910b6261895533af250e89bd8c3061e564f2026b6153a5cea0dd569a85f506c50",
+      "status": "active", "label": "papers" }
+  ],
+  "tombstones": [
+    { "id": "sheaf:tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "kind": "document", "name": "tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "genesisName": "tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua",
+      "lastVersion": "v1", "inventorySha512": "ede3e9be2e8e74503af7df6408f0f43846b80ebaece2737e16019e37a8ce7e8fba0bb6945fde5973a94d6373c7d8118413fd6587d5e9a3cbade685eae2ea5ae3",
+      "date": "2026-05-04", "reason": "Taken down at the request of the holder of the rights." }
+  ]
+}
+```
+
+### C.7 sheaf: URIs
+
+URIs of the paper, of the accepted copy and of the authors' owner (section 12):
+
+```
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva
+    the authors' line (its owner is the originator)
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+    document version 2 of the authors' line
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
+    the authors' object version v2, which the journal vetted
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
+    the same, with a hint
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba/v2
+    document version 2 of the journal's line, its accepted copy
+sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:*
+    the work: the authors' line, the journal's and any other
+sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+    the authors' owner: its key log
+sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae
+    version 2 of its key log, as keyLog names it
+sheaf:glncddtx/v2
+sheaf:glncddtx:rvv4h5sj/v2
+    short forms of the second and fifth (section 12.2)
+https://opensheaf.org/sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+    the second, through a gateway (provisional, #35)
+```
+
+### C.8 A fork of a key log (provisional, #58)
+
+Later, the new laptop is stolen. The thief signs with its key a version 3 of the key log listing only a key of its own; the owner, not yet aware, has signed with the same key another version 3, adding a domain to `keeper`. Both are signed against version 2, so an archive holding one that meets the other replaces its version 3 by a fork record (section 6.3), which nullifies the stolen key. The owner object there:
+
+```
+ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
+  inventory.json
+  inventory.json.sha512
+  v1/
+  v2/
+  v3/                                the fork record
+    inventory.json
+    inventory.json.sha512
+    content/forked/w6s5uujjs56ilzmn/          the owner's version 3
+      inventory.json
+      inventory.json.sha512
+      keys.json
+      signature-4hz7zgsiazl6hx7i.json
+    content/forked/gqqa23zsg6ehczgj/          the thief's version 3
+      inventory.json
+      inventory.json.sha512
+      keys.json
+      signature-4hz7zgsiazl6hx7i.json
+```
+
+The fork record's `genesis.json` and `object.json` are those of `v1`, to which its inventory refers, and it has no `keys.json`. The owner heals with its spare key, which signed neither version: a healing version 3 carrying both, whose `keys.json` lists the spare key and a new one, not the stolen key (section 6.3). The signatures made with the stolen key stay good, and readers weigh them as section 6.4 says.
+
 ## Plan of the rebuilt text
 
 Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 16 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
 
-Appendices (the worked key log of appendix C creates its owner with two keys from v1): C. examples; D. rationale; E. references.
+Appendices: D. rationale; E. references.
