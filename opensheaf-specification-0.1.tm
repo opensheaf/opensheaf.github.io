@@ -87,7 +87,7 @@
     <item><verbatim|objects>: every object of the storage root except drafts, each with <verbatim|id> (section 4), <verbatim|kind>, <verbatim|name> and <verbatim|owner> (section 7), <verbatim|head> (its OCFL head version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as its checksum file states it) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, section 13), and OPTIONALLY a <verbatim|label>.
   </itemize>
 
-  It SHOULD contain <verbatim|mainCollection>, the identifier of the catalogue of the archive's documents (section 8); <verbatim|contact>, a URI; and <verbatim|extensions>, the names of the extensions its objects use (section 2). It MAY contain <verbatim|owners>, the owner names of the owners it hosts (section 6); <verbatim|drafts>, the drafts it chooses to show, with <verbatim|id>, <verbatim|kind> and <verbatim|head>, as unfinished work on which nothing may rely (section 10); <verbatim|tombstones> (section 13); <verbatim|indexes> (section 12); and <verbatim|feed>, the URL of an Atom feed of new object versions.
+  It SHOULD contain <verbatim|mainCollection>, the identifier of the catalogue of the archive's documents (section 8); <verbatim|contact>, a URI; and <verbatim|extensions>, the names of the extensions its objects use (section 2). It MAY contain <verbatim|owners>, the owner names of the owners it hosts (section 6); <verbatim|drafts>, the drafts it chooses to show, with <verbatim|id>, <verbatim|kind> and <verbatim|head>, as unfinished work on which nothing may rely (section 10); <verbatim|tombstones> (section 13); <verbatim|indexes>, which maps each index kept to the length of the prefixes of its files (section 12.5); and <verbatim|feed>, the URL of an Atom feed of new object versions.
 
   The discovery document is rewritten whenever an object is added or changed. It is a map, not a witness: everything it states about objects MUST agree with the storage root, which verifiers check (section 14), and it lists what the archive holds, not every line an owner has elsewhere.
 
@@ -789,11 +789,119 @@
     <item>Whether a custodian follows a takedown of a line it mirrors (section 13; #33, #39).
   </itemize>
 
+  <section*|12. Identifiers: sheaf: URIs, resolution, indexes><label|12-identifiers-sheaf-uris-resolution-indexes>
+
+  Lines, versions, pins, works and owners are written as <verbatim|sheaf:> URIs. A <dfn|resolver> is a program that finds and checks what a <verbatim|sheaf:> URI names; a <dfn|gateway> is a resolver serving web links (section 12.6).
+
+  <subsection*|12.1 sheaf: URIs><label|121-sheaf-uris>
+
+  Where <verbatim|\<less\>name\<gtr\>> is a name (section 5) and <verbatim|\<less\>owner\<gtr\>> an owner name (section 6):
+
+  <\verbatim-code>
+    sheaf:\<less\>name\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the originator's line
+
+    sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the line of that owner
+
+    sheaf:\<less\>name\<gtr\>:* \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ the work: all its lines
+
+    sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ document version n of the line
+
+    sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\> \ \ one object version holding it
+
+    sheaf:\<less\>owner\<gtr\> \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ an owner: its key log
+
+    sheaf:\<less\>owner\<gtr\>/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\> \ \ \ \ \ \ \ \ \ \ \ a version of its key log
+  </verbatim-code>
+
+  <strong|Syntax.> The parts are, in this order: <verbatim|sheaf:> and the name; OPTIONALLY the <dfn|owner part>, <verbatim|:> and an owner name, or instead <verbatim|:*>; OPTIONALLY <verbatim|/v> and a positive integer without leading zeros; OPTIONALLY <verbatim|?> and parameters <verbatim|key=value> joined by <verbatim|&>, with at most one <verbatim|sha512>, only after a version, whose value is an inventory digest as in a pin (section 4), 128 lowercase hexadecimal digits, and at most one <verbatim|at>, after <verbatim|sha512> if both are present. Only the value of <verbatim|at> is percent-encoded; no fragment is defined. The scheme, the name, the owner name, <verbatim|v>, the digest and the parameter names are lowercase, and a resolver MAY fold uppercase letters in them; the value of <verbatim|at> is case-sensitive. A resolver ignores parameters it does not know.
+
+  <strong|The owner.> Without an owner part, a URI names the originator's line (section 5.3), read from the genesis record every copy carries; never the latest or most authoritative line, so a branch is always written with its owner part. An owner is the originator of its own genesis record, so <verbatim|sheaf:\<less\>owner\<gtr\>> names its key log.
+
+  <strong|The work.> <verbatim|sheaf:\<less\>name\<gtr\>:*> names every line of the work (section 12.4). It takes <verbatim|at>, but a resolver rejects it with a version or <verbatim|sha512>, since every line has its own document versions.
+
+  <strong|The version.> <verbatim|/v\<less\>n\<gtr\>> is a document version of the line (section 4.2, also on a branch), or for a key log an object version. It names only signed versions (section 7.3) whose <verbatim|object.json> has the URI's name and the line's owner: a branch names only its own versions, from its branch point, and drafts are never named (section 10.1). Without a digest, it names the object version holding n that the history of the line's latest signed version lists (section 4.2), or without <verbatim|history> the last signed one holding n; what it names may change as the line grows.
+
+  <strong|The pin.> With a digest, the URI names exactly the object version whose inventory file has that digest. Citations of a fixed version SHOULD carry the digest.
+
+  <strong|The hint.> <verbatim|at> gives the base URL of an archive where a copy is expected, which a resolver tries first: an <verbatim|https> URL ending with <verbatim|/>, every character outside the unreserved characters of RFC 3986 percent-encoded, decoded once (<verbatim|sheaf:\<less\>name\<gtr\>/v3?sha512=\<less\>digest\<gtr\>&at=https%3A%2F%2Fauthors.example.org%2F>). It is not part of what the URI names.
+
+  <strong|Canonical form.> The canonical form has complete parts (section 12.2), lowercase where case is folded, no owner part when the owner is the originator, the genesis name (section 5.2) with <verbatim|:*>, and no <verbatim|at> or unknown parameters. Two URIs name the same thing when their canonical forms are equal byte for byte, which may need a copy of the genesis record to decide. Files record <verbatim|sheaf:> URIs in canonical form (<verbatim|keyLog>, section 7.2; relations, section 4.4).
+
+  <subsection*|12.2 Short forms><label|122-short-forms>
+
+  For people, the name and the owner name MAY be shortened to a prefix of at least 8 characters (<verbatim|sheaf:lvfmiq2z:iztwg6bj/v3>); a part of 52 characters is complete. A resolver expands a short form among the lines it knows that pass the checks of section 12.3. The candidates are the lines whose name and owner name start with the parts given (without an owner part, the originators' lines; with <verbatim|:*>, every name starting with the name part, whose work is then searched for, section 12.4). If they all have the same owner, the short form names the one whose first object version of that owner has the earliest <verbatim|created> in its inventory, compared as instants; otherwise (several owners or genesis records, or a tie), it is ambiguous, and the resolver MUST NOT choose but lists the candidates with their full forms and originators.
+
+  Expansions may differ between resolvers and over time, so every file defined by this specification MUST use complete parts. A resolver SHOULD show the full form of what it resolved; landing pages and citation metadata SHOULD give the full form, and MAY add a short one. A short form printed where it cannot be corrected (a paper, a slide) SHOULD have at least 16 characters in each part.
+
+  <subsection*|12.3 Resolution><label|123-resolution>
+
+  <strong|Where to look.> A resolver tries, in any order, the locations it has: the URI's <verbatim|at> first, the <verbatim|at> of a collection member (section 8.2), a branch's <verbatim|parent.url> (section 9.1), the indexes it knows (section 12.5), its user's configuration. At an archive it reads the discovery document, finds the line in the indexes or in <verbatim|objects>, and fetches <verbatim|\<less\>storageRoot\<gtr\>\<less\>path\<gtr\>/\<less\>version\<gtr\>/inventory.json>, <verbatim|\<less\>path\<gtr\>> being given by the archive's layout (section 3.2). The parent version of a branch is fetched at <verbatim|parent.url> and otherwise found as any version of <verbatim|sheaf:\<less\>parent.name\<gtr\>:\<less\>parent.owner\<gtr\>>.
+
+  <strong|Checks.> Every copy found is checked: the URI's name is a name of its <verbatim|genesis.json> (section 5.2); its <verbatim|object.json> has that <verbatim|name> and the line's owner (the owner part, or the originator); its versions are signed (section 7.3), against the key log kept beside it (section 6.5) or a longer copy found elsewhere. For a pin, the inventory file has the digest and the version holds document version n (for a key log, is object version n); a mismatch is reported as in section 14. A copy that passes is a copy of the line, wherever found. Unchecked versions and versions that are not versions (section 7.3) are reported with their status and location, and never resolved to.
+
+  <strong|Copies, forks and ended owners.> Since a copy that stops early looks complete, a resolver uses the latest signed version among the copies it found that agree (section 7.4), and says where it found them. A fork of the line (section 7.4) is reported with the status of each side; the resolver uses only signed versions and does not choose between signed sides. A resolver reports an owner that has ended or whose key log is forked (section 6.3), with any successor, its own or named by its keeper (section 6.6), and never follows a successor by itself.
+
+  <strong|Tombstones.> A tombstone (section 13) is not signed: a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
+
+  <strong|External records.> A deposit with an external service (<verbatim|external>, section 4.3; appendix A) or a software archive snapshot is a witness (section 7.2), not a copy: it holds no inventory, so it is never checked against a pin and resolves nothing; a resolver MAY report it as a place where the files may be found. A snapshot holding an archive's storage root (an archive kept in git) is read as that archive.
+
+  <subsection*|12.4 Searching for a work><label|124-searching-for-a-work>
+
+  Resolving one line needs no search (the originator's line is always named by algorithm 0). But the lines of a work may carry any of the 16 names of its genesis record (section 5.2). To find them all (for <verbatim|:*>, or a search by work), a resolver obtains the genesis record from any copy or index entry found under the name, checked against it; computes its 16 names and looks each up in the indexes it knows; keeps only the entries whose genesis record is byte for byte the one obtained, discarding others as collisions (removed entries without a genesis record are listed apart, as removed lines of those names, and removed entries that kept it are marked removed); and keeps only the lines that pass the checks of section 12.3 and hold back to the origin: the originator's line signed by its originator, and branches whose chains of parent evidence hold (section 9.3). A reused genesis record thus yields no line (section 5.4), and no hash is assumed free of collisions. If several genesis records have the URI's name, the URI is ambiguous: the resolver lists them with their originators.
+
+  <subsection*|12.5 Indexes><label|125-indexes>
+
+  An archive SHOULD keep three <dfn|indexes> of its objects, by name, by owner and by inventory digest, next to its discovery document, declared in its <verbatim|indexes> (section 3.1). A custodian (section 11) or a resolver MAY keep them for many archives at a base URL of its own, declared in <verbatim|indexes.json> there. Indexes are maps, not witnesses: what they lead to is checked (section 12.3).
+
+  <strong|Files.> An index is a folder of files <verbatim|\<less\>p\<gtr\>.json>, where <verbatim|\<less\>p\<gtr\>> is a prefix of the key, each a JSON object with <verbatim|format>, <verbatim|"opensheaf-index/0.1">; <verbatim|index>, its folder; and <verbatim|entries>, every key starting with <verbatim|\<less\>p\<gtr\>>. A file without entries is omitted, so a missing file means no entry. The declaration (<verbatim|indexes> in the discovery document, or <verbatim|indexes.json>, with <verbatim|format> and <verbatim|indexes>) maps each index kept to the length of its <verbatim|\<less\>p\<gtr\>>, from 2 to 4 characters.
+
+  <\itemize>
+    <item><verbatim|names/>, by name: for each object with a genesis record, <verbatim|name>, <verbatim|owner>, <verbatim|id> (section 4), <verbatim|status>, <verbatim|originator> (for an owner object, itself), <verbatim|genesis> (the text of <verbatim|genesis.json>, whose UTF-8 encoding is exactly its bytes, so that works are searched for from indexes alone) and, if any, <verbatim|label> (section 3.1);
+
+    <item><verbatim|owners/>, by owner name: for each owner with lines in the storage root, <verbatim|owner> and <verbatim|names>, the names of those lines, its key log among them when kept there (section 6.5);
+
+    <item><verbatim|sha512/>, by inventory digest: for each sealed object version, <verbatim|inventorySha512>, <verbatim|id>, <verbatim|version> and <verbatim|status>.
+  </itemize>
+
+  <strong|Content.> An archive's indexes list every object with a genesis record and every sealed version of it, never drafts. <verbatim|status> is the object's, <verbatim|active> or <verbatim|withdrawn>, or <verbatim|removed> after a takedown (section 13): a tombstoned object keeps its entries in <verbatim|names/> and <verbatim|sha512/>, of which those in <verbatim|names/> MAY drop <verbatim|originator> and <verbatim|genesis>, while a takedown removes the name from <verbatim|owners/>, and the entry once it lists none. In indexes kept for several archives, every entry has <verbatim|at>, the base URL of the archive serving the copy, and <verbatim|owners/> has an entry for each owner and archive.
+
+  <strong|Lookups.> A resolver looks a line up in <verbatim|names/>, starting from <verbatim|at>, keeping the entries whose <verbatim|owner> matches the owner part, or without one, whose <verbatim|owner> is their <verbatim|originator>; a removed entry without <verbatim|originator> is matched against the originator of any copy of the genesis record, or reported as a removed line of that name, originator unknown. It looks a pin up in <verbatim|sha512/> and an owner's lines in <verbatim|owners/>. At an archive without indexes, it MAY read <verbatim|objects> of the discovery document and fetch <verbatim|genesis.json> and <verbatim|object.json> from the objects.
+
+  <subsection*|12.6 Gateways><label|126-gateways>
+
+  A gateway serves a URI at its base URL followed by the URI unchanged (<verbatim|https://opensheaf.org/sheaf:\<less\>name\<gtr\>/v3>, provisionally, #35); gateway links are written in full, since a relative link starting with <verbatim|sheaf:> is read as a URI. A gateway:
+
+  <\itemize>
+    <item>MUST answer with a page (200) showing what it resolved, or a temporary redirect (302, 303 or 307) only to a copy it has checked (section 12.3); it MUST NOT redirect permanently (301, 308), and MAY cache its result only for a URI with a digest;
+
+    <item>MUST show where what it resolved was found, that a URI without a digest resolves to the latest copy it found, not necessarily the owner's latest, and when the owner has ended or its key log is forked, with any successor;
+
+    <item>MUST NOT serve an archive's files from its own origin, but redirects or links to the archive (section 15);
+
+    <item>MUST fetch on its users' behalf only <verbatim|https> URLs at public addresses, with limits on size and time.
+  </itemize>
+
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>Registering the scheme <verbatim|sheaf> with IANA, as a provisional scheme (RFC 7595), until which DataCite records <verbatim|sheaf:> URIs as <verbatim|URL> (section 4.4) (#36).
+
+    <item>Whether the project runs a gateway, on which domain, and whether a domain used only for resolution drops <verbatim|sheaf:> from the path, as <verbatim|https://doi.org/> drops <verbatim|doi:> (#35).
+
+    <item>Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#13, #20).
+
+    <item>Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's <verbatim|swhid>) (#22).
+
+    <item>Whether a tombstone in one archive should stop resolution at copies elsewhere (#33).
+
+    <item>The numbering of document versions on a branch, which <verbatim|/v\<less\>n\<gtr\>> follows (section 9; #57).
+  </itemize>
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
-  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 11 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 12 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn). 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
+  13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn). 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
 
   Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
 

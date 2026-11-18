@@ -61,7 +61,7 @@ The <dfn>discovery document</dfn> is the JSON file `opensheaf.json` at the base 
 - `profiles`: the profiles it follows, from `zenodo`, `texmacs`, `website` (appendix A), possibly none;
 - `objects`: every object of the storage root except drafts, each with `id` (section 4), `kind`, `name` and `owner` (section 7), `head` (its OCFL head version), `inventorySha512` (the SHA-512 digest of the head inventory, as its checksum file states it) and `status` (`active` or `withdrawn`, section 13), and OPTIONALLY a `label`.
 
-It SHOULD contain `mainCollection`, the identifier of the catalogue of the archive's documents (section 8); `contact`, a URI; and `extensions`, the names of the extensions its objects use (section 2). It MAY contain `owners`, the owner names of the owners it hosts (section 6); `drafts`, the drafts it chooses to show, with `id`, `kind` and `head`, as unfinished work on which nothing may rely (section 10); `tombstones` (section 13); `indexes` (section 12); and `feed`, the URL of an Atom feed of new object versions.
+It SHOULD contain `mainCollection`, the identifier of the catalogue of the archive's documents (section 8); `contact`, a URI; and `extensions`, the names of the extensions its objects use (section 2). It MAY contain `owners`, the owner names of the owners it hosts (section 6); `drafts`, the drafts it chooses to show, with `id`, `kind` and `head`, as unfinished work on which nothing may rely (section 10); `tombstones` (section 13); `indexes`, which maps each index kept to the length of the prefixes of its files (section 12.5); and `feed`, the URL of an Atom feed of new object versions.
 
 The discovery document is rewritten whenever an object is added or changed. It is a map, not a witness: everything it states about objects MUST agree with the storage root, which verifiers check (section 14), and it lists what the archive holds, not every line an owner has elsewhere.
 
@@ -608,11 +608,96 @@ An archive MUST NOT keep a mirror unless the licences of every object version it
 - What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
 - Whether a custodian follows a takedown of a line it mirrors (section 13; #33, #39).
 
+## 12. Identifiers: sheaf: URIs, resolution, indexes
+
+Lines, versions, pins, works and owners are written as `sheaf:` URIs. A <dfn>resolver</dfn> is a program that finds and checks what a `sheaf:` URI names; a <dfn>gateway</dfn> is a resolver serving web links (section 12.6).
+
+### 12.1 sheaf: URIs
+
+Where `<name>` is a name (section 5) and `<owner>` an owner name (section 6):
+
+```
+sheaf:<name>                                  the originator's line
+sheaf:<name>:<owner>                          the line of that owner
+sheaf:<name>:*                                the work: all its lines
+sheaf:<name>[:<owner>]/v<n>                   document version n of the line
+sheaf:<name>[:<owner>]/v<n>?sha512=<digest>   one object version holding it
+sheaf:<owner>                                 an owner: its key log
+sheaf:<owner>/v<n>?sha512=<digest>            a version of its key log
+```
+
+**Syntax.** The parts are, in this order: `sheaf:` and the name; OPTIONALLY the <dfn>owner part</dfn>, `:` and an owner name, or instead `:*`; OPTIONALLY `/v` and a positive integer without leading zeros; OPTIONALLY `?` and parameters `key=value` joined by `&`, with at most one `sha512`, only after a version, whose value is an inventory digest as in a pin (section 4), 128 lowercase hexadecimal digits, and at most one `at`, after `sha512` if both are present. Only the value of `at` is percent-encoded; no fragment is defined. The scheme, the name, the owner name, `v`, the digest and the parameter names are lowercase, and a resolver MAY fold uppercase letters in them; the value of `at` is case-sensitive. A resolver ignores parameters it does not know.
+
+**The owner.** Without an owner part, a URI names the originator's line (section 5.3), read from the genesis record every copy carries; never the latest or most authoritative line, so a branch is always written with its owner part. An owner is the originator of its own genesis record, so `sheaf:<owner>` names its key log.
+
+**The work.** `sheaf:<name>:*` names every line of the work (section 12.4). It takes `at`, but a resolver rejects it with a version or `sha512`, since every line has its own document versions.
+
+**The version.** `/v<n>` is a document version of the line (section 4.2, also on a branch), or for a key log an object version. It names only signed versions (section 7.3) whose `object.json` has the URI's name and the line's owner: a branch names only its own versions, from its branch point, and drafts are never named (section 10.1). Without a digest, it names the object version holding n that the history of the line's latest signed version lists (section 4.2), or without `history` the last signed one holding n; what it names may change as the line grows.
+
+**The pin.** With a digest, the URI names exactly the object version whose inventory file has that digest. Citations of a fixed version SHOULD carry the digest.
+
+**The hint.** `at` gives the base URL of an archive where a copy is expected, which a resolver tries first: an `https` URL ending with `/`, every character outside the unreserved characters of RFC 3986 percent-encoded, decoded once (`sheaf:<name>/v3?sha512=<digest>&at=https%3A%2F%2Fauthors.example.org%2F`). It is not part of what the URI names.
+
+**Canonical form.** The canonical form has complete parts (section 12.2), lowercase where case is folded, no owner part when the owner is the originator, the genesis name (section 5.2) with `:*`, and no `at` or unknown parameters. Two URIs name the same thing when their canonical forms are equal byte for byte, which may need a copy of the genesis record to decide. Files record `sheaf:` URIs in canonical form (`keyLog`, section 7.2; relations, section 4.4).
+
+### 12.2 Short forms
+
+For people, the name and the owner name MAY be shortened to a prefix of at least 8 characters (`sheaf:lvfmiq2z:iztwg6bj/v3`); a part of 52 characters is complete. A resolver expands a short form among the lines it knows that pass the checks of section 12.3. The candidates are the lines whose name and owner name start with the parts given (without an owner part, the originators' lines; with `:*`, every name starting with the name part, whose work is then searched for, section 12.4). If they all have the same owner, the short form names the one whose first object version of that owner has the earliest `created` in its inventory, compared as instants; otherwise (several owners or genesis records, or a tie), it is ambiguous, and the resolver MUST NOT choose but lists the candidates with their full forms and originators.
+
+Expansions may differ between resolvers and over time, so every file defined by this specification MUST use complete parts. A resolver SHOULD show the full form of what it resolved; landing pages and citation metadata SHOULD give the full form, and MAY add a short one. A short form printed where it cannot be corrected (a paper, a slide) SHOULD have at least 16 characters in each part.
+
+### 12.3 Resolution
+
+**Where to look.** A resolver tries, in any order, the locations it has: the URI's `at` first, the `at` of a collection member (section 8.2), a branch's `parent.url` (section 9.1), the indexes it knows (section 12.5), its user's configuration. At an archive it reads the discovery document, finds the line in the indexes or in `objects`, and fetches `<storageRoot><path>/<version>/inventory.json`, `<path>` being given by the archive's layout (section 3.2). The parent version of a branch is fetched at `parent.url` and otherwise found as any version of `sheaf:<parent.name>:<parent.owner>`.
+
+**Checks.** Every copy found is checked: the URI's name is a name of its `genesis.json` (section 5.2); its `object.json` has that `name` and the line's owner (the owner part, or the originator); its versions are signed (section 7.3), against the key log kept beside it (section 6.5) or a longer copy found elsewhere. For a pin, the inventory file has the digest and the version holds document version n (for a key log, is object version n); a mismatch is reported as in section 14. A copy that passes is a copy of the line, wherever found. Unchecked versions and versions that are not versions (section 7.3) are reported with their status and location, and never resolved to.
+
+**Copies, forks and ended owners.** Since a copy that stops early looks complete, a resolver uses the latest signed version among the copies it found that agree (section 7.4), and says where it found them. A fork of the line (section 7.4) is reported with the status of each side; the resolver uses only signed versions and does not choose between signed sides. A resolver reports an owner that has ended or whose key log is forked (section 6.3), with any successor, its own or named by its keeper (section 6.6), and never follows a successor by itself.
+
+**Tombstones.** A tombstone (section 13) is not signed: a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
+
+**External records.** A deposit with an external service (`external`, section 4.3; appendix A) or a software archive snapshot is a witness (section 7.2), not a copy: it holds no inventory, so it is never checked against a pin and resolves nothing; a resolver MAY report it as a place where the files may be found. A snapshot holding an archive's storage root (an archive kept in git) is read as that archive.
+
+### 12.4 Searching for a work
+
+Resolving one line needs no search (the originator's line is always named by algorithm 0). But the lines of a work may carry any of the 16 names of its genesis record (section 5.2). To find them all (for `:*`, or a search by work), a resolver obtains the genesis record from any copy or index entry found under the name, checked against it; computes its 16 names and looks each up in the indexes it knows; keeps only the entries whose genesis record is byte for byte the one obtained, discarding others as collisions (removed entries without a genesis record are listed apart, as removed lines of those names, and removed entries that kept it are marked removed); and keeps only the lines that pass the checks of section 12.3 and hold back to the origin: the originator's line signed by its originator, and branches whose chains of parent evidence hold (section 9.3). A reused genesis record thus yields no line (section 5.4), and no hash is assumed free of collisions. If several genesis records have the URI's name, the URI is ambiguous: the resolver lists them with their originators.
+
+### 12.5 Indexes
+
+An archive SHOULD keep three <dfn>indexes</dfn> of its objects, by name, by owner and by inventory digest, next to its discovery document, declared in its `indexes` (section 3.1). A custodian (section 11) or a resolver MAY keep them for many archives at a base URL of its own, declared in `indexes.json` there. Indexes are maps, not witnesses: what they lead to is checked (section 12.3).
+
+**Files.** An index is a folder of files `<p>.json`, where `<p>` is a prefix of the key, each a JSON object with `format`, `"opensheaf-index/0.1"`; `index`, its folder; and `entries`, every key starting with `<p>`. A file without entries is omitted, so a missing file means no entry. The declaration (`indexes` in the discovery document, or `indexes.json`, with `format` and `indexes`) maps each index kept to the length of its `<p>`, from 2 to 4 characters.
+
+- `names/`, by name: for each object with a genesis record, `name`, `owner`, `id` (section 4), `status`, `originator` (for an owner object, itself), `genesis` (the text of `genesis.json`, whose UTF-8 encoding is exactly its bytes, so that works are searched for from indexes alone) and, if any, `label` (section 3.1);
+- `owners/`, by owner name: for each owner with lines in the storage root, `owner` and `names`, the names of those lines, its key log among them when kept there (section 6.5);
+- `sha512/`, by inventory digest: for each sealed object version, `inventorySha512`, `id`, `version` and `status`.
+
+**Content.** An archive's indexes list every object with a genesis record and every sealed version of it, never drafts. `status` is the object's, `active` or `withdrawn`, or `removed` after a takedown (section 13): a tombstoned object keeps its entries in `names/` and `sha512/`, of which those in `names/` MAY drop `originator` and `genesis`, while a takedown removes the name from `owners/`, and the entry once it lists none. In indexes kept for several archives, every entry has `at`, the base URL of the archive serving the copy, and `owners/` has an entry for each owner and archive.
+
+**Lookups.** A resolver looks a line up in `names/`, starting from `at`, keeping the entries whose `owner` matches the owner part, or without one, whose `owner` is their `originator`; a removed entry without `originator` is matched against the originator of any copy of the genesis record, or reported as a removed line of that name, originator unknown. It looks a pin up in `sha512/` and an owner's lines in `owners/`. At an archive without indexes, it MAY read `objects` of the discovery document and fetch `genesis.json` and `object.json` from the objects.
+
+### 12.6 Gateways
+
+A gateway serves a URI at its base URL followed by the URI unchanged (`https://opensheaf.org/sheaf:<name>/v3`, provisionally, #35); gateway links are written in full, since a relative link starting with `sheaf:` is read as a URI. A gateway:
+
+- MUST answer with a page (200) showing what it resolved, or a temporary redirect (302, 303 or 307) only to a copy it has checked (section 12.3); it MUST NOT redirect permanently (301, 308), and MAY cache its result only for a URI with a digest;
+- MUST show where what it resolved was found, that a URI without a digest resolves to the latest copy it found, not necessarily the owner's latest, and when the owner has ended or its key log is forked, with any successor;
+- MUST NOT serve an archive's files from its own origin, but redirects or links to the archive (section 15);
+- MUST fetch on its users' behalf only `https` URLs at public addresses, with limits on size and time.
+
+**Open questions.**
+
+- Registering the scheme `sheaf` with IANA, as a provisional scheme (RFC 7595), until which DataCite records `sheaf:` URIs as `URL` (section 4.4) (#36).
+- Whether the project runs a gateway, on which domain, and whether a domain used only for resolution drops `sheaf:` from the path, as `https://doi.org/` drops `doi:` (#35).
+- Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#13, #20).
+- Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's `swhid`) (#22).
+- Whether a tombstone in one archive should stop resolution at copies elsewhere (#33).
+- The numbering of document versions on a branch, which `/v<n>` follows (section 9; #57).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 11 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 12 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-12. Identifiers: `sheaf:` URIs, resolution, indexes.
 13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn).
 14. Verification.
 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call).

@@ -206,14 +206,9 @@
       "uniqueItems": true
     },
     "indexes": {
-      "$comment": "proposal (section 6.6): the indexes kept, each with the length of its prefix",
+      "$comment": "the indexes kept, each with the length of the prefixes of its files (sections 3.1, 12.5)",
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": {
-        "type": "integer",
-        "minimum": 2,
-        "maximum": 4
-      },
       "properties": {
         "names": {
           "type": "integer",
@@ -230,7 +225,8 @@
           "minimum": 2,
           "maximum": 4
         }
-      }
+      },
+      "additionalProperties": false
     },
     "owners": {
       "type": "array",
