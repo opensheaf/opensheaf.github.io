@@ -30,9 +30,9 @@ JSON means RFC 8259 JSON in UTF-8 without a byte order mark. URLs are absolute u
 
 - **archive:** sections 3 to 13 and 15;
 - **collection:** section 8, with the rules on objects of sections 4 to 7;
-- **owner tool**, a program that seals, signs or keeps an owner's key log: sections 5 to 7 and 10;
-- **verifier:** sections 14, 15 (on untrusted input) and 16 (as a reader), with the rules it checks;
-- **resolver:** section 12, with sections 6 and 7 for checking signatures and key logs; a gateway also follows the rules on gateways of section 12.
+- **owner tool**, a program that seals, signs or keeps an owner's key log: sections 5 to 7, 10 and 15;
+- **verifier:** sections 14, 15.2 (on untrusted input) and 16 (as a reader), with the rules it checks;
+- **resolver:** sections 12 and 15.2 (on untrusted input), with sections 6 and 7 for checking signatures and key logs; a gateway also follows the rules on gateways of section 12.
 
 **Profiles.** An archive MAY also follow the profiles of appendix A (Zenodo, TeXmacs, website), and MUST list in its discovery document those it follows.
 
@@ -93,7 +93,7 @@ Every object MUST be a valid OCFL 1.1 object, and:
 - its inventories MUST use the digest algorithm `sha512`; they MAY also record MD5 and SHA-256 digests in `fixity` (the Zenodo profile requires MD5, appendix A);
 - every version directory MUST contain the inventory as of that version, with its checksum file, so that each version can be pinned and fetched on its own;
 - version directories MUST NOT be zero-padded (`v1`, not `v001`);
-- logical paths MUST be in UTF-8 and Unicode normalisation form C, and MUST NOT begin with `/` or contain `.` or `..` segments.
+- logical paths MUST be in UTF-8 and Unicode normalisation form C, and MUST NOT begin or end with `/`, or contain empty, `.` or `..` segments, or `\`.
 
 **Deposits.** Each version in the inventory MUST have a `user` with a `name`, SHOULD give its `address` (an ORCID iD, a `mailto:` URI or another URI identifying the depositor), and MUST have a `message` describing the change. The `created` date and `user` of an object version record its <dfn>deposit</dfn>, not repeated in `object.json`; the deposit of a document version is that of the first object version holding it.
 
@@ -141,11 +141,11 @@ A document MUST have `mainSource` (a logical path) and `sourceFormat` (its media
 
 - `changes`: a note saying what changed in this document version, deposited with it (like arXiv's comments);
 - `stage`: the stage of this document version, with `scheme` and `value`; for articles the RECOMMENDED scheme is `NISO-JAV` (NISO Journal Article Versions: `AO`, `SMUR`, `AM`, `P`, `VoR`, `CVoR`, `EVoR`), and other content uses other schemes (editions, software releases), named by the archive;
-- `history` and `notices` (section 4.2), each notice a note with the `documentVersion` it is about and a `date`.
+- `history` and `notices` (section 4.2), each notice a note with the `documentVersion` it is about and a `date`;
+- `licence`: a note with the full text or terms of the licence (for licences without an SPDX identifier); `rightsList` in `datacite.json` remains the description for readers.
 
-A collection has none of these fields of a document. A document or a collection MAY have:
+A collection has none of these fields of a document, and its notes are text only (section 8.2). A document or a collection MAY have:
 
-- `licence`: a note with the full text or terms of the licence (for licences without an SPDX identifier); `rightsList` in `datacite.json` remains the description for readers;
 - `agreement`: a minimal record that the authors agreed to the deposit and the licence: `by` (names only), `date` and `method` ("by e-mail"), all REQUIRED. It MUST NOT contain e-mail addresses, correspondence or signatures of persons;
 - `external`: the external records of this version, each with `role` (`deposit` for a deposit by the archive, appendix A; `source` for the record it was imported from), `service` (its name) and `record` (its URL), all REQUIRED, and OPTIONALLY `doi`, `label` (the service's label for the version, such as `v3`) and `files`, the files kept there but not in the content (a deposit's source archive) or received from there, as received, each with `name` and `sha512` (REQUIRED), `md5` and `bytes`;
 - `withdrawal`, REQUIRED when `status` is `withdrawn`: a `date` and a `reason`, a note (section 13);
@@ -381,7 +381,7 @@ An archive adds a version to a line only if, once added, it is signed against th
 
 ### 7.6 Integrity
 
-Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in the inventory, every inventory by its checksum file, and every member of a collection by a pin (sections 4 and 8). Digests show that files were not changed, signatures who made them; neither shows when (section 7.2).
+Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in the inventory, every inventory by its checksum file, and every member of a collection by a pin (sections 4 and 8). Digests show that files were not changed, signatures which owner's keys signed them; neither shows who wrote them or when (sections 7.2 and 15.1).
 
 **Open questions.**
 
@@ -471,7 +471,7 @@ A collection pins only signed versions (section 7.3), never a draft (section 10)
 
 **Document versions.** A collection makes a new document version exactly when its member list changes (section 4.2); `object.json` of a collection has none of the fields of a document (section 4.3).
 
-**Rights.** A collection version holds only metadata, placed under CC0 (section 15), and its `rightsList` SHOULD say so. The licence of a collection never extends to its members.
+**Rights.** A collection version holds only metadata, placed under CC0 (section 15.6), and its `rightsList` SHOULD say so. The licence of a collection never extends to its members.
 
 **Open questions.**
 
@@ -558,7 +558,7 @@ A version the selection makes itself, such as a typeset version of record, is a 
 
 **Description.** A branch's `datacite.json` has as `publisher` its owner, or for a selection the body behind it, and keeps the relations of the parent version. Its first version, and every version that moves its branch point, SHOULD link the parent version with `IsIdenticalTo`: its DOI if it has one, otherwise `parent.url` as a `URL`.
 
-**Rights.** A branch needs only the right to redistribute its parent versions, and the files it copies keep their licence; a copy of the parent's line beside it needs the right to redistribute every version copied (section 11). The evidence is metadata, under CC0 (section 15).
+**Rights.** A branch needs only the right to redistribute its parent versions, and the files it copies keep their licence; a copy of the parent's line beside it needs the right to redistribute every version copied (section 11). The evidence is metadata, under CC0 (section 15.6).
 
 **Open questions.**
 
@@ -606,7 +606,7 @@ A <dfn>copy</dfn> of a line is its object as held in one storage root; a <dfn>mi
 
 ### 11.2 Rights
 
-An archive MUST NOT keep a mirror unless the licences of every object version it copies (`rightsList`, section 4.4, which a description-only version may change) allow redistribution. A copy keeps the licences of what it copies. A copy of a parent's line beside a branch follows this rule for every version it copies (section 9.7). Key logs, inventories, signature files and the other metadata are under CC0 (section 15), and are copied freely; a reference, a pin without a copy, needs no permission (section 8.5).
+An archive MUST NOT keep a mirror unless the licences of every object version it copies (`rightsList`, section 4.4, which a description-only version may change) allow redistribution. A copy keeps the licences of what it copies. A copy of a parent's line beside a branch follows this rule for every version it copies (section 9.7). Key logs, inventories, signature files and the other metadata are under CC0 (section 15.6), and are copied freely; a reference, a pin without a copy, needs no permission (section 8.5).
 
 **Open questions.**
 
@@ -689,7 +689,7 @@ A gateway serves a URI at its base URL followed by the URI unchanged (`https://o
 
 - MUST answer with a page (200) showing what it resolved, or a temporary redirect (302, 303 or 307) only to a copy it has checked (section 12.3); it MUST NOT redirect permanently (301, 308), and MAY cache its result only for a URI with a digest;
 - MUST show where what it resolved was found, that a URI without a digest resolves to the latest copy it found, not necessarily the owner's latest, and when the owner has ended, is tainted or has healed, with any successor;
-- MUST NOT serve an archive's files from its own origin, but redirects or links to the archive (section 15);
+- MUST NOT serve an archive's files from its own origin, but redirects or links to the archive (section 15.3);
 - MUST fetch on its users' behalf only `https` URLs at public addresses, with limits on size and time.
 
 **Open questions.**
@@ -713,7 +713,7 @@ A withdrawn line keeps every version, signed, pinned and copied as before. Prese
 
 ### 13.2 Takedown
 
-A <dfn>takedown</dfn> deletes a sealed object, witness folder included, from an archive's storage root (with the folders the deletion leaves empty) and from its presentation files, and adds a tombstone (section 13.3). It is the only way an archive removes what it holds, besides the replacements of key-log versions at a fork (sections 6.3, 7.2 and 7.5), and every removal of a sealed object is one, whatever its reason: content that must not be served (by law, for a breach of rights, to erase personal data, section 15), or a line the archive stops keeping. It removes one object: others holding the same files, such as a branch holding its parent version (section 9), are taken down on their own.
+A <dfn>takedown</dfn> deletes a sealed object, witness folder included, from an archive's storage root (with the folders the deletion leaves empty) and from its presentation files, and adds a tombstone (section 13.3). It is the only way an archive removes what it holds, besides the replacements of key-log versions at a fork (sections 6.3, 7.2 and 7.5), and every removal of a sealed object is one, whatever its reason: content that must not be served (by law, for a breach of rights, to erase personal data, section 15.5), or a line the archive stops keeping. It removes one object: others holding the same files, such as a branch holding its parent version (section 9), are taken down on their own.
 
 **Owner objects.** A takedown of a line leaves in place the owner objects its copy carries (section 6.5). An owner object that an object of the archive needs is taken down only for itself: at its owner's request, signed by `threshold` keys of the latest version of its key log that the archive holds, or by law; for an ended or tainted owner (section 6.3), only at its keeper's request (section 6.6) or by law. An archive SHOULD also hear the keeper, when one is named, before acting on a signed request, which a thief can make. The owner's signatures in what the archive keeps are then unchecked there (section 7.3), and the tombstone stands in for the owner object in the rule of section 6.5.
 
@@ -752,7 +752,7 @@ A verifier reports every finding with its place (the archive, an object, a versi
 - a <dfn>warning</dfn>: a breach of a SHOULD; a breach that the archive cannot repair, where this section says so; a check not made or not completed;
 - a <dfn>result</dfn>, neither: the statuses of signature files, versions and members (sections 7.3 and 8.5), the verdicts of branches (section 9.3), forks of lines and of key logs (sections 6.3 and 7.4), ended owners and their successors (sections 6.3 and 6.6), withdrawals (section 13.1) and removals (section 13.3).
 
-**Checks not made.** A verifier reading an archive over HTTP cannot list folders: it checks the objects the discovery document lists, and warns that it has not checked that the storage root holds no others, nor the files of witness folders whose names it cannot compute; one with access to the files checks them. A verifier MAY bound the depth of the chains and collections it follows (section 9.3) and the size of what it fetches (section 15), and warns where it stops.
+**Checks not made.** A verifier reading an archive over HTTP cannot list folders: it checks the objects the discovery document lists, and warns that it has not checked that the storage root holds no others, nor the files of witness folders whose names it cannot compute; one with access to the files checks them. A verifier MAY bound the depth of the chains and collections it follows (section 9.3), SHOULD bound the size of what it fetches (section 15.2), and warns where it stops.
 
 ### 14.2 Files and storage
 
@@ -800,11 +800,63 @@ The verifier then checks, against the objects:
 - What a verifier reports for a pin of an earlier version of a withdrawn line (#25).
 - Fork records and healing, provisional (section 6.3; #58).
 
+## 15. Security, privacy and rights
+
+### 15.1 What the format protects
+
+Pins and signatures make every copy checkable wherever it is fetched (sections 4 and 7); discovery documents, indexes, locations and tombstones are maps and hints (sections 3, 12.3 and 13.3). A host or a network therefore cannot forge a version, nor add one to another owner's line (section 7.5), nor make a valid line from a reused genesis record (section 5.4), nor take over a short form (section 12.2). It can withhold: serve an older copy, or a key log that stops before an end or a fork record, which looks complete (sections 6.5 and 12.3); and it can delete what it serves, never a copy held elsewhere (section 13).
+
+Whoever holds `threshold` keys of an owner acts as that owner until they are nullified or the owner ends (section 6.3), and the format cannot tell what was signed before an exposure from what was signed after (section 6.4).
+
+**Forks of a line.** A fork of a line whose sides are both signed (section 7.4) ends nothing by itself; whether to end is the owner's call. If the owner did not make both sides, its keys may have been exposed, and section 6.3 applies; if it did (two tools, a version made again), it continues from one side, and archives holding the other keep it (section 7.5).
+
+**What a signature shows.** A good signature shows that a key of the owner's key log signed one object version and one key-log version (section 7.2); not who wrote the document (section 4.4), who the owner is (section 6.6), when it was signed, or that no later version exists.
+
+### 15.2 Untrusted input
+
+Every file a program reads is untrusted until checked, also in its own storage root. A program reading files (a verifier, a resolver, an archive copying a line, a tool recreating files in a draft):
+
+- MUST NOT read or write outside the object, or outside the folder it writes into, whatever path a file gives (logical and content paths, the `path` of notes and renditions, entries of an archive file such as `sources.zip`, appendix A), and MUST NOT follow symbolic links; a path that breaks section 4.1 is never followed;
+- SHOULD bound the size of what it fetches or unpacks, the number of objects, versions, files and members, the depth of chains and collections (section 9.3) and its time, and reports where it stops (section 14.1);
+- MUST show the texts of these files (titles, abstracts, notes, reasons) as text, never as HTML, and SHOULD render their mathematics (section 4.4) with a renderer that runs no scripts and follows no links;
+- when it fetches URLs found in files on behalf of others (a custodian, an index service), follows the rule of section 12.6 for gateways.
+
+Deposited sources are code: a tool building renditions from sources it did not write SHOULD run the toolchain isolated, without shell escapes. MD5 (section 4.1) and SHA-1 (git) serve only comparison with external services, never integrity (section 7.6).
+
+### 15.3 Serving and presentation
+
+An archive does not vouch for the files of its objects (section 3). Its presentation files MUST NOT include files of objects, or pages of other archives, as HTML or scripts; they link to them. An archive SHOULD serve its storage root so that its files run no scripts in the origin of its presentation files: from another origin, or with `Content-Security-Policy: sandbox`. A gateway serves no archive's files (section 12.6).
+
+### 15.4 Keys and secrets
+
+Private keys, and other secrets (tokens of external services, the secrets of a review), MUST NOT be stored in an archive: in an object, a witness folder, a draft, presentation files, or the repository of an archive kept in git. Whatever an archive holds is public and copied.
+
+### 15.5 Privacy
+
+What an archive serves is public, its drafts included (section 10.1); a sealed version, its witnesses and the key logs beside it travel with every copy and branch, and never change.
+
+- **Personal data.** Archives record only the personal data needed to describe and cite a work (section 4.4) and the depositor of each version (section 4.1), whose `address` SHOULD be a public identifier (an ORCID iD) rather than a personal e-mail address.
+- **Owners.** An owner name is the digest of a record with a random nonce, and identifies no one. An owner is tied to a person only by what its versions say (`creators`, `user`, `agreement`), by keys it shares with another owner, and by its keeper, who alone confirms that link and can withdraw the confirmation (section 6.6), though `keeper` stays in the key log. An owner that must stay anonymous (a referee) SHOULD have its own keys and no `keeper`, and its versions SHOULD NOT identify the person.
+- **Erasure.** Personal data is erased by a takedown (section 13.2), from that archive and its indexes only. The tombstone and index entries keep only names, owner names and digests, which identify no one (section 13.3); an archive kept in git also rewrites its history ([OpenSheaf archives in git](opensheaf-git-0.1.md), section 9).
+
+### 15.6 Rights
+
+**Metadata.** The JSON files this specification defines, inventories with their checksum files, fork records and the evidence of branches are metadata, texts of notes and abstracts included. Whoever writes them dedicates them to the public domain under CC0 1.0, so that they can be harvested and copied freely; an archive admits only owners that accept this. Files of notes (section 4.3) are content.
+
+**Content.** The files of a document version are under the licence its owner states (sections 4.3 and 4.4); "All rights reserved" is allowed, since depositing grants readers access, not reuse. Copies and branches keep the licences of what they copy, and need the right to redistribute it (sections 9.7 and 11.2).
+
+**Open questions.**
+
+- Which licences allow a mirror, and how a verifier tells a licence from a rights statement (#34, #50); copying by the agreement of the rights holders (#39).
+- Whether a takedown reaches mirrors, branches holding the files, indexes kept by others and gateways (#33).
+- Private archives and drafts, anonymous referees and the secrets of a review (#29).
+- Tying owners to ORCID iDs and domains beyond the keeper (#41).
+- What a reader holding only one side of a fork of a key log can know, and whether nullifying keys from when an archive learns of it is enough against backdating (#55, #58).
+
 ## Plan of the rebuilt text
 
-Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 14 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 15 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call).
 16. Versioning of this specification, and changelog.
 
 Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
