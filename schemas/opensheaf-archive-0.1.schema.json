@@ -55,14 +55,6 @@
       },
       "uniqueItems": true
     },
-    "replicas": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "uri",
-        "pattern": "/$"
-      }
-    },
     "feed": {
       "type": "string",
       "format": "uri"

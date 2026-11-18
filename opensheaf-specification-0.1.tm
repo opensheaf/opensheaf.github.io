@@ -61,13 +61,13 @@
 
   <section*|3. Archives><label|3-archives>
 
-  An <dfn|archive> is a host of objects, served at a <dfn|base URL> ending with <verbatim|/>. It holds the lines that owners write there (section 7) and copies of lines written elsewhere (section 11). It has no identity of its own and owns nothing by hosting: what is authentic is decided by the owners' signatures (section 7), and an archive decides only which owners it hosts and how they deposit (a university admitting its staff, a journal its editors). Its base URL is a location, not a name, and may change.
+  An <dfn|archive> is a host of objects, served at a <dfn|base URL> ending with <verbatim|/>. It holds the lines that owners write there (section 7) and copies of lines written elsewhere (section 11). No file of an object names the archive that holds it (section 4.3), and what is authentic is decided by pins and the owners' signatures (sections 4 and 7), never by where a file was fetched; an archive decides only which owners it hosts and how they deposit (a university admitting its staff, a journal its editors). Its base URL is a location, not a name, and may change; an archive's files MAY be served at several base URLs, each a location of the same archive.
 
   An archive consists of a <strong|discovery document>, REQUIRED (section 3.1); a <strong|storage root>, REQUIRED (section 3.2); <strong|indexes>, RECOMMENDED (section 12); and <strong|presentation files>, OPTIONAL: web pages and other files generated for readers, never authoritative, kept outside the storage root (appendix A).
 
   <strong|Serving.> The discovery document, the storage root and the indexes MUST be served byte for byte, as stored: no conversion of line endings or character sets, and no compression that changes the bytes delivered after decoding. Archives SHOULD be served over HTTPS, and SHOULD allow cross-origin requests to these files (<verbatim|Access-Control-Allow-Origin: *>), so that tools in a browser can read them. Any static web server will do; an archive kept in git follows <hlink|OpenSheaf archives in git|opensheaf-git-0.1.tm>.
 
-  <strong|Moving.> An archive moving to another site copies its files; nothing in them changes, so every pin, signature and witness stays valid. Its base URL, and every location of a copy given elsewhere (in collections, <verbatim|sheaf:> URIs, discovery documents), is a hint that needs no signature: whatever is fetched from it is checked against pins and signatures, so a wrong or stale location gives a reader nothing, or an older valid copy, never a forged one.
+  <strong|Moving.> An archive moving to another site, or served at another, copies its files unchanged, its drafts included (section 10); nothing in them changes, so every pin, signature and witness stays valid. Its base URL, and every location of a copy given elsewhere (in collections, <verbatim|sheaf:> URIs, indexes), is a hint that needs no signature: whatever is fetched from it is checked against pins and signatures, so a wrong or stale location gives a reader nothing, or an older valid copy, never a forged one.
 
   <subsection*|3.1 The discovery document><label|31-the-discovery-document>
 
@@ -87,7 +87,7 @@
     <item><verbatim|objects>: every object of the storage root except drafts, each with <verbatim|id> (section 4), <verbatim|kind>, <verbatim|name> and <verbatim|owner> (section 7), <verbatim|head> (its OCFL head version), <verbatim|inventorySha512> (the SHA-512 digest of the head inventory, as its checksum file states it) and <verbatim|status> (<verbatim|active> or <verbatim|withdrawn>, section 13), and OPTIONALLY a <verbatim|label>.
   </itemize>
 
-  It SHOULD contain <verbatim|mainCollection>, the identifier of the catalogue of the archive's documents (section 8); <verbatim|contact>, a URI; and <verbatim|extensions>, the names of the extensions its objects use (section 2). It MAY contain <verbatim|owners>, the owner names of the owners it hosts (section 6); <verbatim|drafts>, the drafts it chooses to show, with <verbatim|id>, <verbatim|kind> and <verbatim|head>, as unfinished work on which nothing may rely (section 10); <verbatim|replicas>, base URLs of complete copies of the whole archive (distinct from mirrors of lines, section 11); <verbatim|tombstones> (section 13); <verbatim|indexes> (section 12); and <verbatim|feed>, the URL of an Atom feed of new object versions.
+  It SHOULD contain <verbatim|mainCollection>, the identifier of the catalogue of the archive's documents (section 8); <verbatim|contact>, a URI; and <verbatim|extensions>, the names of the extensions its objects use (section 2). It MAY contain <verbatim|owners>, the owner names of the owners it hosts (section 6); <verbatim|drafts>, the drafts it chooses to show, with <verbatim|id>, <verbatim|kind> and <verbatim|head>, as unfinished work on which nothing may rely (section 10); <verbatim|tombstones> (section 13); <verbatim|indexes> (section 12); and <verbatim|feed>, the URL of an Atom feed of new object versions.
 
   The discovery document is rewritten whenever an object is added or changed. It is a map, not a witness: everything it states about objects MUST agree with the storage root, which verifiers check (section 14), and it lists what the archive holds, not every line an owner has elsewhere.
 
@@ -397,7 +397,7 @@
 
   <section*|7. Lines and signatures><label|7-lines-and-signatures>
 
-  A <dfn|line> is the history of a work as decided by one owner, identified by the pair (name, owner) and so by the identifier <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> (section 4). Its object versions form a single sequence, signed by its owner. <strong|A line is its signed versions, wherever they are stored>: in an archive where its owner writes, in a mirror (section 11), in any other archive. Lines of other owners with the same genesis record are branches (section 9). An owner's key log is the line of its owner object (section 6).
+  A <dfn|line> is the history of a work as decided by one owner, identified by the pair (name, owner) and so by the identifier <verbatim|sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>> (section 4). Its object versions form a single sequence, signed by its owner. <strong|A line is its signed versions, wherever they are stored>: in an archive where its owner writes, or in a mirror (section 11). Lines of other owners with the same genesis record are branches (section 9). An owner's key log is the line of its owner object (section 6).
 
   <subsection*|7.1 Signing><label|71-signing>
 
@@ -519,7 +519,7 @@
 
   Both types may have collections as members (an archive of archives, a selection of issues).
 
-  <strong|An archive's collections.> An archive has no identity of its own (section 3); an archive that makes collections does so as an owner, with a key log like any other (section 6). Its <dfn|main catalogue>, named by <verbatim|mainCollection> in its discovery document (section 3.1), is a catalogue of the documents of the lines its owners write in the archive, not of the copies it holds. It MAY also keep a catalogue of the lines it holds as copies (section 11). A selection is kept by the owner of the body that vets (a journal, a review journal), which also owns the accepted copies the selection keeps (section 9).
+  <strong|An archive's collections.> An archive that makes collections does so as an owner, with a key log like any other (section 6). Its <dfn|main catalogue>, named by <verbatim|mainCollection> in its discovery document (section 3.1), is a catalogue of the documents of the lines its owners write in the archive, not of the copies it holds. It MAY also keep a catalogue of the lines it holds as copies (section 11). A selection is kept by the owner of the body that vets (a journal, a review journal), which also owns the accepted copies the selection keeps (section 9).
 
   <subsection*|8.2 The member list: members.json><label|82-the-member-list-membersjson>
 
@@ -761,11 +761,39 @@
 
   <strong|Open question.> Whether and how drafts are shared before sealing (among co-authors, with a journal under review), and how an archive serves them, which bears on when a work must be sealed (#29).
 
+  <section*|11. Copies and mirrors><label|11-copies-and-mirrors>
+
+  A <dfn|copy> of a line is its object as held in one storage root; a <dfn|mirror> is a copy kept in an archive where the owner of the line does not write, which is the archive's policy (section 3). Nothing marks a mirror: it is listed in <verbatim|objects> like any line (section 3.1), and the rules of every copy apply to it. Whoever keeps mirrors of other owners' lines, or indexes of them (section 12), is a <dfn|custodian>.
+
+  <subsection*|11.1 Mirrors><label|111-mirrors>
+
+  <strong|What a mirror holds.> An archive MAY keep a mirror of a line written elsewhere: the object's versions up to the latest signed version of the copy it copies (section 7.3), with their inventories, files and witnesses, byte for byte, at the path its layout gives the line's identifier (section 3.2), and beside it the key logs its signatures need (section 6.5). Files of the witness folder that are not witnesses need not be copied (section 7.2): not copying them is not removing them. When a copy holds, under the same name, a witness file other than the mirror's, the mirror keeps its own and reports the other.
+
+  <strong|How a mirror grows.> A mirror is the same line, signed by its owner, never a new one. It MUST NOT be changed except by adding the owner's signed versions as section 7.5 allows, from a copy that agrees with it (section 7.4); by adding witnesses (section 7.2); by recording the evidence of forks of a key log (section 6.3); or by a takedown (section 13). It keeps every version it holds (section 7.5). A copy that does not agree with it is a fork of the line: the archive keeps the side it holds, and reports the other (sections 5.3 and 7.4). The lines of an ended owner are added only in this way, from copies found elsewhere (section 7.5).
+
+  <strong|Elsewhere.> A mirror may be listed in a catalogue of copies, never in the main catalogue (section 8.1), and located by the <verbatim|at> of collection members (section 8.2). A copy of a parent's line kept beside a branch is a mirror (section 9.5); an accepted copy is a branch, not a mirror (section 9.6). Drafts are never mirrored (section 10.1).
+
+  <subsection*|11.2 Rights><label|112-rights>
+
+  An archive MUST NOT keep a mirror unless the licences of every object version it copies (<verbatim|rightsList>, section 4.4, which a description-only version may change) allow redistribution. A copy keeps the licences of what it copies. A copy of a parent's line beside a branch follows this rule for every version it copies (section 9.7). Key logs, inventories, signature files and the other metadata are under CC0 (section 15), and are copied freely; a reference, a pin without a copy, needs no permission (section 8.5).
+
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what the licences allow (#39).
+
+    <item>Copying by the agreement of the rights holders, besides the licences, recorded minimally (#39), and which licences allow redistribution (#34).
+
+    <item>What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
+
+    <item>Whether a custodian follows a takedown of a line it mirrors (section 13; #33, #39).
+  </itemize>
+
   <section*|Plan of the rebuilt text><label|plan-of-the-rebuilt-text>
 
-  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 10 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
+  Each part is rebuilt in turn, from the reference text and an audit of the concept, and agreed before the next. Sections 1 to 11 are rebuilt; the others are planned as follows, and read meanwhile in the reference text.
 
-  11. Copies and mirrors (moving an owner is in section 6.5; a replica of the whole archive is the same archive and may hold its drafts). 12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn). 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
+  12. Identifiers: <verbatim|sheaf:> URIs, resolution, indexes. 13. Withdrawal, takedown and tombstones (a draft is deleted, never withdrawn). 14. Verification. 15. Security, privacy and rights (with: after a fork of a line, whether to end is the owner's call). 16. Versioning of this specification, and changelog.
 
   Appendices (the worked key log of appendix C creates its owner with two keys from v1): A. profiles (Zenodo, TeXmacs, website); B. JSON Schemas (with the new keeper schema); C. examples; D. rationale; E. references.
 
