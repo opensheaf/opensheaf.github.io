@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-keeper-0.2.schema.json",
+  "title": "OpenSheaf keeper confirmation (.well-known/opensheaf), version 0.2",
+  "$comment": "Section 6.6 of the specification. Dedicated to the public domain under CC0 1.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "owners"
+  ],
+  "properties": {
+    "format": {
+      "const": "opensheaf-keeper/0.2"
+    },
+    "owners": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/ownerName"
+      },
+      "$comment": "the owner names this keeper answers for"
+    },
+    "successors": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z2-7]{51}[aq]$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/ownerName"
+      },
+      "$comment": "optional: owner names this keeper answers for, mapped to their successors"
+    }
+  },
+  "$defs": {
+    "ownerName": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$"
+    }
+  }
+}

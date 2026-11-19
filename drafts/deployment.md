@@ -11,6 +11,14 @@ layers for those who use neither git nor the command line. Facts about
 services are as of November 2026, and change: check them before relying on
 them.*
 
+> [!NOTE]
+> Written before the rebuild of the specification into version 0.2 (18 and 19
+> November 2026) and not updated: its section numbers are those of the earlier
+> text. The `mirrors` field of the discovery document is gone: a copy served
+> elsewhere is the same archive at another location (section 3), and archives
+> have no identifiers (#52). Where they differ, [version
+> 0.2](../opensheaf-specification-0.2.md) of the specification holds.
+
 ## 1. What a host must do
 
 An archive is a folder of plain files: the discovery document

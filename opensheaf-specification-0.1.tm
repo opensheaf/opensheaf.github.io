@@ -9,6 +9,8 @@
 
   <notes-abstract|Specification, version 0.1 (draft), 16 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). This version is experimental and may change in incompatible ways before version 1.0. The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain under CC0 1.0.>
 
+  <os-alert|note|Note.|<strong|Superseded.> This is version 0.1 as published (13 to 16 November 2026), kept as a record. The current draft is <hlink|version 0.2|opensheaf-specification-0.2.tm>.>
+
   <os-alert|warning|Warning.|<strong|Draft.> This version is a draft. Until version 1.0, any revision may change the format in incompatible ways, and archives and collections made now may have to be rebuilt or migrated. Do not rely on it yet for anything you cannot redo. Changes are listed in the changelog (section 17) and discussed in the <hlink|issues|https://github.com/opensheaf/opensheaf.github.io/issues>.>
 
   <section*|1. Introduction (non-normative)><label|1-introduction-non-normative>

@@ -2,6 +2,9 @@
 
 *Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 16 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.*
 
+> [!NOTE]
+> **Superseded.** This is version 0.1 as published (15 and 16 November 2026), kept as a record. The current draft is [version 0.2](opensheaf-git-0.2.md).
+
 > [!WARNING]
 > **Draft for discussion.** This document is a first draft. Its open questions are listed in section 13; none of them is settled.
 

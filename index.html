@@ -22,7 +22,7 @@
   <body>
     <div class="notes-header">
       <p>
-        [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.1.html">specification</a>] [<a href="use-cases.html">use
+        [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.2.html">specification</a>] [<a href="use-cases.html">use
         cases</a>] [<a href="faq.html">FAQ</a>] [<a href="https://mgubi.org/papers/">first archive</a>]<em class="notes-header-name">OpenSheaf</em>
       </p>
     </div>
@@ -34,16 +34,17 @@
     </center>
     <div class="notes-abstract">
       OpenSheaf is an open format for archives of scholarly documents and for
-      collections of them. Read the <a href="opensheaf-specification-0.1.html">specification</a> (version 0.1)
-      and the <a href="faq.html">FAQ</a>, which explains its main choices. The site is
-      <a href="https://opensheaf.org">opensheaf.org</a> (also <tt class="verbatim">sheaf.pub</tt>).
+      collections of them. Read the <a href="opensheaf-specification-0.2.html">specification</a> (version 0.2, a
+      draft) and the <a href="faq.html">FAQ</a>, which explains its main choices. The
+      site is <a href="https://opensheaf.org">opensheaf.org</a> (also <tt class="verbatim">sheaf.pub</tt>).
     </div>
     <div class="os-alert os-warning">
-      <font class="os-alert-label">Warning.</font> <strong>Draft.</strong> OpenSheaf 0.1 is a
+      <font class="os-alert-label">Warning.</font> <strong>Draft.</strong> OpenSheaf 0.2 is a
       draft specification. Until version 1.0, any revision may change the
-      format in incompatible ways. Archives and collections made now may have
-      to be rebuilt or migrated, and the tools follow the latest draft. Do not
-      rely on it yet for anything you cannot redo.
+      format in incompatible ways. Version 0.2 is incompatible with <a href="opensheaf-specification-0.1.html">version
+      0.1</a>, which is kept as published. Archives and collections made now
+      may have to be rebuilt or migrated, and the tools follow the latest
+      draft. Do not rely on it yet for anything you cannot redo.
     </div>
     <p>
       <strong>Source:</strong> the specification and this site are kept in the
@@ -122,9 +123,9 @@
       together. In mathematics, a sheaf is the structure that attaches data to
       each part of a space so that local pieces, which agree where they
       overlap, glue into a whole. OpenSheaf works the same way: archives are
-      kept and verified separately, each by its owner, and collections glue
-      them together without copying, while every piece stays checkable on its
-      own.
+      kept and verified separately, each by whoever keeps it, and collections
+      glue them together without copying, while every piece stays checkable on
+      its own.
     </p>
     <h2 id="auto-3"><a id="taking-part"></a>Taking part<span style="margin-left: 1em"></span></h2>
     <p>
@@ -147,7 +148,7 @@
       <li>
         <p>
           <strong>Amendments:</strong> propose changes to the text as pull
-          requests on <a href="opensheaf-specification-0.1.html">opensheaf-specification-0.1.md</a>, with an
+          requests on <a href="opensheaf-specification-0.2.html">opensheaf-specification-0.2.md</a>, with an
           explanation of the motivation; larger changes are best discussed in
           an issue first.
         </p>
@@ -231,8 +232,18 @@
     <ul>
       <li>
         <p>
-          <a href="opensheaf-specification-0.1.html"><tt class="verbatim">opensheaf-specification-0.1.md</tt></a>: the
-          specification, in Markdown, its only source.
+          <a href="opensheaf-specification-0.2.html"><tt class="verbatim">opensheaf-specification-0.2.md</tt></a>: the
+          specification, version 0.2 (the current draft), in Markdown, its
+          only source.
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="opensheaf-specification-0.1.html"><tt class="verbatim">opensheaf-specification-0.1.md</tt></a> and <a
+          href="opensheaf-git-0.1.html"><tt class="verbatim">opensheaf-git-0.1.md</tt></a>, with the schemas <tt
+          class="verbatim">opensheaf-archive-0.1.schema.json</tt>, <tt class="verbatim">opensheaf-object-0.1.schema.json</tt>
+          and <tt class="verbatim">opensheaf-collection-0.1.schema.json</tt>: version
+          0.1, kept as published and not edited.
         </p>
       </li>
       <li>
@@ -249,10 +260,19 @@
       </li>
       <li>
         <p>
-          <a href="opensheaf-git-0.1.html"><tt class="verbatim">opensheaf-git-0.1.md</tt></a>: OpenSheaf
+          <a href="opensheaf-git-0.2.html"><tt class="verbatim">opensheaf-git-0.2.md</tt></a>: OpenSheaf
           archives in git, a companion to the specification: how to keep,
           publish and copy an archive in a git repository without changing its
           bytes.
+        </p>
+      </li>
+      <li>
+        <p>
+          <a href="opensheaf-timestamps-0.2.html"><tt class="verbatim">opensheaf-timestamps-0.2.md</tt></a>: OpenSheaf
+          timestamps, an extension of the specification: how an owner dates
+          its signatures (RFC 3161, OpenTimestamps) and declares it in its key
+          log, so that readers can tell which versions existed by a date, for
+          instance before a key was exposed.
         </p>
       </li>
       <li>
@@ -265,22 +285,31 @@
         <p>
           <a href="https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas"><tt class="verbatim">schemas/</tt></a>: the JSON Schemas of the files
           defined by the specification, also published at <tt class="verbatim">https://opensheaf.org/schemas/</tt>:
-          <a href="https://opensheaf.org/schemas/opensheaf-archive-0.1.schema.json"><tt class="verbatim">opensheaf-archive-0.1.schema.json</tt></a> for
-          <tt class="verbatim">opensheaf.json</tt>, <a href="https://opensheaf.org/schemas/opensheaf-object-0.1.schema.json"><tt class="verbatim">opensheaf-object-0.1.schema.json</tt></a>
-          for <tt class="verbatim">object.json</tt> and <a href="https://opensheaf.org/schemas/opensheaf-collection-0.1.schema.json"><tt class="verbatim">opensheaf-collection-0.1.schema.json</tt></a>
-          for <tt class="verbatim">members.json</tt>.
+          <a href="https://opensheaf.org/schemas/opensheaf-archive-0.2.schema.json"><tt class="verbatim">opensheaf-archive-0.2.schema.json</tt></a> for
+          <tt class="verbatim">opensheaf.json</tt>, <a href="https://opensheaf.org/schemas/opensheaf-object-0.2.schema.json"><tt class="verbatim">opensheaf-object-0.2.schema.json</tt></a>
+          for <tt class="verbatim">object.json</tt>, <a href="https://opensheaf.org/schemas/opensheaf-collection-0.2.schema.json"><tt class="verbatim">opensheaf-collection-0.2.schema.json</tt></a>
+          for <tt class="verbatim">members.json</tt>, <a href="https://opensheaf.org/schemas/opensheaf-genesis-0.2.schema.json"><tt class="verbatim">opensheaf-genesis-0.2.schema.json</tt></a>
+          for <tt class="verbatim">genesis.json</tt>, <a href="https://opensheaf.org/schemas/opensheaf-keys-0.2.schema.json"><tt class="verbatim">opensheaf-keys-0.2.schema.json</tt></a>
+          for <tt class="verbatim">keys.json</tt>, <a href="https://opensheaf.org/schemas/opensheaf-signature-0.2.schema.json"><tt class="verbatim">opensheaf-signature-0.2.schema.json</tt></a>
+          for signature files, <a href="https://opensheaf.org/schemas/opensheaf-keeper-0.2.schema.json"><tt class="verbatim">opensheaf-keeper-0.2.schema.json</tt></a>
+          for a keeper's <tt class="verbatim">/.well-known/opensheaf</tt> and <a href="https://opensheaf.org/schemas/opensheaf-index-0.2.schema.json"><tt
+          class="verbatim">opensheaf-index-0.2.schema.json</tt></a> for the index files;
+          and, for the timestamps extension, <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.2.schema.json"><tt class="verbatim">opensheaf-timestamps-0.2.schema.json</tt></a>
+          for its declaration in <tt class="verbatim">keys.json</tt> or, for the first
+          version, the owner's genesis record.
         </p>
       </li>
       <li>
         <p>
           <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm"><tt class="verbatim">index.tm</tt></a>/<a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html"><tt class="verbatim">index.html</tt></a>,
-          <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm"><tt class="verbatim">opensheaf-specification-0.1.tm</tt></a>/<a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html"><tt
+          <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.2.tm"><tt class="verbatim">opensheaf-specification-0.2.tm</tt></a>/<a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.2.html"><tt
           class="verbatim">.html</tt></a>, <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm"><tt class="verbatim">faq.tm</tt></a>/<a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html"><tt
           class="verbatim">faq.html</tt></a>, <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm"><tt class="verbatim">use-cases.tm</tt></a>/<a
-          href="https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html"><tt class="verbatim">use-cases.html</tt></a>, <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.tm"><tt class="verbatim">opensheaf-git-0.1.tm</tt></a>/<a
-          href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.html"><tt class="verbatim">.html</tt></a>: the pages of the site, generated
-          from the Markdown files (for TeXmacs and for the web); do not edit
-          them.
+          href="https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html"><tt class="verbatim">use-cases.html</tt></a>, <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.2.tm"><tt class="verbatim">opensheaf-git-0.2.tm</tt></a>/<a
+          href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.2.html"><tt class="verbatim">.html</tt></a>, <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.2.tm"><tt class="verbatim">opensheaf-timestamps-0.2.tm</tt></a>/<a
+          href="https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.2.html"><tt class="verbatim">.html</tt></a>, and those of version 0.1: the pages
+          of the site, generated from the Markdown files (for TeXmacs and for
+          the web); do not edit them.
         </p>
       </li>
       <li>
@@ -337,16 +366,17 @@
     </ul>
     <h2 id="auto-6"><a id="licence"></a>Licence<span style="margin-left: 1em"></span></h2>
     <p>
-      The text of the specification, of the FAQ and of the use cases is
-      licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0
-      International licence</a> (CC BY-SA 4.0): it may be copied and adapted
-      with attribution, and adapted versions must be shared under the same
-      licence. The JSON Schemas in <a href="https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas"><tt class="verbatim">schemas/</tt></a> are
-      dedicated to the public domain under <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a>, so that they
-      can be embedded in any software. The tools and style files are licensed
-      under the GNU General Public License, version 3 or later. The fonts in
-      <a href="https://github.com/opensheaf/opensheaf.github.io/tree/main/resources/fonts"><tt class="verbatim">resources/fonts/</tt></a> keep their own licence
-      (SIL Open Font License). The logo and the symbol in <a href="https://github.com/opensheaf/opensheaf.github.io/tree/main/resources/brand"><tt class="verbatim">resources/brand/</tt></a>
+      The text of the specification, of its timestamps extension, of the git
+      companion, of the FAQ and of the use cases is licensed under the <a
+      href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International
+      licence</a> (CC BY-SA 4.0): it may be copied and adapted with
+      attribution, and adapted versions must be shared under the same licence.
+      The JSON Schemas in <a href="https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas"><tt class="verbatim">schemas/</tt></a> are dedicated
+      to the public domain under <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a>, so that they can be
+      embedded in any software. The tools and style files are licensed under
+      the GNU General Public License, version 3 or later. The fonts in <a
+      href="https://github.com/opensheaf/opensheaf.github.io/tree/main/resources/fonts"><tt class="verbatim">resources/fonts/</tt></a> keep their own licence (SIL
+      Open Font License). The logo and the symbol in <a href="https://github.com/opensheaf/opensheaf.github.io/tree/main/resources/brand"><tt class="verbatim">resources/brand/</tt></a>
       are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; the use of the name OpenSheaf
       and of the logo as marks is governed by <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/TRADEMARKS.md"><tt class="verbatim">TRADEMARKS.md</tt></a>:
       describing or pointing to OpenSheaf needs no permission, suggesting

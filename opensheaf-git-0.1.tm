@@ -9,6 +9,8 @@
 
   <notes-abstract|Companion to the OpenSheaf specification 0.1. Version 0.1 (draft), 16 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
 
+  <os-alert|note|Note.|<strong|Superseded.> This is version 0.1 as published (15 and 16 November 2026), kept as a record. The current draft is <hlink|version 0.2|opensheaf-git-0.2.tm>.>
+
   <os-alert|warning|Warning.|<strong|Draft for discussion.> This document is a first draft. Its open questions are listed in section 13; none of them is settled.>
 
   <section*|1. Introduction (non-normative)><label|1-introduction-non-normative>
@@ -125,7 +127,21 @@
 
   Let C be a published commit and C' the next one on the published branch. Between C and C', the archive files MAY change only as follows:
 
-  1. a new object folder <verbatim|ocfl/\<less\>path\<gtr\>/>, where <verbatim|\<less\>path\<gtr\>> is the object's path in the layout of the storage root (<verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive); 2. a new version folder <verbatim|ocfl/\<less\>path\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version; 3. files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder, or under <verbatim|witnesses/>; 4. the replacement of <verbatim|opensheaf.json>; 5. at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification); 6. the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9); 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
+  <\enumerate>
+    <item>a new object folder <verbatim|ocfl/\<less\>path\<gtr\>/>, where <verbatim|\<less\>path\<gtr\>> is the object's path in the layout of the storage root (<verbatim|\<less\>id\<gtr\>>, or <verbatim|\<less\>t1\<gtr\>/\<less\>t2\<gtr\>/\<less\>t3\<gtr\>/\<less\>id\<gtr\>> in the hashed layout, section 5 of the specification), with the folders of the hash it needs, and the files of a complete OCFL object (a new object, or the copy of an object of another archive);
+
+    <item>a new version folder <verbatim|ocfl/\<less\>path\<gtr\>/v\<less\>N\<gtr\>/>, where <verbatim|v\<less\>N-1\<gtr\>> is the head of the object in C, with the replacement of the object's root <verbatim|inventory.json> and its checksum file by those of the new version;
+
+    <item>files added, replaced or removed in an object's <verbatim|extensions/opensheaf-witnesses/> folder, or under <verbatim|witnesses/>;
+
+    <item>the replacement of <verbatim|opensheaf.json>;
+
+    <item>at the creation of the storage root, its own files (<verbatim|0=ocfl_1.1>, <verbatim|ocfl_layout.json>, the configuration of the layout extension, and the loose files allowed by section 5 of the specification);
+
+    <item>the removal of an object folder, with the folders of the hash it leaves empty, by a takedown (section 9);
+
+    <item>the repair of a file whose bytes do not match the digest its inventory records (section 5.3).
+  </enumerate>
 
   No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -227,7 +243,15 @@
 
   When content must be removed (by law, or for a breach of rights), the keeper MUST:
 
-  1. commit the removal of the object folder and the tombstone, as in section 5.1, item 6; 2. rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with <verbatim|git filter-repo --invert-paths --path ocfl/\<less\>path\<gtr\>/>, with the object's path in the layout); 3. force-push the rewritten branches, and delete tags that point to commits holding the files; 4. ask the host to remove what it keeps of the old history (on GitHub, cached views and the references of pull requests are removed on request to its support; forks are separate repositories, which it does not change).
+  <\enumerate>
+    <item>commit the removal of the object folder and the tombstone, as in section 5.1, item 6;
+
+    <item>rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with <verbatim|git filter-repo --invert-paths --path ocfl/\<less\>path\<gtr\>/>, with the object's path in the layout);
+
+    <item>force-push the rewritten branches, and delete tags that point to commits holding the files;
+
+    <item>ask the host to remove what it keeps of the old history (on GitHub, cached views and the references of pull requests are removed on request to its support; forks are separate repositories, which it does not change).
+  </enumerate>
 
   This is the only rewrite of the published branch allowed. The commit of step 1 SHOULD say that it is a takedown, and name the object, so that a check comparing the history before and after (section 10) can recognise it. The rewrite changes the hash of every commit after the first that held the object: signatures of those commits and tags no longer verify, and clones must be made again. Copies of the repository elsewhere (forks, other clones, Software Heritage) follow their own rules, as external copies do (section 11.3 of the specification).
 
@@ -271,7 +295,19 @@
 
   <section*|13. Open questions><label|13-open-questions>
 
-  1. <strong|A profile, or a guide?> This document adds nothing that readers see, so it is not declared in the discovery document. Tools that copy archives would gain from knowing where to clone one from: should the discovery document name its repository (a <verbatim|repository> URL), or the website link to it? 2. <strong|Takedown without rewriting history.> Section 9 makes takedown a rewrite of history. Alternatives: content files outside git, one repository per object, or the deletion mechanism expected in OCFL 2 (section 11.3 of the specification). Archives that hold documents of others (a journal, an institution) need it most. 3. <strong|Portable content paths> (section 4.3): a recommendation here, or a rule of the specification itself, since it matters for any copy made on another system? 4. <strong|Drafts and publication dates> (sections 6.2 and 6.3): the draft state and the date a version becomes public, in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>. 5. <strong|Scale> (section 8): indexes and the size of git trees for very large archives, in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19> and <hlink|issue #32|https://github.com/opensheaf/opensheaf.github.io/issues/32>. 6. <strong|Objects held by others> (<hlink|issue #13|https://github.com/opensheaf/opensheaf.github.io/issues/13>): whether objects controlled by their authors and kept by custodians call for one repository per object, and how such repositories make up an archive without submodules.
+  <\enumerate>
+    <item><strong|A profile, or a guide?> This document adds nothing that readers see, so it is not declared in the discovery document. Tools that copy archives would gain from knowing where to clone one from: should the discovery document name its repository (a <verbatim|repository> URL), or the website link to it?
+
+    <item><strong|Takedown without rewriting history.> Section 9 makes takedown a rewrite of history. Alternatives: content files outside git, one repository per object, or the deletion mechanism expected in OCFL 2 (section 11.3 of the specification). Archives that hold documents of others (a journal, an institution) need it most.
+
+    <item><strong|Portable content paths> (section 4.3): a recommendation here, or a rule of the specification itself, since it matters for any copy made on another system?
+
+    <item><strong|Drafts and publication dates> (sections 6.2 and 6.3): the draft state and the date a version becomes public, in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>.
+
+    <item><strong|Scale> (section 8): indexes and the size of git trees for very large archives, in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19> and <hlink|issue #32|https://github.com/opensheaf/opensheaf.github.io/issues/32>.
+
+    <item><strong|Objects held by others> (<hlink|issue #13|https://github.com/opensheaf/opensheaf.github.io/issues/13>): whether objects controlled by their authors and kept by custodians call for one repository per object, and how such repositories make up an archive without submodules.
+  </enumerate>
 
   <section*|14. Changelog><label|14-changelog>
 

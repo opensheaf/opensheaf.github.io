@@ -17,9 +17,15 @@ notes are for anyone, person or agent, changing it.
 ## Sources and build
 
 - Edit only the Markdown sources: `README.md` (also the home page),
-  `opensheaf-specification-0.1.md`, `FAQ.md`, `USE-CASES.md`,
-  `opensheaf-git-0.1.md` (archives in git, a companion to the
-  specification); and the schemas in `schemas/`.
+  `opensheaf-specification-0.2.md`, `FAQ.md`, `USE-CASES.md`,
+  `opensheaf-git-0.2.md` (archives in git, a companion to the
+  specification), `opensheaf-timestamps-0.2.md` (the timestamps extension);
+  and the schemas `schemas/opensheaf-*-0.2.schema.json`.
+- Version 0.1 (`opensheaf-specification-0.1.md`, `opensheaf-git-0.1.md`,
+  `schemas/opensheaf-{archive,collection,object}-0.1.schema.json`) is kept
+  as published and is not edited; its pages are still built.
+  `reference/` holds the text of PR #30 before its rebuild into 0.2,
+  unbuilt and not maintained.
 - Run `tools/build.py` after every change of a Markdown source, and commit
   the regenerated `.tm` and `.html` files with their sources. Never edit the
   `.tm` or `.html` files by hand. The build needs TeXmacs and its `notes` and
@@ -34,12 +40,20 @@ notes are for anyone, person or agent, changing it.
 
 ## The specification is a draft
 
-- Version 0.1 is a draft. Agreed changes go into 0.1 itself: no 0.2, no
-  compatibility rules, no deprecated names; format names stay
-  `opensheaf-object/0.1` and so on. Archives built with the draft are
-  rebuilt when 0.1 is final.
+- Version 0.2 is the current draft. Agreed changes go into 0.2 itself: no
+  0.3 until 0.2 is final, no compatibility rules, no deprecated names;
+  format names stay `opensheaf-object/0.2` and so on. Archives built with
+  the draft are rebuilt when 0.2 is final.
+- Version 0.1 is kept as published and is not edited. 0.2 is incompatible
+  with it (section 16.1); archives made under 0.1 are rebuilt to move to 0.2.
+- The examples of appendix C are computed: format names enter genesis
+  records and signatures, so any change of them changes the names, digests
+  and signatures shown, which are then recomputed and checked against the
+  schemas.
 - Each change of the specification gets a line in its changelog (section
-  17), dated, and the date in the heading is updated.
+  16.2), dated, and the date in the heading is updated; the same holds for the
+  timestamps extension and the git companion, which have changelogs of
+  their own.
 - Open design questions are discussed in the
   [issues](https://github.com/opensheaf/opensheaf.github.io/issues), with the
   existing labels (`design` for open questions, `settled` once written into
@@ -61,8 +75,9 @@ notes are for anyone, person or agent, changing it.
 - Use the terms of the specification consistently (see the spec skill):
   catalogue and selection, mirror and accepted copy, document version and
   object version, pin, revision.
-- Wrap Markdown paragraphs at about 78 columns, except in the specification
-  and in `opensheaf-git-0.1.md`, whose paragraphs are one line each.
+- Wrap Markdown paragraphs at about 78 columns, except in the specification,
+  `opensheaf-git-0.2.md` and `opensheaf-timestamps-0.2.md`, whose paragraphs
+  are one line each.
 
 ## Related repositories
 

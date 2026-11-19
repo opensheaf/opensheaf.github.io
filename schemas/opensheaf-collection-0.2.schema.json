@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-collection-0.2.schema.json",
+  "title": "OpenSheaf member list (members.json), format opensheaf-collection/0.2",
+  "$comment": "Section 8.2 of the specification. Part of OpenSheaf 0.2 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
+  "type": "object",
+  "required": [
+    "format",
+    "type",
+    "members"
+  ],
+  "properties": {
+    "format": {
+      "const": "opensheaf-collection/0.2"
+    },
+    "order": {
+      "enum": [
+        "manual",
+        "issued-desc",
+        "issued-asc"
+      ]
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "name",
+          "owner",
+          "at"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "document",
+              "collection"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^v[1-9][0-9]*$"
+          },
+          "inventorySha512": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{128}$"
+          },
+          "doi": {
+            "type": "string",
+            "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$"
+          },
+          "conceptDoi": {
+            "type": "string",
+            "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$"
+          },
+          "follow": {
+            "const": "latest"
+          },
+          "cite": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "creators": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "year": {
+                "type": "integer"
+              },
+              "issued": {
+                "type": "string"
+              }
+            }
+          },
+          "revisions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "documentVersion",
+                "version",
+                "inventorySha512"
+              ],
+              "properties": {
+                "documentVersion": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "version": {
+                  "type": "string",
+                  "pattern": "^v[1-9][0-9]*$"
+                },
+                "inventorySha512": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{128}$"
+                },
+                "doi": {
+                  "type": "string",
+                  "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$",
+                  "$comment": "optional (section 8.4): the version DOI of the document version vetted"
+                }
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z2-7]{52}$",
+            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
+          },
+          "owner": {
+            "type": "string",
+            "pattern": "^[a-z2-7]{51}[aq]$",
+            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
+          },
+          "at": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://.*/$"
+            },
+            "$comment": "base URLs where copies of the line may be found, all equal hints (sections 3, 8.2, 12.3)"
+          }
+        }
+      }
+    },
+    "type": {
+      "enum": [
+        "catalogue",
+        "selection"
+      ],
+      "description": "catalogue: members pin objects whole (version, inventorySha512, optional follow); selection: members pin revision sets (revisions)"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "catalogue"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "members": {
+            "items": {
+              "required": [
+                "version",
+                "inventorySha512"
+              ],
+              "not": {
+                "required": [
+                  "revisions"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "selection"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "members": {
+            "items": {
+              "required": [
+                "revisions"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "version"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "inventorySha512"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "follow"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

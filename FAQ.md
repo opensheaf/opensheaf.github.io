@@ -2,7 +2,7 @@
 
 *Answers to questions that come up about the design of
 [OpenSheaf](https://opensheaf.org). The specification
-([opensheaf-specification-0.1.md](opensheaf-specification-0.1.md)) is
+([opensheaf-specification-0.2.md](opensheaf-specification-0.2.md)) is
 authoritative; this page explains its choices.*
 
 ## What is OpenSheaf for?
@@ -16,18 +16,17 @@ metadata, and collections that combine documents from several archives.
 ## Why not just use arXiv, or Zenodo?
 
 Both are excellent services, and OpenSheaf works with them: a document can
-also be on arXiv (linked with `IsIdenticalTo`), and the Zenodo binding gives
-every version a DOI on Zenodo. What OpenSheaf adds is an archive that its
-owner keeps and controls, that stores sources (not only PDFs) in a
-documented layout, that anyone can verify file by file, and that can be
-combined with other archives into collections and selections without asking
-any central service.
+also be on arXiv (linked with `IsIdenticalTo`), and the Zenodo profile gives
+every version a DOI on Zenodo. What OpenSheaf adds is an archive that you keep
+and control, that stores sources (not only PDFs) in a documented layout, that
+anyone can verify file by file, and that can be combined with other archives
+into collections and selections without asking any central service.
 
 ## Do I need Zenodo, TeXmacs, git or GitHub?
 
 No. The core of the format is an OCFL storage root and a discovery document
 served over HTTPS. Zenodo, TeXmacs and the website are optional profiles
-(appendices A, B and C). Git and GitHub Pages are convenient ways to keep and
+(appendix A). Git and GitHub Pages are convenient ways to keep and
 serve an archive, but any static web server will do.
 
 ## Can an archive be served straight from GitHub, without GitHub Pages?
@@ -39,9 +38,10 @@ Explorer, and other tools that read archives over HTTP, can read and verify an
 archive from it. It does not serve a website: it sends pages as plain text and
 PDFs as downloads, so landing pages are neither shown nor read by search
 engines, and it serves the pointers of Git LFS, not the files. It is best
-listed as a second location in `mirrors` of the discovery document, next to a
-GitHub Pages site or another web server. See section 7.4 of [OpenSheaf
-archives in git](opensheaf-git-0.1.md).
+used as a second location of the archive, beside a GitHub Pages site or
+another web server: an archive's files may be served at several base URLs,
+each a location of the same archive. See section 7.4 of [OpenSheaf archives
+in git](opensheaf-git-0.2.md).
 
 ## Why OCFL? Isn't git enough?
 
@@ -50,17 +50,17 @@ in most repositories) are not meant for long-term preservation. OCFL (the
 Oxford Common File Layout) is a published specification for exactly this
 problem: versioned objects stored as plain files, every file fixed by a
 SHA-512 digest, readable without any special software, with independent
-validators, used by research libraries. An OpenSheaf archive can still be
-kept in git; git just is not part of its integrity.
+validators, used by research libraries. An OpenSheaf archive can still be kept
+in git; git just is not part of its integrity.
 
 ## Why DataCite metadata, and not RO-Crate, Dublin Core or JATS?
 
 DataCite is the metadata behind DOIs for repositories (Zenodo, arXiv's DOIs,
 university repositories). It has the relations needed here (versions,
 preprints and published articles, collections), it maps directly to Zenodo,
-and its records are harvested by ORCID, OpenAlex and search services.
-RO-Crate is richer but heavier; Dublin Core is too thin; JATS is for the
-full text of journal articles.
+and its records are harvested by ORCID, OpenAlex and search services. RO-Crate
+is richer but heavier; Dublin Core is too thin; JATS is for the full text of
+journal articles.
 
 ## Why JSON and not YAML?
 
@@ -71,25 +71,29 @@ extra libraries. YAML is nicer to edit by hand but converts values silently
 
 ## Why is there a discovery document (opensheaf.json)?
 
-Static web servers cannot list folders, so a program visiting an archive
-could not find its objects. `opensheaf.json`, at the archive's address, lists
-them with their head versions and digests, names the storage root and the
-main collection, and says which version of the specification the archive
-follows. It is only a map: everything it says is checked against the storage
-root.
+Static web servers cannot list folders, so a program visiting an archive could
+not find its objects. `opensheaf.json`, at the archive's address, lists them
+with their head versions and digests, names the storage root and the main
+collection, and says which version of the specification the archive follows.
+It is only a map: everything it says is checked against the storage root.
 
-## Why are identifiers short names and not URIs?
+## How are objects identified?
 
-The flat-direct storage layout puts each object in a folder named by its
-identifier, so paths stay readable and can be computed over plain HTTP; a
-folder name cannot contain `/`. A large archive may instead spread its objects
-over folders named by parts of the hash of their identifiers (the layout
-`0003-hash-and-id-n-tuple-storage-layout`, for instance
-`ocfl/f2a/eee/55d/kpz-details/`); the last folder is still named by the
-identifier, and the path is still computed by rule. The archive itself has a
-URI-like identifier (a `tag:` URI, for instance
-`tag:opensheaf.org,2026:mgubi`), and an object is named globally by the pair
-(archive identifier, object identifier).
+A work has a name independent of any archive, the digest of its genesis
+record, and each history of it an owner; the identifier of an object is its
+line, written as a `sheaf:` URI, `sheaf:<name>:<owner>`. Identifiers chosen by
+each archive would clash as soon as one archive kept copies of another's
+objects; identifiers made from lines never do, so one storage root can hold
+the lines its owners write and copies of others' side by side. The default
+layout puts a line at `<owner>/<name>/`, one folder per owner, so that paths
+can be computed over plain HTTP; a large archive may instead spread its
+objects over folders named by parts of the hash of their identifiers. Archives
+have no identifiers of their own: they are found at their addresses. Readable
+names (`kpz-details`) are **labels** in the discovery document, used for the
+website's URLs; they are not permanent, and permanent links use `sheaf:` URIs,
+for instance `sheaf:<name>/v3` for document version 3 of the originator's
+line. Drafts, which have no name yet, are identified locally, as
+`sheaf:draft:<id>`.
 
 ## What is the difference between a document version and an object version?
 
@@ -97,18 +101,18 @@ The document version is the version of the work, what readers see and what
 gets a DOI: it changes only when the document's own files change (sources,
 renditions, change note). The object version (`v1`, `v2`, ...) is OCFL's: it
 changes at every change of the object, including corrections of the
-description (adding the DOI of the journal version, fixing an affiliation)
-and notices about earlier versions.
+description (adding the DOI of the journal version, fixing an affiliation) and
+notices about earlier versions.
 
 ## How are versions numbered and ordered?
 
-The archive numbers document versions itself, from 1 and without gaps, even
-when an external service numbers them differently: if arXiv still serves only
-v1, v3 and v4 of a paper, they are document versions 1, 2 and 3, and the
-arXiv labels are recorded beside them. Versions are normally in the order of
-their numbers. When an earlier version turns up later, it gets the next
-number and an explicit `history` in `object.json` puts it in its place; the
-current version, the one readers are directed to, is the last in the
+The owner of a line numbers its document versions itself, from 1 and without
+gaps, even when an external service numbers them differently: if arXiv still
+serves only v1, v3 and v4 of a paper, they are document versions 1, 2 and 3,
+and the arXiv labels are recorded beside them. Versions are normally in the
+order of their numbers. When an earlier version turns up later, it gets the
+next number and an explicit `history` in `object.json` puts it in its place;
+the current version, the one readers are directed to, is the last in the
 history. Dates are only information: they may be approximate or unknown, so
 they never decide the order.
 
@@ -120,42 +124,47 @@ erratum, as text or as a file): notices are later statements about a version,
 kept with the object and shown with that version, and they never change the
 version itself.
 
-## How do collections work across archives? What if another archive disappears?
+## How do collections work across archives? What if an archive disappears?
 
-A collection lists its members by archive identifier, address, object
-identifier, version and the SHA-512 digest of that version's inventory (the
-"pin"). Since an inventory fixes all its files, the pin fixes the member
-completely, and a collection becomes a hash tree over everything it contains.
-If the member's archive moves or disappears, the member can be fetched from a
-mirror, from its DOI deposit or from a Software Heritage snapshot: any copy
-that matches the pin is the right one. A collection also keeps a cached
-citation of each member, so that it stays readable even if no copy is found.
+A collection lists its members by line (name and owner), the addresses where
+copies may be found, and a version with the SHA-512 digest of its inventory
+(the "pin"), or, in a selection, its revisions. Since an inventory fixes all
+its files, the pin fixes the member completely, and a collection becomes a
+hash tree over everything it contains. If the member's archive moves or
+disappears, the member can be fetched from a mirror or any other copy: any
+copy that matches the pin is the right one. External records, such as a DOI
+deposit or a Software Heritage snapshot, are witnesses, not copies: they keep
+the files but not the inventory, so they cannot be checked against the pin,
+and only tell a reader where the files may be found (#22).
+A collection also keeps a cached citation of each member, so that it stays
+readable even if no copy is found.
 
 ## Why both archives and collections?
 
-They answer different questions. An **archive** is custody and naming: one
-owner's storage root and discovery document, under an archive identifier. It
-says who keeps an object, what it is called, and where its files are. An
-object is named by the pair (archive identifier, object identifier), and its
-versions are added only by its archive, which is its single writer: a copy
-kept elsewhere (a mirror) stays the object of its archive and can only
-receive its versions. Archives do not overlap and do not nest.
+They answer different questions. An **archive** is custody: a storage root and
+a discovery document, served at an address. It says what is kept there and
+where its files are. An archive hosts the lines of any number of owners and
+owns none of them by hosting them: every version of a line is signed by its
+owner, wherever it is stored, and an archive cannot add to another owner's
+line. A copy kept elsewhere (a mirror) stays its owner's line and can only
+receive the owner's versions (see "Who owns an object?" and "What is a
+branch?").
 
 A **collection** is a statement: a versioned list of pins, made by a curator,
-over objects of any archives. It says which objects, in which versions, go
+over objects kept anywhere. It says which objects, in which versions, go
 together: an author's papers, an issue of a journal, a reading list.
-Collections are objects themselves, so they can be pinned, nested and
-included in other collections, across archives.
+Collections are objects themselves, so they can be pinned, nested and included
+in other collections, across archives.
 
 The two are kept apart because an archive changes at every deposit and holds
-facts that are nobody's claim (which objects it holds, their heads, mirrors,
-tombstones, keys), while a collection changes by the rules its curator set
-(adding members, following them as they grow, vetting their versions), and
-each of its versions can be cited and verified as it stood. When an archive
-itself should be cited as it stood, that is what its main collection is for:
-a catalogue of its own documents, pinned like any other. Archives partition
-the objects, each object having one home; collections overlay them, any
-number of views over any homes.
+facts that are nobody's claim (which objects it holds, their heads, its
+tombstones), while a collection changes by the rules its curator set (adding
+members, following them as they grow, vetting their versions), and each of its
+versions can be cited and verified as it stood. When an archive's documents
+should be cited as they stood, that is what its main collection is for: a
+catalogue of them, pinned like any other. Archives hold copies, each line
+possibly in several; collections overlay them, any number of views over any
+copies.
 
 ## What is the difference between a catalogue and a selection?
 
@@ -173,47 +182,167 @@ cases](USE-CASES.md) show both at work.
 
 ## Can I put someone else's paper in my collection?
 
-Yes. A reference (a pin) copies nothing and needs no permission. There are
-two ways to keep a copy, both allowed only if the licence of what is copied
-permits redistribution (or the authors agree): a **mirror** copies the whole
-object, every version, and stays the original archive's object (for an
-institution or a storage site); an **accepted copy** takes the one revision a
-selection vetted into the selection's own archive, where later changes are
-the curator's acts (for a journal). The licence of a collection (CC0 for the
-list) never extends to its members.
+Yes. A reference (a pin) copies nothing and needs no permission. There are two
+ways to keep a copy, both allowed only if the licence of what is copied
+permits redistribution (copying by the authors' agreement is still open, #39):
+a **mirror** copies the whole line, every version, and stays its owner's line
+(for an institution or a storage site); an **accepted copy** takes the one
+revision a selection vetted into a line of the selection's owner, where later
+changes are the curator's acts (for a journal). The licence of a collection
+(CC0 for the list) never extends to its members.
 
-## Can documents be linked in richer ways (a short account and its full proof)?
+## Who owns an object?
+
+A work has a **name**, the digest of the genesis record written when it is
+sealed, at its owner's request, before it is first shared. Each history of it
+has an **owner**: a person, a group or an institution, which decides its
+versions and signs them. The pair (name, owner) identifies a **line**: one
+history, with a single writer. A line is its signed versions, wherever they
+are stored: the archive that keeps a copy is only where it lives, and an owner
+who moves to another archive continues its lines there.
+
+Every version of every line is signed, except the computed first version of a
+key log (below), and the key logs travel with the objects they sign, so a line
+can be checked from any copy, even when the archives that served it have gone.
+A version signed with good keys vouches for every version before it: its
+inventory fixes their files, and its `object.json` gives, as `previous`, the
+digest of the inventory before it, so that signing a version fixes every
+earlier one byte for byte.
+
+## What is a key log, and which keys sign what?
+
+An owner is itself an object, named by its own genesis record, which lists its
+first keys, and whose versions are its **key log**. Each version lists the
+owner's **current keys**, which sign its documents and collections, with the
+number of them that must sign, and commits, by their digests, to the
+**rotation keys** that alone sign the next version of the key log, as in KERI
+(pre-rotation is provisional, #58); current keys never sign the key log, whose
+first version is computed from the genesis record and signed by no key.
+
+Current keys are in daily use, one on each device; rotation keys are kept
+apart, committed in one version and used once, and never become current keys.
+Three rotation keys on hardware tokens, with two required, survive the loss of
+one or the theft of one; a single one kept offline (printed, or on a USB key)
+also works, but its loss leaves the owner unable to change its keys, and its
+theft lets a thief take the owner over. Keys can thus be added or retired
+while the owner stays the same, and what was signed stays signed: a signature
+that verifies against the key-log version it names is good for ever. A person
+usually needs one signature; a group of co-authors can share one owner with a
+threshold, for instance two signatures out of three.
+
+## What happens when a key is stolen?
+
+If current keys that could reach the threshold may have been exposed, the
+owner signs with its rotation keys a version of its key log listing them as
+**exposed**, which a thief holding current keys cannot contest; or it
+**ends**, by a last version of its key log that may name a successor, which
+continues the work by branches. A thief holding enough rotation keys not yet
+revealed takes the owner over by signing the next version of its key log,
+without a fork; the owner can then only end it, and only with its own copies
+of those keys.
+
+Two signed versions of a key log with one number whose inventories differ are
+a fork, which needs rotation keys stolen or kept after use, and never happens
+at the first version, which every copy computes alike. Since no one can tell
+the owner's side from a thief's, the fork ends the owner; an archive keeps the
+side it saw first and appends a fork record carrying the other, so that every
+copy shows the fork. An exposure counts on either side of a fork: a thief that
+forks may expose the owner's earlier keys, which harms trust in what they
+signed, but never lets a forgery pass.
+
+Either way the old signatures stay good, but readers trust them only as far as
+other evidence goes, since nothing tells the owner's signatures from a
+thief's; versions that need an exposed key, or name a version of a key log
+from a fork on, are **contested**, and archives never add them, unless other
+evidence (a timestamp) dates them before. A fork **freezes** the owner:
+archives that know of it add nothing more to its lines, unless such evidence
+dates it before the fork, and the work continues under a successor; after an
+ending without a fork, archives take the owner's lines only from copies, never
+as new deposits.
+
+## Who answers for an owner?
+
+An owner may name in its genesis record one **keeper** who answers for it (an
+ORCID iD, an institution), fixed with the owner name. The keeper may confirm
+the link in a place only it controls, and names the successor when no ending
+version before a fork names one, after a fork for instance. Nothing requires a
+keeper: an anonymous referee, for instance, has none.
+
+## What is a draft?
+
+Drafts are a sandbox: objects of a reserved owner, `draft`, kept by one
+archive, never signed, pinned or copied out of it, and free to be rewritten or
+deleted, which OCFL does not expect of its objects, so nothing may rely on
+them. Sealing makes a new object, the first version of the line; the draft's
+versions are not part of it.
+
+## What is a branch?
+
+Anyone can copy a genesis record, so the name alone cannot say whose history
+is the right one. That is why the owner is part of the identity: a copy
+continued by another owner is a **branch**, which declares the version
+it starts from, and an archive cannot pass its own changes off as another
+owner's, since it cannot sign for it. A branch is a new object: it keeps only
+the version it starts from, with the parent's inventory, `object.json` and
+signatures as evidence, and, for a branch of a branch, the evidence of its own
+parents, and adds its own versions (a journal keeping the version it vetted,
+then its corrections; a co-author carrying the work on). It cannot continue
+the parent's object, whose inventories record the parent's identifier. A
+co-author who wants the whole past at hand keeps a copy of the parent's line
+beside the branch, as a separate object; in git the files they share are
+stored once. The key logs of the parents' owners travel beside the branch as
+owner objects, one for each owner, as every key log does, never inside its
+content. An accepted copy is a branch kept by a selection's owner.
+
+A branch can be checked without its parent: the genesis record gives the name,
+the copied inventory gives the parent pin, the files match that inventory, the
+copied `object.json` says whose version it was, and the parent owner's
+signature, checked against the parent owner's key log, kept beside the branch
+as an owner object, shows that the version is that owner's; for a branch of a
+branch, the same holds for each parent in turn, back to the originator's line.
+
+## Can documents be linked in richer ways (a short account and its proof)?
 
 Yes, on top of the format rather than in it. The core keeps only what every
-archive needs to keep, cite, compose and verify documents. Other relations
-are built from it: by links inside the documents and DataCite relations,
-which need nothing more, or by **extensions** (section 4 of the
-specification), published separately, whose data an object version records in
-its `object.json`, so that tools that know them can follow the relation when
-they copy, verify or present documents. Extensions never change the core: an
-archive is read and verified without them. The [use cases](USE-CASES.md)
-show a journal publishing a short account of a proof whose detailed argument,
+archive needs to keep, cite, compose and verify documents. Other relations are
+built from it: by links inside the documents and DataCite relations, which
+need nothing more, or by **extensions** (section 2 of the specification),
+published separately, whose data an object version records in its
+`object.json`, so that tools that know them can follow the relation when they
+copy, verify or present documents. Extensions never change the core: an
+archive is read and verified without them. The [use cases](USE-CASES.md) show
+a journal publishing a short account of a proof whose detailed argument,
 possibly written with AI, stays online in the version reviewed.
 
 ## Where do signatures and timestamps go, and why not in the version itself?
 
-A signature or timestamp of an object version can only be made after the
-version is committed, so it cannot be part of that version: a signature of an
-inventory cannot be listed in the inventory it signs. Making a new version
-for each signature would mix evidence with changes of the work, and every
-upgrade of a timestamp proof (OpenTimestamps proofs are completed once their
-attestation is confirmed) would be another version.
+A signature of an object version, or a timestamp of that signature, can only
+be made after the version is committed, so it cannot be part of that version:
+a signature of an inventory cannot be listed in the inventory it signs. Making
+a new version for each signature would mix evidence with changes of the work,
+and every completion of a timestamp proof (an OpenTimestamps proof is
+completed once a Bitcoin block attests it) would be another version. Witnesses
+are never replaced: a completed proof is a new file beside the pending one.
 
-OCFL does not allow arbitrary files in an object folder; its `logs/` folder
-is meant for unstructured records of actions and is not covered by digests.
-The place OCFL provides for data that is not part of any version is the
-object's `extensions/` folder (the registered mutable-head extension keeps its
-data there). So OpenSheaf puts witnesses in
-`extensions/opensheaf-witnesses/`, where they travel with the object. An
-archive that never touches object folders after commit may keep them in a
-`witnesses/` folder outside the storage root instead. Witnesses need no
-digests of their own: each one is checked directly against the checksum file
-it names, which the pins fix.
+OCFL does not allow arbitrary files in an object folder; its `logs/` folder is
+meant for unstructured records of actions and is not covered by digests. The
+place OCFL provides for data that is not part of any version is the object's
+`extensions/` folder (the registered mutable-head extension keeps its data
+there). So OpenSheaf puts witnesses in `extensions/opensheaf-witnesses/`,
+where they travel with the object: the owner's signature of every version,
+required, and timestamps and others' signatures, optional. Timestamps are
+defined by an extension, [OpenSheaf timestamps](opensheaf-timestamps-0.2.md):
+RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or
+both. An owner that wants its signatures dated, a journal or an institution
+for instance, adopts it in its key log, from the first version, so that if a
+key is ever stolen, readers can tell which of its versions were signed
+before. Timestamps change no status by themselves: dates are evidence that
+readers weigh, and the specification (section 7.3) admits trusted dates as
+evidence against `contested`. A single researcher may not need it. Anyone
+holding a copy may add timestamps later; the earliest is what counts.
+Witnesses are not covered by the inventory digests, and need not be: a
+signature is checked against the version it names, which the pins fix, and a
+timestamp against the signature file it stamps.
 
 ## Why is the HTML version not part of the deposit?
 
@@ -223,13 +352,18 @@ regenerated from the sources whenever the presentation changes.
 
 ## How do I withdraw or take down a document?
 
-To withdraw a document (for instance a retraction), make a new version with a
-withdrawal notice: the content and its history stay, and presentations show
-the notice. If content must be removed (by law, or for a breach of rights),
-the object is deleted and a tombstone is left in the discovery document, so
-that collections pinning it report it as removed rather than corrupt. OCFL
-version 2 is expected to add a native mechanism for deleting single files;
-OpenSheaf will adopt it when it is published.
+To withdraw a document (for instance a retraction), its owner makes a new
+object version that only marks it withdrawn, with a date and a reason: the
+content and its history stay, and presentations show the withdrawal. Content
+is removed only by a **takedown** (by law, for a breach of rights, or
+because the archive stops keeping it): the object is deleted and a tombstone
+is left in the discovery document, so that collections pinning it report it
+as removed rather than corrupt. Every removal is a takedown, so nothing leaves
+an archive silently. The owners' key logs stay, since other objects need them
+to be checked; an owner's key log is taken down only for itself. Drafts are
+neither withdrawn nor taken down: they are simply deleted. OCFL version 2 is
+expected to add a native mechanism for deleting single files; whether
+OpenSheaf uses it is open (#32).
 
 ## Can I use "All rights reserved"?
 
@@ -243,20 +377,29 @@ entered as a custom licence.
 
 If the archive follows the website profile: each document then has a landing
 page with the `citation_*` meta tags Google Scholar reads, and a PDF on the
-same host. Appendix C also recommends a sitemap and FAIR Signposting links.
+same host. The profile (appendix A.3) also recommends a sitemap and FAIR
+Signposting links.
 
 ## How do I check an archive?
 
 A verifier validates the JSON files against the schemas in
 [schemas/](schemas/), validates the storage root with a standard OCFL
 validator (such as `ocfl-py`), checks that the discovery document matches the
-storage root, and resolves and checks every member of every collection. The
+storage root, checks the key logs and the owners' signatures of every version,
+and resolves and checks the members of the head of every collection, and
+those held in the archive in every earlier version (optionally, those held
+elsewhere). It reports errors (breaches of what
+the specification requires), warnings, and results that are neither (the
+status of each signature and member, forks, ended owners, withdrawals). The
 specification (section 14) lists the checks.
 
 ## Is the format stable?
 
-Not yet: version 0.1 is a draft, and versions before 1.0 may change in
-incompatible ways. Every file declares the version of the format it follows,
+Not yet: version 0.2 is a draft, and versions before 1.0 may change in
+incompatible ways. Version 0.2 is incompatible with
+[version 0.1](opensheaf-specification-0.1.md), which is kept as published:
+an archive made under 0.1 is rebuilt to move to 0.2 (section 16.1 of the
+specification). Every file declares the version of the format it follows,
 so that tools can tell. From version 1.0, minor versions will be backward
 compatible.
 

@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.2.schema.json",
+  "title": "OpenSheaf key log version (keys.json), version 0.2",
+  "$comment": "Section 6 of the specification (field names provisional, #55; next, nextThreshold and exposed provisional, #58). Dedicated to the public domain under CC0 1.0. That threshold does not exceed the number of keys nor nextThreshold that of next, that no version follows one with ended or a fork record (which holds forked/<d>/ and no keys.json), that keys lists no exposed key and no key whose digest next of its version or an earlier one holds, that next holds no digest of a current key nor a digest held in next of an earlier version, that exposed lists only keys of earlier versions of the same key log, that the first version is the one computed from the genesis record, its keys.json being the JCS form of format and the keys, threshold, next and nextThreshold of the genesis record (keeper and the extensions of the first version are in the genesis record), and that each later version is signed by nextThreshold rotation keys of the version before, are checked by verifiers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format"
+  ],
+  "properties": {
+    "format": {
+      "const": "opensheaf-keys/0.2"
+    },
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/didKey"
+      },
+      "$comment": "section 6.1: the current keys, which sign the versions of the owner's lines and never the key log; absent from an ending version"
+    },
+    "threshold": {
+      "type": "integer",
+      "minimum": 1,
+      "$comment": "section 6.1: how many distinct current keys must sign a version of a line; absent from an ending version"
+    },
+    "next": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/keyDigest"
+      },
+      "$comment": "section 6.1: digests of the rotation keys that sign the next version of the key log, each committed in one version only; absent from an ending version"
+    },
+    "nextThreshold": {
+      "type": "integer",
+      "minimum": 1,
+      "$comment": "section 6.1: how many distinct rotation keys must sign the next version"
+    },
+    "extensions": {
+      "type": "object",
+      "$comment": "sections 2 and 6.1: the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.2; each value is an object, validated by the schema of its extension; absent from the first version, whose extensions are in the genesis record",
+      "propertyNames": {
+        "format": "uri",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "ended": {
+      "const": true,
+      "$comment": "optional (section 6.3): the owner ends with this version, which has no keys, threshold, next or nextThreshold; no later version but a fork record is a version of the key log"
+    },
+    "successor": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$",
+      "$comment": "optional, only with ended (section 6.3): the owner name of the owner that continues the work, other than this owner; accepted only as section 6.6 says"
+    },
+    "exposed": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/didKey"
+      },
+      "$comment": "optional (section 6.3): keys listed in keys of earlier versions of this key log that this version declares exposed; an exposure in any version, on either side of a fork, carried versions included, counts"
+    }
+  },
+  "$defs": {
+    "didKey": {
+      "type": "string",
+      "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]{44}$",
+      "$comment": "an Ed25519 key as did:key (multibase base58btc, multicodec ed25519-pub)"
+    },
+    "keyDigest": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$",
+      "$comment": "the lowercase base32 (RFC 4648, without padding) SHA-256 digest of a did:key URI as UTF-8, 52 characters"
+    }
+  },
+  "dependentRequired": {
+    "successor": [
+      "ended"
+    ],
+    "keys": [
+      "threshold"
+    ],
+    "threshold": [
+      "keys"
+    ],
+    "next": [
+      "nextThreshold"
+    ],
+    "nextThreshold": [
+      "next"
+    ]
+  },
+  "if": {
+    "required": [
+      "ended"
+    ]
+  },
+  "then": {
+    "not": {
+      "anyOf": [
+        {
+          "required": [
+            "keys"
+          ]
+        },
+        {
+          "required": [
+            "threshold"
+          ]
+        },
+        {
+          "required": [
+            "next"
+          ]
+        },
+        {
+          "required": [
+            "nextThreshold"
+          ]
+        }
+      ]
+    }
+  },
+  "else": {
+    "required": [
+      "keys",
+      "threshold",
+      "next"
+    ]
+  }
+}

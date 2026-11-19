@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-index-0.2.schema.json",
+  "title": "OpenSheaf index file (names/, owners/, sha512/) and index declaration (indexes.json), version 0.2",
+  "$comment": "Section 12.5 of the specification. An index file has `index` and `entries`; a declaration of indexes kept for several archives (indexes.json) has `indexes`. Dedicated to the public domain under CC0 1.0. The prefix of each entry, which must be the file's, is checked by verifiers, not by this schema.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/indexFile"
+    },
+    {
+      "$ref": "#/$defs/declaration"
+    }
+  ],
+  "$defs": {
+    "indexFile": {
+      "type": "object",
+      "required": [
+        "format",
+        "index",
+        "entries"
+      ],
+      "properties": {
+        "format": {
+          "const": "opensheaf-index/0.2"
+        },
+        "index": {
+          "enum": [
+            "names",
+            "owners",
+            "sha512"
+          ]
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/base32"
+              },
+              "originator": {
+                "$ref": "#/$defs/ownerName",
+                "$comment": "the owner name of the originator (sections 5.1, 12.5); for an owner object, itself"
+              },
+              "owner": {
+                "$ref": "#/$defs/ownerName",
+                "$comment": "an owner name (section 6)"
+              },
+              "names": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/base32"
+                }
+              },
+              "genesis": {
+                "type": "string",
+                "$comment": "the exact text of genesis.json (sections 5.1, 12.4)"
+              },
+              "inventorySha512": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{128}$"
+              },
+              "version": {
+                "type": "string",
+                "pattern": "^v[1-9][0-9]*$"
+              },
+              "status": {
+                "enum": [
+                  "active",
+                  "withdrawn",
+                  "removed"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
+                "$comment": "the object's line, sheaf:<name>:<owner> (section 4)"
+              },
+              "label": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 64
+              },
+              "at": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://.*/$"
+                },
+                "$comment": "in indexes kept for several archives: base URLs of the archive serving the copy, equal hints (sections 3, 12.5)"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "index": {
+                "const": "names"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "entries": {
+                "items": {
+                  "required": [
+                    "name",
+                    "owner",
+                    "id",
+                    "status"
+                  ],
+                  "if": {
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "active",
+                          "withdrawn"
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "originator",
+                      "genesis"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "index": {
+                "const": "owners"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "entries": {
+                "items": {
+                  "required": [
+                    "owner",
+                    "names"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "index": {
+                "const": "sha512"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "entries": {
+                "items": {
+                  "required": [
+                    "inventorySha512",
+                    "id",
+                    "version",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "declaration": {
+      "type": "object",
+      "required": [
+        "format",
+        "indexes"
+      ],
+      "properties": {
+        "format": {
+          "const": "opensheaf-index/0.2"
+        },
+        "indexes": {
+          "$ref": "#/$defs/prefixes"
+        }
+      },
+      "not": {
+        "required": [
+          "entries"
+        ]
+      }
+    },
+    "prefixes": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "names": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 4
+        },
+        "owners": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 4
+        },
+        "sha512": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 4
+        }
+      },
+      "additionalProperties": false
+    },
+    "base32": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{52}$"
+    },
+    "ownerName": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$",
+      "$comment": "an owner name (section 6): always made by algorithm 0 (sections 5.2 and 6.2)"
+    }
+  }
+}

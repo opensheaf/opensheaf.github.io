@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opensheaf.org/schemas/opensheaf-genesis-0.2.schema.json",
+  "title": "OpenSheaf genesis record (genesis.json), version 0.2",
+  "$comment": "Section 5 of the specification. Dedicated to the public domain under CC0 1.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "kind",
+    "created",
+    "nonce"
+  ],
+  "properties": {
+    "format": {
+      "const": "opensheaf-genesis/0.2"
+    },
+    "kind": {
+      "enum": [
+        "document",
+        "collection",
+        "owner"
+      ]
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "originator": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$",
+      "$comment": "section 5.3: the owner name of the owner of the first line"
+    },
+    "nonce": {
+      "type": "string",
+      "pattern": "^([0-9a-f]{2}){16,}$"
+    },
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]{44}$"
+      },
+      "$comment": "sections 5.1 and 6.1: an owner's first current keys"
+    },
+    "threshold": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "next": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z2-7]{51}[aq]$"
+      },
+      "$comment": "sections 5.1 and 6.1: the digests of an owner's first rotation keys, which sign the second version of its key log; the first version is computed from this record"
+    },
+    "nextThreshold": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "keeper": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://(orcid\\.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]|[a-z0-9.-]+/)$"
+      },
+      "$comment": "optional, for an owner only (sections 5.1 and 6.6): the single person or institution who answers for the owner, an ORCID iD or a domain, fixed by the owner name; at most one"
+    },
+    "extensions": {
+      "type": "object",
+      "$comment": "optional, for an owner only (sections 2, 5.1 and 6.1): the data of extensions concerning its key log as of the first version, keyed by their names (URIs); each value is an object, validated by the schema of its extension",
+      "propertyNames": {
+        "format": "uri",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "object"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "owner"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "keys",
+          "threshold",
+          "next",
+          "nextThreshold"
+        ],
+        "not": {
+          "required": [
+            "originator"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "originator"
+        ],
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "keys"
+              ]
+            },
+            {
+              "required": [
+                "threshold"
+              ]
+            },
+            {
+              "required": [
+                "next"
+              ]
+            },
+            {
+              "required": [
+                "nextThreshold"
+              ]
+            },
+            {
+              "required": [
+                "keeper"
+              ]
+            },
+            {
+              "required": [
+                "extensions"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
