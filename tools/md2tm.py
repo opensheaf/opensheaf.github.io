@@ -24,7 +24,9 @@ Handles the subset of Markdown used by spec.md:
 - fenced code blocks (three backticks), with an optional language after
   them (```sh, ```json), used for syntax highlighting on the web;
 - inline `code`, **bold**, *italic* and [text](target) links, and
-  `<dfn>term</dfn>` for the defining occurrence of a technical term.
+  `<dfn>term</dfn>` for the defining occurrence of a technical term;
+- GitHub alerts (`> [!NOTE]`, `> [!WARNING]`, ...) as boxes, and other
+  blockquotes (`> `) as quotations.
 
 The output uses the `notes` style of the author's website with the package
 `notes-meta.ts` of this repository. Strings are written for TeXmacs files:
@@ -217,6 +219,15 @@ def convert(md):
             label = {'warning': 'Warning.', 'note': 'Note.', 'important': 'Important.',
                      'caution': 'Caution.', 'tip': 'Tip.'}[kind]
             blocks.append(f'  <os-alert|{kind}|{label}|{inline(" ".join(body))}>')
+            continue
+        if l.startswith('>'):
+            # a plain blockquote: its lines joined into one quoted paragraph
+            # (consumed here, so that the paragraph rule never stops on it)
+            body = []
+            while i < len(lines) and lines[i].startswith('>'):
+                body.append(lines[i][1:].strip())
+                i += 1
+            blocks.append(f'  <\\quote-env>\n    {inline(" ".join(body))}\n  </quote-env>')
             continue
         if l.startswith('### '):
             blocks.append(f'  <subsection*|{inline(l[4:])}><label|{slug(l[4:])}>')

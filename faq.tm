@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf: frequently asked questions>
 
-  <notes-abstract|Answers to questions that come up about the design of <hlink|OpenSheaf|https://opensheaf.org>. The specification (<hlink|opensheaf-specification-0.1.md|opensheaf-specification-0.1.tm>) is authoritative; this page explains its choices.>
+  <notes-abstract|Answers to questions that come up about the design of <hlink|OpenSheaf|https://opensheaf.org>. The specification (<hlink|opensheaf-specification-0.2.md|opensheaf-specification-0.2.tm>) is authoritative; this page explains its choices.>
 
   <section*|What is OpenSheaf for?><label|what-is-opensheaf-for>
 
@@ -23,7 +23,7 @@
 
   <section*|Can an archive be served straight from GitHub, without GitHub Pages?><label|can-an-archive-be-served-straight-from-github-without-github-pages>
 
-  For tools, yes; for readers, no. The raw file server of a public GitHub repository (<verbatim|https://raw.githubusercontent.com/\<less\>owner\<gtr\>/\<less\>repository\<gtr\>/main/>) serves every file byte for byte and allows cross-origin requests, so the Explorer, and other tools that read archives over HTTP, can read and verify an archive from it. It does not serve a website: it sends pages as plain text and PDFs as downloads, so landing pages are neither shown nor read by search engines, and it serves the pointers of Git LFS, not the files. It is best used as a second location of the archive, beside a GitHub Pages site or another web server: an archive's files may be served at several base URLs, each a location of the same archive. See section 7.4 of <hlink|OpenSheaf archives in git|opensheaf-git-0.1.tm>.
+  For tools, yes; for readers, no. The raw file server of a public GitHub repository (<verbatim|https://raw.githubusercontent.com/\<less\>owner\<gtr\>/\<less\>repository\<gtr\>/main/>) serves every file byte for byte and allows cross-origin requests, so the Explorer, and other tools that read archives over HTTP, can read and verify an archive from it. It does not serve a website: it sends pages as plain text and PDFs as downloads, so landing pages are neither shown nor read by search engines, and it serves the pointers of Git LFS, not the files. It is best used as a second location of the archive, beside a GitHub Pages site or another web server: an archive's files may be served at several base URLs, each a location of the same archive. See section 7.4 of <hlink|OpenSheaf archives in git|opensheaf-git-0.2.tm>.
 
   <section*|Why OCFL? Isn't git enough?><label|why-ocfl-isnt-git-enough>
 
@@ -119,7 +119,7 @@
 
   A signature of an object version, or a timestamp of that signature, can only be made after the version is committed, so it cannot be part of that version: a signature of an inventory cannot be listed in the inventory it signs. Making a new version for each signature would mix evidence with changes of the work, and every completion of a timestamp proof (an OpenTimestamps proof is completed once a Bitcoin block attests it) would be another version. Witnesses are never replaced: a completed proof is a new file beside the pending one.
 
-  OCFL does not allow arbitrary files in an object folder; its <verbatim|logs/> folder is meant for unstructured records of actions and is not covered by digests. The place OCFL provides for data that is not part of any version is the object's <verbatim|extensions/> folder (the registered mutable-head extension keeps its data there). So OpenSheaf puts witnesses in <verbatim|extensions/opensheaf-witnesses/>, where they travel with the object: the owner's signature of every version, required, and timestamps and others' signatures, optional. Timestamps are defined by an extension, <hlink|OpenSheaf timestamps|opensheaf-timestamps-0.1.tm>: RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or both. An owner that wants its signatures dated, a journal or an institution for instance, adopts it in its key log, from the first version, so that if a key is ever stolen, readers can tell which of its versions were signed before. Timestamps change no status by themselves: dates are evidence that readers weigh, and the specification (section 7.3) admits trusted dates as evidence against <verbatim|contested>. A single researcher may not need it. Anyone holding a copy may add timestamps later; the earliest is what counts. Witnesses are not covered by the inventory digests, and need not be: a signature is checked against the version it names, which the pins fix, and a timestamp against the signature file it stamps.
+  OCFL does not allow arbitrary files in an object folder; its <verbatim|logs/> folder is meant for unstructured records of actions and is not covered by digests. The place OCFL provides for data that is not part of any version is the object's <verbatim|extensions/> folder (the registered mutable-head extension keeps its data there). So OpenSheaf puts witnesses in <verbatim|extensions/opensheaf-witnesses/>, where they travel with the object: the owner's signature of every version, required, and timestamps and others' signatures, optional. Timestamps are defined by an extension, <hlink|OpenSheaf timestamps|opensheaf-timestamps-0.2.tm>: RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or both. An owner that wants its signatures dated, a journal or an institution for instance, adopts it in its key log, from the first version, so that if a key is ever stolen, readers can tell which of its versions were signed before. Timestamps change no status by themselves: dates are evidence that readers weigh, and the specification (section 7.3) admits trusted dates as evidence against <verbatim|contested>. A single researcher may not need it. Anyone holding a copy may add timestamps later; the earliest is what counts. Witnesses are not covered by the inventory digests, and need not be: a signature is checked against the version it names, which the pins fix, and a timestamp against the signature file it stamps.
 
   <section*|Why is the HTML version not part of the deposit?><label|why-is-the-html-version-not-part-of-the-deposit>
 
@@ -143,7 +143,7 @@
 
   <section*|Is the format stable?><label|is-the-format-stable>
 
-  Not yet: version 0.1 is a draft, and versions before 1.0 may change in incompatible ways. Every file declares the version of the format it follows, so that tools can tell. From version 1.0, minor versions will be backward compatible.
+  Not yet: version 0.2 is a draft, and versions before 1.0 may change in incompatible ways. Version 0.2 is incompatible with <hlink|version 0.1|opensheaf-specification-0.1.tm>, which is kept as published: an archive made under 0.1 is rebuilt to move to 0.2 (section 16.1 of the specification). Every file declares the version of the format it follows, so that tools can tell. From version 1.0, minor versions will be backward compatible.
 
   <section*|Why the name?><label|why-the-name>
 

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-collection-0.1.schema.json",
   "title": "OpenSheaf member list (members.json), format opensheaf-collection/0.1",
-  "$comment": "Section 8.2 of the specification. Part of OpenSheaf 0.1 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
+  "$comment": "Part of OpenSheaf 0.1 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
   "type": "object",
   "required": [
     "format",
@@ -26,9 +26,9 @@
         "type": "object",
         "required": [
           "kind",
-          "name",
-          "owner",
-          "at"
+          "archive",
+          "archiveUrl",
+          "id"
         ],
         "properties": {
           "kind": {
@@ -36,6 +36,20 @@
               "document",
               "collection"
             ]
+          },
+          "archive": {
+            "type": "string",
+            "format": "uri"
+          },
+          "archiveUrl": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "/$"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 64
           },
           "version": {
             "type": "string",
@@ -45,13 +59,19 @@
             "type": "string",
             "pattern": "^[0-9a-f]{128}$"
           },
+          "mirrors": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "/$"
+            }
+          },
           "doi": {
-            "type": "string",
-            "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$"
+            "type": "string"
           },
           "conceptDoi": {
-            "type": "string",
-            "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$"
+            "type": "string"
           },
           "follow": {
             "const": "latest"
@@ -98,35 +118,9 @@
                 "inventorySha512": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{128}$"
-                },
-                "doi": {
-                  "type": "string",
-                  "pattern": "^10\\.[0-9]+(\\.[0-9]+)*/\\S+$",
-                  "$comment": "optional (section 8.4): the version DOI of the document version vetted"
                 }
               }
             }
-          },
-          "name": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
-            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
-          },
-          "owner": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{51}[aq]$",
-            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
-          },
-          "at": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "type": "string",
-              "format": "uri",
-              "pattern": "^https://.*/$"
-            },
-            "$comment": "base URLs where copies of the line may be found, all equal hints (sections 3, 8.2, 12.3)"
           }
         }
       }

@@ -2,7 +2,7 @@
 
 *Answers to questions that come up about the design of
 [OpenSheaf](https://opensheaf.org). The specification
-([opensheaf-specification-0.1.md](opensheaf-specification-0.1.md)) is
+([opensheaf-specification-0.2.md](opensheaf-specification-0.2.md)) is
 authoritative; this page explains its choices.*
 
 ## What is OpenSheaf for?
@@ -41,7 +41,7 @@ engines, and it serves the pointers of Git LFS, not the files. It is best
 used as a second location of the archive, beside a GitHub Pages site or
 another web server: an archive's files may be served at several base URLs,
 each a location of the same archive. See section 7.4 of [OpenSheaf archives
-in git](opensheaf-git-0.1.md).
+in git](opensheaf-git-0.2.md).
 
 ## Why OCFL? Isn't git enough?
 
@@ -331,7 +331,7 @@ place OCFL provides for data that is not part of any version is the object's
 there). So OpenSheaf puts witnesses in `extensions/opensheaf-witnesses/`,
 where they travel with the object: the owner's signature of every version,
 required, and timestamps and others' signatures, optional. Timestamps are
-defined by an extension, [OpenSheaf timestamps](opensheaf-timestamps-0.1.md):
+defined by an extension, [OpenSheaf timestamps](opensheaf-timestamps-0.2.md):
 RFC 3161 tokens from authorities the owner trusts, OpenTimestamps proofs, or
 both. An owner that wants its signatures dated, a journal or an institution
 for instance, adopts it in its key log, from the first version, so that if a
@@ -395,8 +395,11 @@ specification (section 14) lists the checks.
 
 ## Is the format stable?
 
-Not yet: version 0.1 is a draft, and versions before 1.0 may change in
-incompatible ways. Every file declares the version of the format it follows,
+Not yet: version 0.2 is a draft, and versions before 1.0 may change in
+incompatible ways. Version 0.2 is incompatible with
+[version 0.1](opensheaf-specification-0.1.md), which is kept as published:
+an archive made under 0.1 is rebuilt to move to 0.2 (section 16.1 of the
+specification). Every file declares the version of the format it follows,
 so that tools can tell. From version 1.0, minor versions will be backward
 compatible.
 

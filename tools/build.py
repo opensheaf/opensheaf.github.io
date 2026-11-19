@@ -2,10 +2,11 @@
 """Build the OpenSheaf pages from their Markdown sources.
 
 README.md becomes the home page (index.tm, index.html), the specification
-opensheaf-specification-0.1.md its own page, FAQ.md the page faq.html,
-USE-CASES.md the page use-cases.html, and the companions opensheaf-git-0.1.md
-(archives in git) and opensheaf-timestamps-0.1.md (the timestamps extension)
-their own pages.
+opensheaf-specification-0.2.md (the current draft) its own page, FAQ.md the
+page faq.html, USE-CASES.md the page use-cases.html, and the companions
+opensheaf-git-0.2.md (archives in git) and opensheaf-timestamps-0.2.md (the
+timestamps extension) their own pages. Version 0.1, kept as published
+(opensheaf-specification-0.1.md and opensheaf-git-0.1.md), is built too.
 tools/md2tm.py converts each Markdown file to TeXmacs, with links between the
 Markdown files turned into links between the pages, and TeXmacs exports each
 document to HTML. The .tm and .html files are generated: edit the Markdown
@@ -16,7 +17,7 @@ committed), whose plugins are those linked in ~/.TeXmacs/plugins: the
 `notes` and `max-html` plugins of the author's website repository.
 
     tools/build.py            Markdown -> TeXmacs -> HTML, for every page
-    tools/build.py --pdf F    also write a PDF of the specification to F
+    tools/build.py --pdf F    also write a PDF of the specification (0.2) to F
 """
 
 import argparse
@@ -35,13 +36,16 @@ TM = os.environ.get("TEXMACS_BIN", "/Applications/TeXmacs.app/Contents/MacOS/TeX
 # exports each document to HTML next to it.
 PAGES = {
     "README.md": "index.tm",                                        # home page
-    "opensheaf-specification-0.1.md": "opensheaf-specification-0.1.tm",
+    "opensheaf-specification-0.2.md": "opensheaf-specification-0.2.tm",
     "FAQ.md": "faq.tm",
     "USE-CASES.md": "use-cases.tm",
+    "opensheaf-git-0.2.md": "opensheaf-git-0.2.tm",
+    "opensheaf-timestamps-0.2.md": "opensheaf-timestamps-0.2.tm",
+    # version 0.1, kept as published
+    "opensheaf-specification-0.1.md": "opensheaf-specification-0.1.tm",
     "opensheaf-git-0.1.md": "opensheaf-git-0.1.tm",
-    "opensheaf-timestamps-0.1.md": "opensheaf-timestamps-0.1.tm",
 }
-SPEC = "opensheaf-specification-0.1.md"
+SPEC = "opensheaf-specification-0.2.md"  # the current draft, for --pdf
 
 
 def run_texmacs(calls):

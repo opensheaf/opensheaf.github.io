@@ -2,11 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-archive-0.1.schema.json",
   "title": "OpenSheaf discovery document (opensheaf.json), format opensheaf-archive/0.1",
-  "$comment": "Section 3.1 of the specification. Part of OpenSheaf 0.1 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
+  "$comment": "Part of OpenSheaf 0.1 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
   "type": "object",
   "required": [
     "format",
     "specification",
+    "archiveId",
     "name",
     "storageRoot",
     "storageLayout",
@@ -19,6 +20,10 @@
     },
     "specification": {
       "const": "0.1"
+    },
+    "archiveId": {
+      "type": "string",
+      "format": "uri"
     },
     "name": {
       "type": "string",
@@ -35,14 +40,14 @@
     },
     "storageLayout": {
       "enum": [
-        "opensheaf-owner-name-storage-layout",
+        "0002-flat-direct-storage-layout",
         "0003-hash-and-id-n-tuple-storage-layout"
       ]
     },
     "mainCollection": {
       "type": "string",
-      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
-      "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
     },
     "profiles": {
       "type": "array",
@@ -54,6 +59,14 @@
         ]
       },
       "uniqueItems": true
+    },
+    "mirrors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "/$"
+      }
     },
     "feed": {
       "type": "string",
@@ -68,21 +81,18 @@
           "kind",
           "head",
           "inventorySha512",
-          "status",
-          "name",
-          "owner"
+          "status"
         ],
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
-            "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 64
           },
           "kind": {
             "enum": [
               "document",
-              "collection",
-              "owner"
+              "collection"
             ]
           },
           "head": {
@@ -99,41 +109,11 @@
               "withdrawn"
             ]
           },
-          "name": {
+          "mirrorOf": {
             "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
-            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
-          },
-          "owner": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{51}[aq]$",
-            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
-          },
-          "label": {
-            "type": "string",
-            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-            "maxLength": 64,
-            "$comment": "a readable label (section 3.1), not an identifier"
+            "format": "uri"
           }
-        },
-        "allOf": [
-          {
-            "if": {
-              "properties": {
-                "kind": {
-                  "const": "owner"
-                }
-              }
-            },
-            "then": {
-              "properties": {
-                "status": {
-                  "const": "active"
-                }
-              }
-            }
-          }
-        ]
+        }
       }
     },
     "tombstones": {
@@ -146,22 +126,18 @@
           "lastVersion",
           "inventorySha512",
           "date",
-          "reason",
-          "name",
-          "owner",
-          "genesisName"
+          "reason"
         ],
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
-            "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 64
           },
           "kind": {
             "enum": [
               "document",
-              "collection",
-              "owner"
+              "collection"
             ]
           },
           "lastVersion": {
@@ -178,23 +154,42 @@
           },
           "reason": {
             "type": "string"
-          },
-          "name": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
-            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
-          },
-          "owner": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{51}[aq]$",
-            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
-          },
-          "genesisName": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{51}[aq]$",
-            "$comment": "the genesis name, by algorithm 0 (sections 5.2, 13.3)"
           }
         }
+      }
+    },
+    "keys": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "fingerprint": {
+            "type": "string"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "url"
+            ]
+          },
+          {
+            "required": [
+              "fingerprint"
+            ]
+          }
+        ]
       }
     },
     "extensions": {
@@ -204,68 +199,6 @@
         "format": "uri"
       },
       "uniqueItems": true
-    },
-    "indexes": {
-      "$comment": "the indexes kept, each with the length of the prefixes of its files (sections 3.1, 12.5)",
-      "type": "object",
-      "minProperties": 1,
-      "properties": {
-        "names": {
-          "type": "integer",
-          "minimum": 2,
-          "maximum": 4
-        },
-        "owners": {
-          "type": "integer",
-          "minimum": 2,
-          "maximum": 4
-        },
-        "sha512": {
-          "type": "integer",
-          "minimum": 2,
-          "maximum": 4
-        }
-      },
-      "additionalProperties": false
-    },
-    "owners": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z2-7]{51}[aq]$"
-      },
-      "uniqueItems": true,
-      "$comment": "the owner names (section 6) of the owners the archive hosts"
-    },
-    "drafts": {
-      "type": "array",
-      "$comment": "drafts (section 10.1) shown as unfinished work, on which nothing may rely",
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "kind",
-          "head"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^sheaf:draft:[a-z0-9]+(-[a-z0-9]+)*$",
-            "maxLength": 76,
-            "$comment": "a draft's local identifier (section 10.1), sheaf:draft:<id>, <id> following the pattern of labels, at most 64 characters (76 in all)"
-          },
-          "kind": {
-            "enum": [
-              "document",
-              "collection"
-            ]
-          },
-          "head": {
-            "type": "string",
-            "pattern": "^v[1-9][0-9]*$"
-          }
-        }
-      }
     }
   }
 }

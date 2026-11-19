@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opensheaf.org/schemas/opensheaf-keeper-0.1.schema.json",
-  "title": "OpenSheaf keeper confirmation (.well-known/opensheaf), version 0.1",
+  "$id": "https://opensheaf.org/schemas/opensheaf-keeper-0.2.schema.json",
+  "title": "OpenSheaf keeper confirmation (.well-known/opensheaf), version 0.2",
   "$comment": "Section 6.6 of the specification. Dedicated to the public domain under CC0 1.0.",
   "type": "object",
   "additionalProperties": false,
@@ -11,7 +11,7 @@
   ],
   "properties": {
     "format": {
-      "const": "opensheaf-keeper/0.1"
+      "const": "opensheaf-keeper/0.2"
     },
     "owners": {
       "type": "array",

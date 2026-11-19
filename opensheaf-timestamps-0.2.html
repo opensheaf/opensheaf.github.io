@@ -22,17 +22,17 @@
   <body>
     <div class="notes-header">
       <p>
-        [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.1.html">specification</a>] [<a href="use-cases.html">use
+        [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.2.html">specification</a>] [<a href="use-cases.html">use
         cases</a>] [<a href="faq.html">FAQ</a>] [<a href="https://mgubi.org/papers/">first archive</a>]<em class="notes-header-name">OpenSheaf</em>
       </p>
     </div>
     <h1 id="auto-1">OpenSheaf timestamps<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 19
+      Extension to the OpenSheaf specification 0.2. Version 0.2 (draft), 19
       November 2026. How an owner dates its signatures with RFC 3161 tokens or
       OpenTimestamps proofs, and declares in its key log that it does so, so
       that readers can tell which versions existed by a date, for instance
-      before a key was exposed. The extension is named by the URI <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>.
+      before a key was exposed. The extension is named by the URI <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.2</tt>.
       The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to
       the public domain under CC0 1.0.
     </div>
@@ -45,7 +45,7 @@
     </div>
     <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
-      In the <a href="opensheaf-specification-0.1.html">OpenSheaf specification</a>, every version of a line is
+      In the <a href="opensheaf-specification-0.2.html">OpenSheaf specification</a>, every version of a line is
       signed by its owner, under a version of the owner's key log, and a good
       signature stays good (sections 6 and 7 of the specification). Signatures
       say who made a version, not when. So when a key may have been exposed,
@@ -135,7 +135,7 @@
       An owner adopts this extension in its key log: its genesis record, for
       the first version of the key log, or the <tt class="verbatim">keys.json</tt> of a
       later version holds, under <tt class="verbatim">extensions</tt> (sections 5.1 and
-      6.1 of the specification), an entry keyed by <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>,
+      6.1 of the specification), an entry keyed by <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.2</tt>,
       an object with:
     </p>
     <ul>
@@ -288,9 +288,9 @@
     </ul>
     <h2 id="auto-10"><a id="appendix-a-json-schema-normative"></a>Appendix A. JSON Schema (normative)<span style="margin-left: 1em"></span></h2>
     <p>
-      The data of the declaration, the value of <tt class="verbatim">extensions[&quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;]</tt>
+      The data of the declaration, the value of <tt class="verbatim">extensions[&quot;https://opensheaf.org/opensheaf-timestamps-0.2&quot;]</tt>
       in the genesis record of an owner or in <tt class="verbatim">keys.json</tt>,
-      validates against <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json">opensheaf-timestamps-0.1.schema.json</a>
+      validates against <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.2.schema.json">opensheaf-timestamps-0.2.schema.json</a>
       (JSON Schema 2020-12, CC0 1.0), which allows no other properties, like
       the schemas of the genesis records and <tt class="verbatim">keys.json</tt> that
       hold it.
@@ -308,7 +308,7 @@
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 {
-  &quot;format&quot;: &quot;opensheaf-genesis/0.1&quot;,
+  &quot;format&quot;: &quot;opensheaf-genesis/0.2&quot;,
   &quot;kind&quot;: &quot;owner&quot;,
   &quot;created&quot;: &quot;2026-01-10T09:00:00Z&quot;,
   &quot;nonce&quot;: &quot;3f9c2a7d41e85b06c9d2f1a4e7b03c58&quot;,
@@ -320,7 +320,7 @@
             &quot;twrtx2ec6pzozvgex4m6ndtokezgccn63kqpbl7z4bnedmxbdx2a&quot; ],
   &quot;nextThreshold&quot;: 2,
   &quot;extensions&quot;: {
-    &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
+    &quot;https://opensheaf.org/opensheaf-timestamps-0.2&quot;: {
       &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
     }
   }
@@ -346,7 +346,7 @@ extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7d
     <ul>
       <li>
         <p>
-          <a href="opensheaf-specification-0.1.html">OpenSheaf specification 0.1</a>, sections 2, 6, 7, 9 and 14
+          <a href="opensheaf-specification-0.2.html">OpenSheaf specification 0.2</a>, sections 2, 6, 7, 9 and 14
         </p>
       </li>
       <li>
@@ -370,24 +370,25 @@ extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7d
     <ul>
       <li>
         <p>
-          <strong>0.1 (draft), 17 November 2026:</strong> first draft, moving
-          the timestamp rules out of the identity proposal of the
-          specification, then revised the same day with the reviews of PR #30:
-          RFC 3161 tokens and OpenTimestamps proofs of signature files, named
-          by the digest of their own bytes, completed proofs as new files,
-          anyone may stamp; the owner's declaration in <tt class="verbatim">keys.json</tt>
-          under <tt class="verbatim">extensions</tt>; checking at <tt class="verbatim">genTime</tt>
-          with listed authorities and complete proofs only; the date of a
-          version. Finally, following the specification, where an exposed key
-          ends its owner, the extension changes no status: it no longer
-          confirms the signatures of revoked keys (there are none) nor
-          resolves forks of key logs, and only gives dates that readers may
-          weigh.
+          <strong>0.2 (draft), 17 November 2026:</strong> first version (the
+          extension has no version 0.1), an extension of version 0.2 of the
+          specification, moving the timestamp rules out of the identity
+          proposal of the specification, then revised the same day with the
+          reviews of PR #30: RFC 3161 tokens and OpenTimestamps proofs of
+          signature files, named by the digest of their own bytes, completed
+          proofs as new files, anyone may stamp; the owner's declaration in
+          <tt class="verbatim">keys.json</tt> under <tt class="verbatim">extensions</tt>; checking
+          at <tt class="verbatim">genTime</tt> with listed authorities and complete
+          proofs only; the date of a version. Finally, following the
+          specification, where an exposed key ends its owner, the extension
+          changes no status: it no longer confirms the signatures of revoked
+          keys (there are none) nor resolves forks of key logs, and only gives
+          dates that readers may weigh.
         </p>
       </li>
       <li>
         <p>
-          <strong>0.1 (draft), 17 November 2026, after a thirteenth review of
+          <strong>0.2 (draft), 17 November 2026, after a thirteenth review of
           PR #30:</strong> the declaration is the entry itself, with only <tt
           class="verbatim">timestampAuthorities</tt>; the authorities trusted for a
           signature are those listed up to the key-log version it names, not
@@ -396,7 +397,7 @@ extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7d
       </li>
       <li>
         <p>
-          <strong>0.1 (draft), 18 November 2026, after a fourteenth review of
+          <strong>0.2 (draft), 18 November 2026, after a fourteenth review of
           PR #30:</strong> a date counts only if not earlier than the date of
           the key-log version the signature names, so that an authority listed
           later dates nothing before its listing; a version vouched for
@@ -406,7 +407,7 @@ extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7d
       </li>
       <li>
         <p>
-          <strong>0.1 (draft), 19 November 2026 (PR #30):</strong> following
+          <strong>0.2 (draft), 19 November 2026 (PR #30):</strong> following
           the rebuilt specification and its pre-rotation of key logs (#58):
           section references updated (extensions are in section 2); timestamps
           change no status by themselves, and are evidence that readers and
@@ -428,6 +429,14 @@ extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7d
           appendix B commits to rotation keys in <tt class="verbatim">next</tt> and
           stamps a signature of the second version, named after a digest of
           <tt class="verbatim">next</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 19 November 2026:</strong> named version 0.2,
+          with version 0.2 of the specification, which it extends; its URI is
+          <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.2</tt>, and
+          its schema <tt class="verbatim">opensheaf-timestamps-0.2.schema.json</tt>.
         </p>
       </li>
     </ul>

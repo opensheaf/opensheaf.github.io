@@ -7,13 +7,13 @@
 
   <chapter*|OpenSheaf timestamps>
 
-  <notes-abstract|Extension to the OpenSheaf specification 0.1. Version 0.1 (draft), 19 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that it does so, so that readers can tell which versions existed by a date, for instance before a key was exposed. The extension is named by the URI <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.>
+  <notes-abstract|Extension to the OpenSheaf specification 0.2. Version 0.2 (draft), 19 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that it does so, so that readers can tell which versions existed by a date, for instance before a key was exposed. The extension is named by the URI <verbatim|https://opensheaf.org/opensheaf-timestamps-0.2>. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.>
 
   <os-alert|warning|Warning.|<strong|Draft.> This extension rests on the owners, key logs and signatures of the specification (sections 6 and 7), whose field names are open (<hlink|issue #55|https://github.com/opensheaf/opensheaf.github.io/issues/55>), and on its pre-rotation of key logs, exposed keys and fork records, provisional (<hlink|issue #58|https://github.com/opensheaf/opensheaf.github.io/issues/58>).>
 
   <section*|1. Introduction (non-normative)><label|1-introduction-non-normative>
 
-  In the <hlink|OpenSheaf specification|opensheaf-specification-0.1.tm>, every version of a line is signed by its owner, under a version of the owner's key log, and a good signature stays good (sections 6 and 7 of the specification). Signatures say who made a version, not when. So when a key may have been exposed, the core cannot tell the signatures made with it before from those its new holder makes after: the owner exposes the keys in its key log, or ends (section 6.3 of the specification); its signatures stay good, and readers trust its history only as far as other evidence goes (section 6.4 of the specification).
+  In the <hlink|OpenSheaf specification|opensheaf-specification-0.2.tm>, every version of a line is signed by its owner, under a version of the owner's key log, and a good signature stays good (sections 6 and 7 of the specification). Signatures say who made a version, not when. So when a key may have been exposed, the core cannot tell the signatures made with it before from those its new holder makes after: the owner exposes the keys in its key log, or ends (section 6.3 of the specification); its signatures stay good, and readers trust its history only as far as other evidence goes (section 6.4 of the specification).
 
   A timestamp is such evidence: it shows that a signature existed by a date. A single researcher needs none. A journal, an institution, or anyone who wants its history to be trusted after a key is lost to others adopts this extension in its key log, from its first version, so that every signature it makes is dated.
 
@@ -37,7 +37,7 @@
 
   <section*|4. The owner's declaration><label|4-the-owners-declaration>
 
-  An owner adopts this extension in its key log: its genesis record, for the first version of the key log, or the <verbatim|keys.json> of a later version holds, under <verbatim|extensions> (sections 5.1 and 6.1 of the specification), an entry keyed by <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>, an object with:
+  An owner adopts this extension in its key log: its genesis record, for the first version of the key log, or the <verbatim|keys.json> of a later version holds, under <verbatim|extensions> (sections 5.1 and 6.1 of the specification), an entry keyed by <verbatim|https://opensheaf.org/opensheaf-timestamps-0.2>, an object with:
 
   <\itemize>
     <item><verbatim|timestampAuthorities>, OPTIONAL: RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The authorities trusted for a signature file are those listed in the key-log version its <verbatim|keyLog> names and in the versions before it (for the first version, in the genesis record), so that no one can add an authority later to date earlier signatures. Each version of the key log states the extensions in force (section 6.1 of the specification), so a later version that keeps the declaration repeats it. That authorities listed in earlier versions stay trusted for signatures naming a later version, also one that drops the declaration, is this extension's own reading of its data, consistent with that rule: each version states which extensions it declares, and this extension never delists an authority (section 8). Without any, only OpenTimestamps proofs are used.
@@ -79,7 +79,7 @@
 
   <section*|Appendix A. JSON Schema (normative)><label|appendix-a-json-schema-normative>
 
-  The data of the declaration, the value of <verbatim|extensions["https://opensheaf.org/opensheaf-timestamps-0.1"]> in the genesis record of an owner or in <verbatim|keys.json>, validates against <hlink|opensheaf-timestamps-0.1.schema.json|https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json> (JSON Schema 2020-12, CC0 1.0), which allows no other properties, like the schemas of the genesis records and <verbatim|keys.json> that hold it.
+  The data of the declaration, the value of <verbatim|extensions["https://opensheaf.org/opensheaf-timestamps-0.2"]> in the genesis record of an owner or in <verbatim|keys.json>, validates against <hlink|opensheaf-timestamps-0.2.schema.json|https://opensheaf.org/schemas/opensheaf-timestamps-0.2.schema.json> (JSON Schema 2020-12, CC0 1.0), which allows no other properties, like the schemas of the genesis records and <verbatim|keys.json> that hold it.
 
   <section*|Appendix B. Example (non-normative)><label|appendix-b-example-non-normative>
 
@@ -89,7 +89,7 @@
   <\verbatim-code>
     {
 
-    \ \ "format": "opensheaf-genesis/0.1",
+    \ \ "format": "opensheaf-genesis/0.2",
 
     \ \ "kind": "owner",
 
@@ -113,7 +113,7 @@
 
     \ \ "extensions": {
 
-    \ \ \ \ "https://opensheaf.org/opensheaf-timestamps-0.1": {
+    \ \ \ \ "https://opensheaf.org/opensheaf-timestamps-0.2": {
 
     \ \ \ \ \ \ "timestampAuthorities": [ "5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147" ]
 
@@ -140,7 +140,7 @@
   <section*|Appendix C. References><label|appendix-c-references>
 
   <\itemize>
-    <item><hlink|OpenSheaf specification 0.1|opensheaf-specification-0.1.tm>, sections 2, 6, 7, 9 and 14
+    <item><hlink|OpenSheaf specification 0.2|opensheaf-specification-0.2.tm>, sections 2, 6, 7, 9 and 14
 
     <item><hlink|RFC 3161|https://www.rfc-editor.org/rfc/rfc3161>, Time-Stamp Protocol, and <hlink|RFC 5816|https://www.rfc-editor.org/rfc/rfc5816>, its update for other hash algorithms
 
@@ -152,13 +152,15 @@
   <section*|Changelog><label|changelog>
 
   <\itemize>
-    <item><strong|0.1 (draft), 17 November 2026:> first draft, moving the timestamp rules out of the identity proposal of the specification, then revised the same day with the reviews of PR #30: RFC 3161 tokens and OpenTimestamps proofs of signature files, named by the digest of their own bytes, completed proofs as new files, anyone may stamp; the owner's declaration in <verbatim|keys.json> under <verbatim|extensions>; checking at <verbatim|genTime> with listed authorities and complete proofs only; the date of a version. Finally, following the specification, where an exposed key ends its owner, the extension changes no status: it no longer confirms the signatures of revoked keys (there are none) nor resolves forks of key logs, and only gives dates that readers may weigh.
+    <item><strong|0.2 (draft), 17 November 2026:> first version (the extension has no version 0.1), an extension of version 0.2 of the specification, moving the timestamp rules out of the identity proposal of the specification, then revised the same day with the reviews of PR #30: RFC 3161 tokens and OpenTimestamps proofs of signature files, named by the digest of their own bytes, completed proofs as new files, anyone may stamp; the owner's declaration in <verbatim|keys.json> under <verbatim|extensions>; checking at <verbatim|genTime> with listed authorities and complete proofs only; the date of a version. Finally, following the specification, where an exposed key ends its owner, the extension changes no status: it no longer confirms the signatures of revoked keys (there are none) nor resolves forks of key logs, and only gives dates that readers may weigh.
 
-    <item><strong|0.1 (draft), 17 November 2026, after a thirteenth review of PR #30:> the declaration is the entry itself, with only <verbatim|timestampAuthorities>; the authorities trusted for a signature are those listed up to the key-log version it names, not later ones; guidance for tools merged into section 6.
+    <item><strong|0.2 (draft), 17 November 2026, after a thirteenth review of PR #30:> the declaration is the entry itself, with only <verbatim|timestampAuthorities>; the authorities trusted for a signature are those listed up to the key-log version it names, not later ones; guidance for tools merged into section 6.
 
-    <item><strong|0.1 (draft), 18 November 2026, after a fourteenth review of PR #30:> a date counts only if not earlier than the date of the key-log version the signature names, so that an authority listed later dates nothing before its listing; a version vouched for existed by the date of the version that vouches for it; a compromised authority means a new owner; repetitions cut.
+    <item><strong|0.2 (draft), 18 November 2026, after a fourteenth review of PR #30:> a date counts only if not earlier than the date of the key-log version the signature names, so that an authority listed later dates nothing before its listing; a version vouched for existed by the date of the version that vouches for it; a compromised authority means a new owner; repetitions cut.
 
-    <item><strong|0.1 (draft), 19 November 2026 (PR #30):> following the rebuilt specification and its pre-rotation of key logs (#58): section references updated (extensions are in section 2); timestamps change no status by themselves, and are evidence that readers and archives may weigh against <verbatim|contested>, for exposed keys, exposed on either side of a fork, and for forks of key logs, and to add a version of the lines of a frozen owner (sections 1, 2 and 6, citing sections 7.3 and 7.5 of the specification); the declaration of the first version of a key log is in the owner's genesis record, fixed by the owner name, and a later version that keeps it repeats it, authorities listed earlier staying trusted by the extension's own reading of its data (section 4, appendices A and B); a version of a key log is dated by as many signatures as it needs, <verbatim|nextThreshold> of the version before, and the first version, computed and never signed, is not dated, signatures naming it having dates with no lower bound (section 5); timestamp files are found over HTTP only where folders can be listed (section 3), and pending proofs in a branch count for nothing (section 6); the schema allows no other properties (appendix A); the example of appendix B commits to rotation keys in <verbatim|next> and stamps a signature of the second version, named after a digest of <verbatim|next>.
+    <item><strong|0.2 (draft), 19 November 2026 (PR #30):> following the rebuilt specification and its pre-rotation of key logs (#58): section references updated (extensions are in section 2); timestamps change no status by themselves, and are evidence that readers and archives may weigh against <verbatim|contested>, for exposed keys, exposed on either side of a fork, and for forks of key logs, and to add a version of the lines of a frozen owner (sections 1, 2 and 6, citing sections 7.3 and 7.5 of the specification); the declaration of the first version of a key log is in the owner's genesis record, fixed by the owner name, and a later version that keeps it repeats it, authorities listed earlier staying trusted by the extension's own reading of its data (section 4, appendices A and B); a version of a key log is dated by as many signatures as it needs, <verbatim|nextThreshold> of the version before, and the first version, computed and never signed, is not dated, signatures naming it having dates with no lower bound (section 5); timestamp files are found over HTTP only where folders can be listed (section 3), and pending proofs in a branch count for nothing (section 6); the schema allows no other properties (appendix A); the example of appendix B commits to rotation keys in <verbatim|next> and stamps a signature of the second version, named after a digest of <verbatim|next>.
+
+    <item><strong|0.2 (draft), 19 November 2026:> named version 0.2, with version 0.2 of the specification, which it extends; its URI is <verbatim|https://opensheaf.org/opensheaf-timestamps-0.2>, and its schema <verbatim|opensheaf-timestamps-0.2.schema.json>.
   </itemize>
 
 </body>

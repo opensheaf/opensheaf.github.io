@@ -18,11 +18,12 @@ federated and distributed systems, weighs what separating the functions
 costs, and makes proposals.*
 
 > [!NOTE]
-> Written before the rebuild of the specification (18 and 19 November 2026)
-> and not updated: its section numbers are those of the earlier text. Archives
-> have no identifiers: objects are named by their lines,
+> Written before the rebuild of the specification into version 0.2 (18 and 19
+> November 2026) and not updated: its section numbers are those of the earlier
+> text. Archives have no identifiers: objects are named by their lines,
 > `sheaf:<name>:<owner>`, and archives are hosts found at their addresses
-> (sections 3 and 4, #52). Where they differ, the specification holds.
+> (sections 3 and 4, #52). Where they differ, [version
+> 0.2](../opensheaf-specification-0.2.md) of the specification holds.
 
 ## 1. The functions
 

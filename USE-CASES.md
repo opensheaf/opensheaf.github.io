@@ -1,6 +1,6 @@
 # OpenSheaf: use cases
 
-How the [specification](opensheaf-specification-0.1.md) adapts to the people
+How the [specification](opensheaf-specification-0.2.md) adapts to the people
 and institutions that keep and select scholarly documents. It is
 non-normative: where it and the specification differ, the specification holds.
 Commands of the reference tools,
@@ -280,7 +280,7 @@ particular version of each paper.
   licensed version. Later versions of the accepted copy (corrections, notices,
   a withdrawal) are the editors' acts, signed by the journal; the authors
   cannot change them. A journal will usually adopt the [timestamps
-  extension](opensheaf-timestamps-0.1.md) in its key log, from its first
+  extension](opensheaf-timestamps-0.2.md) in its key log, from its first
   version, so that every version it signs is dated, by an RFC 3161 authority
   it trusts or by OpenTimestamps, so that if it ever loses a key to others,
   readers can tell which versions came before. A correction the

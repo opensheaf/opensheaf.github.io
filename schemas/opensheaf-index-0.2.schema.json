@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json",
-  "title": "OpenSheaf index file (names/, owners/, sha512/) and index declaration (indexes.json), version 0.1",
+  "$id": "https://opensheaf.org/schemas/opensheaf-index-0.2.schema.json",
+  "title": "OpenSheaf index file (names/, owners/, sha512/) and index declaration (indexes.json), version 0.2",
   "$comment": "Section 12.5 of the specification. An index file has `index` and `entries`; a declaration of indexes kept for several archives (indexes.json) has `indexes`. Dedicated to the public domain under CC0 1.0. The prefix of each entry, which must be the file's, is checked by verifiers, not by this schema.",
   "oneOf": [
     {
@@ -21,7 +21,7 @@
       ],
       "properties": {
         "format": {
-          "const": "opensheaf-index/0.1"
+          "const": "opensheaf-index/0.2"
         },
         "index": {
           "enum": [
@@ -192,7 +192,7 @@
       ],
       "properties": {
         "format": {
-          "const": "opensheaf-index/0.1"
+          "const": "opensheaf-index/0.2"
         },
         "indexes": {
           "$ref": "#/$defs/prefixes"

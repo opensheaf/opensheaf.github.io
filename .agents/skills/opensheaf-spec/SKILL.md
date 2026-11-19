@@ -5,12 +5,15 @@ description: The concepts of the OpenSheaf specification (archives, objects, doc
 
 # The OpenSheaf specification
 
-The source is `opensheaf-specification-0.1.md` (one line per paragraph). This
-is a map of it; the text is authoritative. Section numbers below are those of
-the text, rebuilt on 18 and 19 November 2026 (PR #30). The text before the
-rebuild, with its own numbering and the changelog of every earlier revision,
-is kept in `reference/opensheaf-specification-0.1-full.md`; never cite its
-section numbers.
+The source is `opensheaf-specification-0.2.md` (one line per paragraph), the
+current draft. This is a map of it; the text is authoritative. Section
+numbers below are those of 0.2, the text of PR #30 rebuilt on 18 and 19
+November 2026. Version 0.1 (`opensheaf-specification-0.1.md`), incompatible
+with 0.2, is kept as published and is not edited; never cite its section
+numbers for 0.2. The text of PR #30 before the rebuild, with its own
+numbering and the changelog of every earlier revision (written as revisions
+of 0.1), is kept in `reference/opensheaf-specification-0.1-full.md`; never
+cite its section numbers either.
 
 ## What it is
 
@@ -176,7 +179,7 @@ questions are listed at the end of the sections they concern.
   storage root (the line's owner and every parent owner); the longer copy
   wins; an owner moves by copying its folder. **Keepers** (6.6): at most one, ORCID iD or
   domain, in the genesis record (another keeper, another owner), confirmed
-  by ORCID or `/.well-known/opensheaf` (`opensheaf-keeper/0.1`, `owners`,
+  by ORCID or `/.well-known/opensheaf` (`opensheaf-keeper/0.2`, `owners`,
   `successors`).
 - **Lines and signatures** (7): a line is its signed versions, wherever
   stored. Signature files `extensions/opensheaf-witnesses/<v>/signature-<k>.json`
@@ -231,7 +234,7 @@ questions are listed at the end of the sections they concern.
   `object.json` or `keys.json` or, for the first version of a key log, the
   owner's genesis record; each key-log version states the extensions in
   force (6.1); never change the core.
-- **Timestamps: an extension, not the core.** `opensheaf-timestamps-0.1.md`:
+- **Timestamps: an extension, not the core.** `opensheaf-timestamps-0.2.md`:
   `.tsr` and `.ots` files beside signature files, the owner's declaration
   in `keys.json` or, for the first version, the owner's genesis record;
   evidence only: timestamps change no status by themselves, and section 7.3
@@ -239,16 +242,16 @@ questions are listed at the end of the sections they concern.
 
 ## Schemas
 
-`schemas/opensheaf-archive-0.1.schema.json` (`opensheaf.json`),
-`opensheaf-object-0.1.schema.json` (`object.json`, also as
-`parent.object.json`), `opensheaf-collection-0.1.schema.json`
-(`members.json`), `opensheaf-genesis-0.1.schema.json` (`genesis.json`),
-`opensheaf-keys-0.1.schema.json` (`keys.json`, also as carried by fork
-records), `opensheaf-signature-0.1.schema.json` (signature files and
-`witness-<label>.json`), `opensheaf-keeper-0.1.schema.json`
-(`/.well-known/opensheaf`), `opensheaf-index-0.1.schema.json` (index files
+`schemas/opensheaf-archive-0.2.schema.json` (`opensheaf.json`),
+`opensheaf-object-0.2.schema.json` (`object.json`, also as
+`parent.object.json`), `opensheaf-collection-0.2.schema.json`
+(`members.json`), `opensheaf-genesis-0.2.schema.json` (`genesis.json`),
+`opensheaf-keys-0.2.schema.json` (`keys.json`, also as carried by fork
+records), `opensheaf-signature-0.2.schema.json` (signature files and
+`witness-<label>.json`), `opensheaf-keeper-0.2.schema.json`
+(`/.well-known/opensheaf`), `opensheaf-index-0.2.schema.json` (index files
 and `indexes.json`) and, for the timestamps extension,
-`opensheaf-timestamps-0.1.schema.json`; JSON Schema 2020-12, CC0 (appendix
+`opensheaf-timestamps-0.2.schema.json`; JSON Schema 2020-12, CC0 (appendix
 B). The schemas of `genesis.json`, `keys.json`, signature files, the
 keeper's file and the timestamps declaration are closed (no other properties); the others allow other
 properties, which carry no meaning. A change of a field in the text needs
@@ -256,10 +259,13 @@ the same change in its schema, and the other way round.
 
 ## Changing the specification
 
-- 0.1 is a draft: changes go into 0.1 itself, with a dated changelog entry
-  (section 16.2) and the date in the heading updated; no compatibility rules
-  for draft names. The timestamps extension (`opensheaf-timestamps-0.1.md`)
-  and the git companion (`opensheaf-git-0.1.md`) have their own changelogs
+- 0.2 is the current draft: changes go into 0.2 itself (no 0.3 until 0.2 is
+  final), with a dated changelog entry (section 16.2) and the date in the
+  heading updated; no compatibility rules for draft names. 0.1 is kept as
+  published and never edited. Format names (`opensheaf-object/0.2`, ...)
+  enter genesis records and signatures, so the examples of appendix C are
+  recomputed whenever they change. The timestamps extension (`opensheaf-timestamps-0.2.md`)
+  and the git companion (`opensheaf-git-0.2.md`) have their own changelogs
   and dates, updated when they change.
 - A new field: in the text (where its file is defined), in the schema, in
   the verification rules (14) if it can be checked, in an example (appendix

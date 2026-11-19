@@ -5,13 +5,15 @@
 
 *OpenSheaf is an open format for archives of scholarly documents and for
 collections of them. Read the
-[specification](opensheaf-specification-0.1.md) (version 0.1) and the
-[FAQ](FAQ.md), which explains its main choices. The site is
+[specification](opensheaf-specification-0.2.md) (version 0.2, a draft) and
+the [FAQ](FAQ.md), which explains its main choices. The site is
 [opensheaf.org](https://opensheaf.org) (also `sheaf.pub`).*
 
 > [!WARNING]
-> **Draft.** OpenSheaf 0.1 is a draft specification. Until version 1.0, any
-> revision may change the format in incompatible ways. Archives and collections made now
+> **Draft.** OpenSheaf 0.2 is a draft specification. Until version 1.0, any
+> revision may change the format in incompatible ways. Version 0.2 is
+> incompatible with [version 0.1](opensheaf-specification-0.1.md), which is
+> kept as published. Archives and collections made now
 > may have to be rebuilt or migrated, and the tools follow the latest draft.
 > Do not rely on it yet for anything you cannot redo.
 
@@ -77,7 +79,7 @@ This repository is the place to discuss OpenSheaf and to propose changes:
 - **Ideas and open-ended discussion:** use the
   [Discussions](https://github.com/opensheaf/opensheaf.github.io/discussions).
 - **Amendments:** propose changes to the text as pull requests on
-  [opensheaf-specification-0.1.md](opensheaf-specification-0.1.md), with an
+  [opensheaf-specification-0.2.md](opensheaf-specification-0.2.md), with an
   explanation of the motivation; larger changes are best discussed in an
   issue first.
 - **Implementations:** if you build an archive, a tool or a verifier for
@@ -124,15 +126,21 @@ on GitHub, and archives made with them.
 
 ## Files
 
-- [`opensheaf-specification-0.1.md`](opensheaf-specification-0.1.md): the
-  specification, in Markdown, its only source.
+- [`opensheaf-specification-0.2.md`](opensheaf-specification-0.2.md): the
+  specification, version 0.2 (the current draft), in Markdown, its only
+  source.
+- [`opensheaf-specification-0.1.md`](opensheaf-specification-0.1.md) and
+  [`opensheaf-git-0.1.md`](opensheaf-git-0.1.md), with the schemas
+  `opensheaf-archive-0.1.schema.json`, `opensheaf-object-0.1.schema.json`
+  and `opensheaf-collection-0.1.schema.json`: version 0.1, kept as published
+  and not edited.
 - [`FAQ.md`](FAQ.md): answers to common questions about the design.
 - [`USE-CASES.md`](USE-CASES.md): how the specification adapts to authors,
   archives and selections (non-normative).
-- [`opensheaf-git-0.1.md`](opensheaf-git-0.1.md): OpenSheaf archives in git,
+- [`opensheaf-git-0.2.md`](opensheaf-git-0.2.md): OpenSheaf archives in git,
   a companion to the specification: how to keep, publish and copy an archive
   in a git repository without changing its bytes.
-- [`opensheaf-timestamps-0.1.md`](opensheaf-timestamps-0.1.md): OpenSheaf
+- [`opensheaf-timestamps-0.2.md`](opensheaf-timestamps-0.2.md): OpenSheaf
   timestamps, an extension of the specification: how an owner dates its
   signatures (RFC 3161, OpenTimestamps) and declares it in its key log, so
   that readers can tell which versions existed by a date, for instance before
@@ -140,31 +148,32 @@ on GitHub, and archives made with them.
 - [`README.md`](https://github.com/opensheaf/opensheaf.github.io/blob/main/README.md): this text, also the home page of the site.
 - [`schemas/`](https://github.com/opensheaf/opensheaf.github.io/tree/main/schemas): the JSON Schemas of the files defined by the
   specification, also published at `https://opensheaf.org/schemas/`:
-  [`opensheaf-archive-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-archive-0.1.schema.json)
+  [`opensheaf-archive-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-archive-0.2.schema.json)
   for `opensheaf.json`,
-  [`opensheaf-object-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-object-0.1.schema.json)
+  [`opensheaf-object-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-object-0.2.schema.json)
   for `object.json`,
-  [`opensheaf-collection-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-collection-0.1.schema.json)
+  [`opensheaf-collection-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-collection-0.2.schema.json)
   for `members.json`,
-  [`opensheaf-genesis-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json)
+  [`opensheaf-genesis-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-genesis-0.2.schema.json)
   for `genesis.json`,
-  [`opensheaf-keys-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json)
+  [`opensheaf-keys-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-keys-0.2.schema.json)
   for `keys.json`,
-  [`opensheaf-signature-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-signature-0.1.schema.json)
+  [`opensheaf-signature-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-signature-0.2.schema.json)
   for signature files,
-  [`opensheaf-keeper-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-keeper-0.1.schema.json)
+  [`opensheaf-keeper-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-keeper-0.2.schema.json)
   for a keeper's `/.well-known/opensheaf` and
-  [`opensheaf-index-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json)
+  [`opensheaf-index-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-index-0.2.schema.json)
   for the index files; and, for the timestamps extension,
-  [`opensheaf-timestamps-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json)
+  [`opensheaf-timestamps-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-timestamps-0.2.schema.json)
   for its declaration in `keys.json` or, for the first version, the owner's
   genesis record.
 - [`index.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm)/[`index.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html),
-  [`opensheaf-specification-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html),
+  [`opensheaf-specification-0.2.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.2.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.2.html),
   [`faq.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm)/[`faq.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html),
   [`use-cases.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm)/[`use-cases.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html),
-  [`opensheaf-git-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.1.html),
-  [`opensheaf-timestamps-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.1.html): the pages of the site,
+  [`opensheaf-git-0.2.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.2.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.2.html),
+  [`opensheaf-timestamps-0.2.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.2.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.2.html),
+  and those of version 0.1: the pages of the site,
   generated from the Markdown files (for TeXmacs and for the web); do not
   edit them.
 - [`notes-meta.ts`](https://github.com/opensheaf/opensheaf.github.io/blob/main/notes-meta.ts): the TeXmacs style package of the

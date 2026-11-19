@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opensheaf.org/schemas/opensheaf-genesis-0.1.schema.json",
-  "title": "OpenSheaf genesis record (genesis.json), version 0.1",
+  "$id": "https://opensheaf.org/schemas/opensheaf-genesis-0.2.schema.json",
+  "title": "OpenSheaf genesis record (genesis.json), version 0.2",
   "$comment": "Section 5 of the specification. Dedicated to the public domain under CC0 1.0.",
   "type": "object",
   "additionalProperties": false,
@@ -13,7 +13,7 @@
   ],
   "properties": {
     "format": {
-      "const": "opensheaf-genesis/0.1"
+      "const": "opensheaf-genesis/0.2"
     },
     "kind": {
       "enum": [
