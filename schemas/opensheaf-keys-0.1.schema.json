@@ -57,7 +57,7 @@
     },
     "successor": {
       "type": "string",
-      "pattern": "^[a-z2-7]{52}$",
+      "pattern": "^[a-z2-7]{51}[aq]$",
       "$comment": "optional, only with ended (section 6.3): the owner name of the owner that continues the work, other than this owner; accepted only as section 6.6 says"
     },
     "exposed": {
@@ -67,13 +67,13 @@
       "items": {
         "$ref": "#/$defs/didKey"
       },
-      "$comment": "optional (section 6.3): keys listed in keys of earlier versions of this key log that this version declares exposed; an exposure counts only in a version before any fork point"
+      "$comment": "optional (section 6.3): keys listed in keys of earlier versions of this key log that this version declares exposed; an exposure in any version, on either side of a fork, carried versions included, counts"
     }
   },
   "$defs": {
     "didKey": {
       "type": "string",
-      "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]+$",
+      "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]{44}$",
       "$comment": "an Ed25519 key as did:key (multibase base58btc, multicodec ed25519-pub)"
     },
     "keyDigest": {

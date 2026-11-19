@@ -188,7 +188,7 @@
       version of a line is signed by its owner, wherever it is stored, and an
       archive cannot add to another owner's line. A copy kept elsewhere (a
       mirror) stays its owner's line and can only receive the owner's versions
-      (see &quot;Who owns an object, and what is a branch?&quot;).
+      (see &quot;Who owns an object?&quot; and &quot;What is a branch?&quot;).
     </p>
     <p>
       A <strong>collection</strong> is a statement: a versioned list of pins,
@@ -237,7 +237,7 @@
       changes are the curator's acts (for a journal). The licence of a
       collection (CC0 for the list) never extends to its members.
     </p>
-    <h2 id="auto-18"><a id="who-owns-an-object-and-what-is-a-branch"></a>Who owns an object, and what is a branch?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-18"><a id="who-owns-an-object"></a>Who owns an object?<span style="margin-left: 1em"></span></h2>
     <p>
       A work has a <strong>name</strong>, the digest of the genesis record
       written when it is sealed, at its owner's request, before it is first
@@ -249,6 +249,18 @@
       owner who moves to another archive continues its lines there.
     </p>
     <p>
+      Every version of every line is signed, except the computed first version
+      of a key log (below), and the key logs travel with the objects they
+      sign, so a line can be checked from any copy, even when the archives
+      that served it have gone. A version signed with good keys vouches for
+      every version before it: its inventory fixes their files, and its <tt
+      class="verbatim">object.json</tt> gives, as <tt class="verbatim">previous</tt>, the digest
+      of the inventory before it, so that signing a version fixes every
+      earlier one byte for byte.
+    </p>
+    <h2 id="auto-19"><a id="what-is-a-key-log-and-which-keys-sign-what"></a>What is a key log, and which keys sign what?<span
+    style="margin-left: 1em"></span></h2>
+    <p>
       An owner is itself an object, named by its own genesis record, which
       lists its first keys, and whose versions are its <strong>key
       log</strong>. Each version lists the owner's <strong>current
@@ -257,52 +269,73 @@
       <strong>rotation keys</strong> that alone sign the next version of the
       key log, as in KERI (pre-rotation is provisional, #58); current keys
       never sign the key log, whose first version is computed from the genesis
-      record and signed by no key. Current keys are in daily use, one on each
-      device; rotation keys are kept apart (on hardware tokens, for instance),
-      committed in one version and used once, and never become current keys;
-      three of them with two required survive the loss of one or the theft of
-      one. Keys can thus be added or retired while the owner stays the same,
-      and what was signed stays signed: a signature that verifies against the
-      key-log version it names is good for ever. A version signed with good
-      keys vouches for every version before it, since its inventory fixes
-      them. A person usually needs one signature; a group of co-authors can
-      share one owner with a threshold, for instance two signatures out of
-      three. If current keys that could reach the threshold may have been
-      exposed, the owner signs with its rotation keys a version of its key log
-      listing them as <strong>exposed</strong>, which a thief holding current
-      keys cannot contest; or it <strong>ends</strong>, by a last version of
-      its key log that may name a successor, which continues the work by
-      branches. A thief holding enough rotation keys not yet revealed takes
-      the owner over by signing the next version of its key log, without a
-      fork; the owner can then only end it, and only with its own copies of
-      those keys. Two signed versions of a key log with one number whose
-      inventories differ are a fork, which needs rotation keys stolen or kept
-      after use, and never happens at the first version, which every copy
-      computes alike: since no one can tell the owner's side from a thief's,
-      the fork ends the owner; an archive keeps the side it saw first and
-      appends a fork record carrying the other, so that every copy shows the
-      fork. Either way the old signatures stay good, but readers trust them
-      only as far as other evidence goes, since nothing tells the owner's
-      signatures from a thief's; versions that need an exposed key, or name a
-      version of a key log from a fork on, are <strong>contested</strong>, and
-      archives never add them, unless other evidence (a timestamp) dates them
-      before. A fork <strong>freezes</strong> the owner: archives that know of
-      it add nothing more to its lines, unless such evidence dates it before
-      the fork, and the work continues under a successor; after an ending
-      without a fork, archives take the owner's lines only from copies, never
-      as new deposits. Every version of every line is signed, except the
-      computed first version of a key log, and the key logs travel with the
-      objects they sign, so a line can be checked from any copy, even when the
-      archives that served it have gone. An owner may name in its genesis
-      record one keeper who answers for it (an ORCID iD, an institution),
-      fixed with the owner name, which the keeper may confirm in a place only
-      it controls, and which names the successor when no ending version before
-      a fork names one, after a fork for instance; nothing requires it. Drafts
-      are a sandbox: objects of a reserved owner, <tt class="verbatim">draft</tt>, kept
-      by one archive, never signed, pinned or copied out of it, and free to be
-      rewritten or deleted. Sealing makes a new object, the first version of
-      the line; the draft's versions are not part of it.
+      record and signed by no key.
     </p>
+    <p>
+      Current keys are in daily use, one on each device; rotation keys are
+      kept apart, committed in one version and used once, and never become
+      current keys. Three rotation keys on hardware tokens, with two required,
+      survive the loss of one or the theft of one; a single one kept offline
+      (printed, or on a USB key) also works, but its loss leaves the owner
+      unable to change its keys, and its theft lets a thief take the owner
+      over. Keys can thus be added or retired while the owner stays the same,
+      and what was signed stays signed: a signature that verifies against the
+      key-log version it names is good for ever. A person usually needs one
+      signature; a group of co-authors can share one owner with a threshold,
+      for instance two signatures out of three.
+    </p>
+    <h2 id="auto-20"><a id="what-happens-when-a-key-is-stolen"></a>What happens when a key is stolen?<span style="margin-left: 1em"></span></h2>
+    <p>
+      If current keys that could reach the threshold may have been exposed,
+      the owner signs with its rotation keys a version of its key log listing
+      them as <strong>exposed</strong>, which a thief holding current keys
+      cannot contest; or it <strong>ends</strong>, by a last version of its
+      key log that may name a successor, which continues the work by branches.
+      A thief holding enough rotation keys not yet revealed takes the owner
+      over by signing the next version of its key log, without a fork; the
+      owner can then only end it, and only with its own copies of those keys.
+    </p>
+    <p>
+      Two signed versions of a key log with one number whose inventories
+      differ are a fork, which needs rotation keys stolen or kept after use,
+      and never happens at the first version, which every copy computes alike.
+      Since no one can tell the owner's side from a thief's, the fork ends the
+      owner; an archive keeps the side it saw first and appends a fork record
+      carrying the other, so that every copy shows the fork. An exposure
+      counts on either side of a fork: a thief that forks may expose the
+      owner's earlier keys, which harms trust in what they signed, but never
+      lets a forgery pass.
+    </p>
+    <p>
+      Either way the old signatures stay good, but readers trust them only as
+      far as other evidence goes, since nothing tells the owner's signatures
+      from a thief's; versions that need an exposed key, or name a version of
+      a key log from a fork on, are <strong>contested</strong>, and archives
+      never add them, unless other evidence (a timestamp) dates them before. A
+      fork <strong>freezes</strong> the owner: archives that know of it add
+      nothing more to its lines, unless such evidence dates it before the
+      fork, and the work continues under a successor; after an ending without
+      a fork, archives take the owner's lines only from copies, never as new
+      deposits.
+    </p>
+    <h2 id="auto-21"><a id="who-answers-for-an-owner"></a>Who answers for an owner?<span style="margin-left: 1em"></span></h2>
+    <p>
+      An owner may name in its genesis record one <strong>keeper</strong> who
+      answers for it (an ORCID iD, an institution), fixed with the owner name.
+      The keeper may confirm the link in a place only it controls, and names
+      the successor when no ending version before a fork names one, after a
+      fork for instance. Nothing requires a keeper: an anonymous referee, for
+      instance, has none.
+    </p>
+    <h2 id="auto-22"><a id="what-is-a-draft"></a>What is a draft?<span style="margin-left: 1em"></span></h2>
+    <p>
+      Drafts are a sandbox: objects of a reserved owner, <tt class="verbatim">draft</tt>,
+      kept by one archive, never signed, pinned or copied out of it, and free
+      to be rewritten or deleted, which OCFL does not expect of its objects,
+      so nothing may rely on them. Sealing makes a new object, the first
+      version of the line; the draft's versions are not part of it.
+    </p>
+    <h2 id="auto-23"><a id="what-is-a-branch"></a>What is a branch?<span style="margin-left: 1em"></span></h2>
     <p>
       Anyone can copy a genesis record, so the name alone cannot say whose
       history is the right one. That is why the owner is part of the identity:
@@ -331,7 +364,7 @@
       the version is that owner's; for a branch of a branch, the same holds
       for each parent in turn, back to the originator's line.
     </p>
-    <h2 id="auto-19"><a id="can-documents-be-linked-in-richer-ways-a-short-account-and-its-proof"></a>Can documents be linked in richer ways (a short account
+    <h2 id="auto-24"><a id="can-documents-be-linked-in-richer-ways-a-short-account-and-its-proof"></a>Can documents be linked in richer ways (a short account
     and its proof)?<span style="margin-left: 1em"></span></h2>
     <p>
       Yes, on top of the format rather than in it. The core keeps only what
@@ -346,7 +379,7 @@
       publishing a short account of a proof whose detailed argument, possibly
       written with AI, stays online in the version reviewed.
     </p>
-    <h2 id="auto-20"><a id="where-do-signatures-and-timestamps-go-and-why-not-in-the-version-itself"></a>Where do signatures and timestamps go, and why not in
+    <h2 id="auto-25"><a id="where-do-signatures-and-timestamps-go-and-why-not-in-the-version-itself"></a>Where do signatures and timestamps go, and why not in
     the version itself?<span style="margin-left: 1em"></span></h2>
     <p>
       A signature of an object version, or a timestamp of that signature, can
@@ -381,14 +414,14 @@
       against the version it names, which the pins fix, and a timestamp
       against the signature file it stamps.
     </p>
-    <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
+    <h2 id="auto-26"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>
     <p>
       Because presentations improve (stylesheets, exporters, fixes) and
       deposits must not change. The deposit keeps the sources and the PDF; the
       HTML is regenerated from the sources whenever the presentation changes.
     </p>
-    <h2 id="auto-22"><a id="how-do-i-withdraw-or-take-down-a-document"></a>How do I withdraw or take down a document?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-27"><a id="how-do-i-withdraw-or-take-down-a-document"></a>How do I withdraw or take down a document?<span style="margin-left: 1em"></span></h2>
     <p>
       To withdraw a document (for instance a retraction), its owner makes a
       new object version that only marks it withdrawn, with a date and a
@@ -404,7 +437,7 @@
       expected to add a native mechanism for deleting single files; whether
       OpenSheaf uses it is open (#32).
     </p>
-    <h2 id="auto-23"><a id="can-i-use-all-rights-reserved"></a>Can I use &quot;All rights reserved&quot;?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-28"><a id="can-i-use-all-rights-reserved"></a>Can I use &quot;All rights reserved&quot;?<span style="margin-left: 1em"></span></h2>
     <p>
       Yes. Each document carries the licence its authors choose; &quot;All
       rights reserved&quot; means readers may access the document but not
@@ -412,14 +445,14 @@
       inventories) is CC0, so that it can be harvested and mirrored freely. On
       Zenodo, &quot;All rights reserved&quot; is entered as a custom licence.
     </p>
-    <h2 id="auto-24"><a id="will-google-scholar-find-the-papers"></a>Will Google Scholar find the papers?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-29"><a id="will-google-scholar-find-the-papers"></a>Will Google Scholar find the papers?<span style="margin-left: 1em"></span></h2>
     <p>
       If the archive follows the website profile: each document then has a
       landing page with the <tt class="verbatim">citation_*</tt> meta tags Google
       Scholar reads, and a PDF on the same host. The profile (appendix A.3)
       also recommends a sitemap and FAIR Signposting links.
     </p>
-    <h2 id="auto-25"><a id="how-do-i-check-an-archive"></a>How do I check an archive?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-30"><a id="how-do-i-check-an-archive"></a>How do I check an archive?<span style="margin-left: 1em"></span></h2>
     <p>
       A verifier validates the JSON files against the schemas in <a href="schemas/">schemas/</a>,
       validates the storage root with a standard OCFL validator (such as <tt
@@ -432,14 +465,14 @@
       status of each signature and member, forks, ended owners, withdrawals).
       The specification (section 14) lists the checks.
     </p>
-    <h2 id="auto-26"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-31"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
     <p>
       Not yet: version 0.1 is a draft, and versions before 1.0 may change in
       incompatible ways. Every file declares the version of the format it
       follows, so that tools can tell. From version 1.0, minor versions will
       be backward compatible.
     </p>
-    <h2 id="auto-27"><a id="why-the-name"></a>Why the name?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-32"><a id="why-the-name"></a>Why the name?<span style="margin-left: 1em"></span></h2>
     <p>
       A sheaf is a bundle of papers. In mathematics, a sheaf is the structure
       in which local pieces glue into a whole: archives kept and verified

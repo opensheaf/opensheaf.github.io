@@ -41,7 +41,7 @@
     },
     "mainCollection": {
       "type": "string",
-      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
+      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
       "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
     },
     "profiles": {
@@ -75,7 +75,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
+            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
             "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
           },
           "kind": {
@@ -106,7 +106,7 @@
           },
           "owner": {
             "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
+            "pattern": "^[a-z2-7]{51}[aq]$",
             "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
           },
           "label": {
@@ -154,7 +154,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
+            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
             "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
           },
           "kind": {
@@ -186,7 +186,7 @@
           },
           "owner": {
             "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
+            "pattern": "^[a-z2-7]{51}[aq]$",
             "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
           },
           "genesisName": {
@@ -232,7 +232,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[a-z2-7]{52}$"
+        "pattern": "^[a-z2-7]{51}[aq]$"
       },
       "uniqueItems": true,
       "$comment": "the owner names (section 6) of the owners the archive hosts"

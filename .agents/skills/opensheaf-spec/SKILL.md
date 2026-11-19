@@ -70,19 +70,29 @@ questions are listed at the end of the sections they concern.
 - **Storage root and layouts** (3.2): the owner-name layout
   (`<owner>/<name>/`, drafts at `draft/<id>/`, the key log at
   `<owner>/<owner>/`), default; OCFL `0003` hashed layout with default
-  parameters for large archives.
+  parameters for large archives. `storageLayout` in the discovery document
+  is authoritative; `ocfl_layout.json` names only registered OCFL
+  extensions, so it is present for the hashed layout only, and the
+  owner-name layout is described by the plain text file
+  `opensheaf-owner-name-storage-layout.md` (OCFL 1.1, 4.5); registering it
+  is open.
 - **Object** (4): kind `document`, `collection` or `owner`; identifier
   `sheaf:<name>:<owner>` (a draft `sheaf:draft:<id>`), never reused once
   sealed. **Object version** (`v1`, ...) changes at every change and never
-  changes once made, except in a draft and by a takedown.
-  **Document version** (4.2): numbered by the line's owner from 1 without
-  gaps; new exactly when the document's own files change. **Pin** (4):
-  (object version, SHA-512 of its inventory file). Identity files (4.1):
-  `genesis.json` and a branch's `parent.*`; reserved top-level names.
+  changes once made, except in a draft and by a takedown. **Document
+  version** (4.2): numbered by the line's owner from 1 without gaps; new
+  exactly when the document's own files change. **Pin** (4): (object
+  version, SHA-512 of its inventory file). **Inventory chain** (4.3): every
+  sealed version after the first has `previous` in `object.json`, the digest
+  of the inventory file before it (none in v1, the computed key-log v1, a
+  branch's v1 or a draft), so signing a version fixes every earlier
+  inventory byte for byte and pins of vouched-for versions are as reliable
+  as signed ones (#46, settled). Identity files (4.1): `genesis.json` and a
+  branch's `parent.*`; reserved top-level names.
 - **Documents** (4.2): sources, renditions, notes; description-only
   versions, completion of `sourcesMissing`, `history`, current version,
-  notices. `object.json` (4.3): `format`, `specification`, `kind`,
-  `status`, `documentVersion`, `name`, `owner`, `parent`; documents
+  notices. `object.json` (4.3): `format`, `specification`, `kind`, `status`,
+  `documentVersion`, `name`, `owner`, `parent`, `previous`; documents
   `mainSource`, `sourceFormat`, `renditions`, `toolchain`, `changes`,
   `stage`, `history`, `notices`, `licence` (documents only); documents and
   collections `agreement`, `external` (deposit or source records),
@@ -91,10 +101,12 @@ questions are listed at the end of the sections they concern.
   written bare.
 - **Names** (5): the name is the SHA-256 of `opensheaf-name-<k>\n` and the
   bytes of `genesis.json`, in base32, 52 characters, k (0 to 15) in the last
-  4 bits; the genesis name is algorithm 0. Originator's line has no parent;
-  every other line of the record is a branch. Clashes resolved where a line
-  is made; reused genesis records are refused unless signed by the
-  originator or a confirmed branch (5.4); aliases open (#44).
+  4 bits; the genesis name is algorithm 0, and owner names are always
+  algorithm 0 (last character `a` or `q`); names of algorithms 1 to 15 are
+  not canonical base32, compared as strings, never decoded. Originator's
+  line has no parent; every other line of the record is a branch. Clashes
+  resolved where a line is made; reused genesis records are refused unless
+  signed by the originator or a confirmed branch (5.4); aliases open (#44).
 - **Owners and key logs** (6): an owner object, named by its genesis record
   (first `keys`, `threshold`, `next`, `nextThreshold`; optional `keeper` and
   `extensions`, fixed by the owner name); its versions are its key log,
@@ -114,8 +126,9 @@ questions are listed at the end of the sections they concern.
   become current keys, and each digest is in the `next` of one version only;
   `keys` never lists a rotation key, used or not. Advice (6.2): one current
   key per device, never copied; threshold 1 for a person, more for a group;
-  e.g. three rotation keys with `nextThreshold` 2. Retiring a key: leaving
-  it out.
+  three rotation keys with `nextThreshold` 2 recommended; minimal: one
+  rotation key kept offline with `nextThreshold` 1, its risk stated (loss:
+  no rotation; theft: takeover). Retiring a key: leaving it out.
 - **Ending** (6.3): a signed last version with `ended`, without `keys`,
   `threshold`, `next`, `nextThreshold` (and optional `successor`, a hint);
   it has no keys, so nothing is signed against it; an **ended** owner signs
@@ -125,24 +138,27 @@ questions are listed at the end of the sections they concern.
 - **Exposed keys** (6.3): an owner whose current keys may have been exposed
   and could reach a threshold signs at once a version listing them in
   `exposed` (any earlier current key, retired or not), which whoever holds
-  current keys cannot contest; an exposure counts only in a version before
-  any fork point, and concerns versions of lines, never of key logs;
-  otherwise retiring is enough. There is no revocation.
+  current keys cannot contest; an exposure counts in any version, on either
+  side of a fork, carried versions included (a thief that forks may expose
+  the owner's earlier keys: harms trust, never lets a forgery pass), and
+  concerns versions of lines, never of key logs; otherwise retiring is
+  enough. There is no revocation.
 - **Forks of a key log, fork records** (6.3, provisional, #58): two signed
   versions of one number whose inventories differ are a fork, at its fork
   point. Only rotation keys can make one, never at the computed version 1,
-  and a fork **ends the owner** and **freezes** it (7.5). An archive keeps the side it saw first
-  (both at once: either), never replaces or removes a version, and appends a
-  **fork record** after its latest version: unsigned, made by that archive,
-  holding the `genesis.json` and `object.json` of v1 and the other side's
-  versions it carries, from the fork point, under `forked/<d>/` (inventory,
-  checksum, `keys.json`, signature files with their witnesses), and no
-  `keys.json` of its own; valid only if its first carried version differs
-  from the one held. A fork record is never a side: copies are compared up
-  to it. No version follows a fork record, and only a fork record follows an
-  ending version. A thief with rotation keys not yet revealed of the latest
-  version takes over without a fork; the owner can only end it, with its own
-  copies of those keys.
+  and a fork **ends the owner** and **freezes** it (7.5). An archive keeps
+  the side it saw first (both at once: either), never replaces or removes a
+  version, and appends a **fork record** after its latest version: unsigned,
+  made by that archive, holding the `genesis.json` of v1, an `object.json`
+  with the fields of v1's and `previous`, and the other side's versions it
+  carries, from the fork point, under `forked/<d>/` (inventory, checksum,
+  `keys.json`, signature files with their witnesses), and no `keys.json` of
+  its own; valid only if its first carried version differs from the one
+  held. A fork record is never a side: copies are compared up to it. No
+  version follows a fork record, and only a fork record follows an ending
+  version. A thief with rotation keys not yet revealed of the latest version
+  takes over without a fork; the owner can only end it, with its own copies
+  of those keys.
 - **After an end or an exposure** (6.4): signatures stay good; readers weigh
   them by other evidence (copies, pins, timestamps). Versions of lines that
   need an exposed key, or name a key-log version from a fork point on, are
@@ -262,7 +278,7 @@ the same change in its schema, and the other way round.
   records and pins, #25 withdrawal details, #27 and #45 collections, #28
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
-  registering `sheaf`, #37 resolution through mirrors, #44 aliases, #46,
+  registering `sheaf`, #37 resolution through mirrors, #44 aliases,
   #48, #49, #50, #51 and #23 verification details, #54 custody policies, #55
   field names of owners and signatures, #57 branch numbering, #58 pre-rotation,
   exposed keys and fork records (provisional). Read the relevant issue before

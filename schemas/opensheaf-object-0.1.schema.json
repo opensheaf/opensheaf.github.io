@@ -231,6 +231,11 @@
         "withdrawn"
       ]
     },
+    "previous": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$",
+      "$comment": "section 4.3: in every sealed object version from the second, the SHA-512 digest of the inventory file of the version before (its pin); absent in a first version and in a draft. Required from the second version on, which a verifier checks (section 14.2), since this file does not state its object version"
+    },
     "withdrawal": {
       "type": "object",
       "required": [
@@ -262,7 +267,7 @@
     },
     "owner": {
       "type": "string",
-      "pattern": "^[a-z2-7]{52}$",
+      "pattern": "^[a-z2-7]{51}[aq]$",
       "$comment": "section 6: an owner name, the name of the owner's genesis record (52 characters of base32)"
     },
     "parent": {
@@ -278,7 +283,7 @@
       "properties": {
         "owner": {
           "type": "string",
-          "pattern": "^[a-z2-7]{52}$",
+          "pattern": "^[a-z2-7]{51}[aq]$",
           "$comment": "section 6: an owner name, the name of the owner's genesis record (52 characters of base32)"
         },
         "name": {

@@ -20,11 +20,11 @@
     },
     "key": {
       "type": "string",
-      "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]+$"
+      "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]{44}$"
     },
     "keyLog": {
       "type": "string",
-      "pattern": "^sheaf:[a-z2-7]{52}/v[1-9][0-9]*\\?sha512=[0-9a-f]{128}$",
+      "pattern": "^sheaf:[a-z2-7]{51}[aq]/v[1-9][0-9]*\\?sha512=[0-9a-f]{128}$",
       "$comment": "a pin of the key-log version the signature relies on"
     },
     "signature": {
@@ -34,7 +34,7 @@
     },
     "object": {
       "type": "string",
-      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$"
+      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$"
     },
     "version": {
       "type": "string",
@@ -46,7 +46,7 @@
     },
     "signer": {
       "type": "string",
-      "pattern": "^[a-z2-7]{52}$",
+      "pattern": "^[a-z2-7]{51}[aq]$",
       "$comment": "the owner name of the signer"
     }
   },

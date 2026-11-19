@@ -40,11 +40,11 @@
                 "$ref": "#/$defs/base32"
               },
               "originator": {
-                "$ref": "#/$defs/base32",
+                "$ref": "#/$defs/ownerName",
                 "$comment": "the owner name of the originator (sections 5.1, 12.5); for an owner object, itself"
               },
               "owner": {
-                "$ref": "#/$defs/base32",
+                "$ref": "#/$defs/ownerName",
                 "$comment": "an owner name (section 6)"
               },
               "names": {
@@ -75,7 +75,7 @@
               },
               "id": {
                 "type": "string",
-                "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{52}$",
+                "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
                 "$comment": "the object's line, sheaf:<name>:<owner> (section 4)"
               },
               "label": {
@@ -229,6 +229,11 @@
     "base32": {
       "type": "string",
       "pattern": "^[a-z2-7]{52}$"
+    },
+    "ownerName": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$",
+      "$comment": "an owner name (section 6): always made by algorithm 0 (sections 5.2 and 6.2)"
     }
   }
 }

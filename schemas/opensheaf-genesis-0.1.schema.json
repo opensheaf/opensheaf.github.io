@@ -28,7 +28,7 @@
     },
     "originator": {
       "type": "string",
-      "pattern": "^[a-z2-7]{52}$",
+      "pattern": "^[a-z2-7]{51}[aq]$",
       "$comment": "section 5.3: the owner name of the owner of the first line"
     },
     "nonce": {
@@ -41,7 +41,7 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]+$"
+        "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]{44}$"
       },
       "$comment": "sections 5.1 and 6.1: an owner's first current keys"
     },

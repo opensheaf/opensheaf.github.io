@@ -114,7 +114,7 @@
           },
           "owner": {
             "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
+            "pattern": "^[a-z2-7]{51}[aq]$",
             "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
           },
           "at": {

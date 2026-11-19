@@ -18,7 +18,8 @@ Handles the subset of Markdown used by spec.md:
 - images `![alt](path)` on a line of their own (centred);
 - `## Section`, `### Subsection`, each with a label named as GitHub names
   its anchor (`#what-happens-when-`), for links within and between pages;
-- paragraphs; lists with `- ` and nested lists indented by two spaces;
+- paragraphs; lists with `- `, numbered lists with `1. ` (TeXmacs
+  `enumerate`, numbered from 1), and nested lists indented by two spaces;
   a paragraph after a nested list is indented by two spaces;
 - fenced code blocks (three backticks), with an optional language after
   them (```sh, ```json), used for syntax highlighting on the web;
@@ -225,12 +226,16 @@ def convert(md):
             blocks.append(f'  <section*|{inline(l[3:])}><label|{slug(l[3:])}>')
             i += 1
             continue
-        if l.startswith('- '):
+        if l.startswith('- ') or re.match(r'\d+\. ', l):
+            # a bulleted list, or a numbered one (`1. `, numbered by TeXmacs)
+            numbered = not l.startswith('- ')
+            marker = r'\d+\. ' if numbered else r'- '
             items = []  # [text, [subitems], text after the sub-list]
-            while i < len(lines) and (lines[i].startswith('- ') or lines[i].startswith('  ')):
+            while i < len(lines) and (re.match(marker, lines[i]) or lines[i].startswith('  ')):
                 ln = lines[i]
-                if ln.startswith('- '):
-                    items.append([ln[2:], [], ''])
+                m = re.match(marker, ln)
+                if m:
+                    items.append([ln[m.end():], [], ''])
                 elif ln.startswith('  - '):
                     items[-1][1].append(ln[4:])
                 elif items[-1][1] and ln.startswith('    '):
@@ -252,11 +257,12 @@ def convert(md):
                 return out
 
             body = '\n\n'.join(render(*it) for it in items)
-            blocks.append('  <\\itemize>\n' + body + '\n  </itemize>')
+            env = 'enumerate' if numbered else 'itemize'
+            blocks.append(f'  <\\{env}>\n' + body + f'\n  </{env}>')
             continue
         para = []
         while (i < len(lines) and lines[i].strip()
-               and not re.match(r'(#{1,3} |- |```|> |\|)', lines[i])):
+               and not re.match(r'(#{1,3} |- |\d+\. |```|> |\|)', lines[i])):
             para.append(lines[i].strip())
             i += 1
         blocks.append('  ' + inline(' '.join(para)))

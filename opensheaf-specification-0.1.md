@@ -69,12 +69,14 @@ The discovery document is rewritten whenever an object is added or changed. It i
 
 ### 3.2 The storage root
 
-The <dfn>storage root</dfn> is an OCFL 1.1 storage root at the URL `storageRoot`, holding the archive's objects (section 4). Since OCFL allows in it only the folders that lead to objects, and extensions, it SHOULD be a dedicated folder (by convention `ocfl/`), and presentation files MUST NOT be placed in it. It MAY contain, as loose files, copies of the OCFL specification and of this one. Its `ocfl_layout.json` names its storage layout, which MUST be the one given by `storageLayout`:
+The <dfn>storage root</dfn> is an OCFL 1.1 storage root at the URL `storageRoot`, holding the archive's objects (section 4). Since OCFL allows in it only the folders that lead to objects, and extensions, it SHOULD be a dedicated folder (by convention `ocfl/`), and presentation files MUST NOT be placed in it. It MAY contain, as loose files, copies of the OCFL specification and of this one. Its storage layout is the one `storageLayout` names in the discovery document, which is authoritative. OCFL's `ocfl_layout.json`, OPTIONAL in OCFL, may name only a layout registered as an OCFL extension (OCFL 1.1, section 4.1), and is therefore present for the hashed layout only:
 
-- **The owner-name layout**, `opensheaf-owner-name-storage-layout`, the default, defined here (not yet registered with OCFL, so validators may warn about it). The object whose identifier is `sheaf:<name>:<owner>` (section 4) is at `<owner>/<name>/`, and a draft `sheaf:draft:<id>` at `draft/<id>/`; any other identifier is an error. An owner's object is thus at `<owner>/<owner>/`, and the folder of an owner holds its key log and every line of it in the archive, so that an owner moving elsewhere copies one folder. The layout has no parameters; `ocfl_layout.json` describes it as `"Lines at <owner>/<name>, drafts at draft/<id>"`.
-- **The hashed layout**, for large archives: OCFL's `0003-hash-and-id-n-tuple-storage-layout` with its default parameters (`sha256`, tuples of 3 characters, 3 tuples), which a configuration file, if present, MUST NOT change. An object is at `<t1>/<t2>/<t3>/<encoded id>/`, where `<t1>`, `<t2>`, `<t3>` are the first three groups of three characters of the hexadecimal SHA-256 digest of its identifier, and `<encoded id>` is the identifier percent-encoded as the extension says (every character but `A-Z`, `a-z`, `0-9`, `-` and `_`, in lowercase hexadecimal, `%3a`), shortened, when longer than 100 characters, to its first 100 characters, `-` and the full digest; identifiers of lines are always shortened so (appendix C). Readers compute the path; they never decode it.
+- **The owner-name layout**, `opensheaf-owner-name-storage-layout`, the default, defined here, and not registered as an OCFL extension. The object whose identifier is `sheaf:<name>:<owner>` (section 4) is at `<owner>/<name>/`, and a draft `sheaf:draft:<id>` at `draft/<id>/`; any other identifier is an error. An owner's object is thus at `<owner>/<owner>/`, and the folder of an owner holds its key log and every line of it in the archive, so that an owner moving elsewhere copies one folder. The layout has no parameters. The storage root MUST NOT contain `ocfl_layout.json`, whose `extension` would not be a registered extension name; it SHOULD contain instead the plain text file `opensheaf-owner-name-storage-layout.md`, which describes the layout, for instance as `Lines at <owner>/<name>/, drafts at draft/<id>/: the owner-name layout of the OpenSheaf specification 0.1, section 3.2`, as OCFL allows for documenting local extensions (OCFL 1.1, sections 4.1 and 4.5).
+- **The hashed layout**, for large archives: OCFL's `0003-hash-and-id-n-tuple-storage-layout` with its default parameters (`sha256`, tuples of 3 characters, 3 tuples), which a configuration file, if present, MUST NOT change; the storage root MUST contain `ocfl_layout.json`, with `extension` `0003-hash-and-id-n-tuple-storage-layout` and a `description`. An object is at `<t1>/<t2>/<t3>/<encoded id>/`, where `<t1>`, `<t2>`, `<t3>` are the first three groups of three characters of the hexadecimal SHA-256 digest of its identifier, and `<encoded id>` is the identifier percent-encoded as the extension says (every character but `A-Z`, `a-z`, `0-9`, `-` and `_`, in lowercase hexadecimal, `%3a`), shortened, when longer than 100 characters, to its first 100 characters, `-` and the full digest; identifiers of lines are always shortened so (appendix C). Readers compute the path; they never decode it.
 
 Archives SHOULD use the owner-name layout, unless one folder per owner or per name becomes impractical (tens of thousands of lines, fewer in a git repository). The layout is chosen when the archive is created and SHOULD NOT be changed: pins stay valid, since readers compute paths from `storageLayout`, but every URL into the storage root changes.
+
+**Open question.** Registering the owner-name layout as an OCFL community extension, so that `ocfl_layout.json` can name it (#59).
 
 ## 4. Objects
 
@@ -84,7 +86,7 @@ An <dfn>object</dfn> is an OCFL 1.1 object in a storage root. Its <dfn>kind</dfn
 
 **Versions.** An <dfn>object version</dfn> is an OCFL version of an object (`v1`, `v2`, ...): every change of the object makes one. Once made, no object version, and no file of the object's witness folder (section 7.2), is changed or removed, except: in a draft, which may be rewritten or deleted (section 10); and by a takedown, which deletes the whole object (section 13.2). A <dfn>document version</dfn> is a version of the work, a positive integer numbered by the owner of the line and recorded in `object.json` and `datacite.json`; it changes only when the document's own files change (section 4.2), so several object versions may hold one document version, with different descriptions or notices.
 
-**Pins.** A <dfn>pin</dfn> is the pair (object version, SHA-512 digest of that version's inventory file, as its checksum file states it). An inventory records the digests of the files of its version and of every earlier one, so a pin fixes the object up to that version, in any copy. Collections (section 8), branches (section 9) and `sheaf:` URIs (section 12) refer to object versions by pins, and pin only signed versions (section 7).
+**Pins.** A <dfn>pin</dfn> is the pair (object version, SHA-512 digest of that version's inventory file, as its checksum file states it). An inventory records the digests of the files of its version and of every earlier one, and the `object.json` of every sealed version after the first records the digest of the inventory file of the version before (`previous`, section 4.3), so a pin fixes the object up to that version, the bytes of every earlier inventory included, in any copy. Collections (section 8), branches (section 9) and `sheaf:` URIs (section 12) refer to object versions by pins, and pin only signed versions (section 7).
 
 ### 4.1 Common rules
 
@@ -131,9 +133,12 @@ Every object version MUST contain `object.json`, the record of the object's iden
 - `kind`: `document`, `collection` or `owner`;
 - `status`: `active` or `withdrawn` (section 13.1), always `active` for an owner or a draft;
 - `documentVersion`, for a document or a collection: equal to `version` in `datacite.json`;
-- in every version of a line, `name` and `owner` (sections 5 and 6), and in a branch `parent`, its branch point (section 9); a draft has none of them.
+- in every version of a line, `name` and `owner` (sections 5 and 6), and in a branch `parent`, its branch point (section 9); a draft has none of them;
+- in every version of a line after the first, `previous`: the SHA-512 digest of the inventory file of the version before, in lowercase hexadecimal, as its checksum file states it, the digest of its pin (section 4), whatever the version changes (a description-only version, a withdrawal, a fork record of a key log, sections 4.2, 13.1 and 6.3). A first version has none, since sealing starts a new line (section 10.2), and neither has the computed first version of a key log (section 6.1), the first version of a branch (section 9.2) or a draft, whose versions may be rewritten (section 10.1).
 
-An owner object has only these fields, and MAY have `extensions` (below), though data concerning its key log goes in `keys.json` or, for the first version, the owner's genesis record (sections 5.1 and 6.1).
+**The inventory chain.** Signing a version fixes, through `previous`, the bytes of the inventory file of every version before it, not only the files they record: a version vouched for by a later signed version (section 7.3) is fixed byte for byte, and its pin is as reliable as that of a version signed directly (#46). Two versions of one number with the same `previous` share their history; with different ones, they differ in an earlier version too.
+
+An owner object has only these fields, `previous` included, and MAY have `extensions` (below), though data concerning its key log goes in `keys.json` or, for the first version, the owner's genesis record (sections 5.1 and 6.1).
 
 A <dfn>note</dfn> is an object with `text`, a short plain text, or `path` and `mediaType`, a file of the content of the same object version, or both.
 
@@ -204,7 +209,7 @@ The genesis record MUST be part of every object version of the object and of its
 
 ### 5.2 Computing a name
 
-Algorithm k, for k from 0 to 15, takes the SHA-256 digest of the seed `opensheaf-name-<k>` (ASCII, k in decimal, followed by a line feed) followed by the bytes of `genesis.json`, and writes it in lowercase base32 (RFC 4648, without padding): 52 characters, the last of which holds the last bit of the digest and four zero bits, which are set to k. A name thus matches `^[a-z2-7]{52}$`, and its last character gives its algorithm (`a` or `q` for algorithm 0), so names made by different algorithms never coincide. Names are compared as strings, never decoded. `object.json` records a line's name as `name`; appendix C gives examples.
+Algorithm k, for k from 0 to 15, takes the SHA-256 digest of the seed `opensheaf-name-<k>` (ASCII, k in decimal, followed by a line feed) followed by the bytes of `genesis.json`, and writes it in lowercase base32 (RFC 4648, without padding): 52 characters, the last of which holds the last bit of the digest and four zero bits, which are set to k. A name thus matches `^[a-z2-7]{52}$`, and its last character gives its algorithm (`a` or `q` for algorithm 0), so names made by different algorithms never coincide. Names are compared as strings, never decoded: a name of algorithm 1 to 15 sets bits that RFC 4648 requires to be zero, so it is not canonical base32, and a strict decoder may reject it. `object.json` records a line's name as `name`; appendix C gives examples.
 
 A genesis record thus has 16 names of one work (section 12 searches for a work by all of them). Its <dfn>genesis name</dfn>, made by algorithm 0, is the same for every line of the work. Every line is named by its genesis name, except a branch renamed after a clash, and branches named after it (section 5.3).
 
@@ -247,11 +252,22 @@ Every version of the key log, except a fork record (section 6.3), holds, besides
 - `successor`, OPTIONAL, only with `ended`: the owner name of the owner that continues its work (section 6.3);
 - `exposed`, OPTIONAL: keys listed in `keys` of earlier versions of this key log that this version declares exposed (section 6.3), each a `did:key` URI.
 
-In the genesis record of an owner and in every `keys.json`, `threshold` MUST NOT exceed the number of `keys`, nor `nextThreshold` that of `next`. A rotation key is <dfn>revealed</dfn> once it has signed a version of the key log. In every version, earlier versions being those before it on its side of a fork (section 6.3): `keys` MUST NOT list a key that this version or an earlier one exposes, nor a rotation key, revealed or not (a key whose digest `next` of this version or an earlier one holds); `next` MUST NOT hold the digest of a current key of this version or an earlier one, nor a digest that `next` of an earlier version holds, so that each rotation key is committed in one version only; and `exposed` MUST list only keys that `keys` of an earlier version lists.
+A rotation key is <dfn>revealed</dfn> once it has signed a version of the key log. In the genesis record of an owner and in every `keys.json`, earlier versions being those before it on its side of a fork (section 6.3):
+
+1. `threshold` MUST NOT exceed the number of `keys`, nor `nextThreshold` that of `next`;
+2. `keys` MUST NOT list a key that this version or an earlier one exposes, nor a rotation key, revealed or not (a key whose digest `next` of this version or an earlier one holds);
+3. `next` MUST NOT hold the digest of a current key of this version or an earlier one, nor a digest that `next` of an earlier version holds, so that each rotation key is committed in one version only;
+4. `exposed` MUST list only keys that `keys` of an earlier version lists.
 
 Key-log versions are the OCFL versions of the owner object (`v1`, `v2`, ...); an owner object has no document versions. **The first version is computed** from the genesis record, and is never signed. It MUST hold exactly three files, whose bytes are fixed: `genesis.json`, the genesis record; `object.json`, the JCS form (RFC 8785, the JSON Canonicalization Scheme, without a final line feed) of an object with `format`, `specification`, `kind` `owner`, `status` `active`, and `name` and `owner`, both the owner name (section 4.3); and `keys.json`, the JCS form of an object with `format` and the `keys`, `threshold`, `next` and `nextThreshold` of the genesis record. Its inventory file MUST be the JCS form of the OCFL 1.1 inventory of these files, with nothing else: `digestAlgorithm` `sha512`; `head` `v1`; `id` the identifier of the owner object, `sheaf:<owner>:<owner>`; `type` `https://ocfl.io/1.1/spec/#inventory`; `manifest`, mapping the SHA-512 digest of each file, in lowercase hexadecimal, to a list of its content path, `v1/content/` followed by its name; and `versions`, holding only `v1`, with `created`, the `created` of the genesis record, and `state`, mapping the same digests to lists of the names of the files; no `contentDirectory`, `fixity`, `message` or `user`. Its checksum file states the SHA-512 digest of that inventory file, as OCFL requires. These files, and so the digest of the inventory file, are thus the same in every copy, and any reader can rebuild them from the genesis record; a signature naming the first version pins them. A first version with other files or other bytes is invalid, an error (section 14.3), never a fork (section 6.3). No owner tool writes a signature file for it. The keeper and the data of extensions as of the first version are those of the genesis record (section 5.1).
 
-Every later version vN+1, except a fork record (section 6.3), MUST be signed by at least `nextThreshold` distinct <dfn>rotation keys of vN</dfn>, the keys whose digests `next` of vN holds, `nextThreshold` being that of vN (for v2, those of the genesis record); its signature files name these keys, and so reveal them (section 7.2). Current keys never sign a version of the key log, and rotation keys sign nothing else. From the second version on, a version MAY also hold files that this specification does not define (a display name, for instance), signed with it. Signature files, and when a signature is good, are defined in section 7.
+The versions after the first are signed by rotation keys:
+
+1. every later version vN+1, except a fork record (section 6.3), MUST be signed by at least `nextThreshold` distinct <dfn>rotation keys of vN</dfn>, the keys whose digests `next` of vN holds, `nextThreshold` being that of vN (for v2, those of the genesis record);
+2. its signature files name these keys, and so reveal them (section 7.2);
+3. current keys never sign a version of the key log, and rotation keys sign nothing else.
+
+From the second version on, `object.json` has `previous` (section 4.3), and a version MAY also hold files that this specification does not define (a display name, for instance), signed with it. Signature files, and when a signature is good, are defined in section 7.
 
 A current key is added, retired or exposed, a threshold or the data of an extension changed, or the owner ended, by a new version of the key log, which also commits the next rotation keys; the owner name never changes, nor does the keeper, which the genesis record fixes: another keeper means another owner (section 6.6). Changing the current keys or `threshold` affects only signatures naming the new version or a later one: signatures naming earlier versions stay good (section 7.1).
 
@@ -261,7 +277,7 @@ An owner tool creates an owner by making its first current keys and rotation key
 
 **Current keys.** Current keys are in daily use: one on each device the owner signs from (a laptop, a desktop), made there and never copied to another device. A person usually has a `threshold` of 1; a group or an institution MAY require the keys of several members, by a `threshold` of 2 or more, so that a thief holding one of them signs nothing alone.
 
-**Rotation keys.** Rotation keys are kept apart from the current keys and from each other (on hardware tokens, for instance), and used only to sign the next version of the key log. Owner tools SHOULD offer three, with a `nextThreshold` of 2, which survive the loss of one or the theft of one. A rotation key is used once, and committed in the `next` of one version only (section 6.1): once the next version is signed, the rotation keys of the version before, whether they signed or not, are never used again, and the owner SHOULD destroy them. Owner tools MUST warn that an owner left with fewer than `nextThreshold` rotation keys of the latest version of its key log can never change its keys or end.
+**Rotation keys.** Rotation keys are kept apart from the current keys and from each other (on hardware tokens, for instance), and used only to sign the next version of the key log. Owner tools SHOULD offer three, with a `nextThreshold` of 2, which survive the loss of one or the theft of one. The minimal setup, which owner tools MAY offer, is a `nextThreshold` of 1 with at least one rotation key kept offline (printed, or on a USB key kept apart); its risk MUST then be stated: the loss of that key leaves the owner unable to change its keys or end, and its theft lets the thief take the owner over (section 15.1). A rotation key is used once, and committed in the `next` of one version only (section 6.1): once the next version is signed, the rotation keys of the version before, whether they signed or not, are never used again, and the owner SHOULD destroy them. Owner tools MUST warn that an owner left with fewer than `nextThreshold` rotation keys of the latest version of its key log can never change its keys or end.
 
 **Retiring a key.** An owner retires a current key it no longer uses (a replaced laptop, a member who leaves the group) by leaving it out of `keys` in a new version of its key log. Signatures made with it stay good, and a retired key in someone else's hands still makes good signatures naming the versions that list it; section 6.3 says when to expose it instead.
 
@@ -269,11 +285,17 @@ An owner tool creates an owner by making its first current keys and rotation key
 
 **Ending.** An owner ends by signing, as usual, a last version of its key log with `ended` `true`, without `keys`, `threshold`, `next` and `nextThreshold`, and, OPTIONALLY, `successor`, the owner name of a new owner that continues its work, which MUST differ from its own owner name. The ending version only ends: it has no keys, so nothing is signed against it, and signatures made before it name earlier versions, and stay good. Owner tools MUST NOT sign anything for an ended owner. A successor is a hint, never followed automatically, and is accepted only as section 6.6 says. An owner is <dfn>ended</dfn> when its key log has an ending version or a fork record (below).
 
-**Exposed keys.** A current key is <dfn>exposed</dfn> when a version of the key log before any fork point (below) lists it in `exposed`: a key listed in `keys` of an earlier version of the same key log, retired or not; a version from a fork point on, of either side, may be a thief's, and exposes nothing. Exposed keys concern only the versions of the owner's lines (section 7.3), never those of its key log (section 6.1). An owner whose current keys may have been exposed (stolen, leaked, copied), and could together reach the `threshold` of some version of its key log that lists them, MUST at once sign a version of its key log that exposes them, or end; otherwise retiring them is enough. Only rotation keys sign that version, so whoever holds the current keys can neither prevent nor contest it.
+**Exposed keys.** A current key is <dfn>exposed</dfn> when a version of the key log lists it in `exposed`: a key listed in `keys` of an earlier version of the same key log, retired or not. An exposure counts in any version of the key log, on either side of a fork (below), in a version a fork record carries included: a thief that forks the key log may thus expose the owner's earlier keys, which makes contested what they signed (section 7.3), but never makes a version signed. Exposed keys concern only the versions of the owner's lines (section 7.3), never those of its key log (section 6.1). An owner whose current keys may have been exposed (stolen, leaked, copied), and could together reach the `threshold` of some version of its key log that lists them, MUST at once sign a version of its key log that exposes them, or end; otherwise retiring them is enough. Only rotation keys sign that version, so whoever holds the current keys can neither prevent nor contest it.
 
 **Forks of a key log.** Two signed versions of a key log with the same number whose inventory files differ are a <dfn>fork of the key log</dfn>; the first number at which two copies hold such versions is its <dfn>fork point</dfn>. The first version is computed, the same in every copy (section 6.1), so a key log never forks there; only `nextThreshold` rotation keys of the version before can make a fork: rotation keys stolen before use, or kept after it. The format cannot tell which side is the owner's, so a fork ends the owner, at the fork point, and freezes it (section 7.5); no version of either side from the fork point on names a successor that is accepted (section 6.6). An owner that finds a version of its key log it did not make, and still holds `nextThreshold` rotation keys of the version before, MAY sign another version of that number, which ends it (section 7.4).
 
-**Fork records.** An archive keeps the versions of a key log it holds, the side it saw first (when it meets both sides at once, either one, since each ends the owner), and never replaces or removes one but by a takedown (section 4). When it meets, directly or carried by a fork record of another copy, a signed version of the key log whose inventory file differs from that of the version of that number it holds, after versions with the same inventory files as its own, it MUST append a <dfn>fork record</dfn>: a version of the key log after the latest it holds, made by the archive (its deposit, section 4.1), and not signed. A fork record holds `genesis.json` and `object.json`, those of the first version byte for byte, no `keys.json`, and the versions of the other side it met, from the fork point to the latest signed version of that side, each under `forked/<d>/`, where `<d>` is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of its inventory file: that inventory file as `inventory.json`, its checksum file as `inventory.json.sha512`, its `keys.json`, and its signature files `signature-<k>.json` with the witnesses beside them (section 7.2), byte for byte. These versions are <dfn>carried</dfn>, and each carried inventory has the `id` of the owner object. A fork record is valid only when it holds nothing but these files; the first version it carries is signed (section 7.3) against the version before it held below the fork record, and its inventory file differs from that of the version of its number held below it; and every later version it carries is signed against the version before it on its side. Otherwise it is not a version of the key log. Its fork point is the number of the first version it carries. A fork record is never a side of a fork: copies of a key log are compared up to the version before their fork records, and a version held in one copy at the number of a fork record of another, or after it, is no fork. Fork records are copied with the key log like any version, so that every copy shows the fork; copies of a key log may differ after the fork point, each archive keeping the side it saw first.
+**Fork records.** An archive keeps the versions of a key log it holds, the side it saw first (when it meets both sides at once, either one, since each ends the owner), and never replaces or removes one but by a takedown (section 4). When it meets, directly or carried by a fork record of another copy, a signed version of the key log whose inventory file differs from that of the version of that number it holds, after versions with the same inventory files as its own, it MUST append a <dfn>fork record</dfn>: a version of the key log after the latest it holds, made by the archive (its deposit, section 4.1), and not signed. A fork record:
+
+1. holds `genesis.json`, that of the first version byte for byte; `object.json`, with the fields of that of the first version and `previous` (section 4.3); no `keys.json`; and the versions of the other side it met, from the fork point to the latest signed version of that side, each under `forked/<d>/`, where `<d>` is the first 16 characters of the lowercase base32 (RFC 4648, without padding) SHA-256 digest of its inventory file: that inventory file as `inventory.json`, its checksum file as `inventory.json.sha512`, its `keys.json`, and its signature files `signature-<k>.json` with the witnesses beside them (section 7.2), byte for byte. These versions are <dfn>carried</dfn>, and each carried inventory has the `id` of the owner object;
+2. is valid only when it holds nothing but these files; the first version it carries is signed (section 7.3) against the version before it held below the fork record, and its inventory file differs from that of the version of its number held below it; and every later version it carries is signed against the version before it on its side. Otherwise it is not a version of the key log;
+3. has as its fork point the number of the first version it carries;
+4. is never a side of a fork: copies of a key log are compared up to the version before their fork records, and a version held in one copy at the number of a fork record of another, or after it, is no fork;
+5. is copied with the key log like any version, so that every copy shows the fork; copies of a key log may differ after the fork point, each archive keeping the side it saw first.
 
 **The end of a key log.** No version of the key log follows a valid fork record, and none follows an ending version but a fork record, which carries the other side from the fork point on: any other version held after either is not a version of the key log, and a fork met once the key log has a fork record is reported, not recorded.
 
@@ -295,7 +317,7 @@ Of two copies of a key log, compared up to their fork records (section 6.3), eit
 
 ### 6.6 Keepers
 
-An owner MAY name, in `keeper` of its genesis record (section 5.1), a single person or institution who answers for it, as a list of one URI: an ORCID iD (`https://orcid.org/...`) or a domain written as `https://<domain>/`. The keeper is fixed by the owner name: no version of the key log names or changes it, and another keeper means another owner. The keeper MAY confirm it, in a place only the keeper controls: a link naming the owner in its ORCID record, or the file `https://<domain>/.well-known/opensheaf` on its domain, a JSON object with `format` `"opensheaf-keeper/0.1"`, `owners`, the owner names it answers for, and OPTIONALLY `successors`, an object mapping owner names it answers for to their successors (on ORCID, a link naming both).
+An owner MAY name, in `keeper` of its genesis record (section 5.1), a single person or institution who answers for it, as a list of one URI: an ORCID iD (`https://orcid.org/...`), whose last character is a check digit (ISO 7064 MOD 11-2) that verifiers check (section 14.3), since no schema pattern can, or a domain written as `https://<domain>/`. The keeper is fixed by the owner name: no version of the key log names or changes it, and another keeper means another owner. The keeper MAY confirm it, in a place only the keeper controls: a link naming the owner in its ORCID record, or the file `https://<domain>/.well-known/opensheaf` on its domain, a JSON object with `format` `"opensheaf-keeper/0.1"`, `owners`, the owner names it answers for, and OPTIONALLY `successors`, an object mapping owner names it answers for to their successors (on ORCID, a link naming both).
 
 **Successors.** An owner has at most one <dfn>accepted successor</dfn>: the one named by an ending version of its key log before any fork point (section 6.3); failing that, the one its keeper names in the place it controls, as above. The keeper MAY name one for an owner that can no longer change its key log (fewer than `nextThreshold` rotation keys left), that a fork has ended, or that ended without naming one; that successor is reported as named by the keeper, and does not by itself end the owner. Any other successor, named in a version of either side of a fork from the fork point on, or by the keeper when an ending version before any fork point names another, is reported as a claim.
 
@@ -351,11 +373,17 @@ The first line keeps these signatures apart from any other use of the key; the o
 
 ### 7.3 Statuses
 
-A signature file is:
+A signature file is <dfn>invalid</dfn> when:
 
-- <dfn>invalid</dfn> when it is malformed; its name does not match the digest of its key; its signature does not verify; its `object`, `version` and `inventorySha512` are not those of the version whose folder holds it (the digest also as its checksum file states it; in `parent.signatures/`, those of the parent version, section 9; in `forked/<d>/`, those of the version carried, section 6.3); its `signer` is not the line's owner; the reader reaches the key-log version named, with that digest (also as carried by a fork record, section 6.3), and the key is not in its `keys` (for a signature of a key-log version, is not one of its rotation keys, section 6.1); or the version named is not a version of the key log, or is a fork record; or, for a signature of a key-log version, it signs the first version, or its `keyLog` names another number than that of the version before it (section 6.1);
-- <dfn>unchecked</dfn> when it is not invalid but the reader cannot reach the key-log version it names, with that digest (the key log is absent, taken down, or shorter, or the reader holds another version of that number, which verifiers report: a fork of the key log once the version named is found signed, section 6.3); a key-log version that the reader's copy neither holds nor carries, also after its fork record, is reached in a copy that holds it, and the signature is judged against that copy; nothing is added on unchecked signatures (section 7.5);
-- otherwise <dfn>good</dfn>, for ever: later versions of the key log, an end or a fork never change it.
+1. it is malformed, or its name does not match the digest of its key;
+2. its signature does not verify;
+3. its `object`, `version` and `inventorySha512` are not those of the version whose folder holds it (the digest also as its checksum file states it; in `parent.signatures/`, those of the parent version, section 9; in `forked/<d>/`, those of the version carried, section 6.3);
+4. its `signer` is not the line's owner;
+5. the reader reaches the key-log version named, with that digest (also as carried by a fork record, section 6.3), and the key is not in its `keys` (for a signature of a key-log version, is not one of its rotation keys, section 6.1);
+6. the version named is not a version of the key log, or is a fork record; or
+7. for a signature of a key-log version, it signs the first version, or its `keyLog` names another number than that of the version before it (section 6.1).
+
+A signature file that is not invalid is <dfn>unchecked</dfn> when the reader cannot reach the key-log version it names, with that digest (the key log is absent, taken down, or shorter, or the reader holds another version of that number, which verifiers report: a fork of the key log once the version named is found signed, section 6.3); a key-log version that the reader's copy neither holds nor carries, also after its fork record, is reached in a copy that holds it, and the signature is judged against that copy; nothing is added on unchecked signatures (section 7.5). Otherwise it is <dfn>good</dfn>, for ever: later versions of the key log, an end or a fork never change it.
 
 A version of a key log is signed when it is signed as section 6.1 says, with good signature files; its first version is never signed, and counts as signed when it is the version section 6.1 computes. Key logs are read version by version from the first, and are never vouched for (below): each version is checked against the one before, and a fork record is a version when it is valid, though not signed (section 6.3).
 
@@ -365,9 +393,14 @@ A version of a line is:
 - unchecked when it is not signed, but would be if its unchecked signatures were good;
 - otherwise <dfn>not a version</dfn> of the line, wherever it is found, and never shown as one: reported as invalid if at least one signature file of the owner is invalid, and otherwise as <dfn>unsigned</dfn>.
 
-**Contested versions.** A signed version of a line is <dfn>contested</dfn> when it would not be signed if two kinds of good signature files of its owner, its own or those of the versions that vouch for it, were left out: those made with a key that its owner's key log exposes (section 6.3), and those naming a version of its owner's key log from a fork point on, of either side; unless other evidence that the reader trusts (a timestamp of these signature files, with the [timestamps extension](opensheaf-timestamps-0.1.md)) shows them made before the version of the key log that exposes the key, or before the fork. A key that another owner's key log exposes, shared between owners (section 15.5), counts only for that owner's lines. Only versions of lines are contested, never versions of key logs (section 6.1). A contested version is reported with its status (for archives, section 7.5); it is never the latest signed version (below), nor a confirmed branch point (section 9.3) or a verified member (section 8.5).
+**Contested versions.** A signed version of a line is <dfn>contested</dfn> when it would not be signed if these good signature files of its owner, its own or those of the versions that vouch for it, were left out:
 
-**A signed version vouches for its past.** The inventory of a version records the digests of every file of every version before it (section 4), so a version signed directly vouches for every version it extends, whatever their own signatures; a version vouched for needs no signatures of its own.
+1. those made with a key that its owner's key log exposes, in any version, on either side of a fork (section 6.3);
+2. those naming a version of its owner's key log from a fork point on, of either side.
+
+Such signature files count nonetheless when other evidence that the reader trusts (a timestamp of these signature files, with the [timestamps extension](opensheaf-timestamps-0.1.md)) shows them made before the version of the key log that exposes the key, or before the fork. A key that another owner's key log exposes, shared between owners (section 15.5), counts only for that owner's lines. Only versions of lines are contested, never versions of key logs (section 6.1). A contested version is reported with its status (for archives, section 7.5); it is never the latest signed version (below), nor a confirmed branch point (section 9.3) or a verified member (section 8.5).
+
+**A signed version vouches for its past.** The inventory of a version records the digests of every file of every version before it, and its `object.json` the digest of the inventory file of the version before (`previous`, section 4.3), so a version signed directly vouches for every version it extends, byte for byte, inventories included, whatever their own signatures; a version vouched for needs no signatures of its own, and its pin is as reliable as that of a version signed directly.
 
 **Readers use the latest signed version.** The <dfn>latest signed version</dfn> of a copy of a line, its latest version that is signed and not contested, gives the line's history, current version and status (section 4.2). Nothing relies on a version that is not signed: not a pin, a resolution, a collection member or a branch point. An unchecked version is shown with its status until the key log is found, a contested one with its status.
 
@@ -409,7 +442,7 @@ Collections are of two types, which treat the versions of their members differen
 
 Both types may have collections as members (an archive of archives, a selection of issues).
 
-**An archive's collections.** An archive that makes collections does so as an owner, with a key log like any other (section 6). Its <dfn>main catalogue</dfn>, named by `mainCollection` in its discovery document (section 3.1), is a catalogue of the documents of the lines its owners write in the archive, not of the copies it holds. It MAY also keep a catalogue of the lines it holds as copies (section 11). A selection is kept by the owner of the body that vets (a journal, a review journal), which also owns the accepted copies the selection keeps (section 9).
+**An archive's collections.** An archive that makes collections does so as an owner, with a key log like any other (section 6). Its <dfn>main catalogue</dfn>, named by `mainCollection` in its discovery document (section 3.1), is a catalogue of the documents of the lines its owners write in the archive, not of the copies it holds; its owners are those that `owners` of the discovery document lists, and when it lists none, which lines are the archive's own is not checked (section 14.6). It MAY also keep a catalogue of the lines it holds as copies (section 11). A selection is kept by the owner of the body that vets (a journal, a review journal), which also owns the accepted copies the selection keeps (section 9).
 
 ### 8.2 The member list: members.json
 
@@ -585,7 +618,7 @@ A <dfn>draft</dfn> is a sandbox for a work not yet sealed, on which nothing may 
 
 **A draft is its archive's alone.** A draft is never signed (section 7), pinned (sections 8, 9 and 12), copied out of its archive (section 11), indexed or named by a `sheaf:` URI (section 12). The discovery document does not list drafts in `objects`; it MAY list them apart, in `drafts`, as unfinished work on which nothing may rely, or not at all (section 3.1).
 
-**A draft may change.** A draft is the only object that MAY be rewritten or deleted: the rule that object versions never change (section 4) does not apply to it, and a draft deleted leaves no tombstone (section 13).
+**A draft may change.** A draft is the only object that MAY be rewritten or deleted: the rule that object versions never change (section 4) does not apply to it, and a draft deleted leaves no tombstone (section 13). OCFL 1.1 expects the contents of a version directory to be immutable once created (OCFL 1.1, section 3.3), and its extension `0005-mutable-head` keeps a mutable version outside the version directories, which a draft does not: a draft is an OCFL object as it stands, but outside OCFL's guarantees, and verifiers check it only as it stands, never against an earlier state (section 14.4).
 
 **Content.** A tool MAY read any object and recreate its files in a draft, as far as their licences allow.
 
@@ -714,7 +747,7 @@ An owner withdraws a line, which keeps its versions; an archive takes down an ob
 
 ### 13.1 Withdrawal
 
-A document or a collection is <dfn>withdrawn</dfn> by a description-only version (section 4.2) whose `object.json` has `status` `withdrawn` and `withdrawal` (section 4.3), and whose `datacite.json` has `withdrawal.date` as `Withdrawn` (section 4.4). The status is the line's, read from its latest signed version or, failing that, its latest unchecked version (section 7.3), whatever document version that holds; a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
+A document or a collection is <dfn>withdrawn</dfn> by a description-only version (section 4.2) whose `object.json` has `status` `withdrawn` and `withdrawal` (section 4.3), and whose `datacite.json` has `withdrawal.date` as `Withdrawn` (section 4.4). The status is the line's, read, as its history is, from its latest signed version (section 7.3), whatever document version that holds; a copy without a signed version has no status as a line, and its discovery document gives that of its head (section 3.1); a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
 
 A withdrawn line keeps every version, signed, pinned and copied as before. Presentations showing a version of a line they know to be withdrawn MUST show the withdrawal, also when the version shown is earlier.
 
@@ -749,7 +782,7 @@ A tombstone is never removed, except when its line returns: it keeps the line ta
 
 ## 14. Verification
 
-A <dfn>verifier</dfn> is a program that checks an archive, or an object with the key logs kept beside it, against this specification. It checks every requirement of sections 3 to 13 that the files decide, in the order of sections 14.2 to 14.6, each step using the results of those before; the rules are those of the sections cited. The discovery document, the indexes and presentation files are maps: a verifier checks them against the storage root, and never takes them as authoritative (section 3.1).
+A <dfn>verifier</dfn> is a program that checks an archive, or an object with the key logs kept beside it, against this specification. It checks every requirement of sections 3 to 13 that the files decide, in the order of sections 14.2 to 14.6, each step using the results of those before; the rules are those of the sections cited. The discovery document, the indexes and presentation files are maps: a verifier checks them against the storage root, and never takes them as authoritative (section 3.1). Rules on what an archive received or saw, rather than on what it holds, are not checked from the files: that an archive takes the lines of an ended owner only from copies, never as new deposits (section 7.5), and keeps the side of a fork of a key log it saw first (section 6.3).
 
 ### 14.1 Findings
 
@@ -766,13 +799,24 @@ A verifier reports every finding with its place (the archive, an object, a versi
 The verifier checks:
 
 - every JSON file this specification defines against its schema (section 2), formats (dates, URIs) included as assertions, which JSON Schema 2020-12 leaves optional: the discovery document, the files of every object version (`parent.object.json` and the files of `parent.chain/` included), the files of witness folders, the indexes, and a keeper's file when it reads one; a malformed file of a witness folder is a warning (section 7.2);
-- that the storage root and every object are valid OCFL 1.1, with an OCFL validator or equivalent checks, leaving out the warnings validators give on the owner-name layout and witness folders (sections 3.2 and 7.2);
-- that `ocfl_layout.json` names `storageLayout` with the parameters of section 3.2, and that every object is at the path its identifier gives there;
-- the rules of section 4.1 in every object version, and that the inventory of each version folder is the inventory as of that version: its `head` is that version, and its `versions` are those of the head inventory up to it, equal as JSON values.
+- that the storage root and every object are valid OCFL 1.1, with an OCFL validator or equivalent checks, leaving out the warnings validators give on witness folders (section 7.2); a draft is checked as it stands (section 10.1);
+- the layout that `storageLayout` names (section 3.2): for the hashed layout, that `ocfl_layout.json` names it with its parameters; for the owner-name layout, that the storage root has no `ocfl_layout.json`, and, a breach being a warning, that it holds `opensheaf-owner-name-storage-layout.md`; and that every object is at the path its identifier gives in that layout;
+- the rules of section 4.1 in every object version, and that the inventory of each version folder is the inventory as of that version: its `head` is that version, and its `versions` are those of the head inventory up to it, equal as JSON values;
+- the inventory chain (section 4.3): that the `object.json` of every sealed version after the first has `previous`, equal to the SHA-512 digest of the inventory file of the version before, as held in its version folder, and that a first version and a draft have none; a missing or differing `previous` is an error.
 
 ### 14.3 Key logs
 
-The verifier checks the owner objects first, each from its first version (section 6): its genesis record (section 5.1), and that its first version is the one section 6.1 computes, by computing `object.json`, `keys.json` and the inventory file from the genesis record and comparing them with those held, byte for byte, with no other file (a signature file of the first version is invalid, section 7.3, and a warning, as any invalid file of a witness folder, section 7.2); that every later version but a fork record holds `keys.json`; that each later version is signed (section 7.3), and that none is held after a fork record, nor after an ending version but a fork record (section 6.3), a breach of these two being a warning, as for lines (section 14.4); that an ending version has no `keys`, `threshold`, `next` or `nextThreshold`, that `successor` is not the owner itself, and whether it is accepted or claimed (sections 6.3 and 6.6); the thresholds, and the rules of section 6.1 on `keys`, `next` and `exposed`, among them that no digest is in the `next` of two versions; and each fork record (section 6.3): that it is valid, holding the `genesis.json` and `object.json` of the first version, byte for byte, no `keys.json`, and nothing else but the versions it carries, each under the name its inventory digest gives, with the owner object's `id` in its inventory, its `keys.json` and checksum file against its inventory, and its signatures against the version before, the first differing from the version of its number held. It reports as results the latest version of each key log, the exposed keys, and ended owners, by an ending version or by a fork with its fork point, with their successors, accepted or claimed; when a keeper is named, it MAY check the link (section 6.6).
+The verifier checks the owner objects first, each from its first version (section 6):
+
+1. its genesis record (section 5.1), and that its first version is the one section 6.1 computes, by computing `object.json`, `keys.json` and the inventory file from the genesis record and comparing them with those held, byte for byte, with no other file (a signature file of the first version is invalid, section 7.3, and a warning, as any invalid file of a witness folder, section 7.2);
+2. when a keeper is named by an ORCID iD, its check digit (section 6.6);
+3. that every later version but a fork record holds `keys.json`, and that each later version is signed (section 7.3);
+4. that no version is held after a fork record, nor after an ending version but a fork record (section 6.3), a breach of these two being a warning, as for lines (section 14.4);
+5. that an ending version has no `keys`, `threshold`, `next` or `nextThreshold`, that `successor` is not the owner itself, and whether it is accepted or claimed (sections 6.3 and 6.6);
+6. the thresholds, and the rules of section 6.1 on `keys`, `next` and `exposed`, among them that no digest is in the `next` of two versions;
+7. each fork record (section 6.3): that it is valid, holding the `genesis.json` of the first version, byte for byte, an `object.json` with the fields of that of the first version and `previous`, no `keys.json`, and nothing else but the versions it carries, each under the name its inventory digest gives, with the owner object's `id` in its inventory, its `keys.json` and checksum file against its inventory, and its signatures against the version before, the first differing from the version of its number held.
+
+It reports as results the latest version of each key log, the exposed keys, on either side of a fork, and ended owners, by an ending version or by a fork with its fork point, with their successors, accepted or claimed; when a keeper is named, it MAY check the link (section 6.6).
 
 ### 14.4 Objects
 
@@ -782,7 +826,7 @@ For every other object, the verifier checks:
 - **its identity:** the genesis record, the name and the identifier in every version (sections 4 and 5), and that the objects and tombstones of the archive with the same genesis name are its originator's line and branches of it (section 5.4);
 - **its signatures:** the status of every signature file and version, and the latest signed version (section 7.3), against key logs kept beside it as section 6.5 asks. A key log missing is an error; one taken down (section 13.2), or not reaching the versions its signatures name (section 7.3), a warning; the signatures that need it are unchecked. A version that is not a version of its line is a warning (section 7.5); a contested version is a result (section 7.3);
 - **a branch:** the verdict of each branch point (section 9.3), at its first version and at every version that moves it, with the continuity of section 9.4, and that the identity files are unchanged between them. An inconsistent branch point is an error, an unchecked one a warning; the branch's verdict, and whether its parent's line is found, unavailable, removed or withdrawn, are results. A rename whose algorithm number is not greater than that of `parent.name` is an error (section 9.3); one that neither the objects nor the tombstones of the archive justify, or not by the smallest number free there, is a warning (section 5.3);
-- **a draft:** the rules of section 10.1, and that nothing in the archive pins it.
+- **a draft:** the rules of section 10.1, as it stands, and that nothing in the archive pins it.
 
 ### 14.5 Collections
 
@@ -792,7 +836,7 @@ For each collection version, the verifier checks the rules of section 8 on `memb
 
 The verifier then checks, against the objects:
 
-- **the discovery document** (section 3.1): that `objects` lists every object of the storage root except drafts, each entry with the values its object gives (`status` as section 13.1 says), with distinct labels; that `mainCollection` names a catalogue it lists; that `drafts` lists only drafts of the storage root, with their heads; and, a breach being a warning, that `owners` lists only owner objects it holds and `extensions` every extension its objects use;
+- **the discovery document** (section 3.1): that `objects` lists every object of the storage root except drafts, each entry with the values its object gives (`status` as section 13.1 says), with distinct labels; that `mainCollection` names a catalogue it lists and, a breach being a warning, when `owners` is present, that its members are lines of those owners (section 8.1); that `drafts` lists only drafts of the storage root, with their heads; and, a breach being a warning, that `owners` lists only owner objects it holds and `extensions` every extension its objects use;
 - **the tombstones** (section 13.3): that each is well formed, with `id` the line of its `name` and `owner`; that no two have the same `id`; and that no object of the storage root, and no entry of `objects`, has the `id` of one; and, as a warning, that no tombstone stands for an owner object that objects of the archive need, which only the law or its keeper justifies (section 13.2);
 - **the indexes** it declares (section 12.5): that every object with a genesis record and every sealed version, carried key-log versions included, has its entry, in the file of its prefix, with the values its object gives; that each tombstone has its entries in `names/` and `sha512/`, with `status` `removed`, and none in `owners/`; that no draft has one; and, with access to the files, that there are no other entries.
 
@@ -801,7 +845,7 @@ The verifier then checks, against the objects:
 **Open questions.**
 
 - Which status a member has when the checksum file of its inventory is missing or wrong (#48), and whether a mismatch at the member's archive falls through to mirrors (#37).
-- Whether a pin fixes the bytes of the inventories of earlier version folders, which are compared here as JSON values only (#46); whether digests in OCFL files must be in lower case (#49).
+- Whether digests in OCFL files must be in lower case (#49).
 - The parts of section 4.2 that the files do not decide: whether a version deposited out of order wrote `history` (#51), and when a document version is new (#23).
 - How a verifier tells a licence from a rights statement in `rightsList` (#50), and which licences allow a mirror (#34), which is therefore not checked.
 - What a verifier reports for a pin of an earlier version of a withdrawn line (#25).
@@ -813,7 +857,7 @@ The verifier then checks, against the objects:
 
 Pins and signatures make every copy checkable wherever it is fetched (sections 4 and 7); discovery documents, indexes, locations and tombstones are maps and hints (sections 3, 12.3 and 13.3). A host or a network therefore cannot forge a version, nor add one to another owner's line (section 7.5), nor make a valid line from a reused genesis record (section 5.4), nor take over a short form (section 12.2). It can withhold: serve an older copy, or a key log that stops before an end or a fork record, which looks complete (sections 6.5 and 12.3); and it can delete what it serves, never a copy held elsewhere (section 13).
 
-Whoever holds `threshold` current keys of an owner signs versions of its lines as that owner until the owner exposes them, after which what those keys alone sign is contested, and archives aware of it never add it (sections 7.3 and 7.5), though readers still find its signatures good; it cannot change the key log, which only rotation keys sign. Whoever holds `nextThreshold` rotation keys of the latest version of a key log, not revealed, takes the owner over, without a fork, by signing the next version with keys of its own; the owner can then only end it, and only if it still holds copies of those keys itself, by signing another version of that number, a fork (section 6.3). Whoever holds `nextThreshold` rotation keys of an earlier version, kept after use, can fork the key log there, which ends the owner and freezes it (section 7.5). No one can fork a key log at its first version, which is computed from the genesis record (section 6.1). The format cannot tell what was signed before an exposure from what was signed after (section 6.4).
+Whoever holds `threshold` current keys of an owner signs versions of its lines as that owner until the owner exposes them, after which what those keys alone sign is contested, and archives aware of it never add it (sections 7.3 and 7.5), though readers still find its signatures good; it cannot change the key log, which only rotation keys sign. Whoever holds `nextThreshold` rotation keys of the latest version of a key log, not revealed, takes the owner over (with a `nextThreshold` of 1, a single key, section 6.2), without a fork, by signing the next version with keys of its own; the owner can then only end it, and only if it still holds copies of those keys itself, by signing another version of that number, a fork (section 6.3). Whoever holds `nextThreshold` rotation keys of an earlier version, kept after use, can fork the key log there, which ends the owner and freezes it (section 7.5). No one can fork a key log at its first version, which is computed from the genesis record (section 6.1). The format cannot tell what was signed before an exposure from what was signed after (section 6.4).
 
 **The keeper.** The keeper an owner names, at most one, fixed by its owner name, names the accepted successor when no ending version before any fork point names one, and may have the owner object taken down from an archive that keeps it (sections 6.6 and 13.2). Whoever controls the keeper's ORCID record or domain holds these powers, also after a domain lapses and is registered by someone else, or an account is taken over; an owner whose keeper may lapse is better named with an institution's domain, or with no keeper.
 
@@ -822,7 +866,7 @@ Whoever holds `threshold` current keys of an owner signs versions of its lines a
 - a host can withhold an exposure or a fork record, serving a key log that stops before it, so that its readers find signed and uncontested what is contested elsewhere, and an archive it serves does not yet freeze the owner (sections 6.5 and 7.5);
 - archives that see one side of a fork and not yet the other show different views of the owner until a copy holding both reaches them (section 6.3);
 - whoever holds the old current keys of an owner that ended honestly signs versions of its lines naming key-log versions before the end, which are signed and not contested unless those keys were exposed; archives take them only from copies (section 7.5), which the holder can make;
-- a thief cannot gain by forking a key log, since the fork freezes the owner; but an owner whose rotation keys are stolen can add nothing more under that identity, and continues under a successor (sections 6.6 and 7.5);
+- a thief gains no forgery by forking a key log, since the fork freezes the owner and what it signs is contested; but on its side it may expose the owner's earlier keys, which makes the owner's own versions signed with them contested unless trusted evidence dates them (sections 6.3 and 7.3): this harms trust in the owner's past, and never lets a forgery pass; and an owner whose rotation keys are stolen can add nothing more under that identity, and continues under a successor (sections 6.6 and 7.5);
 - a timestamp dates what a thief signs between a theft and its exposure as well as what the owner signed, so evidence that dates a version before the exposure admits both (section 7.3);
 - a retired key never exposed still makes good, uncontested signatures naming the versions that list it (section 6.2); an owner unsure that a retired key is destroyed exposes it;
 - the keeper, as above.
@@ -894,15 +938,7 @@ Before 1.0, every minor version MAY be incompatible. A draft MAY change in any w
 - **0.1 (draft), 13 November 2026:** first version.
 - **0.1 (draft), 13 to 18 November 2026:** revisions, and the proposal of PR #30 (names from genesis records, owners and key logs, lines, branches, `sheaf:` URIs, signatures), each listed in the changelog of the [reference text](reference/opensheaf-specification-0.1-full.md).
 - **0.1 (draft), 18 November 2026, rebuilt (PR #30):** the text rebuilt concept by concept into a shorter whole, from the reference text. Decided in the rebuild: archives are named by no file, and `replicas` is dropped (section 3); external records are witnesses, not copies (section 12.3); index declarations name only `names`, `owners` and `sha512` (section 12.5); every removal is a takedown, and tombstones are required once an object is taken down (section 13); drafts are never withdrawn; key-log forks are recorded by fork records, which nullify the keys involved, and healed by the owner, versions of key logs being replaced only there (section 6.3, provisional, #58); findings are errors, warnings or results (section 14.1); security, privacy and rights rewritten (section 15); `licence` for documents only; logical paths exclude empty segments, a final `/` and `\` (section 4.1).
-- **0.1 (draft), 19 November 2026, rebuilt (PR #30):** appendices A (profiles), B (JSON Schemas) and C (examples, checked against the schemas) rebuilt; DOIs written bare; signature files closed to other properties; fork records carry the witnesses of the versions they carry, under named files (section 6.3, provisional, #58); a threshold of 1 with a spare key survives the theft of the daily key by healing (section 6.2).
-- **0.1 (draft), 19 November 2026, after an audit of the rebuilt text (PR #30):** an owner may sign two versions of its key log to nullify keys (section 7.4); a branch of a branch checks files at the first level only (section 9.3); a healing version replaces a fork record, never follows it, and `healed` is defined (section 6.3); one status rule for lines (section 13.1); short forms without a tie-break by date (section 12.2); conformance classes, the Zenodo MD5 of `sources.zip`, `https` hints in the schemas, and duplicated rules cut. Provisional (#58): a fork record or a healing version carries each side from the fork point to its end, nothing is dropped, and only the keys signing at the fork point are nullified; two fork records carrying the same versions are equivalent; versions that need a nullified key are taken only from copies, like the lines of an ended owner, and never signed again (sections 6.3, 6.4 and 7.5); a key log taken down may return from a copy carrying its version (section 13.2).
-- **0.1 (draft), 19 November 2026, after a second audit (PR #30):** explicit nullification, provisional (#58): `nullified` in `keys.json`, by which the owner nullifies exposed keys at once with keys it still trusts, superseding the versions they signed (sections 6.1 and 6.3); a version superseded, and the versions after the fork point that the superseding version does not carry, are dropped from that copy, a key log not reaching them being a result (sections 6.3 and 14.4); an owner signs two versions of one number only when a key-log version supersedes its own, and the versions after it (section 7.4); a healing version may be deposited to a tainted key log (section 6.4); equivalent fork records kept; `parent.object.json` bound to its inventory at every level of a chain (section 9.3); a key log whose tombstone pins a fork record returns (section 13.2); carried key-log versions resolved and indexed (sections 12.3 and 12.5); the exceptions to fixed versions listed once (section 4), forks of lines handled in section 7.4 only, and the signing of key logs in section 6.1 only.
-- **0.1 (draft), 19 November 2026 (PR #30):** a threshold of 1 needs two spare keys, since a thief may nullify one (section 6.2, #58); the examples of appendix C regenerated with three keys from the first version.
-- **0.1 (draft), 19 November 2026, pre-rotation (PR #30):** pre-rotation of key logs, as in KERI (section 6, provisional, #58), replaces the nullification and healing of fork records: current keys (`keys`, `threshold`) sign lines, and the key log only in its first version; each version commits, in `next` and `nextThreshold`, to the digests of the rotation keys that alone sign the next version, used once and never made current; `exposed` replaces `nullified`, in a version that whoever holds current keys cannot contest; a fork of a key log ends the owner, and an archive keeps the side it saw first, appending a fork record that carries the other, so that no version of a key log is ever replaced (sections 4, 6.3 and 7.4); healing, tainted and healed owners, supersession and spare keys dropped; one current key per device; appendix C regenerated.
-- **0.1 (draft), 19 November 2026, after an audit of pre-rotation (PR #30, provisional, #58):** the keeper, and the data of extensions as of the first version, fixed in the genesis record of an owner, so that another keeper means another owner, and the first version of a key log holds only the key fields of the genesis record (sections 5.1, 6.1 and 6.6); a fork of a key log defined by differing `keys.json`, versions with equal ones being equivalent, so that no key log forks at its first version, and a fork record is never a side (section 6.3); a successor accepted only from an ending version before any fork point or from the keeper, and a takedown of an owner object only by law, at its keeper's request or after an ending version, never on current keys (sections 6.6 and 13.2); versions that need an exposed key, or name a key-log version from a fork point on, never added, unless other evidence dates them before (sections 6.4 and 7.5); an ending version without keys (section 6.3); `keys` lists no rotation key, used or not (section 6.1); the checks of section 14 and the risks of section 15.1 completed; appendix C regenerated.
-- **0.1 (draft), 19 November 2026, the computed first version of key logs (PR #30, provisional, #58):** the first version of a key log is computed from the owner's genesis record, byte for byte (files and inventory in JCS, no `message` or `user`), and not signed, and current keys never sign a key log; equivalent versions dropped, two versions of one number with different inventories being a fork (sections 4.1, 6.1 and 6.3); a rotation key committed in one version only (sections 6.1 and 6.2); one status, contested, for versions of lines that need an exposed key or name a key-log version from a fork point on, an exposure counting only before any fork point (sections 6.3, 6.4, 7.3, 7.5, 8.5, 9.3 and 12.3); owner tools show such versions before extending them (section 7.3); at most one accepted successor, and a fork record may follow an ending version (sections 6.3 and 6.6); at most one keeper, and owner objects taken down only by law or at the keeper's request (sections 6.6 and 13.2); strict Ed25519 verification (section 7.2); fork records valid only with a differing version, their files specified (section 6.3); the checks of section 14 and the risks of section 15.1 completed; appendix C regenerated.
-- **0.1 (draft), 19 November 2026, a fork freezes the owner (PR #30, provisional, #58):** once an archive knows of a fork of an owner's key log, it adds no version of that owner's other lines, from a copy or as a deposit, unless evidence it trusts dates its signatures before the fork point, and the owner continues only under its successor (sections 6.3, 6.4, 7.5, 8.3, 12.3 and 15.1, appendices C.8 and D.3); lines are taken only from copies after an ending version alone; a contested version is never added, said once (section 7.5).
-- **0.1 (draft), 19 November 2026, consistency fixes after the final audit (PR #30):** wording only: timestamps change no status by themselves, trusted dates being evidence against `contested` (sections 7.2 and 7.3, appendix D.3); an owner signs again only versions contested by an exposed key, and only while not ended (sections 6.4 and 7.1); data of extensions of the first version of a key log in the genesis record, and each version's `extensions` replacing the one before (sections 4.3 and 6.1); `keeper` a list of one URI (sections 5.1 and 6.6); rules stated twice cut to one statement; checks of the first version of key logs and of selections' owners (sections 14.3 and 14.5).
+- **0.1 (draft), 19 November 2026 (PR #30):** the rebuilt text completed and audited. Appendices A (profiles), B (JSON Schemas) and C (examples, computed and checked against the schemas) rebuilt; DOIs written bare; conformance classes; one status rule for lines, read from the latest signed version (section 13.1); signature files closed to other properties, and owner names, `did:key` URIs and ORCID check digits checked exactly (appendix B, sections 6.6 and 14.3). Key logs, provisional (#58), replacing the fork records that nullified keys and the healing of the rebuilt text: pre-rotation, as in KERI, current keys (`keys`, `threshold`) signing lines, and each version committing in `next` and `nextThreshold` to the digests of the rotation keys that alone sign the next one, each committed in one version only and never made current, with three rotation keys and a threshold of 2 recommended and one offline key with a threshold of 1 allowed, its risk stated (sections 6.1 and 6.2); the first version of a key log computed from the owner's genesis record, byte for byte, and never signed (section 6.1); the keeper, at most one, and the data of extensions of the first version fixed in that genesis record (sections 5.1 and 6.6); `exposed`, in a version that whoever holds current keys cannot contest, an exposure counting in any version, on either side of a fork (section 6.3); an ending version without keys, and at most one accepted successor (sections 6.3 and 6.6); a fork of a key log ends the owner, the archive keeping the side it saw first and appending a fork record that carries the other, and freezes it, nothing more being added unless trusted evidence dates it before the fork (sections 6.3 and 7.5); one status, contested, for versions of lines that need an exposed key or name a key-log version from a fork point on, which owner tools show before extending them, and which an owner not ended may sign again (sections 6.4, 7.1 and 7.3); owner objects taken down only by law or at the keeper's request (section 13.2); strict Ed25519 verification (section 7.2). The inventory chain: every sealed version after the first has `previous` in `object.json`, the digest of the inventory file before it, so that signing a version fixes the bytes of every earlier inventory, and pins of versions vouched for are as reliable as those of versions signed directly (sections 4, 4.3, 7.3 and 14.2; #46). The owner-name layout is described by the plain text file `opensheaf-owner-name-storage-layout.md` in the storage root instead of `ocfl_layout.json`, which names only registered OCFL extensions, the discovery document being authoritative (sections 3.2 and 14.2). Readability: the rules of sections 6.1, 6.3, 7.3 and 14.3 numbered, a walkthrough of the common path at the head of appendix C, and clarifications on names of algorithms 1 to 15 (section 5.2), the owners of the main catalogue (section 8.1), drafts and OCFL (section 10.1), rules not checked from the files (section 14) and the validation of `datacite.json` (appendix B); rules stated once; the checks of section 14 and the risks of section 15.1 completed.
 
 ## Appendix A. Profiles (normative for archives declaring them)
 
@@ -956,7 +992,7 @@ The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.
 
 **Validation.** A file is valid when it validates against its schema with `format` asserted (section 14.2). The schemas of `genesis.json`, `keys.json`, signature files and the keeper's file allow no other properties; the others do, and such properties carry no meaning here (the data of extensions goes under `extensions`, section 2). Where a schema and the text disagree, the text prevails.
 
-**Other files.** `datacite.json` is validated by converting it to XML, following DataCite's mapping between the JSON of its REST API and XML, against the DataCite 4.7 XML Schema, with the requirements of section 4.4. Inventories, their checksum files and `ocfl_layout.json` are OCFL's (section 14.2). The schema of the [timestamps extension](opensheaf-timestamps-0.1.md) is published with it.
+**Other files.** `datacite.json` is validated by converting it to XML against the DataCite 4.7 XML Schema, with the requirements of section 4.4. The conversion follows the correspondence between the attributes of a DOI in DataCite's REST API and the elements of DataCite XML that DataCite documents (its "DataCite XML to JSON Mapping", appendix E), property by property, for the properties of schema 4.7; a verifier without such a converter checks at least the requirements of section 4.4, and warns that the rest was not checked (section 14.1). Inventories, their checksum files and `ocfl_layout.json` are OCFL's (section 14.2). The schema of the [timestamps extension](opensheaf-timestamps-0.1.md) is published with it.
 
 **Beyond the schemas.** A schema checks one file alone; whatever relates it to another file, its place, a digest or a key (names and identifiers, `documentVersion` and `datacite.json`, thresholds, signatures, fork records, uniqueness across entries, index prefixes) is checked by verifiers (section 14).
 
@@ -966,10 +1002,20 @@ The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.
 - Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
 - Whether a takedown reaches the records of external services (#33).
 - The field names of `keys.json`, signature files and the evidence of branches, which the schemas follow (#55); `next`, `nextThreshold`, `exposed` and the files of fork records, provisional (#58).
+- Which converter is the reference for validating `datacite.json` through XML, since DataCite documents the correspondence but specifies no converter for it (#60).
 
 ## Appendix C. Examples (non-normative)
 
-The examples follow one paper of the first archive (section 1) through an illustrative history: its owner is created, the paper is sealed and revised, kept in the archive's main catalogue, and accepted by a journal, which keeps an accepted copy and lists it in an issue. The title and the authors are those of the archive; the dates, the journal and its domain are invented, and the DOIs (with Zenodo's prefix) and the ORCID iD (with a valid check digit) are placeholders. Every name, owner name, `did:key`, file name derived from a key or a digest, and signature is computed: names from the genesis records shown (section 5.2), keys from private keys made for these examples, signatures over the messages shown (section 7.2), and inventory digests from inventories that are not shown. Every JSON file shown validates against its schema (appendix B).
+The examples follow one paper of the first archive (section 1) through an illustrative history: its owner is created, the paper is sealed and revised, kept in the archive's main catalogue, and accepted by a journal, which keeps an accepted copy and lists it in an issue. The title and the authors are those of the archive; the dates, the journal and its domain are invented, and the DOIs (with Zenodo's prefix) and the ORCID iD (with a valid check digit) are placeholders. Every name, owner name, `did:key`, file name derived from a key or a digest, and signature is computed: names from the genesis records shown (section 5.2), keys from private keys made for these examples, signatures over the messages shown (section 7.2), and inventory digests from inventories that are not shown. The exceptions are the names of the timestamp files of section C.6, which stand for tokens that are not shown, and the fingerprint of the timestamp authority, a placeholder. Every JSON file shown validates against its schema (appendix B).
+
+**The common path.** In brief, what an owner does in the common case; the sections cited give the rules, and the examples below show the files.
+
+1. **Create an owner** (sections 5.1, 6.1 and 6.2). The owner tool makes a current key on each device the owner signs from, and rotation keys kept offline, apart from those devices and from each other: three hardware tokens with a `nextThreshold` of 2, or at least a single key, printed or on a USB key, with a `nextThreshold` of 1. It writes the owner's genesis record, with the current keys, the digests of the rotation keys and, if wanted, a keeper. The owner name is the digest of that record, and the first version of the key log is computed from it (section C.1). The rotation keys are then put away: they are used only to change keys.
+2. **Deposit a paper** (sections 4, 7.1 and 10.2). When the paper first leaves the owner's hands, the tool seals it: it writes a genesis record naming the owner as `originator`, makes the object `sheaf:<name>:<owner>` at `<owner>/<name>/`, whose version `v1` holds the sources, a PDF, `genesis.json`, `object.json` and `datacite.json`, and signs it with a current key, naming the latest version of the key log (sections C.2 and C.3). The owner object goes beside it in the storage root, and the discovery document lists both (section 6.5, section C.6).
+3. **Make a new version** (sections 4.2, 4.3 and 7.1). A corrected paper is a new object version, `v2`, holding document version 2. Its `object.json` has `previous`, the digest of the inventory file of `v1`, and it is signed like the first; signing it fixes `v1` too, byte for byte, so a pin of either is reliable (section C.2).
+4. **Follow it in a catalogue** (sections 8.1 to 8.3). The archive's main catalogue, a collection of the same owner, pins each paper by its object version and inventory digest; with `follow` `latest`, its tool writes a new version of the catalogue pinning `v2` once `v2` is signed (section C.4). A journal that accepts the paper keeps an accepted copy, a branch of its own, and lists it in a selection (sections C.4 and C.5).
+
+A new device, or a lost one, is a new version of the key log, signed by the rotation keys (section C.1); a stolen key is exposed the same way (section C.8).
 
 ### C.1 An owner and its key log
 
@@ -1004,7 +1050,7 @@ The genesis record of the authors' owner, which follows section 6.2: one current
 }
 ```
 
-Its name, the owner name, is `wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq`: the SHA-256 digest of `opensheaf-name-0`, a line feed and the bytes shown, with a final line feed, in base32 (section 5.2). The owner object is at `wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/` in the owner-name layout (section 3.2). The first version of its key log is computed from the genesis record, and holds nothing else (section 6.1): `genesis.json`, the bytes shown; `object.json`, kept the same in every later version; and `keys.json`, which holds only the `keys`, `threshold`, `next` and `nextThreshold` of the genesis record. Both are the JCS form (RFC 8785) of their fields, without a final line feed:
+Its name, the owner name, is `wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq`: the SHA-256 digest of `opensheaf-name-0`, a line feed and the bytes shown, with a final line feed, in base32 (section 5.2). The owner object is at `wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/` in the owner-name layout (section 3.2). The first version of its key log is computed from the genesis record, and holds nothing else (section 6.1): `genesis.json`, the bytes shown; `object.json`, whose fields every later version repeats, adding `previous` (below); and `keys.json`, which holds only the `keys`, `threshold`, `next` and `nextThreshold` of the genesis record. Both are the JCS form (RFC 8785) of their fields, without a final line feed:
 
 ```json
 {"format":"opensheaf-object/0.1","kind":"owner","name":"wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq","owner":"wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq","specification":"0.1","status":"active"}
@@ -1059,11 +1105,11 @@ When the laptop is replaced, the second version lists the new laptop's key and r
   "format": "opensheaf-signature/0.1",
   "object": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
   "version": "v2",
-  "inventorySha512": "15a59a59d9a62215742e1b5a81945c1c4811a3715437c1b2a7c7bffb12dc30cb20d4af28aa4384457e3e1980448fcaa879fe3ceb42e3e46934ae00d826f6a4e4",
+  "inventorySha512": "7fdfdda7962ba1056084741253ca508cce2b3fa07953e6c377c53bcf54864304e38fa0fed7182f73426dd2d35c77623296e64ddeea89964eccc56f070d1bfffb",
   "signer": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
   "key": "did:key:z6Mkh5i2epG9LsWNnYbBHG7ctEiNLZPjsBNXxNUcsaYgEtNm",
   "keyLog": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v1?sha512=05823c3e4bc200eb136103d10001074a9eb8732ac1e44907ed4ed29ff480fa10d4adbb88a8c686d003d7e0feab6a678b6bc7b853fc1d9b2f1f91ea66e40d94c4",
-  "signature": "uyMqDSR7gf24NqaBNLNfivi/5HDpRn0TrnufSsy1bjRqA+nl1NEif4C2PgUIrn5JwOh8w6Q0cJYc34rp+wD5Bg=="
+  "signature": "GY9+I1T2O5vELZxuJD/WO//Kd5VLxyZlF7fEJoLOm1ju/Lmxhrlgv7HR9iXXPeTTryL/bs3PalyM3/7atY8/AQ=="
 }
 ```
 
@@ -1090,6 +1136,12 @@ Every token of the first version, the third, which did not sign, included, is th
     }
   }
 }
+```
+
+Its `object.json` repeats the fields of that of the first version, and adds `previous`, the digest of the inventory file of the first version, which fixes the bytes of that inventory (section 4.3):
+
+```json
+{"format":"opensheaf-object/0.1","kind":"owner","name":"wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq","owner":"wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq","previous":"05823c3e4bc200eb136103d10001074a9eb8732ac1e44907ed4ed29ff480fa10d4adbb88a8c686d003d7e0feab6a678b6bc7b853fc1d9b2f1f91ea66e40d94c4","specification":"0.1","status":"active"}
 ```
 
 The journal's owner, `a3fh2fbfja6kewlsvd466qc4jzj63cextra2h74rfff5p5tcfjwa`, is a group: three current keys, one for each of its editors, with a `threshold` of 2, so that every version it makes carries two signature files, and three rotation keys with a `nextThreshold` of 2; its genesis record names its domain, `https://journal.example.org/`, as keeper.
@@ -1130,7 +1182,7 @@ Its genesis name is `7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua`; by a
 }
 ```
 
-The `datacite.json` of the same version (section 4.4). The version has a Zenodo DOI, so Zenodo is its `publisher`, and `url` is its landing page (appendix A.3):
+The `datacite.json` of the same version (section 4.4). The version has a Zenodo DOI, so Zenodo is its `publisher`, and `url` (section 4.4) is the version's landing page on the archive's website (appendix A.3), while Zenodo's own record of the DOI has Zenodo's (appendix A.1):
 
 ```json
 {
@@ -1159,7 +1211,7 @@ The `datacite.json` of the same version (section 4.4). The version has a Zenodo 
 }
 ```
 
-The second object version holds document version 2 (section 4.2), corrected after the referee's report and accepted by the journal: its `object.json` has `documentVersion` 2, `changes`, `stage` `AM` and the DOI `10.5281/zenodo.1234568`, and its `datacite.json` has `version` `"2"` and `IsNewVersionOf` the DOI of version 1.
+The second object version holds document version 2 (section 4.2), corrected after the referee's report and accepted by the journal: its `object.json` has `previous`, the digest of the inventory file of the first version (section 4.3), `documentVersion` 2, `changes`, `stage` `AM` and the DOI `10.5281/zenodo.1234568`, and its `datacite.json` has `version` `"2"` and `IsNewVersionOf` the DOI of version 1.
 
 ### C.3 A signature
 
@@ -1170,11 +1222,11 @@ The signature of that version by the new laptop's key, `extensions/opensheaf-wit
   "format": "opensheaf-signature/0.1",
   "object": "sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
   "version": "v2",
-  "inventorySha512": "8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb",
+  "inventorySha512": "a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a",
   "signer": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
   "key": "did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn",
-  "keyLog": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=15a59a59d9a62215742e1b5a81945c1c4811a3715437c1b2a7c7bffb12dc30cb20d4af28aa4384457e3e1980448fcaa879fe3ceb42e3e46934ae00d826f6a4e4",
-  "signature": "RZbS9O+tWpxacfLRp7uqmDNmVS56UZkfZ597uSXEau5hjBHA2eNhfhW803vmibo36iEPWjsWNJtNmWAo2MPYDQ=="
+  "keyLog": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=7fdfdda7962ba1056084741253ca508cce2b3fa07953e6c377c53bcf54864304e38fa0fed7182f73426dd2d35c77623296e64ddeea89964eccc56f070d1bfffb",
+  "signature": "RgA4ue6yWUrcrjWDOwOuyEqSMUZwN00eVkjjtZzLBRzgpOiBjVtxWBsbizhs5SuDdaUuSiOMPoKNnwAmbfF7BQ=="
 }
 ```
 
@@ -1184,8 +1236,8 @@ The message it signs, each line ended by a line feed (section 7.2):
 opensheaf-signature/0.1
 object sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq
 version v2
-inventory 8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb
-keylog sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=15a59a59d9a62215742e1b5a81945c1c4811a3715437c1b2a7c7bffb12dc30cb20d4af28aa4384457e3e1980448fcaa879fe3ceb42e3e46934ae00d826f6a4e4
+inventory a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a
+keylog sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=7fdfdda7962ba1056084741253ca508cce2b3fa07953e6c377c53bcf54864304e38fa0fed7182f73426dd2d35c77623296e64ddeea89964eccc56f070d1bfffb
 ```
 
 With a threshold of 1, this one good signature makes the version signed (section 7.3).
@@ -1205,7 +1257,7 @@ The `members.json` of the second version of the archive's main catalogue (sectio
       "owner": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
       "at": [ "https://mgubi.org/papers/" ],
       "version": "v2",
-      "inventorySha512": "8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb",
+      "inventorySha512": "a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a",
       "follow": "latest",
       "doi": "10.5281/zenodo.1234568",
       "conceptDoi": "10.5281/zenodo.1234566",
@@ -1227,7 +1279,7 @@ The `members.json` of an issue of the journal, a selection owned by the journal'
       "owner": "a3fh2fbfja6kewlsvd466qc4jzj63cextra2h74rfff5p5tcfjwa",
       "at": [ "https://journal.example.org/" ],
       "revisions": [ { "documentVersion": 2, "version": "v1",
-                       "inventorySha512": "bee7b797712909f29be9a252814ec10955ac62938775e392d8945f153df6707877e99b19a519c89e2d12dd5934b0190014947515387c1e74e35839f81278efdd" } ],
+                       "inventorySha512": "61cdcc9a63a1058652f14d9391b4aa9edb5f90a4c18ab5c75012950b99549e84f94390fb194181d429ec3bdc49271c635f5469255521bb84f07044963152081d" } ],
       "cite": { "title": "Mass gap for the fractional $\\Phi^4_2$ model",
                 "creators": [ "P. Duch", "M. Gubinelli" ], "year": 2026, "issued": "2026-03-02" } },
     { "kind": "document",
@@ -1235,7 +1287,7 @@ The `members.json` of an issue of the journal, a selection owned by the journal'
       "owner": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
       "at": [ "https://mgubi.org/papers/" ],
       "revisions": [ { "documentVersion": 2, "version": "v2",
-                       "inventorySha512": "8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb",
+                       "inventorySha512": "a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a",
                        "doi": "10.5281/zenodo.1234568" } ] }
   ]
 }
@@ -1243,7 +1295,7 @@ The `members.json` of an issue of the journal, a selection owned by the journal'
 
 ### C.5 A branch: an accepted copy
 
-The `object.json` of the first version of the journal's accepted copy, a branch of the authors' line at their object version `v2` (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is `sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua:a3fh2fbfja6kewlsvd466qc4jzj63cextra2h74rfff5p5tcfjwa`:
+The `object.json` of the first version of the journal's accepted copy, a branch of the authors' line at their object version `v2` (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is `sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua:a3fh2fbfja6kewlsvd466qc4jzj63cextra2h74rfff5p5tcfjwa`. The first version of a line, it has no `previous`:
 
 ```json
 {
@@ -1257,7 +1309,7 @@ The `object.json` of the first version of the journal's accepted copy, a branch 
     "name": "7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua",
     "objectVersion": "v2",
     "documentVersion": 2,
-    "inventorySha512": "8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb",
+    "inventorySha512": "a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a",
     "url": "https://mgubi.org/papers/ocfl/wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua/v2/"
   },
   "documentVersion": 2,
@@ -1273,12 +1325,12 @@ Its content holds the files of the parent version except `datacite.json` and `ob
 
 ### C.6 The archive
 
-The storage root of the authors' archive in the owner-name layout (section 3.2), showing the paper's witness folder, with an RFC 3161 token of each signature (timestamps extension; the tokens are not shown):
+The storage root of the authors' archive in the owner-name layout (section 3.2), with the plain text file that describes that layout in place of OCFL's `ocfl_layout.json`, which names only registered layouts, and showing the paper's witness folder, with an RFC 3161 token of each signature (timestamps extension; the tokens are not shown):
 
 ```
 ocfl/
   0=ocfl_1.1
-  ocfl_layout.json
+  opensheaf-owner-name-storage-layout.md
   wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/
     wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/      the key log
     7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua/      the paper
@@ -1315,15 +1367,15 @@ The discovery document (section 3.1). The archive hosts one owner, whose key log
   "objects": [
     { "id": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
       "kind": "owner", "name": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq", "owner": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
-      "head": "v2", "inventorySha512": "15a59a59d9a62215742e1b5a81945c1c4811a3715437c1b2a7c7bffb12dc30cb20d4af28aa4384457e3e1980448fcaa879fe3ceb42e3e46934ae00d826f6a4e4",
+      "head": "v2", "inventorySha512": "7fdfdda7962ba1056084741253ca508cce2b3fa07953e6c377c53bcf54864304e38fa0fed7182f73426dd2d35c77623296e64ddeea89964eccc56f070d1bfffb",
       "status": "active" },
     { "id": "sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
       "kind": "document", "name": "7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua", "owner": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
-      "head": "v2", "inventorySha512": "8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb",
+      "head": "v2", "inventorySha512": "a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a",
       "status": "active", "label": "fractional-phi42-mass-gap" },
     { "id": "sheaf:sdjhoc72tckc7pou5xjfledh7xqfu7kafb7oqe4nwwyln3y4h6la:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
       "kind": "collection", "name": "sdjhoc72tckc7pou5xjfledh7xqfu7kafb7oqe4nwwyln3y4h6la", "owner": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
-      "head": "v2", "inventorySha512": "50e7b5cf4544971bcb7e8ff54e2f439c9a521887bca95d788f06efdb2a9651df88bbf714eb8493fdbb8dc25cf3abe07d906e8aa85786ec5ebd49811cfafe6215",
+      "head": "v2", "inventorySha512": "0a64a3bd1761a9304b2ca02a40aeacc4c0393ef29a9692485639b9db984b9f051c5e9f1e85e2e2f01a2cc8e3826e497669484bd57fb2a549d25f0d2e9ee23b58",
       "status": "active", "label": "papers" }
   ],
   "tombstones": [
@@ -1345,9 +1397,9 @@ sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua
     the authors' line (its owner is the originator)
 sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua/v2
     document version 2 of the authors' line
-sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua/v2?sha512=8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb
+sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua/v2?sha512=a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a
     the authors' object version v2, which the journal vetted
-sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua/v2?sha512=8f46023605acf5918b93759f4e2a0d09e5f745bea2e0618e47d41deabb230e4d4a661066a459efb82350e6c92ec22d794c8898e73074f96af4ca6715f17c58cb&at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
+sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua/v2?sha512=a269c26a28cb2a0b2d3e3a41c73d463f2d37e80e6c8ca2ff07b3ca8481be1b233e23cae5055ebb372cd786e95947cf20f128ca385993d488f99726a72503de7a&at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
     the same, with a hint
 sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua:a3fh2fbfja6kewlsvd466qc4jzj63cextra2h74rfff5p5tcfjwa/v2
     document version 2 of the journal's line, its accepted copy
@@ -1355,7 +1407,7 @@ sheaf:7zorzcm4euymqzldcvzyyg46w7z2admlgmn5lz7rosperrskp7ua:*
     the work: the authors' line, the journal's and any other
 sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq
     the authors' owner: its key log
-sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=15a59a59d9a62215742e1b5a81945c1c4811a3715437c1b2a7c7bffb12dc30cb20d4af28aa4384457e3e1980448fcaa879fe3ceb42e3e46934ae00d826f6a4e4
+sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=7fdfdda7962ba1056084741253ca508cce2b3fa07953e6c377c53bcf54864304e38fa0fed7182f73426dd2d35c77623296e64ddeea89964eccc56f070d1bfffb
     version 2 of its key log, as keyLog names it
 sheaf:7zorzcm4/v2
 sheaf:7zorzcm4:a3fh2fbf/v2
@@ -1401,11 +1453,11 @@ The first of its signature files:
   "format": "opensheaf-signature/0.1",
   "object": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
   "version": "v3",
-  "inventorySha512": "63abb35ab6e09d6ac5fea6b0b817ec89c717b2d1412855c17676ff1d17fb132479804b8ffbeabc7cccdc410464bdbf3f869a6fa3b8e39a82400e15a9970bd68e",
+  "inventorySha512": "69ec2e6265ba049796d0b4f962ca1ddbcb489886e6780d5eece489b25cf6dc988ad653ebec46e9f5063f182da90b2ee0146bc6d1faf8ff7189e75bc739a71c9a",
   "signer": "wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq",
   "key": "did:key:z6MksaMy3cmXbnUKqzGv18xhbBreY6berNYVtTZyDrYRb1Hn",
-  "keyLog": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=15a59a59d9a62215742e1b5a81945c1c4811a3715437c1b2a7c7bffb12dc30cb20d4af28aa4384457e3e1980448fcaa879fe3ceb42e3e46934ae00d826f6a4e4",
-  "signature": "PEPRWF1LTaX2xPu6xM7GZEdCWwUF5RzhueLijq6W33CAGXXgNrOfv4Mum/lnkfxE124lX6u5IQvm9emtkQpzCg=="
+  "keyLog": "sheaf:wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/v2?sha512=7fdfdda7962ba1056084741253ca508cce2b3fa07953e6c377c53bcf54864304e38fa0fed7182f73426dd2d35c77623296e64ddeea89964eccc56f070d1bfffb",
+  "signature": "+ieqNbLZiuBp+Es5jFGJLHYE5z/adk9E00Q/1UTRX9lmiC37UKjuc0KbQHyrYfz8B9/mPPpWoNJqEAOEhJEoDw=="
 }
 ```
 
@@ -1421,7 +1473,7 @@ wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwp
   v4/                                the fork record
     inventory.json
     inventory.json.sha512
-    content/forked/dldgqou7ovpvkbxo/          the other version 3
+    content/forked/42whcj2qbhdeh7nx/          the other version 3
       inventory.json
       inventory.json.sha512
       keys.json
@@ -1429,7 +1481,7 @@ wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwp
       signature-fhujijfn3zmvteie.json
 ```
 
-The fork record's `genesis.json` and `object.json` are those of `v1`, byte for byte, to which its inventory refers, and it has no `keys.json`; the inventory carried has the owner object's `id`, and `dldgqou7ovpvkbxo` begins the base32 SHA-256 digest of its bytes. Readers report the owner ended at version 3, its fork point, and the fork freezes it: an archive that knows of the fork adds no version of its lines, from a copy or as a deposit, unless evidence it trusts shows it signed before either version 3 (section 7.5). The exposure in the owner's version 3, made at the fork point, no longer counts (section 6.3), and versions of lines whose signatures name version 3, of either side, are contested, the owner's new signature of the paper's version 2 included; the versions the thief signs with the stolen key naming version 2 are signed, but frozen like the rest. Archives holding the paper's version 2 keep it; others add it only if they trust its RFC 3161 token to date it before the fork, and readers weigh it by such evidence (section 6.4). The keeper may name a successor (section 6.6), under which the authors continue their papers as branches. An archive that met the thief's version 3 first keeps that one, and appends a fork record carrying the owner's.
+The fork record's `genesis.json` is that of `v1`, byte for byte, and its `object.json` has the fields of that of `v1` and `previous`, the digest of the inventory file of the owner's version 3 (section 4.3); it has no `keys.json`. The inventory carried has the owner object's `id`, and `42whcj2qbhdeh7nx` begins the base32 SHA-256 digest of its bytes. Readers report the owner ended at version 3, its fork point, and the fork freezes it: an archive that knows of the fork adds no version of its lines, from a copy or as a deposit, unless evidence it trusts shows it signed before either version 3 (section 7.5). The exposure in the owner's version 3 still counts, as an exposure does on either side of a fork (section 6.3), so the versions the thief signs with the stolen key naming version 2 stay contested; and versions of lines whose signatures name version 3, of either side, are contested too, the owner's new signature of the paper's version 2 included, so that the paper's version 2 is contested. Had the thief's version 3 also exposed the first laptop's key, the paper's version 1, signed with it, would be contested as well, though the owner made it. Archives holding the paper's versions keep them; others add them only if they trust their RFC 3161 tokens to date them before the fork, and readers weigh them by such evidence (section 6.4). The keeper may name a successor (section 6.6), under which the authors continue their papers as branches. An archive that met the thief's version 3 first keeps that one, and appends a fork record carrying the owner's.
 
 ## Appendix D. Rationale (non-normative)
 
@@ -1441,6 +1493,7 @@ The reasons for the main choices, in the order of the sections.
 - **Why a minimal core.** Richer structures (a proof and its detailed argument, a dataset and its analyses) are built on top, by links, DataCite relations or extensions, whose data the pins and signatures fix with each version (section 2), leaving room for designs not yet imagined.
 - **Why archives are hosts.** Once owners sign their lines, a name for an archive identifies no authority and ties lines to places (#52, #55); every location is a hint, checked by pins and signatures. `replicas` was dropped for that reason, and because it is read from the very site that may be gone.
 - **Why identifiers from lines, and two layouts.** Identifiers chosen by archives clash once an archive keeps copies of another's objects; lines never clash (#52). The owner-name layout keeps each owner in one folder, which moves by copying; the hashed layout serves archives too large for that, mostly in git.
+- **Why no `ocfl_layout.json` for the owner-name layout.** OCFL allows in it only the name of a registered extension (OCFL 1.1, section 4.1), which the owner-name layout is not; OCFL lets a plain text file in the storage root document a local arrangement (section 4.5), and the discovery document names the layout for readers, who compute paths from it.
 - **Why document and object versions.** Readers and DOI services see versions of the work; the storage keeps every change, a corrected description or a notice included, each fixed by its pin.
 - **Why the owner numbers its document versions.** External numberings have gaps and miss versions never public there; external labels are kept beside the owner's numbers.
 - **Why an explicit history.** Dates may be approximate or unknown, and fixed versions cannot correct pointers to their predecessors when a version is found later. A list of object versions, read from the latest signed version, can be corrected; it cannot list digests, since a version cannot contain the digest of its own inventory.
@@ -1463,7 +1516,7 @@ The reasons for the main choices, in the order of the sections.
 - **Why the first seen is kept.** Without witnesses, an archive cannot tell which side of a fork came first elsewhere; it keeps what it holds, which no one can then remove, and appends a fork record carrying the other side, so that nothing a signature names is dropped and every copy shows the fork. Meeting both sides at once, it may keep either: each ends the owner.
 - **Why a fork freezes the owner.** Only rotation keys, kept apart and used once, can fork a key log, so a fork is rare and shows that they were exposed; the format cannot tell the owner's side, and healing, tried before, did not settle against a thief ([keys and forks](https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/keys-and-forks.md)). Without a clock, no rule can tell what the owner signed before the fork from what a thief signs after it, also with old current keys naming earlier versions of the key log, and each attempt to salvage part of it (taking a forked owner's versions only from copies, for instance) made new edge cases. So a fork ends the owner and freezes it: archives keep what they hold, signatures stay good, nothing more is added unless evidence dates it before the fork, and, as in Radicle, where a compromised key means a new identity, the work continues under a successor.
 - **Why exposed keys are exposed, never revoked.** Signatures carry no time, so nothing tells what a key signed before it leaked from what a thief signs after; revocation would need trusted time to decide which signatures count. So no signature is undone: the owner exposes the keys, what needs them is contested, never added to an archive unless other evidence dates it before the exposure, and readers weigh the past by other evidence (section 6.4).
-- **Why one status, contested.** An exposed key and a fork of a key log raise one question, whether a good signature may be a thief's, so one status answers both, once, for archives (never added), readers (never the latest signed version), branches and collections, and the same evidence lifts it. An exposure counts only before any fork point, since from there either side may be a thief's, which could expose the owner's keys. Versions of key logs are never contested: current keys never sign them.
+- **Why one status, contested.** An exposed key and a fork of a key log raise one question, whether a good signature may be a thief's, so one status answers both, once, for archives (never added), readers (never the latest signed version), branches and collections, and the same evidence lifts it. An exposure counts in any version, on either side of a fork: the format cannot tell which side is the owner's, and an exposure only makes versions contested, never signed, so counting a thief's costs trust in the owner's past at most, while ignoring the owner's would let what the thief signs with a stolen key pass. Versions of key logs are never contested: current keys never sign them.
 - **Why key logs travel beside objects.** A key log checks itself from its owner name, so any copy will do; as an owner object it is copied once per storage root and grows without changing the lines it signs.
 - **Why timestamps are an extension.** A single researcher needs none, since signatures stay good; an institution may want signatures dated by a provider it names, to tell what came before an exposure. The extension keeps the trade-offs of RFC 3161 authorities and OpenTimestamps out of the core; timestamps change no status by themselves, and section 7.3 admits trusted dates as evidence against `contested`.
 - **Why the keeper is in the genesis record.** A keeper named in the key log could be changed by whoever holds rotation keys, a thief included, and after a fork by either side. Fixed by the owner name, the keeper answers for the owner from outside its keys, and a successor named after a fork counts only when the keeper names it. There is at most one keeper, so that at most one successor is accepted.
@@ -1473,6 +1526,7 @@ The reasons for the main choices, in the order of the sections.
 
 - **Why signatures name the key-log version.** A signature of a checksum file alone could be paired with any key-log version. Judged against the version it names, a signature survives retired keys: an owner cannot find every copy of its lines to sign them again.
 - **Why a signed version vouches for its past.** An inventory fixes every earlier version, so one signature covers them all, as Radicle's canonical head vouches for the commits it reaches.
+- **Why `previous` chains inventories.** As a git commit names its parents by digest, each version names the digest of the inventory file before it. OCFL chains content, not inventories: an inventory records the digests of earlier versions' files, and earlier inventories need only state the same versions as JSON values (OCFL 1.1, section 3.7). A pin is the digest of an inventory's bytes, so without the chain a version vouched for would be fixed in its files but not in the bytes its pin names, and its pin would be less reliable than that of a version signed directly (#46).
 - **Where witnesses live.** A witness follows its version, so it cannot be in it, and a new version for each would mix evidence with the work. OCFL closes the object folder, and its `logs/` are not covered by digests; extension folders hold data outside every version, as the mutable-head extension does.
 - **Why no list of an owner's lines.** Copies are compared through the inventories they share, so a copy that stops early is only older.
 - **Why versions held are never removed.** If a host or a thief could cause a removal, it could remove the owner's own versions; keeping everything costs at most one blocked version number in one archive.

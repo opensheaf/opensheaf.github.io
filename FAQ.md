@@ -147,7 +147,7 @@ where its files are. An archive hosts the lines of any number of owners and
 owns none of them by hosting them: every version of a line is signed by its
 owner, wherever it is stored, and an archive cannot add to another owner's
 line. A copy kept elsewhere (a mirror) stays its owner's line and can only
-receive the owner's versions (see "Who owns an object, and what is a
+receive the owner's versions (see "Who owns an object?" and "What is a
 branch?").
 
 A **collection** is a statement: a versioned list of pins, made by a curator,
@@ -191,16 +191,25 @@ revision a selection vetted into a line of the selection's owner, where later
 changes are the curator's acts (for a journal). The licence of a collection
 (CC0 for the list) never extends to its members.
 
-## Who owns an object, and what is a branch?
+## Who owns an object?
 
 A work has a **name**, the digest of the genesis record written when it is
 sealed, at its owner's request, before it is first shared. Each history of it
 has an **owner**: a person, a group or an institution, which decides its
 versions and signs them. The pair (name, owner) identifies a **line**: one
-history, with a single writer. A line is its signed
-versions, wherever they are stored: the archive that keeps a copy is only
-where it lives, and an owner who moves to another archive continues its lines
-there.
+history, with a single writer. A line is its signed versions, wherever they
+are stored: the archive that keeps a copy is only where it lives, and an owner
+who moves to another archive continues its lines there.
+
+Every version of every line is signed, except the computed first version of a
+key log (below), and the key logs travel with the objects they sign, so a line
+can be checked from any copy, even when the archives that served it have gone.
+A version signed with good keys vouches for every version before it: its
+inventory fixes their files, and its `object.json` gives, as `previous`, the
+digest of the inventory before it, so that signing a version fixes every
+earlier one byte for byte.
+
+## What is a key log, and which keys sign what?
 
 An owner is itself an object, named by its own genesis record, which lists its
 first keys, and whose versions are its **key log**. Each version lists the
@@ -209,47 +218,65 @@ number of them that must sign, and commits, by their digests, to the
 **rotation keys** that alone sign the next version of the key log, as in KERI
 (pre-rotation is provisional, #58); current keys never sign the key log, whose
 first version is computed from the genesis record and signed by no key.
+
 Current keys are in daily use, one on each device; rotation keys are kept
-apart (on hardware tokens, for instance), committed in one version and used
-once, and never become current keys; three of them with two required survive
-the loss of one or the theft of one. Keys can thus be added or retired while
-the owner stays the same, and what was signed stays signed: a signature that
-verifies against the key-log version it names is good for ever. A version
-signed with good keys vouches for every version before it, since its inventory
-fixes them. A person usually needs one signature; a group of co-authors can
-share one owner with a threshold, for instance two signatures out of three. If
-current keys that could reach the threshold may have been exposed, the owner
-signs with its rotation keys a version of its key log listing them as
+apart, committed in one version and used once, and never become current keys.
+Three rotation keys on hardware tokens, with two required, survive the loss of
+one or the theft of one; a single one kept offline (printed, or on a USB key)
+also works, but its loss leaves the owner unable to change its keys, and its
+theft lets a thief take the owner over. Keys can thus be added or retired
+while the owner stays the same, and what was signed stays signed: a signature
+that verifies against the key-log version it names is good for ever. A person
+usually needs one signature; a group of co-authors can share one owner with a
+threshold, for instance two signatures out of three.
+
+## What happens when a key is stolen?
+
+If current keys that could reach the threshold may have been exposed, the
+owner signs with its rotation keys a version of its key log listing them as
 **exposed**, which a thief holding current keys cannot contest; or it
 **ends**, by a last version of its key log that may name a successor, which
 continues the work by branches. A thief holding enough rotation keys not yet
 revealed takes the owner over by signing the next version of its key log,
 without a fork; the owner can then only end it, and only with its own copies
-of those keys. Two signed versions of a key log with one number whose
-inventories differ are a fork, which needs rotation keys stolen or kept after
-use, and never happens at the first version, which every copy computes alike:
-since no one can tell the owner's side from a thief's, the fork ends the
-owner; an archive keeps the side it saw first and appends a fork record
-carrying the other, so that every copy shows the fork. Either way the old
-signatures stay good, but readers trust them only as far as other evidence
-goes, since nothing tells the owner's signatures from a thief's; versions that
-need an exposed key, or name a version of a key log from a fork on, are
-**contested**, and archives never add them, unless other evidence (a
-timestamp) dates them before. A fork **freezes** the owner: archives that know
-of it add nothing more to its lines, unless such evidence dates it before the
-fork, and the work continues under a successor; after an ending without a
-fork, archives take the owner's lines only from copies, never as new
-deposits. Every version of every line is signed, except
-the computed first version of a key log, and the key logs travel with the
-objects they sign, so a line can be checked from any copy, even when the
-archives that served it have gone. An owner may name in its genesis record one
-keeper who answers for it (an ORCID iD, an institution), fixed with the owner
-name, which the keeper may confirm in a place only it controls, and which
-names the successor when no ending version before a fork names one, after a
-fork for instance; nothing requires it. Drafts are a sandbox: objects of a
-reserved owner, `draft`, kept by one archive, never signed, pinned or copied
-out of it, and free to be rewritten or deleted. Sealing makes a new object,
-the first version of the line; the draft's versions are not part of it.
+of those keys.
+
+Two signed versions of a key log with one number whose inventories differ are
+a fork, which needs rotation keys stolen or kept after use, and never happens
+at the first version, which every copy computes alike. Since no one can tell
+the owner's side from a thief's, the fork ends the owner; an archive keeps the
+side it saw first and appends a fork record carrying the other, so that every
+copy shows the fork. An exposure counts on either side of a fork: a thief that
+forks may expose the owner's earlier keys, which harms trust in what they
+signed, but never lets a forgery pass.
+
+Either way the old signatures stay good, but readers trust them only as far as
+other evidence goes, since nothing tells the owner's signatures from a
+thief's; versions that need an exposed key, or name a version of a key log
+from a fork on, are **contested**, and archives never add them, unless other
+evidence (a timestamp) dates them before. A fork **freezes** the owner:
+archives that know of it add nothing more to its lines, unless such evidence
+dates it before the fork, and the work continues under a successor; after an
+ending without a fork, archives take the owner's lines only from copies, never
+as new deposits.
+
+## Who answers for an owner?
+
+An owner may name in its genesis record one **keeper** who answers for it (an
+ORCID iD, an institution), fixed with the owner name. The keeper may confirm
+the link in a place only it controls, and names the successor when no ending
+version before a fork names one, after a fork for instance. Nothing requires a
+keeper: an anonymous referee, for instance, has none.
+
+## What is a draft?
+
+Drafts are a sandbox: objects of a reserved owner, `draft`, kept by one
+archive, never signed, pinned or copied out of it, and free to be rewritten or
+deleted, which OCFL does not expect of its objects, so nothing may rely on
+them. Sealing makes a new object, the first version of the line; the draft's
+versions are not part of it.
+
+## What is a branch?
 
 Anyone can copy a genesis record, so the name alone cannot say whose history
 is the right one. That is why the owner is part of the identity: a copy

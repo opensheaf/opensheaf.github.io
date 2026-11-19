@@ -151,10 +151,12 @@
           authority later to date earlier signatures. Each version of the key
           log states the extensions in force (section 6.1 of the
           specification), so a later version that keeps the declaration
-          repeats it; authorities listed in earlier versions stay trusted all
-          the same for signatures naming it, since authorities are never
-          delisted (section 8). Without any, only OpenTimestamps proofs are
-          used.
+          repeats it. That authorities listed in earlier versions stay trusted
+          for signatures naming a later version, also one that drops the
+          declaration, is this extension's own reading of its data, consistent
+          with that rule: each version states which extensions it declares,
+          and this extension never delists an authority (section 8). Without
+          any, only OpenTimestamps proofs are used.
         </p>
       </li>
     </ul>
@@ -198,15 +200,16 @@
       proof reaches; the earliest valid timestamp of a signature file is its
       date. A date counts only if it is not earlier than the date of the
       key-log version that the signature file's <tt class="verbatim">keyLog</tt> names,
-      and a signature naming an undated key-log version has none (signatures
-      naming the first version, computed from the genesis record and never
-      signed, are bounded by nothing): an authority is trusted only from the
-      key-log version that lists it, which is itself dated by authorities
-      listed before it, so no one, a thief with rotation keys included, can
-      list an authority of its own to date signatures before the listing. A
-      version is <strong>dated</strong> by the n-th earliest of the dates of
-      its good signature files naming one key-log version, n being the number
-      of signatures it needs (<tt class="verbatim">threshold</tt> or, for a version of a
+      and a signature naming another undated key-log version has none.
+      Signatures naming the first version of a key log, which is computed from
+      the genesis record, never signed and so never dated, have dates all the
+      same, but no lower bound. An authority is trusted only from the key-log
+      version that lists it, which is itself dated by authorities listed
+      before it, so no one, a thief with rotation keys included, can list an
+      authority of its own to date signatures before the listing. A version is
+      <strong>dated</strong> by the n-th earliest of the dates of its good
+      signature files naming one key-log version, n being the number of
+      signatures it needs (<tt class="verbatim">threshold</tt> or, for a version of a
       key log, <tt class="verbatim">nextThreshold</tt> of the version before; sections
       6.1 and 7.3 of the specification); the first version of a key log, never
       signed, is not dated; a version vouched for (section 7.3 of the
@@ -403,69 +406,28 @@ extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7d
       </li>
       <li>
         <p>
-          <strong>0.1 (draft), 19 November 2026, for the rebuilt specification
-          (PR #30):</strong> section references updated (extensions are in
-          section 2); an exposed key ends the owner or is nullified by a fork
-          of its key log and healing, and dates help readers weigh the
-          versions of ended and tainted owners and of nullified keys (section
-          6); after an audit, timestamp files found over HTTP only where
-          folders can be listed (section 3), and pending proofs in a branch
-          count for nothing (section 6); after a second audit, keys nullified
-          by a version of the key log as well as at a fork (sections 1 and 6).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 19 November 2026, pre-rotation (PR
-          #30):</strong> following the pre-rotation of key logs in the
-          specification (#58): exposed keys in place of nullified keys, and no
-          healing or tainted owners (sections 1 and 6); a version of a key log
-          is dated by as many signatures as it needs, <tt class="verbatim">nextThreshold</tt>
-          of the version before (section 5); the example of appendix B commits
-          to rotation keys in <tt class="verbatim">next</tt>.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 19 November 2026, after an audit of
-          pre-rotation (PR #30):</strong> following the specification, the
+          <strong>0.1 (draft), 19 November 2026 (PR #30):</strong> following
+          the rebuilt specification and its pre-rotation of key logs (#58):
+          section references updated (extensions are in section 2); timestamps
+          change no status by themselves, and are evidence that readers and
+          archives may weigh against <tt class="verbatim">contested</tt>, for exposed
+          keys, exposed on either side of a fork, and for forks of key logs,
+          and to add a version of the lines of a frozen owner (sections 1, 2
+          and 6, citing sections 7.3 and 7.5 of the specification); the
           declaration of the first version of a key log is in the owner's
-          genesis record, fixed by the owner name (sections 4 and 6,
-          appendices A and B); dates are evidence an archive may weigh to add
-          a version that needs an exposed key, which it otherwise never adds
-          (sections 2 and 6).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 19 November 2026, the computed first version of
-          key logs (PR #30):</strong> following the specification (#58), the
-          first version of a key log is computed and not signed, so it is not
-          dated, and the example of appendix B stamps a signature of the
-          second version (section 5, appendix B); versions that need an
-          exposed key, or name a key-log version from a fork point on, are
-          contested unless trusted dates show their signatures made before
-          (section 6); the schema allows no other properties (appendix A).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 19 November 2026, a fork freezes the owner (PR
-          #30):</strong> following the specification (#58), dates showing
-          signatures made before a fork of the key log are what lets an
-          archive add a version of a frozen owner's lines (section 6).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.1 (draft), 19 November 2026, consistency fixes after the
-          final audit (PR #30):</strong> timestamps change no status by
-          themselves, the specification admitting trusted dates against <tt
-          class="verbatim">contested</tt> and for a frozen owner (sections 7.3 and 7.5
-          of the specification, cited in section 2); a later key-log version
-          that keeps the declaration repeats it (section 4); the signature
-          file of the example named after a digest of <tt class="verbatim">next</tt>
-          (appendix B); changelog in order.
+          genesis record, fixed by the owner name, and a later version that
+          keeps it repeats it, authorities listed earlier staying trusted by
+          the extension's own reading of its data (section 4, appendices A and
+          B); a version of a key log is dated by as many signatures as it
+          needs, <tt class="verbatim">nextThreshold</tt> of the version before, and the
+          first version, computed and never signed, is not dated, signatures
+          naming it having dates with no lower bound (section 5); timestamp
+          files are found over HTTP only where folders can be listed (section
+          3), and pending proofs in a branch count for nothing (section 6);
+          the schema allows no other properties (appendix A); the example of
+          appendix B commits to rotation keys in <tt class="verbatim">next</tt> and
+          stamps a signature of the second version, named after a digest of
+          <tt class="verbatim">next</tt>.
         </p>
       </li>
     </ul>
