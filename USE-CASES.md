@@ -10,25 +10,25 @@ given as illustrations; any tool following the specification will do.
 Three roles recur:
 
 - [<dfn>authors</dfn>](#authors) make documents and their versions;
-- [<dfn>archives</dfn>](#archives) keep documents, every version, impartially:
+- [archives](#archives) keep documents, every version, impartially:
   an author's own archive, an institution's repository, an independent storage
   site;
-- [<dfn>selections</dfn>](#selections) vet particular versions (revisions) of
+- [selections](#selections) vet particular versions (revisions) of
   documents: a journal, a digest, a review journal, a reading list,
   proceedings.
 
-Archives list what they keep in <dfn>catalogues</dfn>, which pin objects whole
+Archives list what they keep in **catalogues**, which pin objects whole
 and may follow them as they grow; selections are the other kind of collection
 of section 8, which pins revision sets and changes only by an act of its
-curator. Copies are of two kinds too: a <dfn>mirror</dfn> copies a whole line,
-with the key logs of its signers (an archive keeping another owner's work), an
-<dfn>accepted copy</dfn> is a branch: a new line of the selection's owner,
+curator. Copies are of two kinds too: a **mirror** copies a whole line, with
+the key logs of its signers (an archive keeping another owner's work), an
+**accepted copy** is a branch: a new line of the selection's owner,
 starting from one vetted revision. Collections and copies only concern
 documents kept in OpenSheaf archives: a paper that exists only on arXiv or on
 a publisher's site is first deposited in an archive (for instance imported
 from arXiv into its author's archive) before it can be pinned.
 
-Every line has an <dfn>owner</dfn>: a person, a group or an institution with
+Every line has an **owner**: a person, a group or an institution with
 keys, which signs every version it makes (sections 6 and 7). An archive hosts
 the lines of any number of owners, and owns none of them by hosting them; it
 is found at its address, and has no identity of its own. A line is named by
@@ -49,12 +49,14 @@ archive, [mgubi.org/papers](https://mgubi.org/papers/), is one).
   of her lines, at `<owner>/<name>/`, with a label (`kpz-uniqueness`) for the
   website. When she replaces a laptop that is wiped and safe, she retires its
   key by a new version of her key log, and nothing else changes. If a laptop
-  is stolen with its key, she nullifies that key by a fork of her key log and
-  heals it with her spare key, and continues her lines; or she ends her
-  owner, naming a new one as successor, and continues her papers as branches
-  under it (sections 6.2 and 6.3; fork records and healing are provisional,
-  #58). Either way, what the thief signed stays good, and readers weigh her
-  history by other evidence (section 6.4).
+  is stolen with its key, she nullifies that key by a new version of her key
+  log signed with her spare key, and continues her lines (if the thief has
+  already signed a version of her key log, archives that meet both record a
+  fork, which she heals with her spare key); or she ends her owner, naming a
+  new one as successor, and continues her papers as branches under it
+  (sections 6.2 and 6.3; nullified keys, fork records and healing are
+  provisional, #58). Either way, what the thief signed stays good, and
+  readers weigh her history by other evidence (section 6.4).
 - Work not yet shared can be a **draft** (section 10), kept by her archive
   under the reserved owner `draft`: unsigned, never copied, and free to be
   rewritten. When she first shares a paper, sealing makes its line.
@@ -275,7 +277,7 @@ particular version of each paper.
   journal makes itself is its own version 4
   (provisionally: the numbering on branches is an open question of section
   9, #57); when the editors later vet the authors' corrected version, the
-  copy moves its branch point to it, with the same evidence, as the journal's
+  copy moves its branch point to it, with new evidence, as the journal's
   next version (the journal's own files are then dropped; how a move keeps
   them is an open question of section 9, #57).
 

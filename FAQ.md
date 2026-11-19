@@ -193,17 +193,17 @@ changes are the curator's acts (for a journal). The licence of a collection
 
 ## Who owns an object, and what is a branch?
 
-A work has a <dfn>name</dfn>, the digest of the genesis record written when it
-is sealed, at its owner's request, before it is first shared. Each history of
-it has an <dfn>owner</dfn>: a person, a group or an institution, which decides
-its versions and signs them. The pair (name, owner) identifies a
-<dfn>line</dfn>: one history, with a single writer. A line is its signed
+A work has a **name**, the digest of the genesis record written when it is
+sealed, at its owner's request, before it is first shared. Each history of it
+has an **owner**: a person, a group or an institution, which decides its
+versions and signs them. The pair (name, owner) identifies a **line**: one
+history, with a single writer. A line is its signed
 versions, wherever they are stored: the archive that keeps a copy is only
 where it lives, and an owner who moves to another archive continues its lines
 there.
 
 An owner is itself an object, named by its own genesis record, which lists its
-first keys, and whose versions are its <dfn>key log</dfn>: the list of its
+first keys, and whose versions are its **key log**: the list of its
 public keys and the number of them that must sign, each version signed by the
 keys of the one before. Keys can thus be added or retired while the owner
 stays the same, and what was signed stays signed: a signature that verifies
@@ -213,14 +213,16 @@ A threshold binds only the signatures naming its version, so owners choose it
 at the start (1 with a spare key kept apart, or 2 of 3 keys); a group of
 co-authors can share one owner with a threshold, for instance two signatures
 out of three. If keys that could reach the threshold may have been exposed,
-the owner either <dfn>ends</dfn>, by a last version of its key log that may
-name a successor, which continues the work by branches; or it nullifies those
-keys by a fork of its key log and <dfn>heals</dfn> it with keys that took no
-part, and continues its lines (fork records and healing are provisional,
-#58). Two versions of a key log with one number, both signed, are a fork:
-since no one can tell the owner's side from a thief's, an archive that meets
-both keeps neither, but a fork record carrying both, and the keys that signed
-them are nullified wherever the record travels. Either way the old signatures
+the owner either **ends**, by a last version of its key log that may name a
+successor, which continues the work by branches; or it **nullifies** those
+keys, by a new version of its key log signed with keys that took no part (a
+spare kept apart), and continues its lines (nullified keys, fork records and
+healing are provisional, #58). Two versions of a key log with one number, both
+signed, are a fork: since no one can tell the owner's side from a thief's, an
+archive that meets both keeps neither, but a fork record carrying both, and
+the keys that signed them are nullified wherever the record travels; the owner
+**heals** the fork by a version carrying both, signed with its spare keys.
+Either way the old signatures
 stay good, but readers trust them only as far as other evidence goes, since
 nothing tells the owner's signatures from a thief's; an ended owner, or one
 that cannot heal, signs nothing more, and archives take its lines only from
@@ -236,7 +238,7 @@ version of the line; the draft's versions are not part of it.
 
 Anyone can copy a genesis record, so the name alone cannot say whose history
 is the right one. That is why the owner is part of the identity: a copy
-continued by another owner is a <dfn>branch</dfn>, which declares the version
+continued by another owner is a **branch**, which declares the version
 it starts from, and an archive cannot pass its own changes off as another
 owner's, since it cannot sign for it. A branch is a new object: it keeps only
 the version it starts from, with the parent's inventory, `object.json` and
@@ -310,7 +312,7 @@ regenerated from the sources whenever the presentation changes.
 To withdraw a document (for instance a retraction), its owner makes a new
 object version that only marks it withdrawn, with a date and a reason: the
 content and its history stay, and presentations show the withdrawal. Content
-is removed only by a <dfn>takedown</dfn> (by law, for a breach of rights, or
+is removed only by a **takedown** (by law, for a breach of rights, or
 because the archive stops keeping it): the object is deleted and a tombstone
 is left in the discovery document, so that collections pinning it report it
 as removed rather than corrupt. Every removal is a takedown, so nothing leaves

@@ -50,10 +50,10 @@
       signature stays good (sections 6 and 7 of the specification). Signatures
       say who made a version, not when. So when a key may have been exposed,
       the core cannot tell the signatures made with it before from those its
-      new holder makes after: the owner ends, or nullifies the keys by a fork
-      of its key log and heals it (section 6.3 of the specification); its
-      signatures stay good, and readers trust its history only as far as other
-      evidence goes (section 6.4 of the specification).
+      new holder makes after: the owner ends, or nullifies the keys in its key
+      log, healing a fork of it if a thief made one (section 6.3 of the
+      specification); its signatures stay good, and readers trust its history
+      only as far as other evidence goes (section 6.4 of the specification).
     </p>
     <p>
       A timestamp is such evidence: it shows that a signature existed by a
@@ -202,12 +202,12 @@
     <p>
       Dates are evidence for readers; this extension draws no conclusion from
       them in the format. For an owner that has ended or is tainted, and for
-      keys nullified at a fork (section 6.3 of the specification), a reader
-      MAY trust the versions dated before the time it believes a key was
-      exposed, and SHOULD say on what evidence. The time of the version that
-      ends the owner, and of each version a fork record or a healing version
-      carries, bound when the owner knew. A branch keeps the timestamp files
-      of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>
+      nullified keys (section 6.3 of the specification), a reader MAY trust
+      the versions dated before the time it believes a key was exposed, and
+      SHOULD say on what evidence. The time of the version that ends the owner
+      or nullifies keys, and of each version a fork record or a healing
+      version carries, bound when the owner knew. A branch keeps the timestamp
+      files of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>
       (section 9.2 of the specification), without the <tt class="verbatim">&lt;version&gt;/</tt>
       folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>);
       a pending proof kept there can never be completed, and counts for
@@ -371,7 +371,8 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           versions of ended and tainted owners and of nullified keys (section
           6); after an audit, timestamp files found over HTTP only where
           folders can be listed (section 3), and pending proofs in a branch
-          count for nothing (section 6).
+          count for nothing (section 6); after a second audit, keys nullified
+          by a version of the key log as well as at a fork (sections 1 and 6).
         </p>
       </li>
     </ul>
