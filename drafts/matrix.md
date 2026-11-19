@@ -8,8 +8,8 @@ identity and shares files, what it guarantees and for how long, and why it
 cannot hold an OpenSheaf archive or replace its owners and keys. It then goes
 through the uses it can have beside an archive: announcing new versions,
 carrying notices with pins, discussion and review, signing in to services,
-coordinating the signers of a group owner, recording which version of a key
-log was seen first, and passing files to referees. It ends with what the
+coordinating the signers of a group owner, evidence of which version of a key
+log was known first, and passing files to referees. It ends with what the
 specification might say, experiments and open questions. It continues the
 notes on notification protocols and federated systems in
 [positioning.md](positioning.md) (sections 4 and 5) and section 4.2 of
@@ -67,29 +67,34 @@ power levels, its rules for joining and for reading history.
 
 **Federation and the event graph.** Each event names the events it follows
 (`prev_events`) and those that authorise it (`auth_events`). The events form
-a directed acyclic graph, copied to every server with members in the room;
-when servers send events concurrently, the graph branches, and an algorithm
+a directed acyclic graph, a partial order, copied to the servers with
+members in the room, each holding what it received since it joined; when
+servers send events concurrently, the graph branches, and an algorithm
 (state resolution) decides the room's state. A room has no home: it exists
-as long as some server keeps it. Since room version 12, the default since
-specification 1.16 (September 2025), a room ID is the hash of the room's
-creation event and no longer contains a server name.
+as long as some server keeps it. In room version 12, which specification
+1.16 (September 2025) made the default, though servers SHOULD keep using
+version 11 for a while, a room ID is the hash of the room's creation event
+and no longer contains a server name.
 
-**Event IDs.** Since room version 3, an event ID is a hash of the event (its
-reference hash), and since version 4 it is written in URL-safe base64. Every
-event also carries a SHA-256 hash of its full content (`hashes.sha256`) and
-the signature of the server that sent it.
+**Event IDs.** Since room version 3, an event ID is a hash of the event in
+its redacted form (its reference hash), and since version 4 it is written in
+URL-safe base64. Every event also carries a SHA-256 hash of the whole event
+as sent (`hashes.sha256`, computed without its signatures) and the signature
+of the server that sent it.
 
 **Sizes.** An event, signatures included, is at most 65536 bytes in its
 canonical JSON form; its `type` and `state_key` at most 255 bytes each.
 Larger content (files, images) goes in the content repository (section 4).
 
 **Visibility.** A room's `history_visibility` is `world_readable`, `shared`,
-`invited` or `joined`. A `world_readable` room can be read by any
-authenticated user, guests included, without joining. Nothing in Matrix is
-readable without some account: even a world-readable room needs an access
-token, at least a guest's. The list of public rooms of a server can be read
-without one, and since 1.15 a server MAY answer a request for a room's summary
-without one.
+`invited` or `joined`. A `world_readable` room can be read without joining by
+any authenticated user, guests included, but only through a server that
+already takes part in the room: Matrix has no reading over federation
+(peeking over federation is MSC2444, open). A guest needs a server that
+offers guest accounts, and can join only a room whose `m.room.guest_access`
+is `can_join`. Nothing in a room is readable without some account. The list
+of a server's public rooms can be read without one, and since 1.15 a server
+MAY answer a request for a room's summary without one.
 
 **Spaces.** A space (since 1.2) is a room of type `m.space` whose state lists
 other rooms (`m.space.child`), forming a hierarchy that clients show as a
@@ -102,16 +107,18 @@ user IDs exclusively, and may set the timestamp of the events it sends.
 Bridges to other networks are built this way.
 
 **Links.** The `matrix:` URI scheme (since 1.2, registered with IANA as
-provisional) names rooms, users and events: `matrix:r/room:example.org` for
-a room alias, `matrix:roomid/<id>?via=example.org` for a room ID, with
-`/e/<event id>` for an event, `matrix:u/alice:example.org` for a user.
+provisional) names rooms, users and events, with their IDs written without
+the sigil (`!`, `$`, `@`, `#`): `matrix:r/room:example.org` for a room
+alias, `matrix:roomid/<id>?via=example.org` for a room ID, with `/e/<event
+id>` for an event, `matrix:u/alice:example.org` for a user. Since a room ID
+of version 12 has no server part, `via` is the only hint of where to ask,
+and is needed in practice.
 
 **Deployments.** Matrix is used by governments and public bodies (France's
 Tchap; the German armed forces' BwMessenger; the TI-Messenger standard of
-gematik, for German healthcare) and by universities, many of them German or
-Austrian: TU Dresden, which also supports the services of TU Darmstadt and
-KIT, KIT itself, TU Wien, the University of Innsbruck, ETH Zurich. A
-researcher at such a university has a Matrix ID on a server run by the
+gematik, for German healthcare) and by universities, among them TU Dresden,
+KIT and the University of Innsbruck, which run servers for their members. A
+researcher at such a university may have a Matrix ID on a server run by the
 institution, which matters for sign-in (section 6.4).
 
 ## 3. Identity in Matrix
@@ -136,8 +143,8 @@ name is bound to DNS and TLS: whoever controls the domain controls the
 server and its keys.
 
 A receiving server checks every event: the origin server's signature, the
-content hash, and the room's authorisation rules (is the sender a member;
-do the power levels allow this event). What it can conclude is: *this server
+hash, and the room's authorisation rules (is the sender a member; do the
+power levels allow this event). What it can conclude is: *this server
 signed this event, and says this user sent it*. The server can send events
 in the name of any of its users, and a user whose server lapses or is
 seized loses their identity with it. There is no user signature on ordinary
@@ -147,15 +154,17 @@ events.
 
 End-to-end encryption brought keys held by users. Each device has its own
 keys; encrypted messages are tied to the device that sent them. With
-**cross-signing**, a user has a master key, which signs a self-signing key
-(which signs the user's devices) and a user-signing key (which signs other
-users' master keys once verified). Users verify each other by comparing short
-strings of emoji or numbers (SAS) or by scanning a QR code, in person or over
-another channel. Secret storage and server-side key backups keep the private
-keys, encrypted by a recovery key, on the server.
+**cross-signing**, a user has three Ed25519 key pairs: a master key, which
+signs a self-signing key (which signs the user's devices) and a user-signing
+key (which signs other users' master keys once verified). Users verify each
+other by comparing short strings of emoji or numbers (SAS) or by scanning a
+QR code, in person or over another channel. Secret storage keeps the
+cross-signing private keys on the server, encrypted by a recovery key, and
+they are shared with the user's verified devices; server-side key backup
+keeps, likewise encrypted, the keys of encrypted messages.
 
 This is a real separation of roles, rarely used master key and daily keys,
-which federated-identity.md (section 4.2) notes as worth borrowing. But:
+which federated-identity.md (section 4.2) notes as worth noticing. But:
 
 - it covers encrypted messages only, not the events of a public room;
 - the server publishes the keys, and trust begins on first use, unless users
@@ -228,8 +237,8 @@ In an encrypted room the client encrypts the file before uploading it, with a
 random AES-256 key in counter mode, and sends in the event an `EncryptedFile`
 object: the `url`, the key (as a JSON Web Key), the initialisation vector,
 and `hashes.sha256`, the SHA-256 digest of the encrypted file. The
-specification says clients MUST verify the hash before decrypting. A plain
-`m.file` has no hash.
+specification says clients MUST verify the hash before using the file's
+contents. A plain `m.file` has no hash.
 
 ### 4.4 What is guaranteed
 
@@ -256,7 +265,8 @@ Taken together:
    only a digest of the ciphertext, valid inside the room.
 3. **No durable history.** A room lives as long as some server keeps it; a
    server may purge history and media, and once all servers leave, the room
-   is gone. Redaction (section 6.1) removes content on every server.
+   is gone. Redaction (section 6.1) strips content on every server that
+   follows the protocol.
 4. **Server-rooted identity.** What a third party can check is the server's
    signature, not the author's.
 5. **Size.** An event holds at most 64 KiB, enough for metadata, a pin or a
@@ -274,18 +284,22 @@ checked**. A message about a document version carries the version's pin
 the archive identifier, object identifier, version and inventory digest),
 and a reader who wants to rely on it fetches the version from an archive and
 checks it against the pin. Where a message must count as evidence of who
-said something, it carries the author's own signature, made with an owner's
-keys, in its content; the server's signature only shows which server sent
-it.
+said something, what it says is itself in an archive, as a document or a
+witness signed with an owner's keys (PR #30, section 7), and the message
+carries its pin; the server's signature only shows which server sent the
+message.
 
 ### 6.1 Announcing new versions
 
 An archive, or an announcement service (positioning.md, section 3), has a
-public room, `world_readable`, in which a bot posts each new object version:
-the title, the authors, a link and the pin. The bot reads the archive's Atom
-feed (`feed` in the discovery document) and needs nothing from the archive
-itself, which stays static. Readers follow by joining the room, or by
-reading it as guests, from any server, with any client.
+public room, `world_readable`, in which a bot posts each new document
+version: the title, the authors, a link and the pin. The bot reads the
+archive's Atom feed (`feed` in the discovery document, which is optional)
+or, failing that, compares `objects` in the discovery document with what it
+saw before; it needs nothing from the archive itself, which stays static.
+Readers follow by joining the room from their own server, or read it as
+guests through a server that takes part in the room, where the room and the
+server allow guests (section 2).
 
 The message can be an ordinary `m.room.message` with `msgtype` `m.notice`,
 whose `body` is readable text, and an additional namespaced key holding the
@@ -296,26 +310,29 @@ data for tools, as bridges do:
   "msgtype": "m.notice",
   "body": "New version: On sheaves of documents, v3 -- https://...",
   "org.opensheaf.version": {
-    "pin": "sheaf:<name>:<owner>/v3?sha512=<digest>",
-    "at": "https://authors.example.org/",
+    "pin": "sheaf:<name>:<owner>/v3?sha512=<digest>&at=https%3A%2F%2Fauthors.example.org%2F",
     "title": "On sheaves of documents",
     "kind": "document"
   }
 }
 ```
 
-Every client shows it; tools read the key. A curated announcement service
-(daily listings by subject) is a room per listing, and a **space** groups
-them: a space for a subject, rooms for its listings, the hierarchy browsable
-in any client.
+The `at` parameter of the `sheaf:` URI (PR #30, section 12.1) gives the
+archive where a copy is expected. Every client shows the message; tools
+read the key. A curated announcement service (daily listings by subject) is
+a room per listing, and a **space** groups them: a space for a subject,
+rooms for its listings, the hierarchy browsable in any client.
 
 Compared with the ActivityPub bridge of positioning.md (section 5), a Matrix
-room is copied to every server with members in it, so the announcements
-outlive the server of the bot, and the order of messages is fixed by the
-event graph. Compared with WebSub, the reader needs no server of their own,
-only an account. The announcement is not a record: if it is redacted, its
-content is stripped on every server and only the event ID remains, which
-does not matter, since the version is in the archive.
+room is copied to the servers with members in it, so the announcements can
+outlive the server of the bot, for as long as those servers keep them.
+Compared with WebSub, the reader needs no server of their own, only an
+account. The announcement is not a record: if it is redacted, its content is
+stripped by every server that follows the protocol (Synapse, by default,
+keeps the original for seven days), while the envelope remains with the
+event's hash and its server's signature, so that whoever kept the original
+can show that it was sent. Nothing is lost either way, since the version is
+in the archive.
 
 ### 6.2 Notices with pins
 
@@ -330,28 +347,32 @@ that a document cannot hold about itself.
 The notice is a custom event, for instance `org.opensheaf.notice`, whose
 content can be a COAR Notify message (an ActivityStreams 2.0 object:
 *Announce Review*, *Announce Endorsement*, *Announce Relationship*) with
-pins as the objects, so that the patterns already implemented by
-repositories and review services are reused, not reinvented. Custom event
-types federate and are stored like any other event; a notice of a few
-kilobytes is far within the 64 KiB limit.
+pins as the objects, as positioning.md proposes, so that the patterns
+already implemented by repositories and review services are reused, not
+reinvented. Custom event types federate and are stored like any other
+event; a notice of a few kilobytes is far within the 64 KiB limit.
 
 What Matrix adds over an LDN inbox:
 
-- the notices are copied to every server in the room, not held by one
+- the notices are copied to the servers in the room, not held by one
   endpoint;
-- they are ordered by the event graph, and each event's ID is its hash, so
-  a later reader sees the same sequence as the archive did, except for
-  redactions;
+- each event names the events it follows, and its ID is its hash, so the
+  notices are in a partial order, the same for honest servers that hold the
+  same events (a server can still withhold or purge events, and concurrent
+  events have no order between them);
 - who may post is set by the room's power levels and, against abusive
   servers, by server access control lists (`m.room.server_acl`).
 
-What it does not add: the notice says what its sender's server says. A
-notice that must stand as evidence (a review, an endorsement) carries a
-signature by the reviewer's owner keys, in the same form as a signature file
-(PR #30, section 7.2), so that it can be checked against the reviewer's key
-log without Matrix. COAR Notify itself has no signatures; this is the
-integrity positioning.md proposes to add, and it is independent of the
-transport.
+What it does not add: the notice says what its sender's server says. What
+must stand as evidence is not the notice but what it points to. A review is
+an OpenSheaf document of its own, in the reviewer's or the journal's
+archive, signed by the owner of its line (PR #30, section 7.1); the notice
+carries the pin of the review and the pin of the reviewed version, and both
+are checked in their archives. An endorsement of a version by someone other
+than its owner can be a witness on that version (PR #30, section 7.2), held
+with the object and checked there. COAR Notify itself identifies resources
+by URI, without digests; carrying pins is the integrity positioning.md
+proposes to add, and it is independent of the transport.
 
 COAR Notify runs over HTTP between repositories and services, and those
 already implementing it (DSpace, EPrints, HAL, Peer Community In,
@@ -374,11 +395,11 @@ For review (issue #29), Matrix offers more than a public network:
   the review, on the journal's server; the journal knows who it is, the
   authors do not. MSC4014 would make per-room identities part of the
   protocol, but it is open.
-- **Files for referees** (section 6.7).
+- **Files for referees** (section 6.8).
 - **The record**: the review sent to the authors, and published if the
-  journal publishes reviews, is a document in an archive, signed by the
-  journal's owner keys (or by the referee's, if signed); the room is the
-  working space, not the record.
+  journal publishes reviews, is a document in an archive, on a line of the
+  journal or of the referee, signed by its owner; the room is the working
+  space, not the record.
 
 ### 6.4 Signing in to services
 
@@ -386,31 +407,49 @@ Matrix has a standard way for a third party to check a user's Matrix ID. The
 client asks its server for a token
 (`POST /_matrix/client/v3/user/<user id>/openid/request_token`), which
 answers with an `access_token`, the `matrix_server_name` and an expiry; the
-client hands the token to the service, which asks that server
-(`GET /_matrix/federation/v1/openid/userinfo?access_token=...`) and receives
-`{"sub": "@alice:example.org"}`. The token proves nothing else and expires.
+client hands the token and the server name to the service, which asks that
+server (`GET /_matrix/federation/v1/openid/userinfo?access_token=...`) and
+receives `{"sub": "@alice:example.org"}`. The token proves nothing else and
+expires.
 
 Services that OpenSheaf leaves to others need accounts: a custodian that
-accepts deposits or keeps mirrors (PR #30, section 11), a selection or
-journal whose editors approve members, a gateway or index that takes
-corrections, an announcement service with moderators. Any of them can accept
-a Matrix ID as a login, alongside ORCID or an institutional login, through
-this exchange.
+keeps mirrors or indexes (PR #30, section 11), a service that accepts
+deposits on behalf of authors, a selection or journal whose editors approve
+members, a gateway or index that takes corrections, an announcement service
+with moderators. Any of them can accept a Matrix ID as a login, alongside
+ORCID or an institutional login, through this exchange.
 
-What this gives is the server's say-so, as section 3.1 explains. Its value
-is in the server:
+A service doing so must take care:
 
-- a Matrix ID on a university's server (`@alice:tu-dresden.de`) shows, as
-  much as an institutional login does, that the institution has an account
-  for this person; a custodian run by a consortium of universities could
-  accept deposits from the IDs of member servers, without running its own
-  identity provider;
+- **The server.** The server name comes from the client. The service finds
+  the server by Matrix's server discovery, and MUST check, as the
+  specification says, that the user ID returned is on the server it called;
+  otherwise any server could vouch for any user.
+- **Replay.** The token is a bearer token with no audience and is not
+  single-use: a service that receives one can present it to another service
+  until it expires (an hour, in the specification's example). A service
+  should accept a token only once, within a login it started (bound by a
+  nonce to the session), and should prefer the server's OAuth 2.0 provider
+  (specification 1.15) where there is one, since it names the client and its
+  redirect addresses.
+- **Fetching.** The service connects to a host the client names, so it
+  limits where it connects (public addresses only, with limits on time and
+  size), as PR #30 (section 12.6) asks of gateways.
+
+What this gives is the server's say-so, as section 3.1 explains, and its
+value is in the server:
+
+- a Matrix ID on a university's server (`@alice:tu-dresden.de`) shows that
+  the institution's server has an account for this person; it says less
+  than an institutional login through eduGAIN, which can carry attributes
+  such as affiliation, and university servers may also hold accounts of
+  alumni or guests;
 - a Matrix ID on a public server shows only that someone controls an account
   there.
 
 This is sign-in to a service, not authorship and not ownership. What a
 service lets a signed-in user do ends in an act made with an owner's keys:
-sealing a version, signing a selection, signing a review. **Matrix
+signing a version of a document, of a selection or of a review. **Matrix
 authenticates the session; the key log authenticates the record.**
 
 ### 6.5 Matrix and owners
@@ -423,32 +462,37 @@ imagined. None is recommended.
   ORCID record, or `https://<domain>/.well-known/opensheaf`). A Matrix ID
   would add a third kind, confirmed by a state event in a room the user
   controls; but the user's server can send that event in the user's name, so
-  the confirmation is only as strong as the server, and an institution that
-  runs a Matrix server already controls the domain, which is a keeper today.
-  Nothing is gained.
+  the confirmation is only as strong as the server; it could be read only
+  with a Matrix account, where the other two are public web pages; and an
+  institution that runs a Matrix server already controls its domain, which
+  is a keeper today. Nothing is gained.
 - **A Matrix ID as a claim of identity.** An owner's key log, or a document's
   `creators`, may say that a Matrix ID belongs to the same person; the user
   may confirm it from their account. This is a claim, as weak as the server,
   and the question of tying owners to people is issue #41. It could at most
   be an extension.
-- **Matrix keys as owner keys.** Cross-signing master keys are Ed25519 and
-  could be written as `did:key` URIs. They should not be: using one key in
-  two protocols lets a signature made in one be presented in the other, and
-  Matrix resets keys through the server, which an owner's key log must never
-  accept. Owner keys stay owner keys.
+- **Matrix keys as owner keys.** Cross-signing keys are Ed25519 and could be
+  written as `did:key` URIs. They do not fit the rules for owners' keys (PR
+  #30, section 6.2): Matrix keeps the master private key on the server, in
+  secret storage, and copies it to every verified device, where an owner's
+  current keys are never copied to another device; the master key would
+  have to serve as a rotation key, used rarely, where Matrix uses it for
+  routine verification; and a cross-signing reset, authorised by the
+  account's password, discards the key that a key log names. Owner keys stay
+  owner keys.
 
 ### 6.6 Coordinating the signers of a group
 
 A group owner, a journal's editorial board or a project, has several keys
-and a threshold (PR #30, section 6.1). Sealing a version needs `threshold`
+and a threshold (PR #30, section 6.1). Signing a version needs `threshold`
 signature files, made by different people on different machines. Today they
 would exchange them by e-mail or through a shared folder.
 
 A room for the group serves well:
 
-- a bot posts the draft to be sealed, with the digest of its inventory;
-- each signer checks the draft and posts their signature file, a small JSON
-  object, as a custom event (`org.opensheaf.signature`);
+- a bot posts the version to be signed, with the digest of its inventory;
+- each signer checks the version and posts their signature file, a small
+  JSON object, as a custom event (`org.opensheaf.signature`);
 - once `threshold` signatures are in, a bot or any member writes them to the
   witness folder and publishes the version.
 
@@ -456,23 +500,30 @@ The power levels of the room can mirror who is expected to sign; but what
 decides is the signatures themselves, checked against the key log, never
 the room's state. The same works for rotating the keys of a group, where a
 new key-log version needs the signatures of the rotation keys (PR #30,
-section 6.1), and for co-signing a selection's new version.
+section 6.1), and for signing a selection's new version.
 
-### 6.7 Which version was seen first
+### 6.7 Which version was known first
 
-Issue #58, and section 11.4 of federated-identity.md, note that a fork of a
-key log cannot be resolved without an order, and consider witnesses that
-record which version of a key log they saw first. A room is a replicated,
-hash-linked, partially ordered record shared by many servers. Archives and
-custodians could post, in a common room, the pin of every key-log version
-they meet: if one archive posted version 5 of a key log with digest A, and
-an event of another server referencing that post appears before any post of
-a version 5 with digest B, then A was seen first by those servers.
+Under PR #30 (sections 6.3 and 6.4) a fork of a key log ends the owner,
+whatever the order in which its sides appeared. Which side was known first
+still matters to what an archive keeps and to how far evidence can date
+signatures, and both are open: issue #58 discusses them, and the open
+questions of PR #30, section 6.6, list witnesses that record which version
+of a key log they saw first, as an extension. Section 11.4 of
+federated-identity.md sketches pre-rotation in this light.
 
-This is weaker than a witness in KERI's sense or a transparency log:
+A room is a replicated, hash-linked record shared by many servers.
+Archives and custodians could post, in a common room, the pin of every
+key-log version they meet. What the event graph supports is only a lower
+bound by ancestry: if a post of version 5 with digest B descends from an
+event that itself descends from a post of version 5 with digest A, then A
+was known in the room before B was posted. Nothing more can be concluded:
 
-- the order is that of the event graph; two servers can post concurrently,
-  and the graph then branches without saying which came first;
+- the graph is a partial order; posts made concurrently have no order
+  between them, and the absence of a reference to a post proves nothing,
+  since each server chooses the events its own events follow;
+- a hostile server can attach a new event to old events, making it look
+  concurrent with, or as early as, events it never saw before;
 - `origin_server_ts` is the sending server's claim, covered by its
   signature but checked by no one, and an application service can set it;
 - a room's history can be purged by each server for itself, and the room
@@ -480,20 +531,20 @@ This is weaker than a witness in KERI's sense or a transparency log:
 - there are no consistency proofs: a server could show a client a partial
   history.
 
-It could still be one source of first-seen evidence among others (timestamps
-by OpenTimestamps, deposits, archives' own records), reported by a verifier
-and never decisive. It belongs to the discussion of witnesses in #58 and
-#55, as an option to evaluate, not a proposal.
+It could still be one source of evidence among others (timestamps by
+OpenTimestamps, deposits, archives' own records), reported by a verifier
+and never decisive. It is an option to weigh in #58, not a proposal.
 
 ### 6.8 Passing files to referees and collaborators
 
-Where files must go to a few people and not be published (a submission under
-review, issue #29; drafts shared among authors, PR #30, section 10), an
-encrypted room carries them with a hash of the ciphertext checked by every
-client. The recipients then check the files against the draft's or the
-version's inventory, which is the check that counts. Upload limits are set
-by each server, often tens of megabytes, which suits papers but not large
-datasets.
+Where files must go to a few people and not be published, such as a
+submission under review (issue #29), an encrypted room carries them, with a
+hash of the ciphertext checked by every client. Under PR #30 (section 10.2)
+a work is sealed before it is shared privately, so what is sent is a signed
+version, and the recipients check the files against its pin, which is the
+check that counts. Whether drafts may be shared before sealing is open
+(#29). Upload limits are set by each server, often tens of megabytes (50
+MB by default in Synapse), which suits papers but not large datasets.
 
 ## 7. Matrix compared with other channels
 
@@ -503,18 +554,18 @@ these are summaries and the details are in the references:
 | | Reader needs | History kept by | Order | Author's signature | Deletion |
 |---|---|---|---|---|---|
 | Atom feed and WebSub | an HTTP client (and a server, to be pushed) | the archive | the feed's | none | the archive rewrites the feed |
-| ActivityPub (Mastodon) | an account on a server | the author's server, copies at followers' servers | per server | none (server keys) | the author can delete; copies receive a deletion |
-| Matrix | an account, a guest's at least | every server in the room | event graph, hash-linked | none for public events (server keys) | redaction strips content on every server |
-| AT Protocol (Bluesky) | an HTTP client, for public data | the user's repository and relays | per repository | yes, the repository's signing key | the user can delete |
+| ActivityPub (Mastodon) | an HTTP client for public posts; an account to follow | the author's server, copies at followers' servers | per server | none (actor keys held by the server) | the author can delete; copies receive a deletion |
+| Matrix | an account, a guest's at least, on a server in the room | each server in the room, from when it joined, until it purges | event graph, hash-linked (a partial order) | none for public events (server keys) | redaction strips content on servers that follow the protocol |
+| AT Protocol (Bluesky) | an HTTP client, for public data | the user's PDS; relays and AppViews hold copies or indexes | per repository | the account's key in its DID document, usually held by the PDS | the user can delete |
 | Nostr | a client and some relays | the relays the author chose | timestamps claimed by authors | yes, the author's key | requests only |
 | COAR Notify (LDN) | the inbox's endpoint | the receiving inbox | per inbox | none | the inbox's choice |
 
-Matrix's distinctive properties are the copy of a room at every
-participating server and the hash-linked order. Its weaknesses for
-OpenSheaf are those of every federated system: the identity and the
-signatures are the server's. In every case the pin and, where needed, an
-owner's signature in the message make the transport irrelevant to what can
-be checked.
+Matrix's distinctive properties are the copy of a room at the participating
+servers and the hash-linked partial order. Its weaknesses for OpenSheaf are
+those of every federated system: the identity and the signatures are the
+server's. In every case the pins in the message, and owners' signatures in
+the archive on what they point to, make the transport irrelevant to what
+can be checked.
 
 ## 8. What the specification and the notes might say
 
@@ -542,8 +593,8 @@ specification, in a note or an extension:
 1. the key `org.opensheaf.version` in announcements (section 6.1), holding a
    pin;
 2. the event type `org.opensheaf.notice` (section 6.2), holding a COAR
-   Notify message with pins, and optionally a signature made with an owner's
-   keys;
+   Notify message whose objects are pins: of the version concerned and, for
+   a review or a comment, of the document that holds it;
 3. the event type `org.opensheaf.signature` (section 6.6), holding a
    signature file unchanged.
 
@@ -556,24 +607,27 @@ archive.
 1. **A feed bot.** A bot, as an ordinary account driven by a short script
    (for instance with the Python library `matrix-nio`), reads the Atom feed
    of [mgubi/papers](https://github.com/mgubi/papers) and posts each new
-   version to a world-readable room, with the key of section 6.1. Check how
-   the messages look in several clients, and that a guest can read the room.
+   document version to a world-readable room, with the key of section 6.1.
+   Check how the messages look in several clients, and whether and how a
+   guest can read the room.
 2. **Pins round trip.** `osheaf` (or the Explorer) reads the room, takes the
    pins, fetches the versions and checks them; it reports a pin whose version
    cannot be found or does not match.
 3. **Notices.** Post an `org.opensheaf.notice` carrying a COAR Notify
-   *Announce Review* with a pin and a signature, from a second server; check
-   that it federates, that the archive's tools find and verify it, and what
-   remains after a redaction.
+   *Announce Review*, with the pins of a signed review document and of the
+   reviewed version, from a second server; check that it federates, that the
+   archive's tools find it and verify both pins, and what remains after a
+   redaction.
 4. **Sign-in.** A small service accepting Matrix IDs through the OpenID
-   exchange of section 6.4, tried with accounts on a public server and, if
-   available, a university server.
+   exchange of section 6.4, with the checks listed there, tried with accounts
+   on a public server and, if available, a university server.
 5. **Co-signing.** A test group owner with threshold 2: two signers on two
    servers post signature files in a room; a bot assembles the witness folder
    and the verifier accepts the version.
-6. **Order.** Two servers post conflicting pins of a key-log version
-   concurrently and after each other; look at what the event graph lets a
-   reader conclude (section 6.7).
+6. **Order.** Two servers post conflicting pins of a key-log version,
+   concurrently and one after the other; look at what the event graph lets a
+   reader conclude, and what a server that misbehaves can make it show
+   (section 6.7).
 
 ## 10. Open questions
 
@@ -582,14 +636,16 @@ archive.
   registries.
 - Whether OpenSheaf notices should be COAR Notify messages in every
   transport, so that one format serves HTTP inboxes and Matrix rooms, and
-  how a pin and a signature are written in them (positioning.md, section 4).
+  how pins are written in them (positioning.md, section 4).
 - Whether a Matrix ID, or any login, should ever be recorded in an owner's
   key log or a document, and how that relates to tying owners to people
   (#41).
-- Whether a replicated room is worth anything as first-seen evidence for key
-  logs, beside other witnesses (#55, #58).
+- Whether a replicated room is worth anything as evidence of which version
+  of a key log was known first, beside other witnesses (#58; PR #30, section
+  6.6).
 - Whether review in Matrix rooms fits the review processes and anonymity of
-  #29, and what of it becomes a document.
+  #29, whether drafts may be passed to referees before sealing, and what of
+  a review becomes a document.
 - Whether the project should run an announcement room or space for archives,
   as a demonstration, and who would moderate it.
 
@@ -616,6 +672,8 @@ archive.
   events), MSC3861 (OAuth 2.0 API), MSC1763 (retention), MSC2444 (peeking
   over federation), MSC1228, MSC2787, MSC4014, MSC4080 (identity):
   <https://github.com/matrix-org/matrix-spec-proposals>.
+- Synapse configuration (`max_upload_size`, `redaction_retention_period`):
+  <https://element-hq.github.io/synapse/latest/usage/configuration/config_documentation.html>.
 - The Matrix.org Foundation: <https://matrix.org/foundation/about/>.
 - Deployments: Bundeswehr,
   <https://element.io/case-studies/bundeswehr>; gematik,
