@@ -21,7 +21,7 @@
 
   The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL in this document are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals. Terms are those of the specification: owner, key log, key-log version, signature file, witness, line, branch, ended owner, fork record, current key, rotation key, exposed key.
 
-  This extension follows the extension mechanism of section 2 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes the status of a signature or a version, never ends an owner or decides a fork, and never lets a version into an archive by itself: its dates are evidence that an archive MAY weigh where the specification allows it (section 6.4 of the specification). A reader that does not know it ignores the files and data it defines.
+  This extension follows the extension mechanism of section 2 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes by itself the status of a signature or a version, never ends an owner or decides a fork, and never lets a version into an archive by itself: its dates are evidence that readers and archives MAY weigh where the specification allows it, which admits trusted dates as evidence against <verbatim|contested> and for adding a version of a frozen owner's lines (sections 7.3 and 7.5 of the specification). A reader that does not know it ignores the files and data it defines.
 
   <section*|3. Timestamps><label|3-timestamps>
 
@@ -40,7 +40,7 @@
   An owner adopts this extension in its key log: its genesis record, for the first version of the key log, or the <verbatim|keys.json> of a later version holds, under <verbatim|extensions> (sections 5.1 and 6.1 of the specification), an entry keyed by <verbatim|https://opensheaf.org/opensheaf-timestamps-0.1>, an object with:
 
   <\itemize>
-    <item><verbatim|timestampAuthorities>, OPTIONAL: RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The authorities trusted for a signature file are those listed in the key-log version its <verbatim|keyLog> names and in the versions before it (for the first version, in the genesis record), so that no one can add an authority later to date earlier signatures. Without any, only OpenTimestamps proofs are used.
+    <item><verbatim|timestampAuthorities>, OPTIONAL: RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The authorities trusted for a signature file are those listed in the key-log version its <verbatim|keyLog> names and in the versions before it (for the first version, in the genesis record), so that no one can add an authority later to date earlier signatures. Each version of the key log states the extensions in force (section 6.1 of the specification), so a later version that keeps the declaration repeats it; authorities listed in earlier versions stay trusted all the same for signatures naming it, since authorities are never delisted (section 8). Without any, only OpenTimestamps proofs are used.
   </itemize>
 
   The entry, even empty, declares that the owner timestamps every signature it makes, of its key log and of its lines.
@@ -125,16 +125,16 @@
   </verbatim-code>
   </html-div-class>
 
-  The files of one signature of the second version of its key log, by a rotation key, in the owner object's extension folder: an RFC 3161 token, a pending OpenTimestamps proof, and the completed proof written beside it later (placeholder digests):
+  The files of one signature of the second version of its key log, by the rotation key whose digest is the first of <verbatim|next> above, so that its name begins with the first 16 characters of that digest (section 7.2 of the specification), in the owner object's extension folder: an RFC 3161 token, a pending OpenTimestamps proof, and the completed proof written beside it later (placeholder digests):
 
   <\verbatim-code>
-    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json
+    extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json
 
-    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.q7swxsz56bfiyotn.tsr
+    extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.q7swxsz56bfiyotn.tsr
 
-    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz64.ots
+    extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.hm5uhlee72brbz64.ots
 
-    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots
+    extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7dbj.ots
   </verbatim-code>
 
   <section*|Appendix C. References><label|appendix-c-references>
@@ -160,13 +160,15 @@
 
     <item><strong|0.1 (draft), 19 November 2026, for the rebuilt specification (PR #30):> section references updated (extensions are in section 2); an exposed key ends the owner or is nullified by a fork of its key log and healing, and dates help readers weigh the versions of ended and tainted owners and of nullified keys (section 6); after an audit, timestamp files found over HTTP only where folders can be listed (section 3), and pending proofs in a branch count for nothing (section 6); after a second audit, keys nullified by a version of the key log as well as at a fork (sections 1 and 6).
 
-    <item><strong|0.1 (draft), 19 November 2026, after an audit of pre-rotation (PR #30):> following the specification, the declaration of the first version of a key log is in the owner's genesis record, fixed by the owner name (sections 4 and 6, appendices A and B); dates are evidence an archive may weigh to add a version that needs an exposed key, which it otherwise never adds (sections 2 and 6).
-
     <item><strong|0.1 (draft), 19 November 2026, pre-rotation (PR #30):> following the pre-rotation of key logs in the specification (#58): exposed keys in place of nullified keys, and no healing or tainted owners (sections 1 and 6); a version of a key log is dated by as many signatures as it needs, <verbatim|nextThreshold> of the version before (section 5); the example of appendix B commits to rotation keys in <verbatim|next>.
+
+    <item><strong|0.1 (draft), 19 November 2026, after an audit of pre-rotation (PR #30):> following the specification, the declaration of the first version of a key log is in the owner's genesis record, fixed by the owner name (sections 4 and 6, appendices A and B); dates are evidence an archive may weigh to add a version that needs an exposed key, which it otherwise never adds (sections 2 and 6).
 
     <item><strong|0.1 (draft), 19 November 2026, the computed first version of key logs (PR #30):> following the specification (#58), the first version of a key log is computed and not signed, so it is not dated, and the example of appendix B stamps a signature of the second version (section 5, appendix B); versions that need an exposed key, or name a key-log version from a fork point on, are contested unless trusted dates show their signatures made before (section 6); the schema allows no other properties (appendix A).
 
     <item><strong|0.1 (draft), 19 November 2026, a fork freezes the owner (PR #30):> following the specification (#58), dates showing signatures made before a fork of the key log are what lets an archive add a version of a frozen owner's lines (section 6).
+
+    <item><strong|0.1 (draft), 19 November 2026, consistency fixes after the final audit (PR #30):> timestamps change no status by themselves, the specification admitting trusted dates against <verbatim|contested> and for a frozen owner (sections 7.3 and 7.5 of the specification, cited in section 2); a later key-log version that keeps the declaration repeats it (section 4); the signature file of the example named after a digest of <verbatim|next> (appendix B); changelog in order.
   </itemize>
 
 </body>

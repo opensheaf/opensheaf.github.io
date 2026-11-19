@@ -148,8 +148,9 @@ questions are listed at the end of the sections they concern.
   need an exposed key, or name a key-log version from a fork point on, are
   **contested** (7.3), unless other evidence the reader trusts (a timestamp)
   dates them before: never added, never the latest signed version, member
-  status `contested`, branch point not confirmed; the owner may sign again,
-  with keys not exposed, versions it knows it made. **A fork freezes the
+  status `contested`, branch point not confirmed; while it is not ended, the
+  owner may sign again, with keys not exposed, versions it knows it made
+  that are contested by an exposed key (6.4, 7.1). **A fork freezes the
   owner** (7.5): once an archive knows of a fork, it adds no version of the
   owner's other lines, from a copy or as a deposit, unless evidence it trusts
   dates its signatures before the fork point; it keeps what it holds, and
@@ -211,10 +212,14 @@ questions are listed at the end of the sections they concern.
   pseudonymous owners, metadata (fork records included) under CC0.
 - **Profiles** (appendix A): `zenodo` (a record is a witness, not a copy),
   `texmacs`, `website`. **Extensions** (2): data under `extensions` in
-  `object.json` or `keys.json`; never change the core.
+  `object.json` or `keys.json` or, for the first version of a key log, the
+  owner's genesis record; each key-log version states the extensions in
+  force (6.1); never change the core.
 - **Timestamps: an extension, not the core.** `opensheaf-timestamps-0.1.md`:
   `.tsr` and `.ots` files beside signature files, the owner's declaration
-  in `keys.json`; evidence only, it changes no status.
+  in `keys.json` or, for the first version, the owner's genesis record;
+  evidence only: timestamps change no status by themselves, and section 7.3
+  admits trusted dates as evidence against `contested`.
 
 ## Schemas
 

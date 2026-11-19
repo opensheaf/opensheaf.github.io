@@ -372,12 +372,14 @@
       both. An owner that wants its signatures dated, a journal or an
       institution for instance, adopts it in its key log, from the first
       version, so that if a key is ever stolen, readers can tell which of its
-      versions were signed before. The extension changes no status: dates are
-      evidence that readers weigh. A single researcher may not need it. Anyone
-      holding a copy may add timestamps later; the earliest is what counts.
-      Witnesses are not covered by the inventory digests, and need not be: a
-      signature is checked against the version it names, which the pins fix,
-      and a timestamp against the signature file it stamps.
+      versions were signed before. Timestamps change no status by themselves:
+      dates are evidence that readers weigh, and the specification (section
+      7.3) admits trusted dates as evidence against <tt class="verbatim">contested</tt>.
+      A single researcher may not need it. Anyone holding a copy may add
+      timestamps later; the earliest is what counts. Witnesses are not covered
+      by the inventory digests, and need not be: a signature is checked
+      against the version it names, which the pins fix, and a timestamp
+      against the signature file it stamps.
     </p>
     <h2 id="auto-21"><a id="why-is-the-html-version-not-part-of-the-deposit"></a>Why is the HTML version not part of the deposit?<span
     style="margin-left: 1em"></span></h2>
@@ -424,11 +426,11 @@
       class="verbatim">ocfl-py</tt>), checks that the discovery document matches the
       storage root, checks the key logs and the owners' signatures of every
       version, and resolves and checks the members of the head of every
-      collection (and, optionally, those of earlier versions). It reports
-      errors (breaches of what the specification requires), warnings, and
-      results that are neither (the status of each signature and member,
-      forks, ended owners, withdrawals). The specification (section 14) lists
-      the checks.
+      collection, and those held in the archive in every earlier version
+      (optionally, those held elsewhere). It reports errors (breaches of what
+      the specification requires), warnings, and results that are neither (the
+      status of each signature and member, forks, ended owners, withdrawals).
+      The specification (section 14) lists the checks.
     </p>
     <h2 id="auto-26"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
     <p>

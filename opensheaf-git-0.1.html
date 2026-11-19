@@ -739,8 +739,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           other than the one computed from its genesis record; a version of a
           key log after a fork record, or after an ending version but a fork
           record; a fork record that is not valid; and an added signature file
-          of the owner that is invalid, are errors (section 14.1 of the
-          specification), so that a pull request adding them cannot pass;
+          of the owner that is invalid, are errors of the commit check
+          (section 14.1 of the specification), stricter than the warnings that
+          section 14 of the specification gives for some of these breaches, so
+          that a pull request adding them cannot pass;
         </p>
       </li>
       <li>
@@ -971,16 +973,6 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       </li>
       <li>
         <p>
-          <strong>0.1 (draft), 19 November 2026, after an audit of
-          pre-rotation (PR #30):</strong> following the specification (#58),
-          versions that need an exposed key, or name a version of a key log
-          from a fork point on, are never added, from a copy or as a deposit,
-          unless other evidence dates them before, rather than taken from
-          copies (sections 5.1 and 10).
-        </p>
-      </li>
-      <li>
-        <p>
           <strong>0.1 (draft), 19 November 2026, pre-rotation (PR
           #30):</strong> following the pre-rotation of key logs in the
           specification (#58): a fork of a key log is recorded by a fork
@@ -990,6 +982,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           of a key log is carried by a fork record (section 6.3); exposed keys
           and ended owners in place of nullified keys and tainted owners
           (sections 5.1 and 10).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, after an audit of
+          pre-rotation (PR #30):</strong> following the specification (#58),
+          versions that need an exposed key, or name a version of a key log
+          from a fork point on, are never added, from a copy or as a deposit,
+          unless other evidence dates them before, rather than taken from
+          copies (sections 5.1 and 10).
         </p>
       </li>
       <li>
@@ -1010,6 +1012,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           unless other evidence dates them before the fork, and the lines of
           an owner with an ending version are added only from copies (sections
           5.1 and 10).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, consistency fixes after the
+          final audit (PR #30):</strong> the breaches that fail a commit are
+          errors of the commit check, stricter than the warnings of section 14
+          of the specification (section 10); changelog in order.
         </p>
       </li>
     </ul>

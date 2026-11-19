@@ -157,7 +157,8 @@ on GitHub, and archives made with them.
   [`opensheaf-index-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-index-0.1.schema.json)
   for the index files; and, for the timestamps extension,
   [`opensheaf-timestamps-0.1.schema.json`](https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json)
-  for its declaration in `keys.json`.
+  for its declaration in `keys.json` or, for the first version, the owner's
+  genesis record.
 - [`index.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.tm)/[`index.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/index.html),
   [`opensheaf-specification-0.1.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.1.html),
   [`faq.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm)/[`faq.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html),

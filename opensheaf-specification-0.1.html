@@ -185,8 +185,8 @@
       what this specification defines, nor relax its requirements: archives,
       objects and collections are read and verified without knowing any
       extension, and readers ignore extensions they do not know. The discovery
-      document SHOULD list the extensions its objects use. The <a href="opensheaf-timestamps-0.1.html">timestamps
-      extension</a> is one.
+      document lists the extensions its objects use (section 3.1). The <a
+      href="opensheaf-timestamps-0.1.html">timestamps extension</a> is one.
     </p>
     <p>
       <strong>Schemas.</strong> The JSON files defined here MUST validate
@@ -276,8 +276,8 @@
         <p>
           <tt class="verbatim">objects</tt>: every object of the storage root except
           drafts, each with <tt class="verbatim">id</tt> (section 4), <tt class="verbatim">kind</tt>,
-          <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> (section 7), <tt
-          class="verbatim">head</tt> (its OCFL head version), <tt class="verbatim">inventorySha512</tt>
+          <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> (sections 5 and 6),
+          <tt class="verbatim">head</tt> (its OCFL head version), <tt class="verbatim">inventorySha512</tt>
           (the SHA-512 digest of the head inventory, as its checksum file
           states it) and <tt class="verbatim">status</tt> (<tt class="verbatim">active</tt> or <tt
           class="verbatim">withdrawn</tt>, the line's status, section 13.1), and
@@ -627,7 +627,8 @@
     <p>
       An owner object has only these fields, and MAY have <tt class="verbatim">extensions</tt>
       (below), though data concerning its key log goes in <tt class="verbatim">keys.json</tt>
-      (section 6).
+      or, for the first version, the owner's genesis record (sections 5.1 and
+      6.1).
     </p>
     <p>
       A <dfn>note</dfn> is an object with <tt class="verbatim">text</tt>, a short plain
@@ -940,11 +941,11 @@
           and <tt class="verbatim">nextThreshold</tt>, the digests of its first rotation
           keys and how many must sign the second version of its key log, from
           which the first version of its key log is computed (section 6.1);
-          and, OPTIONALLY, <tt class="verbatim">keeper</tt>, the one person or
-          institution who answers for the owner, fixed with its owner name
-          (section 6.6), and <tt class="verbatim">extensions</tt>, the data of
-          extensions concerning its key log as of the first version (section
-          6.1).
+          and, OPTIONALLY, <tt class="verbatim">keeper</tt>, a list of one URI, the
+          person or institution who answers for the owner, fixed with its
+          owner name (section 6.6), and <tt class="verbatim">extensions</tt>, the data
+          of extensions concerning its key log as of the first version
+          (section 6.1).
         </p>
       </li>
     </ul>
@@ -1090,11 +1091,10 @@
         <p>
           <tt class="verbatim">keys</tt>, except in an ending version (section 6.3): the
           owner's <dfn>current keys</dfn>, which sign the versions of its
-          lines (section 7) and never a version of the key log, at least one,
-          each distinct, each an Ed25519 key written as a <tt class="verbatim">did:key</tt>
-          URI (W3C CCG; multibase base58btc, multicodec <tt class="verbatim">ed25519-pub</tt>,
-          code <tt class="verbatim">0xed</tt>, written as the varint bytes <tt class="verbatim">0xed
-          0x01</tt>);
+          lines (section 7), at least one, each distinct, each an Ed25519 key
+          written as a <tt class="verbatim">did:key</tt> URI (W3C CCG; multibase
+          base58btc, multicodec <tt class="verbatim">ed25519-pub</tt>, code <tt class="verbatim">0xed</tt>,
+          written as the varint bytes <tt class="verbatim">0xed 0x01</tt>);
         </p>
       </li>
       <li>
@@ -1124,9 +1124,12 @@
         <p>
           <tt class="verbatim">extensions</tt>, OPTIONAL, never in the first version,
           whose data of extensions is in the genesis record (section 5.1): the
-          data of extensions concerning the key log, keyed by their names
-          (section 2), each an object; for instance the declaration of the <a
-          href="opensheaf-timestamps-0.1.html">timestamps extension</a>;
+          data of extensions concerning the key log in force as of this
+          version, keyed by their names (section 2), each an object, which
+          replaces that of the version before: each version states the
+          extensions in force, so data that continues is repeated, and a
+          version without <tt class="verbatim">extensions</tt> has none; for instance
+          the declaration of the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>;
         </p>
       </li>
       <li>
@@ -1250,10 +1253,9 @@
       committed in the <tt class="verbatim">next</tt> of one version only (section 6.1):
       once the next version is signed, the rotation keys of the version
       before, whether they signed or not, are never used again, and the owner
-      SHOULD destroy them. A rotation key never becomes a current key,
-      revealed or not (section 6.1). Owner tools MUST warn that an owner left
-      with fewer than <tt class="verbatim">nextThreshold</tt> rotation keys of the
-      latest version of its key log can never change its keys or end.
+      SHOULD destroy them. Owner tools MUST warn that an owner left with fewer
+      than <tt class="verbatim">nextThreshold</tt> rotation keys of the latest version
+      of its key log can never change its keys or end.
     </p>
     <p>
       <strong>Retiring a key.</strong> An owner retires a current key it no
@@ -1284,13 +1286,12 @@
       version of the same key log, retired or not; a version from a fork point
       on, of either side, may be a thief's, and exposes nothing. Exposed keys
       concern only the versions of the owner's lines (section 7.3), never
-      those of its key log, which current keys never sign. An owner whose
-      current keys may have been exposed (stolen, leaked, copied), and could
-      together reach the <tt class="verbatim">threshold</tt> of some version of its key
-      log that lists them, MUST at once sign a version of its key log that
-      exposes them, or end; otherwise retiring them is enough. Only rotation
-      keys sign that version, so whoever holds the current keys can neither
-      prevent nor contest it.
+      those of its key log (section 6.1). An owner whose current keys may have
+      been exposed (stolen, leaked, copied), and could together reach the <tt
+      class="verbatim">threshold</tt> of some version of its key log that lists them,
+      MUST at once sign a version of its key log that exposes them, or end;
+      otherwise retiring them is enough. Only rotation keys sign that version,
+      so whoever holds the current keys can neither prevent nor contest it.
     </p>
     <p>
       <strong>Forks of a key log.</strong> Two signed versions of a key log
@@ -1357,9 +1358,12 @@
       copies held before, the pins of collections (section 8), timestamps (the
       <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>). A version of a line that needs an
       exposed key, or whose signatures name a version of its owner's key log
-      from a fork point on, is contested (section 7.3); the owner MAY sign
-      again, with current keys not exposed, versions it knows it made (section
-      7.1).
+      from a fork point on, is contested, unless other evidence dates its
+      signatures before (section 7.3). While it is not ended, the owner MAY
+      sign again, with current keys not exposed, versions it knows it made
+      that are contested by an exposed key (section 7.1); owner tools sign
+      nothing for an ended owner (section 6.3), and after a fork nothing is
+      added without evidence (section 7.5).
     </p>
     <p>
       <strong>Ended owners.</strong> An archive that knows an owner is ended
@@ -1418,13 +1422,13 @@
     <h3 id="auto-23"><a id="66-keepers"></a>6.6 Keepers<span style="margin-left: 1em"></span></h3>
     <p>
       An owner MAY name, in <tt class="verbatim">keeper</tt> of its genesis record
-      (section 5.1), a single person or institution who answers for it: an
-      ORCID iD (<tt class="verbatim">https://orcid.org/&hellip;</tt>) or a domain
-      written as <tt class="verbatim">https://&lt;domain&gt;/</tt>. The keeper is fixed
-      by the owner name: no version of the key log names or changes it, and
-      another keeper means another owner. The keeper MAY confirm it, in a
-      place only the keeper controls: a link naming the owner in its ORCID
-      record, or the file <tt class="verbatim">https://&lt;domain&gt;/.well-known/opensheaf</tt>
+      (section 5.1), a single person or institution who answers for it, as a
+      list of one URI: an ORCID iD (<tt class="verbatim">https://orcid.org/&hellip;</tt>)
+      or a domain written as <tt class="verbatim">https://&lt;domain&gt;/</tt>. The
+      keeper is fixed by the owner name: no version of the key log names or
+      changes it, and another keeper means another owner. The keeper MAY
+      confirm it, in a place only the keeper controls: a link naming the owner
+      in its ORCID record, or the file <tt class="verbatim">https://&lt;domain&gt;/.well-known/opensheaf</tt>
       on its domain, a JSON object with <tt class="verbatim">format</tt> <tt class="verbatim">&quot;opensheaf-keeper/0.1&quot;</tt>,
       <tt class="verbatim">owners</tt>, the owner names it answers for, and OPTIONALLY
       <tt class="verbatim">successors</tt>, an object mapping owner names it answers for
@@ -1510,10 +1514,11 @@
       against the key-log version it names alone (section 6.1), and no
       signature is ever replaced. An owner MAY add signatures to a version
       later, with current keys that have not signed it, only to a version it
-      knows it made: so it signs again, with keys not exposed, a version that
-      is contested (section 7.3), or one it has not yet added when a key that
-      signed it was exposed (appendix A.1). Versions of a key log are signed
-      as section 6.1 says.
+      knows it made, and only while it is not ended (section 6.3): so it signs
+      again, with keys not exposed, a version contested by an exposed key
+      (section 7.3), or one it has not yet added when a key that signed it was
+      exposed (appendix A.1). Versions of a key log are signed as section 6.1
+      says.
     </p>
     <h3 id="auto-26"><a id="72-witnesses-and-signature-files"></a>7.2 Witnesses and signature files<span style="margin-left: 1em"></span></h3>
     <p>
@@ -1628,8 +1633,9 @@ keylog &lt;the value of keyLog&gt;</pre>
     <p>
       <strong>Other witnesses.</strong> The <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>
       keeps timestamps of signature files beside them, dates that readers may
-      weigh; it changes no status. The parent signatures a branch carries are
-      in its content (section 9).
+      weigh; timestamps change no status by themselves, and section 7.3 admits
+      trusted dates as evidence against <tt class="verbatim">contested</tt>. The parent
+      signatures a branch carries are in its content (section 9).
     </p>
     <p>
       <strong>Files that are not witnesses.</strong> A file of the witness
@@ -1731,10 +1737,10 @@ keylog &lt;the value of keyLog&gt;</pre>
       exposes the key, or before the fork. A key that another owner's key log
       exposes, shared between owners (section 15.5), counts only for that
       owner's lines. Only versions of lines are contested, never versions of
-      key logs, which current keys never sign (section 6.1). A contested
-      version is reported with its status, and never added to an archive
-      (section 7.5); it is never the latest signed version (below), nor a
-      confirmed branch point (section 9.3) or a verified member (section 8.5).
+      key logs (section 6.1). A contested version is reported with its status
+      (for archives, section 7.5); it is never the latest signed version
+      (below), nor a confirmed branch point (section 9.3) or a verified member
+      (section 8.5).
     </p>
     <p>
       <strong>A signed version vouches for its past.</strong> The inventory of
@@ -2552,9 +2558,8 @@ keylog &lt;the value of keyLog&gt;</pre>
     <p>
       <strong>When.</strong> A work is sealed before a version of it first
       leaves its owner's hands: shared privately (submitted to a journal, sent
-      to a co-author) or published. Sealing is done at the owner's request;
-      tools SHOULD seal only at the owner's request, never as a side effect of
-      another operation.
+      to a co-author) or published. Tools SHOULD seal only at the owner's
+      request, never as a side effect of another operation.
     </p>
     <p>
       <strong>What.</strong> An owner tool seals a work by writing its genesis
@@ -2619,11 +2624,10 @@ keylog &lt;the value of keyLog&gt;</pre>
     <p>
       An archive MUST NOT keep a mirror unless the licences of every object
       version it copies (<tt class="verbatim">rightsList</tt>, section 4.4, which a
-      description-only version may change) allow redistribution. A copy of a
-      parent's line beside a branch follows this rule for every version it
-      copies (section 9.7). Key logs, inventories, signature files and the
-      other metadata are under CC0 (section 15.6), and are copied freely; a
-      reference needs no permission (section 8.5).
+      description-only version may change) allow redistribution. Key logs,
+      inventories, signature files and the other metadata are under CC0
+      (section 15.6), and are copied freely; a reference needs no permission
+      (section 8.5).
     </p>
     <p>
       <strong>Open questions.</strong>
@@ -3250,29 +3254,31 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       (section 6): its genesis record (section 5.1), and that its first
       version is the one section 6.1 computes, by computing <tt class="verbatim">object.json</tt>,
       <tt class="verbatim">keys.json</tt> and the inventory file from the genesis record
-      and comparing them with those held, byte for byte, with no other file
-      and no signature file (a signature file there is invalid, section 7.3);
-      that every later version but a fork record holds <tt class="verbatim">keys.json</tt>,
-      that each is signed (section 7.3), and that none is held after a fork
-      record, nor after an ending version but a fork record (section 6.3), a
-      breach being a warning, as for lines (section 14.4); that an ending
-      version has no <tt class="verbatim">keys</tt>, <tt class="verbatim">threshold</tt>, <tt
-      class="verbatim">next</tt> or <tt class="verbatim">nextThreshold</tt>, that <tt class="verbatim">successor</tt>
-      is not the owner itself, and whether it is accepted or claimed (sections
-      6.3 and 6.6); the thresholds, and the rules of section 6.1 on <tt class="verbatim">keys</tt>,
-      <tt class="verbatim">next</tt> and <tt class="verbatim">exposed</tt>, among them that no
-      digest is in the <tt class="verbatim">next</tt> of two versions; and each fork
-      record (section 6.3): that it is valid, holding the <tt class="verbatim">genesis.json</tt>
-      and <tt class="verbatim">object.json</tt> of the first version, byte for byte, no
-      <tt class="verbatim">keys.json</tt>, and nothing else but the versions it carries,
-      each under the name its inventory digest gives, with the owner object's
-      <tt class="verbatim">id</tt> in its inventory, its <tt class="verbatim">keys.json</tt> and
-      checksum file against its inventory, and its signatures against the
-      version before, the first differing from the version of its number held.
-      It reports as results the latest version of each key log, the exposed
-      keys, and ended owners, by an ending version or by a fork with its fork
-      point, with their successors, accepted or claimed; when a keeper is
-      named, it MAY check the link (section 6.6).
+      and comparing them with those held, byte for byte, with no other file (a
+      signature file of the first version is invalid, section 7.3, and a
+      warning, as any invalid file of a witness folder, section 7.2); that
+      every later version but a fork record holds <tt class="verbatim">keys.json</tt>;
+      that each later version is signed (section 7.3), and that none is held
+      after a fork record, nor after an ending version but a fork record
+      (section 6.3), a breach of these two being a warning, as for lines
+      (section 14.4); that an ending version has no <tt class="verbatim">keys</tt>, <tt
+      class="verbatim">threshold</tt>, <tt class="verbatim">next</tt> or <tt class="verbatim">nextThreshold</tt>,
+      that <tt class="verbatim">successor</tt> is not the owner itself, and whether it
+      is accepted or claimed (sections 6.3 and 6.6); the thresholds, and the
+      rules of section 6.1 on <tt class="verbatim">keys</tt>, <tt class="verbatim">next</tt> and
+      <tt class="verbatim">exposed</tt>, among them that no digest is in the <tt class="verbatim">next</tt>
+      of two versions; and each fork record (section 6.3): that it is valid,
+      holding the <tt class="verbatim">genesis.json</tt> and <tt class="verbatim">object.json</tt>
+      of the first version, byte for byte, no <tt class="verbatim">keys.json</tt>, and
+      nothing else but the versions it carries, each under the name its
+      inventory digest gives, with the owner object's <tt class="verbatim">id</tt> in
+      its inventory, its <tt class="verbatim">keys.json</tt> and checksum file against
+      its inventory, and its signatures against the version before, the first
+      differing from the version of its number held. It reports as results the
+      latest version of each key log, the exposed keys, and ended owners, by
+      an ending version or by a fork with its fork point, with their
+      successors, accepted or claimed; when a keeper is named, it MAY check
+      the link (section 6.6).
     </p>
     <h3 id="auto-67"><a id="144-objects"></a>14.4 Objects<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3335,10 +3341,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       member of the head version (every revision, in a selection) as a
       resolver does (section 12.3), and the members held in the archive in
       every earlier version; resolving the other members of earlier versions
-      is OPTIONAL. The status of each member is a result (section 8.5). A
-      member that is not a version is an error, and so is a mismatch of a copy
-      held in the archive; any other status but verified, contested included,
-      is a warning.
+      is OPTIONAL. The status of each member is a result (section 8.5). It
+      also checks that no two selections of the archive with the same owner
+      keep accepted copies of the same document (section 9.6). A member that
+      is not a version is an error, and so is a mismatch of a copy held in the
+      archive; any other status but verified, contested included, is a
+      warning.
     </p>
     <h3 id="auto-69"><a id="146-the-archive-as-a-whole"></a>14.6 The archive as a whole<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3923,6 +3931,22 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           appendices C.8 and D.3); lines are taken only from copies after an
           ending version alone; a contested version is never added, said once
           (section 7.5).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, consistency fixes after the
+          final audit (PR #30):</strong> wording only: timestamps change no
+          status by themselves, trusted dates being evidence against <tt
+          class="verbatim">contested</tt> (sections 7.2 and 7.3, appendix D.3); an owner
+          signs again only versions contested by an exposed key, and only
+          while not ended (sections 6.4 and 7.1); data of extensions of the
+          first version of a key log in the genesis record, and each version's
+          <tt class="verbatim">extensions</tt> replacing the one before (sections 4.3
+          and 6.1); <tt class="verbatim">keeper</tt> a list of one URI (sections 5.1 and
+          6.6); rules stated twice cut to one statement; checks of the first
+          version of key logs and of selections' owners (sections 14.3 and
+          14.5).
         </p>
       </li>
     </ul>
@@ -5134,8 +5158,9 @@ wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwp
           researcher needs none, since signatures stay good; an institution
           may want signatures dated by a provider it names, to tell what came
           before an exposure. The extension keeps the trade-offs of RFC 3161
-          authorities and OpenTimestamps out of the core, and changes no
-          status.
+          authorities and OpenTimestamps out of the core; timestamps change no
+          status by themselves, and section 7.3 admits trusted dates as
+          evidence against <tt class="verbatim">contested</tt>.
         </p>
       </li>
       <li>
