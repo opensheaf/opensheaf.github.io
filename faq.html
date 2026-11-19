@@ -286,10 +286,13 @@
       signatures from a thief's; versions that need an exposed key, or name a
       version of a key log from a fork on, are <strong>contested</strong>, and
       archives never add them, unless other evidence (a timestamp) dates them
-      before, and take the lines of an ended owner only from copies, never as
-      new deposits. Every version of every line is signed, except the computed
-      first version of a key log, and the key logs travel with the objects
-      they sign, so a line can be checked from any copy, even when the
+      before. A fork <strong>freezes</strong> the owner: archives that know of
+      it add nothing more to its lines, unless such evidence dates it before
+      the fork, and the work continues under a successor; after an ending
+      without a fork, archives take the owner's lines only from copies, never
+      as new deposits. Every version of every line is signed, except the
+      computed first version of a key log, and the key logs travel with the
+      objects they sign, so a line can be checked from any copy, even when the
       archives that served it have gone. An owner may name in its genesis
       record one keeper who answers for it (an ORCID iD, an institution),
       fixed with the owner name, which the keeper may confirm in a place only

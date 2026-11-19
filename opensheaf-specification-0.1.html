@@ -1281,16 +1281,16 @@
       <strong>Exposed keys.</strong> A current key is <dfn>exposed</dfn> when
       a version of the key log before any fork point (below) lists it in <tt
       class="verbatim">exposed</tt>: a key listed in <tt class="verbatim">keys</tt> of an earlier
-      version of the same key log, retired or not. A version from a fork point
-      on, of either side, carried by a fork record or not, exposes nothing,
-      since it may be a thief's. Exposed keys concern only the versions of the
-      owner's lines (section 7.3), never those of its key log, which current
-      keys never sign. An owner whose current keys may have been exposed
-      (stolen, leaked, copied), and could together reach the <tt class="verbatim">threshold</tt>
-      of some version of its key log that lists them, MUST at once sign a
-      version of its key log that exposes them, or end; otherwise retiring
-      them is enough. Only rotation keys sign that version, so whoever holds
-      the current keys can neither prevent nor contest it.
+      version of the same key log, retired or not; a version from a fork point
+      on, of either side, may be a thief's, and exposes nothing. Exposed keys
+      concern only the versions of the owner's lines (section 7.3), never
+      those of its key log, which current keys never sign. An owner whose
+      current keys may have been exposed (stolen, leaked, copied), and could
+      together reach the <tt class="verbatim">threshold</tt> of some version of its key
+      log that lists them, MUST at once sign a version of its key log that
+      exposes them, or end; otherwise retiring them is enough. Only rotation
+      keys sign that version, so whoever holds the current keys can neither
+      prevent nor contest it.
     </p>
     <p>
       <strong>Forks of a key log.</strong> Two signed versions of a key log
@@ -1301,11 +1301,11 @@
       class="verbatim">nextThreshold</tt> rotation keys of the version before can make a
       fork: rotation keys stolen before use, or kept after it. The format
       cannot tell which side is the owner's, so a fork ends the owner, at the
-      fork point; no version of either side from the fork point on names a
-      successor that is accepted (section 6.6). An owner that finds a version
-      of its key log it did not make, and still holds <tt class="verbatim">nextThreshold</tt>
-      rotation keys of the version before, MAY sign another version of that
-      number, which ends it (section 7.4).
+      fork point, and freezes it (section 7.5); no version of either side from
+      the fork point on names a successor that is accepted (section 6.6). An
+      owner that finds a version of its key log it did not make, and still
+      holds <tt class="verbatim">nextThreshold</tt> rotation keys of the version before,
+      MAY sign another version of that number, which ends it (section 7.4).
     </p>
     <p>
       <strong>Fork records.</strong> An archive keeps the versions of a key
@@ -1352,28 +1352,25 @@
     <h3 id="auto-21"><a id="64-after-an-end-or-an-exposure"></a>6.4 After an end or an exposure<span style="margin-left: 1em"></span></h3>
     <p>
       The signatures of an ended owner, and those made with exposed keys, stay
-      good, since the format does not date signatures; but versions signed
-      after a key was exposed cannot be told from a thief's, so readers trust
-      them only as far as other evidence goes: copies held before, the pins of
-      collections (section 8), timestamps (the <a href="opensheaf-timestamps-0.1.html">timestamps
-      extension</a>).
-    </p>
-    <p>
-      <strong>Contested versions.</strong> A version of a line that needs an
+      good, since the format does not date signatures; but readers cannot tell
+      them from a thief's, and trust them only as far as other evidence goes:
+      copies held before, the pins of collections (section 8), timestamps (the
+      <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>). A version of a line that needs an
       exposed key, or whose signatures name a version of its owner's key log
-      from a fork point on, is contested (section 7.3): no archive adds it,
-      and readers weigh it as above. The owner MAY sign again, with current
-      keys not exposed, versions it knows it made (section 7.1).
+      from a fork point on, is contested (section 7.3); the owner MAY sign
+      again, with current keys not exposed, versions it knows it made (section
+      7.1).
     </p>
     <p>
       <strong>Ended owners.</strong> An archive that knows an owner is ended
       adds that owner's key log up to the ending version, with the fork record
       that may follow it, or up to the fork record, also as a new deposit, and
-      takes that owner's other lines as section 7.5 says. The work of an ended
-      owner continues under its successor, by branches of its versions
-      (section 9). Resolvers and verifiers report ended owners, by an ending
-      version or by a fork with its fork point, exposed keys, and successors,
-      accepted or claimed (sections 6.6, 12 and 14).
+      that owner's other lines only as section 7.5 says, a fork freezing the
+      owner. The work of an ended owner continues only under its successor, by
+      branches of its versions (section 9). Resolvers and verifiers report
+      ended owners, by an ending version or by a fork with its fork point,
+      exposed keys, and successors, accepted or claimed (sections 6.6, 12 and
+      14).
     </p>
     <h3 id="auto-22"><a id="65-key-logs-travel-with-the-objects-they-sign"></a>6.5 Key logs travel with the objects they sign<span
     style="margin-left: 1em"></span></h3>
@@ -1735,10 +1732,9 @@ keylog &lt;the value of keyLog&gt;</pre>
       exposes, shared between owners (section 15.5), counts only for that
       owner's lines. Only versions of lines are contested, never versions of
       key logs, which current keys never sign (section 6.1). A contested
-      version is reported with its status, and MUST NOT be added to an
-      archive, from a copy or as a deposit (section 7.5); it is never the
-      latest signed version (below), nor a confirmed branch point (section
-      9.3) or a verified member (section 8.5).
+      version is reported with its status, and never added to an archive
+      (section 7.5); it is never the latest signed version (below), nor a
+      confirmed branch point (section 9.3) or a verified member (section 8.5).
     </p>
     <p>
       <strong>A signed version vouches for its past.</strong> The inventory of
@@ -1758,9 +1754,8 @@ keylog &lt;the value of keyLog&gt;</pre>
     </p>
     <p>
       <strong>Owner tools MUST show the owner</strong>, before signing a new
-      version, the versions it would extend that are not signed, that need an
-      exposed key, or whose signatures name a version of the key log from a
-      fork point on, whatever evidence dates them, so that an owner never
+      version, the versions it would extend that are not signed or that need
+      an exposed key, whatever evidence dates them, so that an owner never
       takes a thief's version into its line unknowingly.
     </p>
     <h3 id="auto-28"><a id="74-one-writer-per-line-and-forks"></a>7.4 One writer per line, and forks<span style="margin-left: 1em"></span></h3>
@@ -1782,27 +1777,26 @@ keylog &lt;the value of keyLog&gt;</pre>
     <h3 id="auto-29"><a id="75-adding-versions"></a>7.5 Adding versions<span style="margin-left: 1em"></span></h3>
     <p>
       An archive adds a version to a line only if, once added, it is signed
-      against the key log the archive holds: signed directly by its owner, or
-      vouched for by a version signed directly that is added with it from the
-      same copy. Tools SHOULD fetch the latest version of the key log they can
-      find before adding. An archive adds no invalid signature file. An
-      archive that continues another owner's line makes a branch, under its
-      own owner (section 9).
+      and not contested (section 7.3) against the key log the archive holds:
+      signed directly by its owner, or vouched for by a version signed
+      directly that is added with it from the same copy. Tools SHOULD fetch
+      the latest version of the key log they can find before adding. An
+      archive adds no invalid signature file. An archive that continues
+      another owner's line makes a branch, under its own owner (section 9).
     </p>
     <p>
-      <strong>Ended owners.</strong> For an owner that has ended, as far as
-      the archive knows (section 6.3), the archive takes versions of its lines
-      only from copies found elsewhere, never as new deposits: it MAY copy a
-      line, or extend one it holds, up to the latest signed version of a copy
-      that agrees with it, since holding earlier versions is no reason to
-      trust later ones less or more; when the copies found fork, it takes only
-      the versions they share, and reports the fork. Readers weigh these
-      versions as section 6.4 says. The key log itself is added as section 6.4
-      says.
+      <strong>Ended owners.</strong> For an owner whose key log has an ending
+      version (section 6.3), an archive takes versions of its other lines only
+      from copies found elsewhere, never as new deposits, and of copies that
+      fork, only the versions they share.
     </p>
     <p>
-      <strong>Contested versions.</strong> A contested version (section 7.3)
-      is reported, and never added, from a copy or as a deposit.
+      <strong>A fork freezes the owner.</strong> Once an archive knows of a
+      fork of an owner's key log (section 6.3), it adds no version of that
+      owner's other lines, from a copy or as a deposit, unless other evidence
+      it trusts (a timestamp, with the <a href="opensheaf-timestamps-0.1.html">timestamps extension</a>)
+      dates signature files enough to make the version signed before any
+      version of the key log at the fork point was signed.
     </p>
     <p>
       <strong>Versions held stay.</strong> Nothing that a host or a thief can
@@ -1975,9 +1969,11 @@ keylog &lt;the value of keyLog&gt;</pre>
       that version holds (a new document version, a description, a notice, a
       withdrawal): a catalogue does not judge the versions of its members, but
       never follows to a contested version, which is not the latest signed
-      version (section 7.3). A tool follows only a signed version that extends
-      the version pinned; a copy that does not is a fork of the line (section
-      7.4), which it reports, keeping the pin.
+      version (section 7.3), nor, once it knows the owner's key log forks, to
+      a version that an archive would not add (section 7.5). A tool follows
+      only a signed version that extends the version pinned; a copy that does
+      not is a fork of the line (section 7.4), which it reports, keeping the
+      pin.
     </p>
     <p>
       A withdrawn member stays, and presentations show its withdrawal (section
@@ -2808,12 +2804,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       them. A fork of the line (section 7.4) is reported with the status of
       each side; the resolver uses only signed versions and does not choose
       between signed sides. A fork of a key log is not one of a line: it ends
-      the owner (section 6.3), and signatures naming versions of either side
-      are checked against them, wherever held, the versions they sign being
-      contested from the fork point on (section 7.3). A resolver reports an
-      owner that has ended, by an ending version or a fork, or has exposed
-      keys (section 6.3), with any successor, its own or named by its keeper
-      (section 6.6), and never follows a successor by itself.
+      and freezes the owner (sections 6.3 and 7.5), and signatures naming
+      versions of either side are checked against them, wherever held, the
+      versions they sign being contested from the fork point on (section 7.3).
+      A resolver reports an owner that has ended, by an ending version or a
+      fork, or has exposed keys (section 6.3), with any successor, its own or
+      named by its keeper (section 6.6), and never follows a successor by
+      itself.
     </p>
     <p>
       <strong>Tombstones.</strong> A tombstone (section 13) is not signed: a
@@ -3467,9 +3464,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       itself, by signing another version of that number, a fork (section 6.3).
       Whoever holds <tt class="verbatim">nextThreshold</tt> rotation keys of an earlier
       version, kept after use, can fork the key log there, which ends the
-      owner. No one can fork a key log at its first version, which is computed
-      from the genesis record (section 6.1). The format cannot tell what was
-      signed before an exposure from what was signed after (section 6.4).
+      owner and freezes it (section 7.5). No one can fork a key log at its
+      first version, which is computed from the genesis record (section 6.1).
+      The format cannot tell what was signed before an exposure from what was
+      signed after (section 6.4).
     </p>
     <p>
       <strong>The keeper.</strong> The keeper an owner names, at most one,
@@ -3490,7 +3488,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <p>
           a host can withhold an exposure or a fork record, serving a key log
           that stops before it, so that its readers find signed and
-          uncontested what is contested elsewhere (section 6.5);
+          uncontested what is contested elsewhere, and an archive it serves
+          does not yet freeze the owner (sections 6.5 and 7.5);
         </p>
       </li>
       <li>
@@ -3504,9 +3503,17 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <p>
           whoever holds the old current keys of an owner that ended honestly
           signs versions of its lines naming key-log versions before the end,
-          which are signed and not contested unless those keys were exposed
-          before any fork point; archives take them only from copies (section
-          7.5), which the holder can make;
+          which are signed and not contested unless those keys were exposed;
+          archives take them only from copies (section 7.5), which the holder
+          can make;
+        </p>
+      </li>
+      <li>
+        <p>
+          a thief cannot gain by forking a key log, since the fork freezes the
+          owner; but an owner whose rotation keys are stolen can add nothing
+          more under that identity, and continues under a successor (sections
+          6.6 and 7.5);
         </p>
       </li>
       <li>
@@ -3903,6 +3910,19 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           verification (section 7.2); fork records valid only with a differing
           version, their files specified (section 6.3); the checks of section
           14 and the risks of section 15.1 completed; appendix C regenerated.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, a fork freezes the owner (PR
+          #30, provisional, #58):</strong> once an archive knows of a fork of
+          an owner's key log, it adds no version of that owner's other lines,
+          from a copy or as a deposit, unless evidence it trusts dates its
+          signatures before the fork point, and the owner continues only under
+          its successor (sections 6.3, 6.4, 7.5, 8.3, 12.3 and 15.1,
+          appendices C.8 and D.3); lines are taken only from copies after an
+          ending version alone; a contested version is never added, said once
+          (section 7.5).
         </p>
       </li>
     </ul>
@@ -4859,18 +4879,20 @@ wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwp
       refers, and it has no <tt class="verbatim">keys.json</tt>; the inventory carried
       has the owner object's <tt class="verbatim">id</tt>, and <tt class="verbatim">dldgqou7ovpvkbxo</tt>
       begins the base32 SHA-256 digest of its bytes. Readers report the owner
-      ended at version 3, its fork point. The exposure in the owner's version
-      3, made at the fork point, no longer counts (section 6.3); versions of
-      lines whose signatures name version 3, of either side, are contested,
-      the owner's new signature of the paper's version 2 included. The paper's
-      version 2 is signed, by its signature naming version 2, and so are the
-      versions the thief signs with the stolen key naming version 2: archives
-      take them only from copies, like every version of a line of an ended
-      owner (section 7.5), and readers weigh them by other evidence (section
-      6.4). The keeper may name a successor (section 6.6), under which the
-      authors continue their papers as branches. An archive that met the
-      thief's version 3 first keeps that one, and appends a fork record
-      carrying the owner's.
+      ended at version 3, its fork point, and the fork freezes it: an archive
+      that knows of the fork adds no version of its lines, from a copy or as a
+      deposit, unless evidence it trusts shows it signed before either version
+      3 (section 7.5). The exposure in the owner's version 3, made at the fork
+      point, no longer counts (section 6.3), and versions of lines whose
+      signatures name version 3, of either side, are contested, the owner's
+      new signature of the paper's version 2 included; the versions the thief
+      signs with the stolen key naming version 2 are signed, but frozen like
+      the rest. Archives holding the paper's version 2 keep it; others add it
+      only if they trust its RFC 3161 token to date it before the fork, and
+      readers weigh it by such evidence (section 6.4). The keeper may name a
+      successor (section 6.6), under which the authors continue their papers
+      as branches. An archive that met the thief's version 3 first keeps that
+      one, and appends a fork record carrying the owner's.
     </p>
     <h2 id="auto-94"><a id="appendix-d-rationale-non-normative"></a>Appendix D. Rationale (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
@@ -5059,12 +5081,19 @@ wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwp
       </li>
       <li>
         <p>
-          <strong>Why a fork ends the owner.</strong> Only rotation keys, kept
-          apart and used once, can fork a key log, so a fork is rare and shows
-          that they were exposed; the format cannot tell the owner's side, and
-          healing, tried before, did not settle against a thief (<a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/keys-and-forks.md">keys
-          and forks</a>). As in Radicle, where a compromised key means a new
-          identity, the work continues under a successor.
+          <strong>Why a fork freezes the owner.</strong> Only rotation keys,
+          kept apart and used once, can fork a key log, so a fork is rare and
+          shows that they were exposed; the format cannot tell the owner's
+          side, and healing, tried before, did not settle against a thief (<a
+          href="https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/keys-and-forks.md">keys and forks</a>). Without a clock, no rule can tell what
+          the owner signed before the fork from what a thief signs after it,
+          also with old current keys naming earlier versions of the key log,
+          and each attempt to salvage part of it (taking a forked owner's
+          versions only from copies, for instance) made new edge cases. So a
+          fork ends the owner and freezes it: archives keep what they hold,
+          signatures stay good, nothing more is added unless evidence dates it
+          before the fork, and, as in Radicle, where a compromised key means a
+          new identity, the work continues under a successor.
         </p>
       </li>
       <li>
@@ -5087,8 +5116,8 @@ wmkg2sy2xl2z5xcthvxuyhconwpus4pojadq65yrjnla75ydrzhq/wmkg2sy2xl2z5xcthvxuyhconwp
           added), readers (never the latest signed version), branches and
           collections, and the same evidence lifts it. An exposure counts only
           before any fork point, since from there either side may be a
-          thief's. Versions of key logs are never contested: current keys
-          never sign them.
+          thief's, which could expose the owner's keys. Versions of key logs
+          are never contested: current keys never sign them.
         </p>
       </li>
       <li>

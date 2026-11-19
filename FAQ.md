@@ -235,8 +235,11 @@ signatures stay good, but readers trust them only as far as other evidence
 goes, since nothing tells the owner's signatures from a thief's; versions that
 need an exposed key, or name a version of a key log from a fork on, are
 **contested**, and archives never add them, unless other evidence (a
-timestamp) dates them before, and take the lines of an ended owner only from
-copies, never as new deposits. Every version of every line is signed, except
+timestamp) dates them before. A fork **freezes** the owner: archives that know
+of it add nothing more to its lines, unless such evidence dates it before the
+fork, and the work continues under a successor; after an ending without a
+fork, archives take the owner's lines only from copies, never as new
+deposits. Every version of every line is signed, except
 the computed first version of a key log, and the key logs travel with the
 objects they sign, so a line can be checked from any copy, even when the
 archives that served it have gone. An owner may name in its genesis record one

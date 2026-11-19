@@ -131,7 +131,7 @@ questions are listed at the end of the sections they concern.
 - **Forks of a key log, fork records** (6.3, provisional, #58): two signed
   versions of one number whose inventories differ are a fork, at its fork
   point. Only rotation keys can make one, never at the computed version 1,
-  and a fork **ends the owner**. An archive keeps the side it saw first
+  and a fork **ends the owner** and **freezes** it (7.5). An archive keeps the side it saw first
   (both at once: either), never replaces or removes a version, and appends a
   **fork record** after its latest version: unsigned, made by that archive,
   holding the `genesis.json` and `object.json` of v1 and the other side's
@@ -148,9 +148,13 @@ questions are listed at the end of the sections they concern.
   need an exposed key, or name a key-log version from a fork point on, are
   **contested** (7.3), unless other evidence the reader trusts (a timestamp)
   dates them before: never added, never the latest signed version, member
-  status `contested`, branch point not confirmed; lines of ended owners are
-  taken only from copies found elsewhere; the owner may sign again, with
-  keys not exposed, versions it knows it made.
+  status `contested`, branch point not confirmed; the owner may sign again,
+  with keys not exposed, versions it knows it made. **A fork freezes the
+  owner** (7.5): once an archive knows of a fork, it adds no version of the
+  owner's other lines, from a copy or as a deposit, unless evidence it trusts
+  dates its signatures before the fork point; it keeps what it holds, and
+  the work continues only under the successor. After an ending version
+  alone, lines are taken only from copies found elsewhere.
 - **Key logs travel** (6.5) beside every copy, as owner objects in the same
   storage root (the line's owner and every parent owner); the longer copy
   wins; an owner moves by copying its folder. **Keepers** (6.6): at most one, ORCID iD or

@@ -58,9 +58,11 @@ archive, [mgubi.org/papers](https://mgubi.org/papers/), is one).
   two of her tokens not yet used, it could take her key log over by signing
   its next version, without a fork; she can then only end her owner, by
   signing with her own tokens another version of that number, a fork. A fork
-  ends her owner; she then continues her papers as branches under a new owner,
+  ends her owner and freezes it: archives that know of it add nothing more to
+  her lines, unless a timestamp dates it before the fork, and keep what they
+  hold; she then continues her papers as branches under a new owner,
   which her keeper, fixed in her owner's genesis record, may name as successor
-  (sections 6.2, 6.3 and 6.6; pre-rotation is provisional, #58). Either way,
+  (sections 6.2, 6.3, 6.6 and 7.5; pre-rotation is provisional, #58). Either way,
   what the thief signed stays good, and readers weigh her history by other
   evidence (section 6.4).
 - Work not yet shared can be a **draft** (section 10), kept by her archive
