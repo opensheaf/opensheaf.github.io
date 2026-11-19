@@ -21,10 +21,12 @@ keyed identities with key logs, archives as hosts, storage keyed by lines,
 and branches as new objects.*
 
 > **Note.** The comparison of keys and forks here predates the rebuilt
-> specification of PR #30 (19 November 2026), where a fork of a key log is
-> recorded by an unsigned fork record that nullifies the keys involved, and
-> the owner may heal (section 6.3, provisional; issue
-> [#58](https://github.com/opensheaf/opensheaf.github.io/issues/58)).
+> specification of PR #30 (19 November 2026), where an owner's key log is
+> rotated by keys committed in advance by their digests (pre-rotation, as in
+> KERI), a stolen current key is listed as exposed, and a fork of a key log
+> ends the owner (section 6; issue
+> [#58](https://github.com/opensheaf/opensheaf.github.io/issues/58); see
+> [federated-identity.md](federated-identity.md)).
 
 ## 1. The question
 

@@ -14,13 +14,17 @@ rules does not repeat them. Where it describes the rules, it describes those
 of PR #30 after the commit in which an exposed key ends its owner (section
 3.9); the specification is right where they differ.*
 
-> **Superseded in part.** Since this paper, the rebuilt specification of PR
-> #30 (19 November 2026) no longer ends an owner at a fork of its key log:
-> an archive records the fork by an unsigned fork record, which nullifies the
-> keys involved, and the owner may heal by a signed version made with other
-> keys (section 6.3, provisional; issue
-> [#58](https://github.com/opensheaf/opensheaf.github.io/issues/58)). The
-> difficulties told here are the reasons for that design.
+> **Superseded in part.** The rebuilt specification of PR #30 (19 November
+> 2026) first recorded a fork of a key log by an unsigned fork record that
+> nullified the keys involved, and let the owner heal; an audit showed that
+> healing could not converge against a thief holding a listed key. It now
+> uses pre-rotation, as in KERI: current keys sign lines, and only rotation
+> keys committed in advance by their digests sign the next key-log version.
+> A stolen current key is listed as exposed, uncontested, and a fork, which
+> needs stolen rotation keys, ends the owner (section 6; issue
+> [#58](https://github.com/opensheaf/opensheaf.github.io/issues/58); see
+> [federated-identity.md](federated-identity.md)). The difficulties told here
+> are the reasons for that design.
 
 ## 1. What keys are for
 
