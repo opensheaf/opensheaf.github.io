@@ -40,8 +40,8 @@
       <font class="os-alert-label">Warning.</font> <strong>Draft.</strong> This extension
       rests on the owners, key logs and signatures of the specification
       (sections 6 and 7), whose field names are open (<a href="https://github.com/opensheaf/opensheaf.github.io/issues/55">issue #55</a>),
-      and on its fork records and healing, provisional (<a href="https://github.com/opensheaf/opensheaf.github.io/issues/58">issue
-      #58</a>).
+      and on its pre-rotation of key logs, exposed keys and fork records,
+      provisional (<a href="https://github.com/opensheaf/opensheaf.github.io/issues/58">issue #58</a>).
     </div>
     <h2 id="auto-2"><a id="1-introduction-non-normative"></a>1. Introduction (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
@@ -50,10 +50,10 @@
       signature stays good (sections 6 and 7 of the specification). Signatures
       say who made a version, not when. So when a key may have been exposed,
       the core cannot tell the signatures made with it before from those its
-      new holder makes after: the owner ends, or nullifies the keys in its key
-      log, healing a fork of it if a thief made one (section 6.3 of the
-      specification); its signatures stay good, and readers trust its history
-      only as far as other evidence goes (section 6.4 of the specification).
+      new holder makes after: the owner exposes the keys in its key log, or
+      ends (section 6.3 of the specification); its signatures stay good, and
+      readers trust its history only as far as other evidence goes (section
+      6.4 of the specification).
     </p>
     <p>
       A timestamp is such evidence: it shows that a signature existed by a
@@ -69,8 +69,8 @@
       to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when,
       and only when, they appear in all capitals. Terms are those of the
       specification: owner, key log, key-log version, signature file, witness,
-      line, branch, ended owner, fork record, nullified key, tainted owner,
-      healing version.
+      line, branch, ended owner, fork record, current key, rotation key,
+      exposed key.
     </p>
     <p>
       This extension follows the extension mechanism of section 2 of the
@@ -190,24 +190,27 @@
       naming the first version, which its genesis record fixes, are bounded by
       nothing): an authority is trusted only from the key-log version that
       lists it, which is itself dated by authorities listed before it, so no
-      one, a thief with a current key included, can list an authority of its
+      one, a thief with rotation keys included, can list an authority of its
       own to date signatures before the listing. A version is
-      <strong>dated</strong> by the <tt class="verbatim">threshold</tt>-th earliest of
-      the dates of its good signature files naming one key-log version; a
-      version vouched for (section 7.3 of the specification) existed by the
-      date of the version that vouches for it. Dates within two hours of a
-      Bitcoin block time are uncertain by that much.
+      <strong>dated</strong> by the n-th earliest of the dates of its good
+      signature files naming one key-log version, n being the number of
+      signatures it needs (<tt class="verbatim">threshold</tt> or, for a version of a
+      key log after the first, <tt class="verbatim">nextThreshold</tt> of the version
+      before; sections 6.1 and 7.3 of the specification); a version vouched
+      for (section 7.3 of the specification) existed by the date of the
+      version that vouches for it. Dates within two hours of a Bitcoin block
+      time are uncertain by that much.
     </p>
     <h2 id="auto-7"><a id="6-use"></a>6. Use<span style="margin-left: 1em"></span></h2>
     <p>
       Dates are evidence for readers; this extension draws no conclusion from
-      them in the format. For an owner that has ended or is tainted, and for
-      nullified keys (section 6.3 of the specification), a reader MAY trust
-      the versions dated before the time it believes a key was exposed, and
-      SHOULD say on what evidence. The time of the version that ends the owner
-      or nullifies keys, and of each version a fork record or a healing
-      version carries, bound when the owner knew. A branch keeps the timestamp
-      files of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>
+      them in the format. For an owner that has ended, and for exposed keys
+      (sections 6.3 and 6.4 of the specification), a reader MAY trust the
+      versions dated before the time it believes a key was exposed, and SHOULD
+      say on what evidence. The time of the version that ends the owner or
+      exposes keys bounds when the owner knew, and the times of the versions a
+      fork record carries, when the fork was made. A branch keeps the
+      timestamp files of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>
       (section 9.2 of the specification), without the <tt class="verbatim">&lt;version&gt;/</tt>
       folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>);
       a pending proof kept there can never be completed, and counts for
@@ -269,8 +272,11 @@
     <p>
       The <tt class="verbatim">keys.json</tt> of the first version of an owner's key
       log, adopting the extension from the start, with one RFC 3161 authority
-      (a placeholder fingerprint) and OpenTimestamps; its genesis record lists
-      the same <tt class="verbatim">keys</tt> and <tt class="verbatim">threshold</tt>:
+      (a placeholder fingerprint) and OpenTimestamps; two current keys, on the
+      owner's laptop and desktop, and the digests of three rotation keys, two
+      of which sign the next version; its genesis record lists the same <tt
+      class="verbatim">keys</tt>, <tt class="verbatim">threshold</tt>, <tt class="verbatim">next</tt> and
+      <tt class="verbatim">nextThreshold</tt>:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -280,6 +286,10 @@
   &quot;keys&quot;: [ &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
             &quot;did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH&quot; ],
   &quot;threshold&quot;: 1,
+  &quot;next&quot;: [ &quot;bla7pvxpfmk4o2z2btgp26zqmkpxfqutl5imae3eovmqg6labdba&quot;,
+            &quot;zaolbrk7wl6fjx7atv3bphi3fkg2oukrvwj75cxp6j5dnknfme3q&quot;,
+            &quot;twrtx2ec6pzozvgex4m6ndtokezgccn63kqpbl7z4bnedmxbdx2a&quot; ],
+  &quot;nextThreshold&quot;: 2,
   &quot;extensions&quot;: {
     &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;: {
       &quot;timestampAuthorities&quot;: [ &quot;5b4e3f0c9d2a7e18c6f4b0a39d7e2c51f8a6b3d09e4c7a12f5b8d6e3a0c9f147&quot; ]
@@ -373,6 +383,17 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           folders can be listed (section 3), and pending proofs in a branch
           count for nothing (section 6); after a second audit, keys nullified
           by a version of the key log as well as at a fork (sections 1 and 6).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, pre-rotation (PR
+          #30):</strong> following the pre-rotation of key logs in the
+          specification (#58): exposed keys in place of nullified keys, and no
+          healing or tainted owners (sections 1 and 6); a version of a key log
+          is dated by as many signatures as it needs, <tt class="verbatim">nextThreshold</tt>
+          of the version before (section 5); the example of appendix B commits
+          to rotation keys in <tt class="verbatim">next</tt>.
         </p>
       </li>
     </ul>

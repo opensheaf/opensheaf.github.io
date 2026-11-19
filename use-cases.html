@@ -91,21 +91,25 @@
       <li>
         <p>
           She is an owner: her key log, kept in her archive at <tt class="verbatim">&lt;owner&gt;/&lt;owner&gt;/</tt>,
-          lists her keys (one for daily use, a spare kept apart), and every
-          version she deposits is signed with her daily key (threshold 1).
-          Each paper is one of her lines, at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>,
-          with a label (<tt class="verbatim">kpz-uniqueness</tt>) for the website. When
-          she replaces a laptop that is wiped and safe, she retires its key by
-          a new version of her key log, and nothing else changes. If a laptop
-          is stolen with its key, she nullifies that key by a new version of
-          her key log signed with her spare key, and continues her lines (if
-          the thief has already signed a version of her key log, archives that
-          meet both record a fork, which she heals with her spare key); or she
-          ends her owner, naming a new one as successor, and continues her
-          papers as branches under it (sections 6.2 and 6.3; nullified keys,
-          fork records and healing are provisional, #58). Either way, what the
-          thief signed stays good, and readers weigh her history by other
-          evidence (section 6.4).
+          lists her current key, made on her laptop, which signs every version
+          she deposits (threshold 1), and commits to three rotation keys on
+          hardware tokens kept apart, two of which sign the next version of
+          her key log (<tt class="verbatim">nextThreshold</tt> 2). Each paper is one of
+          her lines, at <tt class="verbatim">&lt;owner&gt;/&lt;name&gt;/</tt>, with a
+          label (<tt class="verbatim">kpz-uniqueness</tt>) for the website. When she
+          replaces a laptop that is wiped and safe, she retires its key by a
+          new version of her key log, signed with two tokens, and nothing else
+          changes. If a laptop is stolen with its key, she signs with two
+          tokens a new version of her key log listing that key as exposed,
+          which the thief cannot contest, since current keys never sign a
+          later version of a key log; what the thief signs is then taken by
+          archives only from copies, and she continues her lines. Should a
+          thief ever hold two of her tokens and sign another version of her
+          key log, the fork ends her owner; she then continues her papers as
+          branches under a new owner, which her keeper may name as successor
+          (sections 6.2 and 6.3; pre-rotation is provisional, #58). Either
+          way, what the thief signed stays good, and readers weigh her history
+          by other evidence (section 6.4).
         </p>
       </li>
       <li>
@@ -233,9 +237,9 @@ osheaf verify</pre>
       class="verbatim">Presentation</tt> for slides); notes revised every year are
       versions of one document, or separate documents when an edition is a
       different work (a new title, a different course). A group can also be
-      one owner, with the keys of several members and a threshold of
-      signatures (section 6.1): what it publishes is then signed by that many
-      of them.
+      one owner, with the current keys of several members and a threshold of
+      signatures (sections 6.1 and 6.2): what it publishes is then signed by
+      that many of them.
     </p>
     <h2 id="auto-6"><a id="archives"></a>Archives<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-7"><a id="an-institutional-repository"></a>An institutional repository<span style="margin-left: 1em"></span></h3>

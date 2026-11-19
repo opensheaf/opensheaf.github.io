@@ -43,9 +43,23 @@
         "type": "string",
         "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]+$"
       },
-      "$comment": "sections 5.1 and 6: an owner's first keys"
+      "$comment": "sections 5.1 and 6.1: an owner's first current keys"
     },
     "threshold": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "next": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z2-7]{51}[aq]$"
+      },
+      "$comment": "sections 5.1 and 6.1: the digests of an owner's first rotation keys, which sign the second version of its key log"
+    },
+    "nextThreshold": {
       "type": "integer",
       "minimum": 1
     }
@@ -62,7 +76,9 @@
       "then": {
         "required": [
           "keys",
-          "threshold"
+          "threshold",
+          "next",
+          "nextThreshold"
         ],
         "not": {
           "required": [
@@ -84,6 +100,16 @@
             {
               "required": [
                 "threshold"
+              ]
+            },
+            {
+              "required": [
+                "next"
+              ]
+            },
+            {
+              "required": [
+                "nextThreshold"
               ]
             }
           ]

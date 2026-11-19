@@ -1,6 +1,6 @@
 ---
 name: opensheaf-spec
-description: The concepts of the OpenSheaf specification (archives, objects, document and object versions, names and genesis records, owners and key logs, forks of key logs and healing, lines and signatures, catalogues and selections, pins, branches and accepted copies, drafts and sealing, mirrors, sheaf: URIs, withdrawal and takedown, verification, profiles and extensions) and how to change the specification, its schemas, the FAQ and the use cases. Use before editing any of them, or answering questions about the format.
+description: The concepts of the OpenSheaf specification (archives, objects, document and object versions, names and genesis records, owners and key logs, pre-rotation, exposed keys and forks of key logs, lines and signatures, catalogues and selections, pins, branches and accepted copies, drafts and sealing, mirrors, sheaf: URIs, withdrawal and takedown, verification, profiles and extensions) and how to change the specification, its schemas, the FAQ and the use cases. Use before editing any of them, or answering questions about the format.
 ---
 
 # The OpenSheaf specification
@@ -32,8 +32,8 @@ owner tool, verifier, resolver; profiles; extensions; schemas); 3 archives
 rules, 4.2 documents and document versions, 4.3 `object.json`, 4.4
 `datacite.json`); 5 names (5.1 genesis record, 5.2 computing a name, 5.3
 origin and clashes, 5.4 reused genesis records); 6 owners (6.1 key log, 6.2
-creating an owner and choosing keys, 6.3 ending, forks and healing, 6.4 after
-an end, a fork or healing, 6.5 key logs travel with the objects they sign,
+creating an owner and choosing keys, 6.3 ending, exposed keys and forks, 6.4
+after an end or an exposure, 6.5 key logs travel with the objects they sign,
 6.6 keepers); 7 lines and signatures (7.1 signing, 7.2 witnesses and
 signature files, 7.3 statuses, 7.4 one writer per line, 7.5 adding versions,
 7.6 integrity); 8 collections (8.1 catalogues and selections, 8.2
@@ -48,7 +48,7 @@ withdrawal, takedown and tombstones; 14 verification (14.1 findings, 14.2 to
 14.6 the checks in order); 15 security, privacy and rights; 16 versioning
 (16.1 versions, **16.2 changelog**). Appendices: A profiles (A.1 Zenodo,
 A.2 TeXmacs, A.3 website), B JSON Schemas, C examples (computed and
-validated; C.8 a fork of a key log), D rationale, E references. Open
+validated; C.8 an exposed key and a fork of a key log), D rationale, E references. Open
 questions are listed at the end of the sections they concern.
 
 ## Concepts
@@ -74,7 +74,7 @@ questions are listed at the end of the sections they concern.
 - **Object** (4): kind `document`, `collection` or `owner`; identifier
   `sheaf:<name>:<owner>` (a draft `sheaf:draft:<id>`), never reused once
   sealed. **Object version** (`v1`, ...) changes at every change and never
-  changes once made, except in a draft and at a fork of a key log.
+  changes once made, except in a draft and by a takedown.
   **Document version** (4.2): numbered by the line's owner from 1 without
   gaps; new exactly when the document's own files change. **Pin** (4):
   (object version, SHA-512 of its inventory file). Identity files (4.1):
@@ -96,36 +96,42 @@ questions are listed at the end of the sections they concern.
   is made; reused genesis records are refused unless signed by the
   originator or a confirmed branch (5.4); aliases open (#44).
 - **Owners and key logs** (6): an owner object, named by its genesis record
-  (first `keys` and `threshold`); its versions are its key log, `keys.json`
-  (`keys` as Ed25519 `did:key`, `threshold`, `extensions`, `keeper`,
-  `ended`, `successor`). Each version vN+1 is signed by `threshold` keys of
-  vN. Retiring a key: leaving it out. Thresholds: 1 with a spare key, or 2
-  of 3 (6.2).
-- **Ending** (6.3): a signed last version with `ended` (and optional
-  `successor`, a hint); no line signature names it; an **ended** owner signs
-  nothing.
-- **Forks of a key log, fork records, nullified keys, tainted, healing** (6.3,
-  provisional, #58): two different versions of one number, each signed
-  against the version before, are a fork, at its fork point. An archive
-  holding one side that meets the other replaces its version at the fork
-  point by a **fork record**: an unsigned version made by that archive,
-  holding `genesis.json`, `object.json` and the conflicting versions it
+  (first `keys`, `threshold`, `next`, `nextThreshold`); its versions are its
+  key log, `keys.json` (`keys` as Ed25519 `did:key`, `threshold`, `next`,
+  `nextThreshold`, `extensions`, `keeper`, `ended`, `successor`,
+  `exposed`). **Pre-rotation**, as in KERI (provisional, #58): **current
+  keys** (`keys`, `threshold`) sign the versions of lines, and the key log
+  only in its first version, which repeats the genesis record; `next` holds
+  the base32 SHA-256 digests of the **rotation keys**, and each later
+  version vN+1 is signed by `nextThreshold` rotation keys of vN, which its
+  signature files reveal. Rotation keys are kept apart, used once (SHOULD be
+  destroyed), never become current keys, and a revealed one is never
+  committed again. Advice (6.2): one current key per device, never copied;
+  threshold 1 for a person, more for a group; e.g. three rotation keys with
+  `nextThreshold` 2. Retiring a key: leaving it out.
+- **Ending** (6.3): a signed last version with `ended`, without `next` (and
+  optional `successor`, a hint); no line signature names it; an **ended**
+  owner signs nothing.
+- **Exposed keys** (6.3): an owner whose current keys may have been exposed
+  and could reach a threshold signs at once a version listing them in
+  `exposed` (any earlier current key, retired or not), which whoever holds
+  current keys cannot contest; otherwise retiring is enough. There is no
+  revocation.
+- **Forks of a key log, fork records** (6.3, provisional, #58): two
+  different versions of one number, each signed against the version before,
+  are a fork, at its fork point; only rotation keys (or current keys at
+  version 1) can make one, and a fork **ends the owner**. An archive keeps
+  the side it saw first, never replaces or removes a version, and appends a
+  **fork record** after its latest version: unsigned, made by that archive,
+  holding `genesis.json`, `object.json` and the other side's versions it
   carries under `forked/<d>/` (inventory, checksum, `keys.json`, signature
-  files with their witnesses), and drops every later version. The keys that
-  sign carried versions are **nullified**. A key log whose latest version is
-  a fork record is **tainted**: only a **healing version** follows it (a
-  version at the fork point carrying the forked versions, with no
-  nullified key in its `keys.json`, signed by `threshold` keys of the
-  version before, none nullified). Rules for versions that meet:
-  supersede, or replace both by a fork record; witness files go with their
-  versions. These are the only changes of object versions outside drafts.
-  An exposed key that could reach a threshold: the owner ends, or nullifies
-  the keys by a fork and heals; otherwise retiring is enough. There is no
-  revocation and no "evidence of forks" folder.
-- **After an end, a fork or healing** (6.4): signatures stay good; readers
-  weigh them by other evidence (copies, pins, timestamps). No version is
-  added that needs a nullified key. Lines of ended or tainted owners only
-  from copies found elsewhere.
+  files with their witnesses). No version follows an ending version or a
+  fork record.
+- **After an end or an exposure** (6.4): signatures stay good; readers
+  weigh them by other evidence (copies, pins, timestamps). Versions of lines
+  that **need an exposed key**, and lines of ended owners, are taken only
+  from copies found elsewhere; the owner may sign again, with keys not
+  exposed, versions it knows it made.
 - **Key logs travel** (6.5) beside every copy, as owner objects in the same
   storage root (the line's owner and every parent owner); the longer copy
   wins; an owner moves by copying its folder. **Keepers** (6.6): ORCID iD
@@ -136,12 +142,12 @@ questions are listed at the end of the sections they concern.
   (`object`, `version`, `inventorySha512`, `signer`, `key`, `keyLog` as a
   pin `sheaf:<owner>/v<n>?sha512=...`, `signature` over a five-line
   message); others' `witness-<label>.json`. Witnesses are never replaced or
-  removed, except by a takedown or at a fork of a key log. **Statuses**
+  removed, except by a takedown. **Statuses**
   (7.3): signature files invalid, unchecked or good (for ever); versions
   signed (directly or vouched for), unchecked, or not a version (invalid or
   unsigned). Readers use the latest signed version. Forks of a line (7.4)
   are reported, never recorded. Adding (7.5): only versions signed once
-  added; versions held stay, but for takedowns and key-log forks.
+  added; versions held stay, but for takedowns.
 - **Collections** (8): `members.json` with `type` `catalogue` (pins whole
   objects, MAY `follow` `"latest"`) or `selection` (revision sets of
   `documentVersion`, `version`, `inventorySha512`); members name `kind`,
@@ -174,8 +180,7 @@ questions are listed at the end of the sections they concern.
 - **Verification** (14): findings are **errors** (breaches of MUST, an
   archive or object without errors passes), **warnings** (SHOULD, breaches
   the archive cannot repair, checks not made) and **results** (statuses,
-  verdicts, forks, ended, tainted and healed owners, nullified keys,
-  withdrawals, removals).
+  verdicts, forks, ended owners, exposed keys, withdrawals, removals).
 - **Security, privacy, rights** (15): untrusted input, serving, secrets,
   pseudonymous owners, metadata (fork records included) under CC0.
 - **Profiles** (appendix A): `zenodo` (a record is a witness, not a copy),
@@ -228,8 +233,8 @@ the same change in its schema, and the other way round.
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors, #44 aliases, #46,
   #48, #49, #50, #51 and #23 verification details, #54 custody policies, #55
-  field names of owners and signatures, #57 branch numbering, #58 fork
-  records and healing (provisional). Read the relevant issue before
+  field names of owners and signatures, #57 branch numbering, #58 pre-rotation,
+  exposed keys and fork records (provisional). Read the relevant issue before
   touching its topic; do not settle an open question without agreement.
 
 ## Design principles to keep
@@ -237,8 +242,8 @@ the same change in its schema, and the other way round.
 - Standards first: use OCFL and DataCite as they are; invent only what they
   leave open.
 - Fixed versions: nothing deposited ever changes; corrections, notices,
-  descriptions and withdrawals are new object versions. The one exception
-  is the replacement of key-log versions at a fork.
+  descriptions and withdrawals are new object versions, and a fork of a key
+  log is recorded by appending a fork record, never by replacing a version.
 - Integrity comes from pins, not places: any matching copy is valid.
 - Statements are made by their authors in their own objects: a document
   never states the collections or reviews about it.

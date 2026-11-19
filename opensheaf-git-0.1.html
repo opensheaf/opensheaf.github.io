@@ -131,8 +131,8 @@
       specification (archive, storage root, discovery document, object, object
       version, pin, mirror, witness, takedown, tombstone, owner, owner object,
       key log, draft, signed version, not a version, ended owner, fork of a
-      line, fork of a key log, fork record, healing version, nullified key,
-      tainted owner, healed owner) keep their meaning.
+      line, fork of a key log, fork record, current key, rotation key, exposed
+      key) keep their meaning.
     </p>
     <ul>
       <li>
@@ -335,12 +335,11 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       specification), their timestamp files, and others' witnesses. A file
       there, once published, is never replaced or removed, even when it is not
       a witness (a stray or malformed file, which is reported and kept),
-      except with its object by a takedown, or with its version at a fork of a
-      key log (item 9): timestamps are made of the bytes of signature files,
-      and a completed timestamp proof is a new file beside the pending one; 4.
-      the replacement of <tt class="verbatim">opensheaf.json</tt>, and files added,
-      replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>, <tt
-      class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
+      except with its object by a takedown: timestamps are made of the bytes
+      of signature files, and a completed timestamp proof is a new file beside
+      the pending one; 4. the replacement of <tt class="verbatim">opensheaf.json</tt>,
+      and files added, replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
+      <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
       which are rewritten at every deposit and takedown (section 12.5 of the
       specification); 5. at the creation of the storage root, its own files
       (<tt class="verbatim">0=ocfl_1.1</tt>, <tt class="verbatim">ocfl_layout.json</tt>, the
@@ -354,53 +353,40 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       layout), including its removal, with the creation of the <tt class="verbatim">draft/</tt>
       folder and its removal when it is left empty: drafts are the only
       objects that may be rewritten or deleted, and are never copied out of
-      the archive; 9. at a fork of a key log (section 6.3 of the
-      specification), in an owner object: the replacement of the version
-      folder at the fork point by a version that supersedes the version held
-      (a fork record, a healing version, or a version that nullifies a key
-      that signed it), the removal of every later version folder, the
-      replacement of the root inventory and its checksum file by those of the
-      new head, and the removal of the witness files of the versions replaced
-      (those carried are kept, with their witnesses, in <tt class="verbatim">forked/&lt;d&gt;/</tt>
-      of the new version; the others are dropped from this copy; provisional,
-      #58). It is made only by a commit that adds that version, valid and
-      superseding the version held as section 6.3 says, the versions after it
-      going with it. These replacements are the only changes of a sealed
-      version folder besides repairs.
+      the archive;
     </p>
     <p>
       No other file of the archive changes, and no file of an existing version
-      folder is changed, renamed or removed, except by a repair or at a fork
-      of a key log (item 9). Several changes MAY be made in one commit.
+      folder is changed, renamed or removed, except by a repair. Several
+      changes MAY be made in one commit.
     </p>
     <p>
       <strong>Only signed versions are added.</strong> Every object version
-      added by items 1, 2 and 9, other than a draft's, MUST be signed once
-      added (sections 6.3, 7.3 and 7.5 of the specification). A version of a
-      line is signed with good signatures of its owner, against the key log of
-      the owner object kept at its path, which the same commit adds or extends
-      if needed, or is vouched for by a version so signed that the same commit
+      added by items 1 and 2, other than a draft's, MUST be signed once added
+      (sections 6.3, 7.3 and 7.5 of the specification). A version of a line is
+      signed with good signatures of its owner, against the key log of the
+      owner object kept at its path, which the same commit adds or extends if
+      needed, or is vouched for by a version so signed that the same commit
       adds. A version of a key log is signed as section 6.1 of the
-      specification says, or is a valid fork record or healing version; none
-      follows an ending version or a fork record, which only a version that
-      supersedes it replaces. Versions of the lines, other than the key log,
-      of an owner that the commit's tree shows to be ended or tainted, and
-      versions that need a key nullified in the commit's tree, are added only
-      from copies found elsewhere, never as new deposits (section 7.5 of the
-      specification); the key log of such an owner is added as section 6.4 of
-      the specification says. Since OCFL cannot skip a version and nothing is
-      removed from a line but by a takedown, a version let in that is not
-      signed would hold its number for good, and the owner's own version of
-      that number could never be added to this archive. Versions already
-      published stay, whatever happens later, except versions of a key log
-      replaced at a fork (item 9).
+      specification says, or is a valid fork record, which records a fork of
+      the key log as a new version after the latest held and replaces nothing;
+      none follows an ending version or a fork record (section 6.3 of the
+      specification). Versions of the lines, other than the key log, of an
+      owner that the commit's tree shows to be ended, and versions that need a
+      key exposed in the commit's tree, are added only from copies found
+      elsewhere, never as new deposits (section 7.5 of the specification); the
+      key log of such an owner is added as section 6.4 of the specification
+      says. Since OCFL cannot skip a version and nothing is removed from a
+      line but by a takedown, a version let in that is not signed would hold
+      its number for good, and the owner's own version of that number could
+      never be added to this archive. Versions already published stay,
+      whatever happens later.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
-      (section 9); the replacements of item 9 are new commits, not a rewrite.
-      Repositories SHOULD use the protection of their host to refuse
-      force-pushes to the published branch and its deletion (on GitHub: a
-      branch protection rule or a ruleset).
+      (section 9). Repositories SHOULD use the protection of their host to
+      refuse force-pushes to the published branch and its deletion (on GitHub:
+      a branch protection rule or a ruleset).
     </p>
     <h3 id="auto-12"><a id="52-every-published-commit-is-an-archive"></a>5.2 Every published commit is an archive<span style="margin-left: 1em"></span></h3>
     <p>
@@ -489,7 +475,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           sealed version is signed when it is made (section 7.1 of the
           specification), and never rebuilt (section 6.2): two versions <tt
           class="verbatim">v&lt;N&gt;</tt> of one line are a fork of the line, never
-          redone by a merge; only one is published, and the other is reported.
+          redone by a merge: only one is published, and the other is reported,
+          or, for a key log, carried by a fork record added after the version
+          published (section 6.3 of the specification).
         </p>
       </li>
       <li>
@@ -728,11 +716,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           <strong>append-only</strong>: between each published commit and the
           next, only the changes of section 5.1 (for a pull request: between
           its base and its head); nothing is removed from an object's version
-          folders or witness folder except by a takedown or, in an owner
-          object, at a fork (item 9), and a change to a file of an existing
-          version folder is accepted only as a repair, when the new bytes have
-          the digest its inventory records and the old bytes did not, or at a
-          fork;
+          folders or witness folder except by a takedown, and a change to a
+          file of an existing version folder is accepted only as a repair,
+          when the new bytes have the digest its inventory records and the old
+          bytes did not;
         </p>
       </li>
       <li>
@@ -743,8 +730,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           An added version that is not signed (unsigned, invalid, or
           unchecked: a key-log version not found), unless a signed version
           added in the same commit extends it; a version of a key log after an
-          ending version or a fork record; a fork record, healing version or
-          version listing <tt class="verbatim">nullified</tt> keys that is not valid;
+          ending version or a fork record; a fork record that is not valid;
           and an added signature file of the owner that is invalid, are errors
           (section 14.1 of the specification), so that a pull request adding
           them cannot pass;
@@ -755,11 +741,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           <strong>reported, never failing</strong>: as warnings, versions
           already published that are not signed (a breach of section 5.1 that
           cannot be undone), files that are not witnesses, and versions added
-          to the lines, other than the key log, of ended or tainted owners, or
-          needing a nullified key (which must come only from copies, which the
-          check cannot see); as results, forks of lines and of key logs,
-          nullified keys, and ended, tainted and healed owners (sections 6.3
-          and 7.4 of the specification);
+          to the lines, other than the key log, of ended owners, or needing an
+          exposed key (which must come only from copies, which the check
+          cannot see); as results, forks of lines and of key logs, exposed
+          keys, and ended owners (sections 6.3 and 7.4 of the specification);
         </p>
       </li>
       <li>
@@ -971,6 +956,19 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           tell a copy from a deposit (sections 5.1 and 10; provisional, #58);
           the history of the published branch is rewritten only for a takedown
           (section 1).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, pre-rotation (PR
+          #30):</strong> following the pre-rotation of key logs in the
+          specification (#58): a fork of a key log is recorded by a fork
+          record added as a new version (item 2), never by replacing versions,
+          so item 9 is removed and repairs are the only changes of a sealed
+          version folder (section 5.1); at a merge, the other side of a fork
+          of a key log is carried by a fork record (section 6.3); exposed keys
+          and ended owners in place of nullified keys and tainted owners
+          (sections 5.1 and 10).
         </p>
       </li>
     </ul>

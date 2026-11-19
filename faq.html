@@ -251,37 +251,40 @@
     <p>
       An owner is itself an object, named by its own genesis record, which
       lists its first keys, and whose versions are its <strong>key
-      log</strong>: the list of its public keys and the number of them that
-      must sign, each version signed by the keys of the one before. Keys can
-      thus be added or retired while the owner stays the same, and what was
-      signed stays signed: a signature that verifies against the key-log
-      version it names is good for ever. A version signed with good keys
-      vouches for every version before it, since its inventory fixes them. A
-      threshold binds only the signatures naming its version, so owners choose
-      it at the start (1 with a spare key kept apart, or 2 of 3 keys); a group
-      of co-authors can share one owner with a threshold, for instance two
-      signatures out of three. If keys that could reach the threshold may have
-      been exposed, the owner either <strong>ends</strong>, by a last version
-      of its key log that may name a successor, which continues the work by
-      branches; or it <strong>nullifies</strong> those keys, by a new version
-      of its key log signed with keys that took no part (a spare kept apart),
-      and continues its lines (nullified keys, fork records and healing are
-      provisional, #58). Two versions of a key log with one number, both
-      signed, are a fork: since no one can tell the owner's side from a
-      thief's, an archive that meets both keeps neither, but a fork record
-      carrying both, and the keys that signed them are nullified wherever the
-      record travels; the owner <strong>heals</strong> the fork by a version
-      carrying both, signed with its spare keys. Either way the old signatures
-      stay good, but readers trust them only as far as other evidence goes,
-      since nothing tells the owner's signatures from a thief's; an ended
-      owner, or one that cannot heal, signs nothing more, and archives take
-      its lines only from copies, never as new deposits. Every version of
-      every line is signed, and the key logs travel with the objects they
-      sign, so a line can be checked from any copy, even when the archives
-      that served it have gone. An owner may name who answers for it (an ORCID
-      iD, an institution), which the keeper may confirm in a place only it
-      controls; nothing requires it. Drafts are a sandbox: objects of a
-      reserved owner, <tt class="verbatim">draft</tt>, kept by one archive, never
+      log</strong>. Each version lists the owner's <strong>current
+      keys</strong>, which sign its documents and collections, with the number
+      of them that must sign, and commits, by their digests, to the
+      <strong>rotation keys</strong> that alone sign the next version of the
+      key log, as in KERI (pre-rotation is provisional, #58). Current keys are
+      in daily use, one on each device; rotation keys are kept apart (on
+      hardware tokens, for instance), used once, and never become current
+      keys; three of them with two required survive the loss of one and the
+      theft of one. Keys can thus be added or retired while the owner stays
+      the same, and what was signed stays signed: a signature that verifies
+      against the key-log version it names is good for ever. A version signed
+      with good keys vouches for every version before it, since its inventory
+      fixes them. A person usually needs one signature; a group of co-authors
+      can share one owner with a threshold, for instance two signatures out of
+      three. If current keys that could reach the threshold may have been
+      exposed, the owner signs with its rotation keys a version of its key log
+      listing them as <strong>exposed</strong>, which a thief holding current
+      keys cannot contest; or it <strong>ends</strong>, by a last version of
+      its key log that may name a successor, which continues the work by
+      branches. Two versions of a key log with one number, both signed, are a
+      fork, which in practice needs stolen rotation keys: since no one can
+      tell the owner's side from a thief's, the fork ends the owner; an
+      archive keeps the side it saw first and appends a fork record carrying
+      the other, so that every copy shows the fork. Either way the old
+      signatures stay good, but readers trust them only as far as other
+      evidence goes, since nothing tells the owner's signatures from a
+      thief's; versions that need an exposed key, and the lines of an ended
+      owner, are taken by archives only from copies, never as new deposits.
+      Every version of every line is signed, and the key logs travel with the
+      objects they sign, so a line can be checked from any copy, even when the
+      archives that served it have gone. An owner may name who answers for it
+      (an ORCID iD, an institution), which the keeper may confirm in a place
+      only it controls; nothing requires it. Drafts are a sandbox: objects of
+      a reserved owner, <tt class="verbatim">draft</tt>, kept by one archive, never
       signed, pinned or copied out of it, and free to be rewritten or deleted.
       Sealing makes a new object, the first version of the line; the draft's
       versions are not part of it.

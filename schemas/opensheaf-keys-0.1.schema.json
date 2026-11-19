@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json",
   "title": "OpenSheaf key log version (keys.json), version 0.1",
-  "$comment": "Section 6 of the specification (field names provisional, #55). Dedicated to the public domain under CC0 1.0. That the threshold does not exceed the number of keys, that no version follows one with ended or a fork record, and the rules of fork records and healing versions (section 6.3, provisional, #58: a fork record holds forked/<d>/ and no keys.json; a healing version holds both), and that keys lists no key of nullified and that none of them signs the version, are checked by verifiers.",
+  "$comment": "Section 6 of the specification (field names provisional, #55; next, nextThreshold and exposed provisional, #58). Dedicated to the public domain under CC0 1.0. That threshold does not exceed the number of keys nor nextThreshold that of next, that no version follows one with ended or a fork record (which holds forked/<d>/ and no keys.json), that keys lists no exposed key and no rotation key that has signed a version, that next holds no digest of a current key or of a rotation key that has signed a version, that the first version repeats the keys, threshold, next and nextThreshold of the genesis record, and that each later version is signed by nextThreshold rotation keys of the version before, are checked by verifiers.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,11 +20,26 @@
       "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/didKey"
-      }
+      },
+      "$comment": "section 6.1: the current keys, which sign the versions of the owner's lines and, in the first version only, the key log"
     },
     "threshold": {
       "type": "integer",
       "minimum": 1
+    },
+    "next": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/keyDigest"
+      },
+      "$comment": "section 6.1: digests of the rotation keys that sign the next version of the key log; absent from an ending version"
+    },
+    "nextThreshold": {
+      "type": "integer",
+      "minimum": 1,
+      "$comment": "section 6.1: how many distinct rotation keys must sign the next version"
     },
     "keeper": {
       "type": "array",
@@ -56,14 +71,14 @@
       "pattern": "^[a-z2-7]{52}$",
       "$comment": "optional, only with ended (section 6.3): the owner name of the owner that continues the work, other than this owner"
     },
-    "nullified": {
+    "exposed": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/didKey"
       },
-      "$comment": "optional, provisional (section 6.3, #58): keys of the version before that this version nullifies; keys lists none of them, and none of them signs this version"
+      "$comment": "optional (section 6.3): current keys of earlier versions that this version declares exposed"
     }
   },
   "$defs": {
@@ -71,11 +86,39 @@
       "type": "string",
       "pattern": "^did:key:z6Mk[1-9A-HJ-NP-Za-km-z]+$",
       "$comment": "an Ed25519 key as did:key (multibase base58btc, multicodec ed25519-pub)"
+    },
+    "keyDigest": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{51}[aq]$",
+      "$comment": "the lowercase base32 (RFC 4648, without padding) SHA-256 digest of a did:key URI as UTF-8, 52 characters"
     }
   },
   "dependentRequired": {
     "successor": [
       "ended"
+    ],
+    "next": [
+      "nextThreshold"
+    ],
+    "nextThreshold": [
+      "next"
+    ]
+  },
+  "if": {
+    "required": [
+      "ended"
+    ]
+  },
+  "then": {
+    "not": {
+      "required": [
+        "next"
+      ]
+    }
+  },
+  "else": {
+    "required": [
+      "next"
     ]
   }
 }
