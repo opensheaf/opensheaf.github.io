@@ -53,13 +53,13 @@ archive, [mgubi.org/papers](https://mgubi.org/papers/), is one).
   signed with two tokens, and nothing else changes. If a laptop is stolen with
   its key, she signs with two tokens a new version of her key log listing that
   key as exposed, which the thief cannot contest, since current keys never
-  sign a later version of a key log; archives then never add what the thief
-  signs with it, and she continues her lines. Should a thief ever copy two of
-  her unused tokens, it could take her key log over by signing its next
-  version, without a fork; she can then only end her owner, by signing with
-  her own tokens another version of that number, a fork. A fork ends her
-  owner; she then continues her papers as branches under a new owner, which
-  her keeper, fixed in her owner's genesis record, may name as successor
+  sign a version of a key log; what the thief signs with it is then contested,
+  archives never add it, and she continues her lines. Should a thief ever copy
+  two of her tokens not yet used, it could take her key log over by signing
+  its next version, without a fork; she can then only end her owner, by
+  signing with her own tokens another version of that number, a fork. A fork
+  ends her owner; she then continues her papers as branches under a new owner,
+  which her keeper, fixed in her owner's genesis record, may name as successor
   (sections 6.2, 6.3 and 6.6; pre-rotation is provisional, #58). Either way,
   what the thief signed stays good, and readers weigh her history by other
   evidence (section 6.4).

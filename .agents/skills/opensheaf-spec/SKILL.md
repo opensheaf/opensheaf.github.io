@@ -102,51 +102,58 @@ questions are listed at the end of the sections they concern.
   `nextThreshold`, `extensions`, `ended`, `successor`, `exposed`; no
   `keeper`), in every version but a fork record. **Pre-rotation**, as in
   KERI (provisional, #58): **current keys** (`keys`, `threshold`) sign the
-  versions of lines, and the key log only in its first version, whose
-  `keys.json` holds exactly the key fields of the genesis record (equal as
-  JSON values), nothing else; `next` holds the base32 SHA-256 digests of the
+  versions of lines, never the key log; the first version of the key log is
+  **computed** from the genesis record, never signed: `genesis.json`,
+  `object.json` and `keys.json` (the key fields of the genesis record), and
+  the inventory (`created` of the genesis record, no `message` or `user`),
+  byte for byte in JCS (RFC 8785), so its pin is fixed; other bytes there
+  are an error, never a fork; `next` holds the base32 SHA-256 digests of the
   **rotation keys**, and each later version vN+1 is signed by
   `nextThreshold` rotation keys of vN, which its signature files reveal.
   Rotation keys are kept apart, used once (SHOULD be destroyed), never
-  become current keys, and a revealed one is never committed again; `keys`
-  never lists a rotation key, used or not. Advice (6.2): one current key per
-  device, never copied; threshold 1 for a person, more for a group; e.g.
-  three rotation keys with `nextThreshold` 2. Retiring a key: leaving it
-  out.
+  become current keys, and each digest is in the `next` of one version only;
+  `keys` never lists a rotation key, used or not. Advice (6.2): one current
+  key per device, never copied; threshold 1 for a person, more for a group;
+  e.g. three rotation keys with `nextThreshold` 2. Retiring a key: leaving
+  it out.
 - **Ending** (6.3): a signed last version with `ended`, without `keys`,
   `threshold`, `next`, `nextThreshold` (and optional `successor`, a hint);
-  no line signature names it; an **ended** owner signs nothing. A successor
-  is accepted only from an ending version before any fork point or from the
-  keeper (6.6); one named from a fork point on is an unconfirmed claim.
+  it has no keys, so nothing is signed against it; an **ended** owner signs
+  nothing. At most one **accepted successor**: the one named by an ending
+  version before any fork point, failing that the keeper's (6.6); any other
+  is a claim.
 - **Exposed keys** (6.3): an owner whose current keys may have been exposed
   and could reach a threshold signs at once a version listing them in
   `exposed` (any earlier current key, retired or not), which whoever holds
-  current keys cannot contest; otherwise retiring is enough. There is no
-  revocation.
-- **Forks of a key log, fork records** (6.3, provisional, #58): two
-  signed versions of one number whose `keys.json` differ (as JSON values)
-  are a fork, at its fork point; versions with equal `keys.json` are
-  **equivalent**, not a fork. Only rotation keys can make one, never at
-  version 1, and a fork **ends the owner**. An archive keeps the side it saw
-  first (both at once: the smaller inventory SHA-512 at the fork point),
-  never replaces or removes a version, and appends a **fork record** after
-  its latest version: unsigned, made by that archive, holding `genesis.json`,
-  `object.json` and the other side's versions it carries under `forked/<d>/`
-  (inventory, checksum, `keys.json`, signature files with their witnesses),
-  and no `keys.json` of its own. A fork record is never a side: copies are
-  compared up to it. No version follows an ending version or a fork record.
-  A thief with unused rotation keys of the latest version takes over without
-  a fork; the owner can only end it, with its own copies of those keys.
-- **After an end or an exposure** (6.4): signatures stay good; readers
-  weigh them by other evidence (copies, pins, timestamps). Versions of lines
-  that **need an exposed key** (exposed by their own owner's key log), or
-  name a key-log version from a fork point on, are reported and never added,
-  unless other evidence (a timestamp) dates them before; lines of ended
-  owners are taken only from copies found elsewhere; the owner may sign
-  again, with keys not exposed, versions it knows it made.
+  current keys cannot contest; an exposure counts only in a version before
+  any fork point, and concerns versions of lines, never of key logs;
+  otherwise retiring is enough. There is no revocation.
+- **Forks of a key log, fork records** (6.3, provisional, #58): two signed
+  versions of one number whose inventories differ are a fork, at its fork
+  point. Only rotation keys can make one, never at the computed version 1,
+  and a fork **ends the owner**. An archive keeps the side it saw first
+  (both at once: either), never replaces or removes a version, and appends a
+  **fork record** after its latest version: unsigned, made by that archive,
+  holding the `genesis.json` and `object.json` of v1 and the other side's
+  versions it carries, from the fork point, under `forked/<d>/` (inventory,
+  checksum, `keys.json`, signature files with their witnesses), and no
+  `keys.json` of its own; valid only if its first carried version differs
+  from the one held. A fork record is never a side: copies are compared up
+  to it. No version follows a fork record, and only a fork record follows an
+  ending version. A thief with rotation keys not yet revealed of the latest
+  version takes over without a fork; the owner can only end it, with its own
+  copies of those keys.
+- **After an end or an exposure** (6.4): signatures stay good; readers weigh
+  them by other evidence (copies, pins, timestamps). Versions of lines that
+  need an exposed key, or name a key-log version from a fork point on, are
+  **contested** (7.3), unless other evidence the reader trusts (a timestamp)
+  dates them before: never added, never the latest signed version, member
+  status `contested`, branch point not confirmed; lines of ended owners are
+  taken only from copies found elsewhere; the owner may sign again, with
+  keys not exposed, versions it knows it made.
 - **Key logs travel** (6.5) beside every copy, as owner objects in the same
   storage root (the line's owner and every parent owner); the longer copy
-  wins; an owner moves by copying its folder. **Keepers** (6.6): ORCID iD or
+  wins; an owner moves by copying its folder. **Keepers** (6.6): at most one, ORCID iD or
   domain, in the genesis record (another keeper, another owner), confirmed
   by ORCID or `/.well-known/opensheaf` (`opensheaf-keeper/0.1`, `owners`,
   `successors`).
@@ -158,14 +165,15 @@ questions are listed at the end of the sections they concern.
   removed, except by a takedown. **Statuses**
   (7.3): signature files invalid, unchecked or good (for ever); versions
   signed (directly or vouched for), unchecked, or not a version (invalid or
-  unsigned). Readers use the latest signed version. Forks of a line (7.4)
+  unsigned); a signed version may be **contested**. Readers use the latest
+  signed version that is not contested. Forks of a line (7.4)
   are reported, never recorded. Adding (7.5): only versions signed once
   added; versions held stay, but for takedowns.
 - **Collections** (8): `members.json` with `type` `catalogue` (pins whole
   objects, MAY `follow` `"latest"`) or `selection` (revision sets of
   `documentVersion`, `version`, `inventorySha512`); members name `kind`,
   `name`, `owner`, `at` (equal hints); member statuses verified, mismatch,
-  unchecked, not a version, unavailable, removed (8.5).
+  contested, unchecked, not a version, unavailable, removed (8.5).
 - **Branches** (9): a line of another owner from a signed parent version,
   declared in `parent`; evidence `parent.inventory.json`,
   `parent.object.json`, `parent.signatures/`, `parent.chain/`; verdicts
@@ -189,8 +197,8 @@ questions are listed at the end of the sections they concern.
   withdrawn. Every removal of a sealed object is a **takedown**, which
   leaves a **tombstone** (`id`, `kind`, `name`, `owner`, `genesisName`,
   `lastVersion`, `inventorySha512`, `date`, `reason`); owner objects others
-  need stay, and are taken down only by law, at the keeper's request or
-  after an ending version, never on a request signed by current keys.
+  need stay, and are taken down only by law or at the keeper's request,
+  never on a request signed by the owner's keys.
 - **Verification** (14): findings are **errors** (breaches of MUST, an
   archive or object without errors passes), **warnings** (SHOULD, breaches
   the archive cannot repair, checks not made) and **results** (statuses,
@@ -216,8 +224,8 @@ records), `opensheaf-signature-0.1.schema.json` (signature files and
 (`/.well-known/opensheaf`), `opensheaf-index-0.1.schema.json` (index files
 and `indexes.json`) and, for the timestamps extension,
 `opensheaf-timestamps-0.1.schema.json`; JSON Schema 2020-12, CC0 (appendix
-B). The schemas of `genesis.json`, `keys.json`, signature files and the
-keeper's file are closed (no other properties); the others allow other
+B). The schemas of `genesis.json`, `keys.json`, signature files, the
+keeper's file and the timestamps declaration are closed (no other properties); the others allow other
 properties, which carry no meaning. A change of a field in the text needs
 the same change in its schema, and the other way round.
 

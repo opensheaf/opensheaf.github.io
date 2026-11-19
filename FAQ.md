@@ -207,8 +207,10 @@ first keys, and whose versions are its **key log**. Each version lists the
 owner's **current keys**, which sign its documents and collections, with the
 number of them that must sign, and commits, by their digests, to the
 **rotation keys** that alone sign the next version of the key log, as in KERI
-(pre-rotation is provisional, #58). Current keys are in daily use, one on each
-device; rotation keys are kept apart (on hardware tokens, for instance), used
+(pre-rotation is provisional, #58); current keys never sign the key log, whose
+first version is computed from the genesis record and signed by no key.
+Current keys are in daily use, one on each device; rotation keys are kept
+apart (on hardware tokens, for instance), committed in one version and used
 once, and never become current keys; three of them with two required survive
 the loss of one or the theft of one. Keys can thus be added or retired while
 the owner stays the same, and what was signed stays signed: a signature that
@@ -220,29 +222,31 @@ current keys that could reach the threshold may have been exposed, the owner
 signs with its rotation keys a version of its key log listing them as
 **exposed**, which a thief holding current keys cannot contest; or it
 **ends**, by a last version of its key log that may name a successor, which
-continues the work by branches. A thief holding enough unused rotation keys
-takes the owner over by signing the next version of its key log, without a
-fork; the owner can then only end it, and only with its own copies of those
-keys. Two signed versions of a key log with one number whose key lists differ
-are a fork, which needs rotation keys stolen or kept after use, and never
-happens at the first version, which repeats the genesis record: since no one
-can tell the owner's side from a thief's, the fork ends the owner; an archive
-keeps the side it saw first and appends a fork record carrying the other, so
-that every copy shows the fork. Either way the old signatures stay good, but
-readers trust them only as far as other evidence goes, since nothing tells the
-owner's signatures from a thief's; archives never add versions that need an
-exposed key, unless other evidence (a timestamp) dates them before the
-exposure, and take the lines of an ended owner only from copies, never as new
-deposits. Every version of every line is signed, and the key logs travel with
-the objects they sign, so a line can be checked from any copy, even when the
-archives that served it have gone. An owner may name in its genesis record who
-answers for it (an ORCID iD, an institution), a keeper fixed with the owner
+continues the work by branches. A thief holding enough rotation keys not yet
+revealed takes the owner over by signing the next version of its key log,
+without a fork; the owner can then only end it, and only with its own copies
+of those keys. Two signed versions of a key log with one number whose
+inventories differ are a fork, which needs rotation keys stolen or kept after
+use, and never happens at the first version, which every copy computes alike:
+since no one can tell the owner's side from a thief's, the fork ends the
+owner; an archive keeps the side it saw first and appends a fork record
+carrying the other, so that every copy shows the fork. Either way the old
+signatures stay good, but readers trust them only as far as other evidence
+goes, since nothing tells the owner's signatures from a thief's; versions that
+need an exposed key, or name a version of a key log from a fork on, are
+**contested**, and archives never add them, unless other evidence (a
+timestamp) dates them before, and take the lines of an ended owner only from
+copies, never as new deposits. Every version of every line is signed, except
+the computed first version of a key log, and the key logs travel with the
+objects they sign, so a line can be checked from any copy, even when the
+archives that served it have gone. An owner may name in its genesis record one
+keeper who answers for it (an ORCID iD, an institution), fixed with the owner
 name, which the keeper may confirm in a place only it controls, and which
-alone may name a successor once a fork has ended the owner; nothing requires
-it. Drafts are a sandbox: objects of a reserved owner, `draft`, kept by one
-archive, never signed, pinned or copied out of it, and free to be rewritten or
-deleted. Sealing makes a new object, the first version of the line; the
-draft's versions are not part of it.
+names the successor when no ending version before a fork names one, after a
+fork for instance; nothing requires it. Drafts are a sandbox: objects of a
+reserved owner, `draft`, kept by one archive, never signed, pinned or copied
+out of it, and free to be rewritten or deleted. Sealing makes a new object,
+the first version of the line; the draft's versions are not part of it.
 
 Anyone can copy a genesis record, so the name alone cannot say whose history
 is the right one. That is why the owner is part of the identity: a copy

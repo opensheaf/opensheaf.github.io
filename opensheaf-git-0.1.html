@@ -367,22 +367,22 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       signed with good signatures of its owner, against the key log of the
       owner object kept at its path, which the same commit adds or extends if
       needed, or is vouched for by a version so signed that the same commit
-      adds. A version of a key log is signed as section 6.1 of the
-      specification says, or is a valid fork record, which records a fork of
-      the key log as a new version after the latest held and replaces nothing;
-      none follows an ending version or a fork record (section 6.3 of the
-      specification). Versions of the lines, other than the key log, of an
-      owner that the commit's tree shows to be ended are added only from
-      copies found elsewhere, never as new deposits (section 7.5 of the
+      adds. A version of a key log is the first version computed from the
+      genesis record, or is signed as section 6.1 of the specification says,
+      or is a valid fork record, which records a fork of the key log as a new
+      version after the latest held and replaces nothing; none follows a fork
+      record, and none but a fork record follows an ending version (section
+      6.3 of the specification). Versions of the lines, other than the key
+      log, of an owner that the commit's tree shows to be ended are added only
+      from copies found elsewhere, never as new deposits (section 7.5 of the
       specification); the key log of such an owner is added as section 6.4 of
-      the specification says. Versions that need a key exposed in the commit's
-      tree, or whose signatures name a version of a key log from a fork point
-      on, are never added, from a copy or as a deposit, unless other evidence
-      dates them before (section 6.4 of the specification). Since OCFL cannot
-      skip a version and nothing is removed from a line but by a takedown, a
-      version let in that is not signed would hold its number for good, and
-      the owner's own version of that number could never be added to this
-      archive. Versions already published stay, whatever happens later.
+      the specification says. Versions that are contested against the key logs
+      of the commit's tree are never added, from a copy or as a deposit
+      (section 7.3 of the specification). Since OCFL cannot skip a version and
+      nothing is removed from a line but by a takedown, a version let in that
+      is not signed would hold its number for good, and the owner's own
+      version of that number could never be added to this archive. Versions
+      already published stay, whatever happens later.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -476,10 +476,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           with a new inventory; it MUST NOT be resolved by editing files. A
           sealed version is signed when it is made (section 7.1 of the
           specification), and never rebuilt (section 6.2): two versions <tt
-          class="verbatim">v&lt;N&gt;</tt> of one line are a fork of the line, never
-          redone by a merge: only one is published, and the other is reported,
-          or, for a key log, carried by a fork record added after the version
-          published (section 6.3 of the specification).
+          class="verbatim">v&lt;N&gt;</tt> of one line with different inventories are a
+          fork of the line, never redone by a merge: only one is published,
+          and the other is reported, or, for a key log, carried by a fork
+          record added after the version published (section 6.3 of the
+          specification); the first version of a key log, computed, is the
+          same on both branches.
         </p>
       </li>
       <li>
@@ -731,11 +733,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           key logs that are owner objects at their paths in the commit's tree.
           An added version that is not signed (unsigned, invalid, or
           unchecked: a key-log version not found), unless a signed version
-          added in the same commit extends it; a version of a key log after an
-          ending version or a fork record; a fork record that is not valid;
-          and an added signature file of the owner that is invalid, are errors
-          (section 14.1 of the specification), so that a pull request adding
-          them cannot pass;
+          added in the same commit extends it; a first version of a key log
+          other than the one computed from its genesis record; a version of a
+          key log after a fork record, or after an ending version but a fork
+          record; a fork record that is not valid; and an added signature file
+          of the owner that is invalid, are errors (section 14.1 of the
+          specification), so that a pull request adding them cannot pass;
         </p>
       </li>
       <li>
@@ -745,10 +748,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           cannot be undone), files that are not witnesses, versions added to
           the lines, other than the key log, of ended owners (which must come
           only from copies, which the check cannot see), and versions added
-          that need an exposed key or name a version of a key log from a fork
-          point on (which need evidence the check does not weigh); as results,
-          forks of lines and of key logs, exposed keys, and ended owners
-          (sections 6.3 and 7.4 of the specification);
+          that are contested (section 7.3 of the specification; the check
+          weighs no evidence that dates them); as results, forks of lines and
+          of key logs, exposed keys, and ended owners (sections 6.3 and 7.4 of
+          the specification);
         </p>
       </li>
       <li>
@@ -983,6 +986,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           of a key log is carried by a fork record (section 6.3); exposed keys
           and ended owners in place of nullified keys and tainted owners
           (sections 5.1 and 10).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, the computed first version of
+          key logs (PR #30):</strong> following the specification (#58), the
+          first version of a key log is computed from the genesis record and
+          not signed, and versions that need an exposed key or name a key-log
+          version from a fork point on are contested, never added (sections
+          5.1, 6.3 and 10).
         </p>
       </li>
     </ul>

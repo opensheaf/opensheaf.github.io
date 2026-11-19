@@ -57,11 +57,11 @@
     <item>for an OpenTimestamps proof: it is complete, attested in a Bitcoin block; a pending proof counts for nothing.
   </itemize>
 
-  The <strong|date> of a valid timestamp is the <verbatim|genTime> of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps proof reaches; the earliest valid timestamp of a signature file is its date. A date counts only if it is not earlier than the date of the key-log version that the signature file's <verbatim|keyLog> names, and a signature naming an undated key-log version has none (signatures naming the first version, which its genesis record fixes, are bounded by nothing): an authority is trusted only from the key-log version that lists it, which is itself dated by authorities listed before it, so no one, a thief with rotation keys included, can list an authority of its own to date signatures before the listing. A version is <strong|dated> by the n-th earliest of the dates of its good signature files naming one key-log version, n being the number of signatures it needs (<verbatim|threshold> or, for a version of a key log after the first, <verbatim|nextThreshold> of the version before; sections 6.1 and 7.3 of the specification); a version vouched for (section 7.3 of the specification) existed by the date of the version that vouches for it. Dates within two hours of a Bitcoin block time are uncertain by that much.
+  The <strong|date> of a valid timestamp is the <verbatim|genTime> of an RFC 3161 token, or the time of the Bitcoin block an OpenTimestamps proof reaches; the earliest valid timestamp of a signature file is its date. A date counts only if it is not earlier than the date of the key-log version that the signature file's <verbatim|keyLog> names, and a signature naming an undated key-log version has none (signatures naming the first version, computed from the genesis record and never signed, are bounded by nothing): an authority is trusted only from the key-log version that lists it, which is itself dated by authorities listed before it, so no one, a thief with rotation keys included, can list an authority of its own to date signatures before the listing. A version is <strong|dated> by the n-th earliest of the dates of its good signature files naming one key-log version, n being the number of signatures it needs (<verbatim|threshold> or, for a version of a key log, <verbatim|nextThreshold> of the version before; sections 6.1 and 7.3 of the specification); the first version of a key log, never signed, is not dated; a version vouched for (section 7.3 of the specification) existed by the date of the version that vouches for it. Dates within two hours of a Bitcoin block time are uncertain by that much.
 
   <section*|6. Use><label|6-use>
 
-  Dates are evidence for readers; this extension draws no conclusion from them in the format. For an owner that has ended, and for exposed keys (sections 6.3 and 6.4 of the specification), a reader MAY trust the versions dated before the time it believes a key was exposed, and SHOULD say on what evidence. An archive MAY add a version that needs an exposed key when dates it trusts show it signed before the key was exposed (section 6.4 of the specification), and SHOULD say so. The time of the version that ends the owner or exposes keys bounds when the owner knew, and the times of the versions a fork record carries, when the fork was made. A branch keeps the timestamp files of its parent's signatures beside them in <verbatim|parent.signatures/> (section 9.2 of the specification), without the <verbatim|\<less\>version\<gtr\>/> folder (<verbatim|parent.signatures/signature-\<less\>k\<gtr\>.json.\<less\>e\<gtr\>.tsr>); a pending proof kept there can never be completed, and counts for nothing (section 5); the timestamp files of key logs are in their owner objects.
+  Dates are evidence for readers; this extension draws no conclusion from them in the format. For an owner that has ended, and for exposed keys (sections 6.3 and 6.4 of the specification), a reader MAY trust the versions dated before the time it believes a key was exposed, and SHOULD say on what evidence. A version that needs an exposed key, or whose signatures name a version of a key log from a fork point on, is not contested for a reader, an archive included, that trusts dates showing those signatures made before the exposure, or before the fork (section 7.3 of the specification); an archive that adds such a version on dates SHOULD say so. The time of the version that ends the owner or exposes keys bounds when the owner knew, and the times of the versions a fork record carries, when the fork was made. A branch keeps the timestamp files of its parent's signatures beside them in <verbatim|parent.signatures/> (section 9.2 of the specification), without the <verbatim|\<less\>version\<gtr\>/> folder (<verbatim|parent.signatures/signature-\<less\>k\<gtr\>.json.\<less\>e\<gtr\>.tsr>); a pending proof kept there can never be completed, and counts for nothing (section 5); the timestamp files of key logs are in their owner objects.
 
   Tools that create an owner SHOULD offer to adopt this extension in its genesis record, and so from the first version of its key log, and SHOULD timestamp each signature when they make it, before a version leaves its owner's hands: with an RFC 3161 token where an owner cannot wait for an OpenTimestamps proof to complete, and with an OpenTimestamps proof beside it where an owner wants evidence that rests on no authority.
 
@@ -79,11 +79,11 @@
 
   <section*|Appendix A. JSON Schema (normative)><label|appendix-a-json-schema-normative>
 
-  The data of the declaration, the value of <verbatim|extensions["https://opensheaf.org/opensheaf-timestamps-0.1"]> in the genesis record of an owner or in <verbatim|keys.json>, validates against <hlink|opensheaf-timestamps-0.1.schema.json|https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json> (JSON Schema 2020-12, CC0 1.0).
+  The data of the declaration, the value of <verbatim|extensions["https://opensheaf.org/opensheaf-timestamps-0.1"]> in the genesis record of an owner or in <verbatim|keys.json>, validates against <hlink|opensheaf-timestamps-0.1.schema.json|https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json> (JSON Schema 2020-12, CC0 1.0), which allows no other properties, like the schemas of the genesis records and <verbatim|keys.json> that hold it.
 
   <section*|Appendix B. Example (non-normative)><label|appendix-b-example-non-normative>
 
-  The genesis record of an owner adopting the extension from the start, with one RFC 3161 authority (a placeholder fingerprint) and OpenTimestamps; two current keys, on the owner's laptop and desktop, and the digests of three rotation keys, two of which sign the next version; the <verbatim|keys.json> of the first version of its key log holds only the same <verbatim|keys>, <verbatim|threshold>, <verbatim|next> and <verbatim|nextThreshold> (placeholder nonce):
+  The genesis record of an owner adopting the extension from the start, with one RFC 3161 authority (a placeholder fingerprint) and OpenTimestamps; two current keys, on the owner's laptop and desktop, and the digests of three rotation keys, two of which sign the next version; the first version of its key log is computed from it, and not signed (section 6.1 of the specification; placeholder nonce):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -125,16 +125,16 @@
   </verbatim-code>
   </html-div-class>
 
-  The files of one signature of that version, in the owner object's extension folder: an RFC 3161 token, a pending OpenTimestamps proof, and the completed proof written beside it later (placeholder digests):
+  The files of one signature of the second version of its key log, by a rotation key, in the owner object's extension folder: an RFC 3161 token, a pending OpenTimestamps proof, and the completed proof written beside it later (placeholder digests):
 
   <\verbatim-code>
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json
+    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json
 
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.q7swxsz56bfiyotn.tsr
+    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.q7swxsz56bfiyotn.tsr
 
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz64.ots
+    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.hm5uhlee72brbz64.ots
 
-    extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots
+    extensions/opensheaf-witnesses/v2/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7dbj.ots
   </verbatim-code>
 
   <section*|Appendix C. References><label|appendix-c-references>
@@ -163,6 +163,8 @@
     <item><strong|0.1 (draft), 19 November 2026, after an audit of pre-rotation (PR #30):> following the specification, the declaration of the first version of a key log is in the owner's genesis record, fixed by the owner name (sections 4 and 6, appendices A and B); dates are evidence an archive may weigh to add a version that needs an exposed key, which it otherwise never adds (sections 2 and 6).
 
     <item><strong|0.1 (draft), 19 November 2026, pre-rotation (PR #30):> following the pre-rotation of key logs in the specification (#58): exposed keys in place of nullified keys, and no healing or tainted owners (sections 1 and 6); a version of a key log is dated by as many signatures as it needs, <verbatim|nextThreshold> of the version before (section 5); the example of appendix B commits to rotation keys in <verbatim|next>.
+
+    <item><strong|0.1 (draft), 19 November 2026, the computed first version of key logs (PR #30):> following the specification (#58), the first version of a key log is computed and not signed, so it is not dated, and the example of appendix B stamps a signature of the second version (section 5, appendix B); versions that need an exposed key, or name a key-log version from a fork point on, are contested unless trusted dates show their signatures made before (section 6); the schema allows no other properties (appendix A).
   </itemize>
 
 </body>

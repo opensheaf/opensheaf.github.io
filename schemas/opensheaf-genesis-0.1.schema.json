@@ -57,7 +57,7 @@
         "type": "string",
         "pattern": "^[a-z2-7]{51}[aq]$"
       },
-      "$comment": "sections 5.1 and 6.1: the digests of an owner's first rotation keys, which sign the second version of its key log"
+      "$comment": "sections 5.1 and 6.1: the digests of an owner's first rotation keys, which sign the second version of its key log; the first version is computed from this record"
     },
     "nextThreshold": {
       "type": "integer",
@@ -65,13 +65,14 @@
     },
     "keeper": {
       "type": "array",
-      "uniqueItems": true,
+      "minItems": 1,
+      "maxItems": 1,
       "items": {
         "type": "string",
         "format": "uri",
         "pattern": "^https://(orcid\\.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]|[a-z0-9.-]+/)$"
       },
-      "$comment": "optional, for an owner only (sections 5.1 and 6.6): who answers for the owner, an ORCID iD or a domain, fixed by the owner name"
+      "$comment": "optional, for an owner only (sections 5.1 and 6.6): the single person or institution who answers for the owner, an ORCID iD or a domain, fixed by the owner name; at most one"
     },
     "extensions": {
       "type": "object",
