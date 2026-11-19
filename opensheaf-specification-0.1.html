@@ -1167,15 +1167,16 @@
     <p>
       <strong>Choosing a threshold.</strong> One <tt class="verbatim">threshold</tt>
       governs the key log and every line of the owner. Owners choose between
-      two risks: a threshold of 1 with a spare key kept apart (on a hardware
-      token, for instance) survives the loss of a key, and the theft of the
-      key in daily use, which the owner nullifies with the spare (section
-      6.3), though what the thief signed stays good (section 6.4); a threshold
-      of 2 with three keys kept apart, from the first version of the key log,
-      survives the loss of one key and the theft of one. Owner tools SHOULD
-      offer both, and SHOULD NOT create an owner with a single key, since an
-      owner that loses every key of the latest version of its key log cannot
-      recover.
+      two risks: a threshold of 1 with two spare keys kept apart (on hardware
+      tokens, for instance) survives the loss of a key, and the theft of the
+      key in daily use, which the owner nullifies with a spare (section 6.3),
+      though what the thief signed stays good (section 6.4); two spares, since
+      a thief may also nullify one of them, and the owner then heals with the
+      other (#58); a threshold of 2 with three keys kept apart, from the first
+      version of the key log, survives the loss of one key and the theft of
+      one. Owner tools SHOULD offer both, and SHOULD NOT create an owner with
+      a single key, since an owner that loses every key of the latest version
+      of its key log cannot recover.
     </p>
     <p>
       <strong>Retiring a key.</strong> An owner retires a key it no longer
@@ -3656,6 +3657,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           section 7.4 only, and the signing of key logs in section 6.1 only.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026 (PR #30):</strong> a threshold
+          of 1 needs two spare keys, since a thief may nullify one (section
+          6.2, #58); the examples of appendix C regenerated with three keys
+          from the first version.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -3991,9 +4000,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <h3 id="auto-86"><a id="c1-an-owner-and-its-key-log"></a>C.1 An owner and its key log<span style="margin-left: 1em"></span></h3>
     <p>
       The genesis record of the authors' owner. It takes the first choice of
-      section 6.2: two keys from the first version and a threshold of 1, the
-      first key in daily use on a laptop, the second a spare kept apart on a
-      hardware token and used only to heal (section 6.3):
+      section 6.2: three keys from the first version and a threshold of 1, the
+      first key in daily use on a laptop, the other two spares kept apart on
+      separate hardware tokens and used only to nullify keys and heal (section
+      6.3). Two spares, since a thief holding the key in daily use may also
+      nullify one of them (section 6.2):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4005,17 +4016,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;nonce&quot;: &quot;1b4d9964664d9825076eb8558af61162&quot;,
   &quot;keys&quot;: [
     &quot;did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW&quot;,
-    &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;
+    &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;,
+    &quot;did:key:z6MkjszEM3afsQVMpGoWDXMAykMNdNq9cHhhw3vTe8a7bv9p&quot;
   ],
   &quot;threshold&quot;: 1
 }</pre>
       </div>
     </div>
     <p>
-      Its name, the owner name, is <tt class="verbatim">ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq</tt>:
+      Its name, the owner name, is <tt class="verbatim">sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda</tt>:
       the SHA-256 digest of <tt class="verbatim">opensheaf-name-0</tt>, a line feed and
       the bytes shown, with a final line feed, in base32 (section 5.2). The
-      owner object is at <tt class="verbatim">ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/</tt>
+      owner object is at <tt class="verbatim">sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/</tt>
       in the owner-name layout (section 3.2), and its <tt class="verbatim">object.json</tt>
       is the same in every version:
     </p>
@@ -4027,8 +4039,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;specification&quot;: &quot;0.1&quot;,
   &quot;kind&quot;: &quot;owner&quot;,
   &quot;status&quot;: &quot;active&quot;,
-  &quot;name&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-  &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;
+  &quot;name&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+  &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;
 }</pre>
       </div>
     </div>
@@ -4045,7 +4057,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
   &quot;keys&quot;: [
     &quot;did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW&quot;,
-    &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;
+    &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;,
+    &quot;did:key:z6MkjszEM3afsQVMpGoWDXMAykMNdNq9cHhhw3vTe8a7bv9p&quot;
   ],
   &quot;threshold&quot;: 1,
   &quot;keeper&quot;: [
@@ -4068,7 +4081,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       second version adds the new laptop's key and retires the old one
       (section 6.2); it is signed by the old key, listed in the first version,
       in <tt class="verbatim">v2/signature-w7htq42yt7tllefi.json</tt>, whose <tt class="verbatim">keyLog</tt>
-      is <tt class="verbatim">sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v1?sha512=2d04f58c210a61cdf4fef1ed4300443f8a99ccb728f27c6765ffc281ff7b3c7c721f6f4421485c1e6697a68106841746f73ae8015f656e9333ac2f05d02e3cfb</tt>:
+      is <tt class="verbatim">sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v1?sha512=f88843be0c6a72d690d131fa58219c2917cbdacc2c0b82e85e8084f80d0cfec398e62515d94ba8bbff2bde7afe8a40b2a9b1e2e9a2b72464261e4497be090e09</tt>:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4077,6 +4090,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
   &quot;keys&quot;: [
     &quot;did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5&quot;,
+    &quot;did:key:z6MkjszEM3afsQVMpGoWDXMAykMNdNq9cHhhw3vTe8a7bv9p&quot;,
     &quot;did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn&quot;
   ],
   &quot;threshold&quot;: 1,
@@ -4110,16 +4124,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;format&quot;: &quot;opensheaf-genesis/0.1&quot;,
   &quot;kind&quot;: &quot;document&quot;,
   &quot;created&quot;: &quot;2026-03-02T09:14:00Z&quot;,
-  &quot;originator&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;originator&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
   &quot;nonce&quot;: &quot;6f65cd32058c16d6d78b05011772ff1d&quot;
 }</pre>
       </div>
     </div>
     <p>
-      Its genesis name is <tt class="verbatim">glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva</tt>;
-      by algorithm 1 its name is <tt class="verbatim">osms3d3jl3nx3qfsfb5tze2qbgtehtdrxhaylj6cd3whpk62njqr</tt>,
+      Its genesis name is <tt class="verbatim">c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa</tt>;
+      by algorithm 1 its name is <tt class="verbatim">mhtrqdptlnmdldfpq3z56dshali2fseuqecpprcbstod2ot2f7lb</tt>,
       which a branch renamed after a clash would take (section 5.3). The line
-      is <tt class="verbatim">sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq</tt>.
+      is <tt class="verbatim">sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda</tt>.
       The <tt class="verbatim">object.json</tt> of its first version (section 4.3),
       which was deposited with Zenodo (appendix A.1):
     </p>
@@ -4130,8 +4144,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;format&quot;: &quot;opensheaf-object/0.1&quot;,
   &quot;specification&quot;: &quot;0.1&quot;,
   &quot;kind&quot;: &quot;document&quot;,
-  &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
-  &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;name&quot;: &quot;c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa&quot;,
+  &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
   &quot;documentVersion&quot;: 1,
   &quot;mainSource&quot;: &quot;fractional-phi42-mass-gap.tm&quot;,
   &quot;sourceFormat&quot;: &quot;application/x-texmacs&quot;,
@@ -4200,13 +4214,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <pre class="verbatim" xml:space="preserve">
 {
   &quot;format&quot;: &quot;opensheaf-signature/0.1&quot;,
-  &quot;object&quot;: &quot;sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;object&quot;: &quot;sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
   &quot;version&quot;: &quot;v2&quot;,
-  &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
-  &quot;signer&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;inventorySha512&quot;: &quot;2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3&quot;,
+  &quot;signer&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
   &quot;key&quot;: &quot;did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn&quot;,
-  &quot;keyLog&quot;: &quot;sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae&quot;,
-  &quot;signature&quot;: &quot;PMhzGXcpbLdw/khQDgsrAj7Z0nuJnY6/UDXGoAekLENCBllYJY3QLERKFvBZXPTwaeGCh7z61evcUE3X9s/DBw==&quot;
+  &quot;keyLog&quot;: &quot;sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v2?sha512=18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050&quot;,
+  &quot;signature&quot;: &quot;krjYuufgTv27bldTRmnRhDU4aO4QdpNOsO4jtY5acivYq6K3at2ko1WH5T2B+mIsKmncx7m07dw8sbr+BtV4CQ==&quot;
 }</pre>
       </div>
     </div>
@@ -4216,10 +4230,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
 opensheaf-signature/0.1
-object sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+object sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda
 version v2
-inventory a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
-keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae</pre>
+inventory 2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3
+keylog sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v2?sha512=18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050</pre>
     </div>
     <p>
       With a threshold of 1, this one good signature makes the version signed
@@ -4241,11 +4255,11 @@ keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624
   &quot;order&quot;: &quot;issued-desc&quot;,
   &quot;members&quot;: [
     { &quot;kind&quot;: &quot;document&quot;,
-      &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
-      &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;name&quot;: &quot;c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa&quot;,
+      &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
       &quot;at&quot;: [ &quot;https://mgubi.org/papers/&quot; ],
       &quot;version&quot;: &quot;v2&quot;,
-      &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+      &quot;inventorySha512&quot;: &quot;2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3&quot;,
       &quot;follow&quot;: &quot;latest&quot;,
       &quot;doi&quot;: &quot;10.5281/zenodo.1234568&quot;,
       &quot;conceptDoi&quot;: &quot;10.5281/zenodo.1234566&quot;,
@@ -4269,19 +4283,19 @@ keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624
   &quot;type&quot;: &quot;selection&quot;,
   &quot;members&quot;: [
     { &quot;kind&quot;: &quot;document&quot;,
-      &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+      &quot;name&quot;: &quot;c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa&quot;,
       &quot;owner&quot;: &quot;rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba&quot;,
       &quot;at&quot;: [ &quot;https://journal.example.org/&quot; ],
       &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 2, &quot;version&quot;: &quot;v1&quot;,
-                       &quot;inventorySha512&quot;: &quot;fd4f4ea3c71eb9ca6d5653298771606154b1b1f665438068a80d1139cdf2c622d88d596867ef627b52aef27af51189db9d92836e06cc5cadb9480ed568792183&quot; } ],
+                       &quot;inventorySha512&quot;: &quot;f7c0a210c66658c4f9ae0419158f27c74f6a805ecea2288a4ccb1604746338acd2e2f7af245dc9fbd2e9e68b3abe2492648c2ef7dca9b2ebf45f2720d0d79520&quot; } ],
       &quot;cite&quot;: { &quot;title&quot;: &quot;Mass gap for the fractional $\\Phi^4_2$ model&quot;,
                 &quot;creators&quot;: [ &quot;P. Duch&quot;, &quot;M. Gubinelli&quot; ], &quot;year&quot;: 2026, &quot;issued&quot;: &quot;2026-03-02&quot; } },
     { &quot;kind&quot;: &quot;document&quot;,
-      &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
-      &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+      &quot;name&quot;: &quot;c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa&quot;,
+      &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
       &quot;at&quot;: [ &quot;https://mgubi.org/papers/&quot; ],
       &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 2, &quot;version&quot;: &quot;v2&quot;,
-                       &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+                       &quot;inventorySha512&quot;: &quot;2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3&quot;,
                        &quot;doi&quot;: &quot;10.5281/zenodo.1234568&quot; } ] }
   ]
 }</pre>
@@ -4293,7 +4307,7 @@ keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624
       accepted copy, a branch of the authors' line at their object version <tt
       class="verbatim">v2</tt> (sections 9.1 and 9.6). No line of that name is the
       journal's, so the branch takes the genesis name, and its line is <tt
-      class="verbatim">sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba</tt>:
+      class="verbatim">sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba</tt>:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -4302,15 +4316,15 @@ keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624
   &quot;format&quot;: &quot;opensheaf-object/0.1&quot;,
   &quot;specification&quot;: &quot;0.1&quot;,
   &quot;kind&quot;: &quot;document&quot;,
-  &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+  &quot;name&quot;: &quot;c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa&quot;,
   &quot;owner&quot;: &quot;rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba&quot;,
   &quot;parent&quot;: {
-    &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-    &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;,
+    &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+    &quot;name&quot;: &quot;c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa&quot;,
     &quot;objectVersion&quot;: &quot;v2&quot;,
     &quot;documentVersion&quot;: 2,
-    &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
-    &quot;url&quot;: &quot;https://mgubi.org/papers/ocfl/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2/&quot;
+    &quot;inventorySha512&quot;: &quot;2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3&quot;,
+    &quot;url&quot;: &quot;https://mgubi.org/papers/ocfl/sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2/&quot;
   },
   &quot;documentVersion&quot;: 2,
   &quot;mainSource&quot;: &quot;fractional-phi42-mass-gap.tm&quot;,
@@ -4345,9 +4359,9 @@ keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624
 ocfl/
   0=ocfl_1.1
   ocfl_layout.json
-  ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
-    ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/      the key log
-    glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/      the paper
+  sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/
+    sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/      the key log
+    c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/      the paper
       0=ocfl_object_1.1
       inventory.json
       inventory.json.sha512
@@ -4358,10 +4372,10 @@ ocfl/
         v1/signature-w7htq42yt7tllefi.json.3mpvi64zr26ezfvh.tsr
         v2/signature-4hz7zgsiazl6hx7i.json
         v2/signature-4hz7zgsiazl6hx7i.json.5xjh5tk24wrufjrz.tsr
-    qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma/      the main catalogue</pre>
+    kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza/      the main catalogue</pre>
     </div>
     <p>
-      In the hashed layout, the paper would be at <tt class="verbatim">933/34d/349/sheaf%3aglncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva%3attm4koeifphkud7j5wkmqqovbpbhlycbunxav-93334d349fc19e8fbbc73330df99a0606e54fe0e3f68a1ebe117416b8f96f945/</tt>:
+      In the hashed layout, the paper would be at <tt class="verbatim">64d/e76/56d/sheaf%3ac655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa%3asa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia-64de7656d94e22e3fa36217d87893125deba8b0a7f9fa10438d5e16f5518ede2/</tt>:
       its identifier of 111 characters encodes to 115, each <tt class="verbatim">:</tt>
       becoming <tt class="verbatim">%3a</tt>, and is shortened (section 3.2).
     </p>
@@ -4381,30 +4395,30 @@ ocfl/
   &quot;contact&quot;: &quot;https://orcid.org/0000-0002-1234-5677&quot;,
   &quot;storageRoot&quot;: &quot;ocfl/&quot;,
   &quot;storageLayout&quot;: &quot;opensheaf-owner-name-storage-layout&quot;,
-  &quot;mainCollection&quot;: &quot;sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
+  &quot;mainCollection&quot;: &quot;sheaf:kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
   &quot;profiles&quot;: [ &quot;zenodo&quot;, &quot;texmacs&quot;, &quot;website&quot; ],
   &quot;extensions&quot;: [ &quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot; ],
-  &quot;owners&quot;: [ &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot; ],
+  &quot;owners&quot;: [ &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot; ],
   &quot;indexes&quot;: { &quot;names&quot;: 2, &quot;owners&quot;: 2, &quot;sha512&quot;: 2 },
   &quot;objects&quot;: [
-    { &quot;id&quot;: &quot;sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;kind&quot;: &quot;owner&quot;, &quot;name&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae&quot;,
+    { &quot;id&quot;: &quot;sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;kind&quot;: &quot;owner&quot;, &quot;name&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;, &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050&quot;,
       &quot;status&quot;: &quot;active&quot; },
-    { &quot;id&quot;: &quot;sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;kind&quot;: &quot;document&quot;, &quot;name&quot;: &quot;glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&quot;,
+    { &quot;id&quot;: &quot;sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;kind&quot;: &quot;document&quot;, &quot;name&quot;: &quot;c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa&quot;, &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3&quot;,
       &quot;status&quot;: &quot;active&quot;, &quot;label&quot;: &quot;fractional-phi42-mass-gap&quot; },
-    { &quot;id&quot;: &quot;sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;kind&quot;: &quot;collection&quot;, &quot;name&quot;: &quot;qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;29c17c0325606d503059a6276a0ff9366f9ee0f70aecd8dc5393089d2648609910b6261895533af250e89bd8c3061e564f2026b6153a5cea0dd569a85f506c50&quot;,
+    { &quot;id&quot;: &quot;sheaf:kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;kind&quot;: &quot;collection&quot;, &quot;name&quot;: &quot;kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza&quot;, &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;head&quot;: &quot;v2&quot;, &quot;inventorySha512&quot;: &quot;12eb4181868b27376ad68b5c86aefd6d5074624c5df6022e2371d31b174967e1f1f23281e4f1491c87175638c4d69943d1f4e33a39e70e5a47fb46a393f2d754&quot;,
       &quot;status&quot;: &quot;active&quot;, &quot;label&quot;: &quot;papers&quot; }
   ],
   &quot;tombstones&quot;: [
-    { &quot;id&quot;: &quot;sheaf:tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;kind&quot;: &quot;document&quot;, &quot;name&quot;: &quot;tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua&quot;, &quot;owner&quot;: &quot;ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq&quot;,
-      &quot;genesisName&quot;: &quot;tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua&quot;,
-      &quot;lastVersion&quot;: &quot;v1&quot;, &quot;inventorySha512&quot;: &quot;ede3e9be2e8e74503af7df6408f0f43846b80ebaece2737e16019e37a8ce7e8fba0bb6945fde5973a94d6373c7d8118413fd6587d5e9a3cbade685eae2ea5ae3&quot;,
+    { &quot;id&quot;: &quot;sheaf:fczcpwpqsunaypvsx3ljfi5hs6dt7wooepethtyig36upm7eyusq:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;kind&quot;: &quot;document&quot;, &quot;name&quot;: &quot;fczcpwpqsunaypvsx3ljfi5hs6dt7wooepethtyig36upm7eyusq&quot;, &quot;owner&quot;: &quot;sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda&quot;,
+      &quot;genesisName&quot;: &quot;fczcpwpqsunaypvsx3ljfi5hs6dt7wooepethtyig36upm7eyusq&quot;,
+      &quot;lastVersion&quot;: &quot;v1&quot;, &quot;inventorySha512&quot;: &quot;1ff3e7a990f1ac5e84fff27ea41cb4ee87b74adb2e957bf74baa0c01b265c0be1592cf715e2ec118f66f21debc00367de5befc201e3b19d7f3e087e7b6d17aa0&quot;,
       &quot;date&quot;: &quot;2026-05-04&quot;, &quot;reason&quot;: &quot;Taken down at the request of the holder of the rights.&quot; }
   ]
 }</pre>
@@ -4417,26 +4431,26 @@ ocfl/
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa
     the authors' line (its owner is the originator)
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2
     document version 2 of the authors' line
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2?sha512=2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3
     the authors' object version v2, which the journal vetted
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&amp;at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2?sha512=2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3&amp;at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
     the same, with a hint
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba/v2
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba/v2
     document version 2 of the journal's line, its accepted copy
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:*
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:*
     the work: the authors' line, the journal's and any other
-sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda
     the authors' owner: its key log
-sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae
+sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v2?sha512=18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050
     version 2 of its key log, as keyLog names it
-sheaf:glncddtx/v2
-sheaf:glncddtx:rvv4h5sj/v2
+sheaf:c655x5wm/v2
+sheaf:c655x5wm:rvv4h5sj/v2
     short forms of the second and fifth (section 12.2)
-https://opensheaf.org/sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+https://opensheaf.org/sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2
     the second, through a gateway (provisional, #35)</pre>
     </div>
     <h3 id="auto-93"><a id="c8-a-fork-of-a-key-log-provisional-58"></a>C.8 A fork of a key log (provisional, #58)<span style="margin-left: 1em"></span></h3>
@@ -4454,7 +4468,7 @@ https://opensheaf.org/sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
-ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
+sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/
   inventory.json
   inventory.json.sha512
   v1/
@@ -4462,12 +4476,12 @@ ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpb
   v3/                                the fork record
     inventory.json
     inventory.json.sha512
-    content/forked/w6s5uujjs56ilzmn/          the owner's version 3
+    content/forked/bqhn7r6fjeq5aaaz/          the owner's version 3
       inventory.json
       inventory.json.sha512
       keys.json
       signature-4hz7zgsiazl6hx7i.json
-    content/forked/gqqa23zsg6ehczgj/          the thief's version 3
+    content/forked/bm657wpgc5jqam4f/          the thief's version 3
       inventory.json
       inventory.json.sha512
       keys.json
@@ -4477,15 +4491,19 @@ ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpb
       The fork record's <tt class="verbatim">genesis.json</tt> and <tt class="verbatim">object.json</tt>
       are those of <tt class="verbatim">v1</tt>, to which its inventory refers, and it
       has no <tt class="verbatim">keys.json</tt>. Had the thief signed no version of the
-      key log, the owner would simply have signed with its spare key a version
-      3 listing the stolen key in <tt class="verbatim">nullified</tt>, carrying nothing
-      (section 6.3). Here the owner heals with its spare key, which signed
-      neither version: a healing version 3 carrying both, whose <tt class="verbatim">keys.json</tt>
-      lists the spare key and a new one, not the stolen key (section 6.3). The
-      signatures made with the stolen key stay good, and readers weigh them as
-      section 6.4 says; the versions that need them, the paper's version 2
-      among them, are taken by other archives only from copies (section 7.5),
-      until a later version signed with a new key vouches for them.
+      key log, the owner would simply have signed with one of its spare keys a
+      version 3 listing the stolen key in <tt class="verbatim">nullified</tt>, carrying
+      nothing (section 6.3). Here the owner heals with a spare key, which
+      signed neither version: a healing version 3 carrying both, whose <tt
+      class="verbatim">keys.json</tt> lists the two spare keys and a new one, not the
+      stolen key (section 6.3); had the thief's version 3 also listed one of
+      the spare keys in <tt class="verbatim">nullified</tt>, the fork record would
+      nullify that spare too, and the owner would heal with the other (section
+      6.2). The signatures made with the stolen key stay good, and readers
+      weigh them as section 6.4 says; the versions that need them, the paper's
+      version 2 among them, are taken by other archives only from copies
+      (section 7.5), until a later version signed with a new key vouches for
+      them.
     </p>
     <h2 id="auto-94"><a id="appendix-d-rationale-non-normative"></a>Appendix D. Rationale (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>

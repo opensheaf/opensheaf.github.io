@@ -256,7 +256,7 @@ A key is added, retired or nullified, the threshold or the data of an extension 
 
 An owner tool creates an owner by writing its genesis record, with `kind` `owner` and the first `keys` and `threshold` (section 5.1), and the first version of its key log, signed as above. An owner is its own originator, and its owner object has no parent, so its owner name is made by algorithm 0 (section 5.2). If the owner name is taken, in the archive where the tool writes or among the owners it knows elsewhere, the tool draws a new nonce (section 5.3).
 
-**Choosing a threshold.** One `threshold` governs the key log and every line of the owner. Owners choose between two risks: a threshold of 1 with a spare key kept apart (on a hardware token, for instance) survives the loss of a key, and the theft of the key in daily use, which the owner nullifies with the spare (section 6.3), though what the thief signed stays good (section 6.4); a threshold of 2 with three keys kept apart, from the first version of the key log, survives the loss of one key and the theft of one. Owner tools SHOULD offer both, and SHOULD NOT create an owner with a single key, since an owner that loses every key of the latest version of its key log cannot recover.
+**Choosing a threshold.** One `threshold` governs the key log and every line of the owner. Owners choose between two risks: a threshold of 1 with two spare keys kept apart (on hardware tokens, for instance) survives the loss of a key, and the theft of the key in daily use, which the owner nullifies with a spare (section 6.3), though what the thief signed stays good (section 6.4); two spares, since a thief may also nullify one of them, and the owner then heals with the other (#58); a threshold of 2 with three keys kept apart, from the first version of the key log, survives the loss of one key and the theft of one. Owner tools SHOULD offer both, and SHOULD NOT create an owner with a single key, since an owner that loses every key of the latest version of its key log cannot recover.
 
 **Retiring a key.** An owner retires a key it no longer uses (a replaced laptop, a member who leaves the group) by leaving it out of `keys` in a new version of its key log. Signatures made with it stay good, and a retired key in someone else's hands still makes good signatures naming the versions that list it; section 6.3 says when retiring is enough after an exposure.
 
@@ -880,6 +880,7 @@ Before 1.0, every minor version MAY be incompatible. A draft MAY change in any w
 - **0.1 (draft), 19 November 2026, rebuilt (PR #30):** appendices A (profiles), B (JSON Schemas) and C (examples, checked against the schemas) rebuilt; DOIs written bare; signature files closed to other properties; fork records carry the witnesses of the versions they carry, under named files (section 6.3, provisional, #58); a threshold of 1 with a spare key survives the theft of the daily key by healing (section 6.2).
 - **0.1 (draft), 19 November 2026, after an audit of the rebuilt text (PR #30):** an owner may sign two versions of its key log to nullify keys (section 7.4); a branch of a branch checks files at the first level only (section 9.3); a healing version replaces a fork record, never follows it, and `healed` is defined (section 6.3); one status rule for lines (section 13.1); short forms without a tie-break by date (section 12.2); conformance classes, the Zenodo MD5 of `sources.zip`, `https` hints in the schemas, and duplicated rules cut. Provisional (#58): a fork record or a healing version carries each side from the fork point to its end, nothing is dropped, and only the keys signing at the fork point are nullified; two fork records carrying the same versions are equivalent; versions that need a nullified key are taken only from copies, like the lines of an ended owner, and never signed again (sections 6.3, 6.4 and 7.5); a key log taken down may return from a copy carrying its version (section 13.2).
 - **0.1 (draft), 19 November 2026, after a second audit (PR #30):** explicit nullification, provisional (#58): `nullified` in `keys.json`, by which the owner nullifies exposed keys at once with keys it still trusts, superseding the versions they signed (sections 6.1 and 6.3); a version superseded, and the versions after the fork point that the superseding version does not carry, are dropped from that copy, a key log not reaching them being a result (sections 6.3 and 14.4); an owner signs two versions of one number only when a key-log version supersedes its own, and the versions after it (section 7.4); a healing version may be deposited to a tainted key log (section 6.4); equivalent fork records kept; `parent.object.json` bound to its inventory at every level of a chain (section 9.3); a key log whose tombstone pins a fork record returns (section 13.2); carried key-log versions resolved and indexed (sections 12.3 and 12.5); the exceptions to fixed versions listed once (section 4), forks of lines handled in section 7.4 only, and the signing of key logs in section 6.1 only.
+- **0.1 (draft), 19 November 2026 (PR #30):** a threshold of 1 needs two spare keys, since a thief may nullify one (section 6.2, #58); the examples of appendix C regenerated with three keys from the first version.
 
 ## Appendix A. Profiles (normative for archives declaring them)
 
@@ -950,7 +951,7 @@ The examples follow one paper of the first archive (section 1) through an illust
 
 ### C.1 An owner and its key log
 
-The genesis record of the authors' owner. It takes the first choice of section 6.2: two keys from the first version and a threshold of 1, the first key in daily use on a laptop, the second a spare kept apart on a hardware token and used only to heal (section 6.3):
+The genesis record of the authors' owner. It takes the first choice of section 6.2: three keys from the first version and a threshold of 1, the first key in daily use on a laptop, the other two spares kept apart on separate hardware tokens and used only to nullify keys and heal (section 6.3). Two spares, since a thief holding the key in daily use may also nullify one of them (section 6.2):
 
 ```json
 {
@@ -960,13 +961,14 @@ The genesis record of the authors' owner. It takes the first choice of section 6
   "nonce": "1b4d9964664d9825076eb8558af61162",
   "keys": [
     "did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW",
-    "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5"
+    "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5",
+    "did:key:z6MkjszEM3afsQVMpGoWDXMAykMNdNq9cHhhw3vTe8a7bv9p"
   ],
   "threshold": 1
 }
 ```
 
-Its name, the owner name, is `ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq`: the SHA-256 digest of `opensheaf-name-0`, a line feed and the bytes shown, with a final line feed, in base32 (section 5.2). The owner object is at `ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/` in the owner-name layout (section 3.2), and its `object.json` is the same in every version:
+Its name, the owner name, is `sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda`: the SHA-256 digest of `opensheaf-name-0`, a line feed and the bytes shown, with a final line feed, in base32 (section 5.2). The owner object is at `sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/` in the owner-name layout (section 3.2), and its `object.json` is the same in every version:
 
 ```json
 {
@@ -974,8 +976,8 @@ Its name, the owner name, is `ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3
   "specification": "0.1",
   "kind": "owner",
   "status": "active",
-  "name": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-  "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq"
+  "name": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+  "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda"
 }
 ```
 
@@ -986,7 +988,8 @@ The `keys.json` of the first version of the key log repeats the keys and thresho
   "format": "opensheaf-keys/0.1",
   "keys": [
     "did:key:z6MksKLDefPeXwhL6SJCLqpW1dGZcvBjfsv9mxGCFpMkMuVW",
-    "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5"
+    "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5",
+    "did:key:z6MkjszEM3afsQVMpGoWDXMAykMNdNq9cHhhw3vTe8a7bv9p"
   ],
   "threshold": 1,
   "keeper": [
@@ -1002,13 +1005,14 @@ The `keys.json` of the first version of the key log repeats the keys and thresho
 }
 ```
 
-It is signed by its own first key, in `v1/signature-w7htq42yt7tllefi.json` of the owner object's witness folder, whose `keyLog` names this version itself (section 7.2). When the laptop is replaced, the second version adds the new laptop's key and retires the old one (section 6.2); it is signed by the old key, listed in the first version, in `v2/signature-w7htq42yt7tllefi.json`, whose `keyLog` is `sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v1?sha512=2d04f58c210a61cdf4fef1ed4300443f8a99ccb728f27c6765ffc281ff7b3c7c721f6f4421485c1e6697a68106841746f73ae8015f656e9333ac2f05d02e3cfb`:
+It is signed by its own first key, in `v1/signature-w7htq42yt7tllefi.json` of the owner object's witness folder, whose `keyLog` names this version itself (section 7.2). When the laptop is replaced, the second version adds the new laptop's key and retires the old one (section 6.2); it is signed by the old key, listed in the first version, in `v2/signature-w7htq42yt7tllefi.json`, whose `keyLog` is `sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v1?sha512=f88843be0c6a72d690d131fa58219c2917cbdacc2c0b82e85e8084f80d0cfec398e62515d94ba8bbff2bde7afe8a40b2a9b1e2e9a2b72464261e4497be090e09`:
 
 ```json
 {
   "format": "opensheaf-keys/0.1",
   "keys": [
     "did:key:z6MkkmL4ZLBakiEjfqGa5KrRJQ3bAWDgowW2AicNGxBrxwP5",
+    "did:key:z6MkjszEM3afsQVMpGoWDXMAykMNdNq9cHhhw3vTe8a7bv9p",
     "did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn"
   ],
   "threshold": 1,
@@ -1036,20 +1040,20 @@ The genesis record of the paper, written when the owner sealed it (section 10.2)
   "format": "opensheaf-genesis/0.1",
   "kind": "document",
   "created": "2026-03-02T09:14:00Z",
-  "originator": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "originator": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
   "nonce": "6f65cd32058c16d6d78b05011772ff1d"
 }
 ```
 
-Its genesis name is `glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva`; by algorithm 1 its name is `osms3d3jl3nx3qfsfb5tze2qbgtehtdrxhaylj6cd3whpk62njqr`, which a branch renamed after a clash would take (section 5.3). The line is `sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq`. The `object.json` of its first version (section 4.3), which was deposited with Zenodo (appendix A.1):
+Its genesis name is `c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa`; by algorithm 1 its name is `mhtrqdptlnmdldfpq3z56dshali2fseuqecpprcbstod2ot2f7lb`, which a branch renamed after a clash would take (section 5.3). The line is `sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda`. The `object.json` of its first version (section 4.3), which was deposited with Zenodo (appendix A.1):
 
 ```json
 {
   "format": "opensheaf-object/0.1",
   "specification": "0.1",
   "kind": "document",
-  "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
-  "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "name": "c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa",
+  "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
   "documentVersion": 1,
   "mainSource": "fractional-phi42-mass-gap.tm",
   "sourceFormat": "application/x-texmacs",
@@ -1101,13 +1105,13 @@ The signature of that version by the new laptop's key, `extensions/opensheaf-wit
 ```json
 {
   "format": "opensheaf-signature/0.1",
-  "object": "sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "object": "sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
   "version": "v2",
-  "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
-  "signer": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "inventorySha512": "2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3",
+  "signer": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
   "key": "did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn",
-  "keyLog": "sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae",
-  "signature": "PMhzGXcpbLdw/khQDgsrAj7Z0nuJnY6/UDXGoAekLENCBllYJY3QLERKFvBZXPTwaeGCh7z61evcUE3X9s/DBw=="
+  "keyLog": "sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v2?sha512=18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050",
+  "signature": "krjYuufgTv27bldTRmnRhDU4aO4QdpNOsO4jtY5acivYq6K3at2ko1WH5T2B+mIsKmncx7m07dw8sbr+BtV4CQ=="
 }
 ```
 
@@ -1115,10 +1119,10 @@ The message it signs, each line ended by a line feed (section 7.2):
 
 ```
 opensheaf-signature/0.1
-object sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+object sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda
 version v2
-inventory a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
-keylog sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae
+inventory 2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3
+keylog sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v2?sha512=18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050
 ```
 
 With a threshold of 1, this one good signature makes the version signed (section 7.3).
@@ -1134,11 +1138,11 @@ The `members.json` of the second version of the archive's main catalogue (sectio
   "order": "issued-desc",
   "members": [
     { "kind": "document",
-      "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
-      "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "name": "c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa",
+      "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
       "at": [ "https://mgubi.org/papers/" ],
       "version": "v2",
-      "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+      "inventorySha512": "2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3",
       "follow": "latest",
       "doi": "10.5281/zenodo.1234568",
       "conceptDoi": "10.5281/zenodo.1234566",
@@ -1156,19 +1160,19 @@ The `members.json` of an issue of the journal, a selection owned by the journal'
   "type": "selection",
   "members": [
     { "kind": "document",
-      "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+      "name": "c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa",
       "owner": "rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba",
       "at": [ "https://journal.example.org/" ],
       "revisions": [ { "documentVersion": 2, "version": "v1",
-                       "inventorySha512": "fd4f4ea3c71eb9ca6d5653298771606154b1b1f665438068a80d1139cdf2c622d88d596867ef627b52aef27af51189db9d92836e06cc5cadb9480ed568792183" } ],
+                       "inventorySha512": "f7c0a210c66658c4f9ae0419158f27c74f6a805ecea2288a4ccb1604746338acd2e2f7af245dc9fbd2e9e68b3abe2492648c2ef7dca9b2ebf45f2720d0d79520" } ],
       "cite": { "title": "Mass gap for the fractional $\\Phi^4_2$ model",
                 "creators": [ "P. Duch", "M. Gubinelli" ], "year": 2026, "issued": "2026-03-02" } },
     { "kind": "document",
-      "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
-      "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+      "name": "c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa",
+      "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
       "at": [ "https://mgubi.org/papers/" ],
       "revisions": [ { "documentVersion": 2, "version": "v2",
-                       "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+                       "inventorySha512": "2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3",
                        "doi": "10.5281/zenodo.1234568" } ] }
   ]
 }
@@ -1176,22 +1180,22 @@ The `members.json` of an issue of the journal, a selection owned by the journal'
 
 ### C.5 A branch: an accepted copy
 
-The `object.json` of the first version of the journal's accepted copy, a branch of the authors' line at their object version `v2` (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is `sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba`:
+The `object.json` of the first version of the journal's accepted copy, a branch of the authors' line at their object version `v2` (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is `sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba`:
 
 ```json
 {
   "format": "opensheaf-object/0.1",
   "specification": "0.1",
   "kind": "document",
-  "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+  "name": "c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa",
   "owner": "rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba",
   "parent": {
-    "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-    "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva",
+    "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+    "name": "c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa",
     "objectVersion": "v2",
     "documentVersion": 2,
-    "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
-    "url": "https://mgubi.org/papers/ocfl/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2/"
+    "inventorySha512": "2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3",
+    "url": "https://mgubi.org/papers/ocfl/sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2/"
   },
   "documentVersion": 2,
   "mainSource": "fractional-phi42-mass-gap.tm",
@@ -1212,9 +1216,9 @@ The storage root of the authors' archive in the owner-name layout (section 3.2),
 ocfl/
   0=ocfl_1.1
   ocfl_layout.json
-  ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
-    ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/      the key log
-    glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/      the paper
+  sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/
+    sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/      the key log
+    c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/      the paper
       0=ocfl_object_1.1
       inventory.json
       inventory.json.sha512
@@ -1225,10 +1229,10 @@ ocfl/
         v1/signature-w7htq42yt7tllefi.json.3mpvi64zr26ezfvh.tsr
         v2/signature-4hz7zgsiazl6hx7i.json
         v2/signature-4hz7zgsiazl6hx7i.json.5xjh5tk24wrufjrz.tsr
-    qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma/      the main catalogue
+    kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza/      the main catalogue
 ```
 
-In the hashed layout, the paper would be at `933/34d/349/sheaf%3aglncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva%3attm4koeifphkud7j5wkmqqovbpbhlycbunxav-93334d349fc19e8fbbc73330df99a0606e54fe0e3f68a1ebe117416b8f96f945/`: its identifier of 111 characters encodes to 115, each `:` becoming `%3a`, and is shortened (section 3.2).
+In the hashed layout, the paper would be at `64d/e76/56d/sheaf%3ac655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa%3asa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia-64de7656d94e22e3fa36217d87893125deba8b0a7f9fa10438d5e16f5518ede2/`: its identifier of 111 characters encodes to 115, each `:` becoming `%3a`, and is shortened (section 3.2).
 
 The discovery document (section 3.1). The archive hosts one owner, whose key log, paper and catalogue it lists, with labels for the website; a second paper of the owner was taken down, and its tombstone (section 13.3) keeps its line taken:
 
@@ -1240,30 +1244,30 @@ The discovery document (section 3.1). The archive hosts one owner, whose key log
   "contact": "https://orcid.org/0000-0002-1234-5677",
   "storageRoot": "ocfl/",
   "storageLayout": "opensheaf-owner-name-storage-layout",
-  "mainCollection": "sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
+  "mainCollection": "sheaf:kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
   "profiles": [ "zenodo", "texmacs", "website" ],
   "extensions": [ "https://opensheaf.org/opensheaf-timestamps-0.1" ],
-  "owners": [ "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq" ],
+  "owners": [ "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda" ],
   "indexes": { "names": 2, "owners": 2, "sha512": 2 },
   "objects": [
-    { "id": "sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "kind": "owner", "name": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "head": "v2", "inventorySha512": "a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae",
+    { "id": "sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "kind": "owner", "name": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda", "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "head": "v2", "inventorySha512": "18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050",
       "status": "active" },
-    { "id": "sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "kind": "document", "name": "glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "head": "v2", "inventorySha512": "a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689",
+    { "id": "sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "kind": "document", "name": "c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa", "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "head": "v2", "inventorySha512": "2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3",
       "status": "active", "label": "fractional-phi42-mass-gap" },
-    { "id": "sheaf:qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "kind": "collection", "name": "qgtkkcwbbao2powpxpge4f6w27rr3drqzt3eljswnv2ymvlkbxma", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "head": "v2", "inventorySha512": "29c17c0325606d503059a6276a0ff9366f9ee0f70aecd8dc5393089d2648609910b6261895533af250e89bd8c3061e564f2026b6153a5cea0dd569a85f506c50",
+    { "id": "sheaf:kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "kind": "collection", "name": "kv6qc5e2oimbteojiqd4lrkpiso7g5h4rezxmfcsxyvzcuts6pza", "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "head": "v2", "inventorySha512": "12eb4181868b27376ad68b5c86aefd6d5074624c5df6022e2371d31b174967e1f1f23281e4f1491c87175638c4d69943d1f4e33a39e70e5a47fb46a393f2d754",
       "status": "active", "label": "papers" }
   ],
   "tombstones": [
-    { "id": "sheaf:tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "kind": "document", "name": "tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua", "owner": "ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq",
-      "genesisName": "tsck634axtq5brrchz2oxxanzztzd4drsoirdnuh5eyvs6ty4fua",
-      "lastVersion": "v1", "inventorySha512": "ede3e9be2e8e74503af7df6408f0f43846b80ebaece2737e16019e37a8ce7e8fba0bb6945fde5973a94d6373c7d8118413fd6587d5e9a3cbade685eae2ea5ae3",
+    { "id": "sheaf:fczcpwpqsunaypvsx3ljfi5hs6dt7wooepethtyig36upm7eyusq:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "kind": "document", "name": "fczcpwpqsunaypvsx3ljfi5hs6dt7wooepethtyig36upm7eyusq", "owner": "sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda",
+      "genesisName": "fczcpwpqsunaypvsx3ljfi5hs6dt7wooepethtyig36upm7eyusq",
+      "lastVersion": "v1", "inventorySha512": "1ff3e7a990f1ac5e84fff27ea41cb4ee87b74adb2e957bf74baa0c01b265c0be1592cf715e2ec118f66f21debc00367de5befc201e3b19d7f3e087e7b6d17aa0",
       "date": "2026-05-04", "reason": "Taken down at the request of the holder of the rights." }
   ]
 }
@@ -1274,26 +1278,26 @@ The discovery document (section 3.1). The archive hosts one owner, whose key log
 URIs of the paper, of the accepted copy and of the authors' owner (section 12):
 
 ```
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa
     the authors' line (its owner is the originator)
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2
     document version 2 of the authors' line
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2?sha512=2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3
     the authors' object version v2, which the journal vetted
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2?sha512=a7cf31b8075b26d140d4961075996d25bdcbeb72edd97d455333f58051368f2bb65ee0e6a61b744edbf316eeae335b964ae0c658255fbfee9395520b417f8689&at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2?sha512=2ad0c0386f88ae5fbce0238404b78b3b604b64992a7b321ccd1f6f47c877a120381f1191931d244f96e0e83c46f799c975a235d9e8f8578ad0987e00d667fcc3&at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
     the same, with a hint
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba/v2
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:rvv4h5sjjhpumjybemqnsscf544aonqmvmthqma3xc3ldmim73ba/v2
     document version 2 of the journal's line, its accepted copy
-sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva:*
+sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa:*
     the work: the authors' line, the journal's and any other
-sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq
+sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda
     the authors' owner: its key log
-sheaf:ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/v2?sha512=a624c2dc10c0dbd369b7da9bd1326c445efd453afd5b84e5a6f53812c59ae393799452387d905980beae7f6a06ec05a08e73d1a0d3813a47f4c5fe08686601ae
+sheaf:sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/v2?sha512=18a4d8801db5bdd78f46a537e74843843aef4131b9ebe2dccd93e79021f807a9c5823c9aad98f0d360542859220d27f85fe6ef62b2f829b951fd5f5c8732c050
     version 2 of its key log, as keyLog names it
-sheaf:glncddtx/v2
-sheaf:glncddtx:rvv4h5sj/v2
+sheaf:c655x5wm/v2
+sheaf:c655x5wm:rvv4h5sj/v2
     short forms of the second and fifth (section 12.2)
-https://opensheaf.org/sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva/v2
+https://opensheaf.org/sheaf:c655x5wmrch2o37fu6q2ng6x3yp2izeaxa33ampjvd46aotpzufa/v2
     the second, through a gateway (provisional, #35)
 ```
 
@@ -1302,7 +1306,7 @@ https://opensheaf.org/sheaf:glncddtxk4yxiiqzzht5j6rzbu2xangkvezhj3inn2s4icxjgvva
 Later, the new laptop is stolen. The thief signs with its key a version 3 of the key log listing only a key of its own; the owner, not yet aware, has signed with the same key another version 3, adding a domain to `keeper`. Both are signed against version 2, so an archive holding one that meets the other replaces its version 3 by a fork record (section 6.3), which carries both sides and nullifies the stolen key, which signed them. Each side is here version 3 alone; had the owner gone on to a version 4, the fork record would carry it too, in a folder `forked/<d>/` of its own. The owner object there:
 
 ```
-ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/
+sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/sa34a3tbsqirizvtmu7zkjqqfqaqpg6mlb7ia6dyjsjtkvqr3bda/
   inventory.json
   inventory.json.sha512
   v1/
@@ -1310,19 +1314,19 @@ ttm4koeifphkud7j5wkmqqovbpbhlycbunxavensjixgjyc5u3eq/ttm4koeifphkud7j5wkmqqovbpb
   v3/                                the fork record
     inventory.json
     inventory.json.sha512
-    content/forked/w6s5uujjs56ilzmn/          the owner's version 3
+    content/forked/bqhn7r6fjeq5aaaz/          the owner's version 3
       inventory.json
       inventory.json.sha512
       keys.json
       signature-4hz7zgsiazl6hx7i.json
-    content/forked/gqqa23zsg6ehczgj/          the thief's version 3
+    content/forked/bm657wpgc5jqam4f/          the thief's version 3
       inventory.json
       inventory.json.sha512
       keys.json
       signature-4hz7zgsiazl6hx7i.json
 ```
 
-The fork record's `genesis.json` and `object.json` are those of `v1`, to which its inventory refers, and it has no `keys.json`. Had the thief signed no version of the key log, the owner would simply have signed with its spare key a version 3 listing the stolen key in `nullified`, carrying nothing (section 6.3). Here the owner heals with its spare key, which signed neither version: a healing version 3 carrying both, whose `keys.json` lists the spare key and a new one, not the stolen key (section 6.3). The signatures made with the stolen key stay good, and readers weigh them as section 6.4 says; the versions that need them, the paper's version 2 among them, are taken by other archives only from copies (section 7.5), until a later version signed with a new key vouches for them.
+The fork record's `genesis.json` and `object.json` are those of `v1`, to which its inventory refers, and it has no `keys.json`. Had the thief signed no version of the key log, the owner would simply have signed with one of its spare keys a version 3 listing the stolen key in `nullified`, carrying nothing (section 6.3). Here the owner heals with a spare key, which signed neither version: a healing version 3 carrying both, whose `keys.json` lists the two spare keys and a new one, not the stolen key (section 6.3); had the thief's version 3 also listed one of the spare keys in `nullified`, the fork record would nullify that spare too, and the owner would heal with the other (section 6.2). The signatures made with the stolen key stay good, and readers weigh them as section 6.4 says; the versions that need them, the paper's version 2 among them, are taken by other archives only from copies (section 7.5), until a later version signed with a new key vouches for them.
 
 ## Appendix D. Rationale (non-normative)
 
