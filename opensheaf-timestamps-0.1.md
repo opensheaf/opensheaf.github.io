@@ -15,7 +15,7 @@ A timestamp is such evidence: it shows that a signature existed by a date. A sin
 
 The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL in this document are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals. Terms are those of the specification: owner, key log, key-log version, signature file, witness, line, branch, ended owner, fork record, current key, rotation key, exposed key.
 
-This extension follows the extension mechanism of section 2 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes the status of a signature or a version, never ends an owner or decides a fork, and never lets a version into an archive. A reader that does not know it ignores the files and data it defines.
+This extension follows the extension mechanism of section 2 of the specification: it never changes the meaning of what the specification defines, nor relaxes its requirements, never changes the status of a signature or a version, never ends an owner or decides a fork, and never lets a version into an archive by itself: its dates are evidence that an archive MAY weigh where the specification allows it (section 6.4 of the specification). A reader that does not know it ignores the files and data it defines.
 
 ## 3. Timestamps
 
@@ -28,13 +28,13 @@ A timestamp file of the signature file `<version>/signature-<k>.json` (section 7
 
 ## 4. The owner's declaration
 
-An owner adopts this extension in its key log: a version of the key log holds, in its `keys.json`, under `extensions` (section 6.1 of the specification), an entry keyed by `https://opensheaf.org/opensheaf-timestamps-0.1`, an object with:
+An owner adopts this extension in its key log: its genesis record, for the first version of the key log, or the `keys.json` of a later version holds, under `extensions` (sections 5.1 and 6.1 of the specification), an entry keyed by `https://opensheaf.org/opensheaf-timestamps-0.1`, an object with:
 
-- `timestampAuthorities`, OPTIONAL: RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The authorities trusted for a signature file are those listed in the key-log version its `keyLog` names and in the versions before it, so that no one can add an authority later to date earlier signatures. Without any, only OpenTimestamps proofs are used.
+- `timestampAuthorities`, OPTIONAL: RFC 3161 time-stamping authorities the owner trusts, each the SHA-256 fingerprint (lowercase hexadecimal) of the authority's signing certificate or of the root certificate of its chain. The authorities trusted for a signature file are those listed in the key-log version its `keyLog` names and in the versions before it (for the first version, in the genesis record), so that no one can add an authority later to date earlier signatures. Without any, only OpenTimestamps proofs are used.
 
 The entry, even empty, declares that the owner timestamps every signature it makes, of its key log and of its lines.
 
-The declaration validates against the schema of appendix A, and is part of the key-log version, signed with it.
+The declaration validates against the schema of appendix A, and is part of the genesis record, fixed by the owner name, or of the key-log version, signed with it.
 
 ## 5. Checking a timestamp
 
@@ -47,9 +47,9 @@ The **date** of a valid timestamp is the `genTime` of an RFC 3161 token, or the 
 
 ## 6. Use
 
-Dates are evidence for readers; this extension draws no conclusion from them in the format. For an owner that has ended, and for exposed keys (sections 6.3 and 6.4 of the specification), a reader MAY trust the versions dated before the time it believes a key was exposed, and SHOULD say on what evidence. The time of the version that ends the owner or exposes keys bounds when the owner knew, and the times of the versions a fork record carries, when the fork was made. A branch keeps the timestamp files of its parent's signatures beside them in `parent.signatures/` (section 9.2 of the specification), without the `<version>/` folder (`parent.signatures/signature-<k>.json.<e>.tsr`); a pending proof kept there can never be completed, and counts for nothing (section 5); the timestamp files of key logs are in their owner objects.
+Dates are evidence for readers; this extension draws no conclusion from them in the format. For an owner that has ended, and for exposed keys (sections 6.3 and 6.4 of the specification), a reader MAY trust the versions dated before the time it believes a key was exposed, and SHOULD say on what evidence. An archive MAY add a version that needs an exposed key when dates it trusts show it signed before the key was exposed (section 6.4 of the specification), and SHOULD say so. The time of the version that ends the owner or exposes keys bounds when the owner knew, and the times of the versions a fork record carries, when the fork was made. A branch keeps the timestamp files of its parent's signatures beside them in `parent.signatures/` (section 9.2 of the specification), without the `<version>/` folder (`parent.signatures/signature-<k>.json.<e>.tsr`); a pending proof kept there can never be completed, and counts for nothing (section 5); the timestamp files of key logs are in their owner objects.
 
-Tools that create an owner SHOULD offer to adopt this extension in the first version of its key log, and SHOULD timestamp each signature when they make it, before a version leaves its owner's hands: with an RFC 3161 token where an owner cannot wait for an OpenTimestamps proof to complete, and with an OpenTimestamps proof beside it where an owner wants evidence that rests on no authority.
+Tools that create an owner SHOULD offer to adopt this extension in its genesis record, and so from the first version of its key log, and SHOULD timestamp each signature when they make it, before a version leaves its owner's hands: with an RFC 3161 token where an owner cannot wait for an OpenTimestamps proof to complete, and with an OpenTimestamps proof beside it where an owner wants evidence that rests on no authority.
 
 ## 7. Verification
 
@@ -62,15 +62,18 @@ A verifier that knows this extension, in addition to the checks of section 14 of
 
 ## Appendix A. JSON Schema (normative)
 
-The data of the declaration, the value of `extensions["https://opensheaf.org/opensheaf-timestamps-0.1"]` in `keys.json`, validates against [opensheaf-timestamps-0.1.schema.json](https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json) (JSON Schema 2020-12, CC0 1.0).
+The data of the declaration, the value of `extensions["https://opensheaf.org/opensheaf-timestamps-0.1"]` in the genesis record of an owner or in `keys.json`, validates against [opensheaf-timestamps-0.1.schema.json](https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json) (JSON Schema 2020-12, CC0 1.0).
 
 ## Appendix B. Example (non-normative)
 
-The `keys.json` of the first version of an owner's key log, adopting the extension from the start, with one RFC 3161 authority (a placeholder fingerprint) and OpenTimestamps; two current keys, on the owner's laptop and desktop, and the digests of three rotation keys, two of which sign the next version; its genesis record lists the same `keys`, `threshold`, `next` and `nextThreshold`:
+The genesis record of an owner adopting the extension from the start, with one RFC 3161 authority (a placeholder fingerprint) and OpenTimestamps; two current keys, on the owner's laptop and desktop, and the digests of three rotation keys, two of which sign the next version; the `keys.json` of the first version of its key log holds only the same `keys`, `threshold`, `next` and `nextThreshold` (placeholder nonce):
 
 ```json
 {
-  "format": "opensheaf-keys/0.1",
+  "format": "opensheaf-genesis/0.1",
+  "kind": "owner",
+  "created": "2026-01-10T09:00:00Z",
+  "nonce": "3f9c2a7d41e85b06c9d2f1a4e7b03c58",
   "keys": [ "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
             "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH" ],
   "threshold": 1,
@@ -108,4 +111,5 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
 - **0.1 (draft), 17 November 2026, after a thirteenth review of PR #30:** the declaration is the entry itself, with only `timestampAuthorities`; the authorities trusted for a signature are those listed up to the key-log version it names, not later ones; guidance for tools merged into section 6.
 - **0.1 (draft), 18 November 2026, after a fourteenth review of PR #30:** a date counts only if not earlier than the date of the key-log version the signature names, so that an authority listed later dates nothing before its listing; a version vouched for existed by the date of the version that vouches for it; a compromised authority means a new owner; repetitions cut.
 - **0.1 (draft), 19 November 2026, for the rebuilt specification (PR #30):** section references updated (extensions are in section 2); an exposed key ends the owner or is nullified by a fork of its key log and healing, and dates help readers weigh the versions of ended and tainted owners and of nullified keys (section 6); after an audit, timestamp files found over HTTP only where folders can be listed (section 3), and pending proofs in a branch count for nothing (section 6); after a second audit, keys nullified by a version of the key log as well as at a fork (sections 1 and 6).
+- **0.1 (draft), 19 November 2026, after an audit of pre-rotation (PR #30):** following the specification, the declaration of the first version of a key log is in the owner's genesis record, fixed by the owner name (sections 4 and 6, appendices A and B); dates are evidence an archive may weigh to add a version that needs an exposed key, which it otherwise never adds (sections 2 and 6).
 - **0.1 (draft), 19 November 2026, pre-rotation (PR #30):** following the pre-rotation of key logs in the specification (#58): exposed keys in place of nullified keys, and no healing or tainted owners (sections 1 and 6); a version of a key log is dated by as many signatures as it needs, `nextThreshold` of the version before (section 5); the example of appendix B commits to rotation keys in `next`.

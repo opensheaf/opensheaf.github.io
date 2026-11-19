@@ -372,15 +372,17 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       the key log as a new version after the latest held and replaces nothing;
       none follows an ending version or a fork record (section 6.3 of the
       specification). Versions of the lines, other than the key log, of an
-      owner that the commit's tree shows to be ended, and versions that need a
-      key exposed in the commit's tree, are added only from copies found
-      elsewhere, never as new deposits (section 7.5 of the specification); the
-      key log of such an owner is added as section 6.4 of the specification
-      says. Since OCFL cannot skip a version and nothing is removed from a
-      line but by a takedown, a version let in that is not signed would hold
-      its number for good, and the owner's own version of that number could
-      never be added to this archive. Versions already published stay,
-      whatever happens later.
+      owner that the commit's tree shows to be ended are added only from
+      copies found elsewhere, never as new deposits (section 7.5 of the
+      specification); the key log of such an owner is added as section 6.4 of
+      the specification says. Versions that need a key exposed in the commit's
+      tree, or whose signatures name a version of a key log from a fork point
+      on, are never added, from a copy or as a deposit, unless other evidence
+      dates them before (section 6.4 of the specification). Since OCFL cannot
+      skip a version and nothing is removed from a line but by a takedown, a
+      version let in that is not signed would hold its number for good, and
+      the owner's own version of that number could never be added to this
+      archive. Versions already published stay, whatever happens later.
     </p>
     <p>
       The published branch MUST NOT be rewritten, except for a takedown
@@ -740,11 +742,13 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
         <p>
           <strong>reported, never failing</strong>: as warnings, versions
           already published that are not signed (a breach of section 5.1 that
-          cannot be undone), files that are not witnesses, and versions added
-          to the lines, other than the key log, of ended owners, or needing an
-          exposed key (which must come only from copies, which the check
-          cannot see); as results, forks of lines and of key logs, exposed
-          keys, and ended owners (sections 6.3 and 7.4 of the specification);
+          cannot be undone), files that are not witnesses, versions added to
+          the lines, other than the key log, of ended owners (which must come
+          only from copies, which the check cannot see), and versions added
+          that need an exposed key or name a version of a key log from a fork
+          point on (which need evidence the check does not weigh); as results,
+          forks of lines and of key logs, exposed keys, and ended owners
+          (sections 6.3 and 7.4 of the specification);
         </p>
       </li>
       <li>
@@ -956,6 +960,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           tell a copy from a deposit (sections 5.1 and 10; provisional, #58);
           the history of the published branch is rewritten only for a takedown
           (section 1).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, after an audit of
+          pre-rotation (PR #30):</strong> following the specification (#58),
+          versions that need an exposed key, or name a version of a key log
+          from a fork point on, are never added, from a copy or as a deposit,
+          unless other evidence dates them before, rather than taken from
+          copies (sections 5.1 and 10).
         </p>
       </li>
       <li>

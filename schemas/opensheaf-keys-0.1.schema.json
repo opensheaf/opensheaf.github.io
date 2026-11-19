@@ -2,13 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-keys-0.1.schema.json",
   "title": "OpenSheaf key log version (keys.json), version 0.1",
-  "$comment": "Section 6 of the specification (field names provisional, #55; next, nextThreshold and exposed provisional, #58). Dedicated to the public domain under CC0 1.0. That threshold does not exceed the number of keys nor nextThreshold that of next, that no version follows one with ended or a fork record (which holds forked/<d>/ and no keys.json), that keys lists no exposed key and no rotation key that has signed a version, that next holds no digest of a current key or of a rotation key that has signed a version, that the first version repeats the keys, threshold, next and nextThreshold of the genesis record, and that each later version is signed by nextThreshold rotation keys of the version before, are checked by verifiers.",
+  "$comment": "Section 6 of the specification (field names provisional, #55; next, nextThreshold and exposed provisional, #58). Dedicated to the public domain under CC0 1.0. That threshold does not exceed the number of keys nor nextThreshold that of next, that no version follows one with ended or a fork record (which holds forked/<d>/ and no keys.json), that keys lists no exposed key and no key whose digest next of its version or an earlier one holds, that next holds no digest of a current key or of a rotation key that has signed a version, that exposed lists only keys of earlier versions of the same key log, that the first version holds only format and the keys, threshold, next and nextThreshold of the genesis record, equal as JSON values (keeper and the extensions of the first version are in the genesis record), and that each later version is signed by nextThreshold rotation keys of the version before, are checked by verifiers.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "format",
-    "keys",
-    "threshold"
+    "format"
   ],
   "properties": {
     "format": {
@@ -21,11 +19,12 @@
       "items": {
         "$ref": "#/$defs/didKey"
       },
-      "$comment": "section 6.1: the current keys, which sign the versions of the owner's lines and, in the first version only, the key log"
+      "$comment": "section 6.1: the current keys, which sign the versions of the owner's lines and, in the first version only, the key log; absent from an ending version"
     },
     "threshold": {
       "type": "integer",
-      "minimum": 1
+      "minimum": 1,
+      "$comment": "section 6.1: how many distinct current keys must sign a version of a line; absent from an ending version"
     },
     "next": {
       "type": "array",
@@ -41,19 +40,9 @@
       "minimum": 1,
       "$comment": "section 6.1: how many distinct rotation keys must sign the next version"
     },
-    "keeper": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "format": "uri",
-        "pattern": "^https://(orcid\\.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]|[a-z0-9.-]+/)$"
-      },
-      "$comment": "optional (section 6.6): who answers for the owner, an ORCID iD or a domain"
-    },
     "extensions": {
       "type": "object",
-      "$comment": "sections 2 and 6.1: the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.1; each value is an object, validated by the schema of its extension",
+      "$comment": "sections 2 and 6.1: the data of extensions concerning the key log, keyed by their names (URIs), for instance https://opensheaf.org/opensheaf-timestamps-0.1; each value is an object, validated by the schema of its extension; absent from the first version, whose extensions are in the genesis record",
       "propertyNames": {
         "format": "uri",
         "minLength": 1
@@ -64,12 +53,12 @@
     },
     "ended": {
       "const": true,
-      "$comment": "optional (section 6.3): the owner ends with this version; no later version is a version of the key log, and no line signature names it"
+      "$comment": "optional (section 6.3): the owner ends with this version, which has no keys, threshold, next or nextThreshold; no later version is a version of the key log, and no line signature names it"
     },
     "successor": {
       "type": "string",
       "pattern": "^[a-z2-7]{52}$",
-      "$comment": "optional, only with ended (section 6.3): the owner name of the owner that continues the work, other than this owner"
+      "$comment": "optional, only with ended (section 6.3): the owner name of the owner that continues the work, other than this owner; accepted only as section 6.6 says"
     },
     "exposed": {
       "type": "array",
@@ -78,7 +67,7 @@
       "items": {
         "$ref": "#/$defs/didKey"
       },
-      "$comment": "optional (section 6.3): current keys of earlier versions that this version declares exposed"
+      "$comment": "optional (section 6.3): keys listed in keys of earlier versions of this key log that this version declares exposed"
     }
   },
   "$defs": {
@@ -97,6 +86,12 @@
     "successor": [
       "ended"
     ],
+    "keys": [
+      "threshold"
+    ],
+    "threshold": [
+      "keys"
+    ],
     "next": [
       "nextThreshold"
     ],
@@ -111,13 +106,34 @@
   },
   "then": {
     "not": {
-      "required": [
-        "next"
+      "anyOf": [
+        {
+          "required": [
+            "keys"
+          ]
+        },
+        {
+          "required": [
+            "threshold"
+          ]
+        },
+        {
+          "required": [
+            "next"
+          ]
+        },
+        {
+          "required": [
+            "nextThreshold"
+          ]
+        }
       ]
     }
   },
   "else": {
     "required": [
+      "keys",
+      "threshold",
       "next"
     ]
   }

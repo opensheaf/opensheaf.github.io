@@ -96,47 +96,60 @@ questions are listed at the end of the sections they concern.
   is made; reused genesis records are refused unless signed by the
   originator or a confirmed branch (5.4); aliases open (#44).
 - **Owners and key logs** (6): an owner object, named by its genesis record
-  (first `keys`, `threshold`, `next`, `nextThreshold`); its versions are its
-  key log, `keys.json` (`keys` as Ed25519 `did:key`, `threshold`, `next`,
-  `nextThreshold`, `extensions`, `keeper`, `ended`, `successor`,
-  `exposed`). **Pre-rotation**, as in KERI (provisional, #58): **current
-  keys** (`keys`, `threshold`) sign the versions of lines, and the key log
-  only in its first version, which repeats the genesis record; `next` holds
-  the base32 SHA-256 digests of the **rotation keys**, and each later
-  version vN+1 is signed by `nextThreshold` rotation keys of vN, which its
-  signature files reveal. Rotation keys are kept apart, used once (SHOULD be
-  destroyed), never become current keys, and a revealed one is never
-  committed again. Advice (6.2): one current key per device, never copied;
-  threshold 1 for a person, more for a group; e.g. three rotation keys with
-  `nextThreshold` 2. Retiring a key: leaving it out.
-- **Ending** (6.3): a signed last version with `ended`, without `next` (and
-  optional `successor`, a hint); no line signature names it; an **ended**
-  owner signs nothing.
+  (first `keys`, `threshold`, `next`, `nextThreshold`; optional `keeper` and
+  `extensions`, fixed by the owner name); its versions are its key log,
+  `keys.json` (`keys` as Ed25519 `did:key`, `threshold`, `next`,
+  `nextThreshold`, `extensions`, `ended`, `successor`, `exposed`; no
+  `keeper`), in every version but a fork record. **Pre-rotation**, as in
+  KERI (provisional, #58): **current keys** (`keys`, `threshold`) sign the
+  versions of lines, and the key log only in its first version, whose
+  `keys.json` holds exactly the key fields of the genesis record (equal as
+  JSON values), nothing else; `next` holds the base32 SHA-256 digests of the
+  **rotation keys**, and each later version vN+1 is signed by
+  `nextThreshold` rotation keys of vN, which its signature files reveal.
+  Rotation keys are kept apart, used once (SHOULD be destroyed), never
+  become current keys, and a revealed one is never committed again; `keys`
+  never lists a rotation key, used or not. Advice (6.2): one current key per
+  device, never copied; threshold 1 for a person, more for a group; e.g.
+  three rotation keys with `nextThreshold` 2. Retiring a key: leaving it
+  out.
+- **Ending** (6.3): a signed last version with `ended`, without `keys`,
+  `threshold`, `next`, `nextThreshold` (and optional `successor`, a hint);
+  no line signature names it; an **ended** owner signs nothing. A successor
+  is accepted only from an ending version before any fork point or from the
+  keeper (6.6); one named from a fork point on is an unconfirmed claim.
 - **Exposed keys** (6.3): an owner whose current keys may have been exposed
   and could reach a threshold signs at once a version listing them in
   `exposed` (any earlier current key, retired or not), which whoever holds
   current keys cannot contest; otherwise retiring is enough. There is no
   revocation.
 - **Forks of a key log, fork records** (6.3, provisional, #58): two
-  different versions of one number, each signed against the version before,
-  are a fork, at its fork point; only rotation keys (or current keys at
-  version 1) can make one, and a fork **ends the owner**. An archive keeps
-  the side it saw first, never replaces or removes a version, and appends a
-  **fork record** after its latest version: unsigned, made by that archive,
-  holding `genesis.json`, `object.json` and the other side's versions it
-  carries under `forked/<d>/` (inventory, checksum, `keys.json`, signature
-  files with their witnesses). No version follows an ending version or a
-  fork record.
+  signed versions of one number whose `keys.json` differ (as JSON values)
+  are a fork, at its fork point; versions with equal `keys.json` are
+  **equivalent**, not a fork. Only rotation keys can make one, never at
+  version 1, and a fork **ends the owner**. An archive keeps the side it saw
+  first (both at once: the smaller inventory SHA-512 at the fork point),
+  never replaces or removes a version, and appends a **fork record** after
+  its latest version: unsigned, made by that archive, holding `genesis.json`,
+  `object.json` and the other side's versions it carries under `forked/<d>/`
+  (inventory, checksum, `keys.json`, signature files with their witnesses),
+  and no `keys.json` of its own. A fork record is never a side: copies are
+  compared up to it. No version follows an ending version or a fork record.
+  A thief with unused rotation keys of the latest version takes over without
+  a fork; the owner can only end it, with its own copies of those keys.
 - **After an end or an exposure** (6.4): signatures stay good; readers
   weigh them by other evidence (copies, pins, timestamps). Versions of lines
-  that **need an exposed key**, and lines of ended owners, are taken only
-  from copies found elsewhere; the owner may sign again, with keys not
-  exposed, versions it knows it made.
+  that **need an exposed key** (exposed by their own owner's key log), or
+  name a key-log version from a fork point on, are reported and never added,
+  unless other evidence (a timestamp) dates them before; lines of ended
+  owners are taken only from copies found elsewhere; the owner may sign
+  again, with keys not exposed, versions it knows it made.
 - **Key logs travel** (6.5) beside every copy, as owner objects in the same
   storage root (the line's owner and every parent owner); the longer copy
-  wins; an owner moves by copying its folder. **Keepers** (6.6): ORCID iD
-  or domain, confirmed by ORCID or `/.well-known/opensheaf`
-  (`opensheaf-keeper/0.1`, `owners`, `successors`).
+  wins; an owner moves by copying its folder. **Keepers** (6.6): ORCID iD or
+  domain, in the genesis record (another keeper, another owner), confirmed
+  by ORCID or `/.well-known/opensheaf` (`opensheaf-keeper/0.1`, `owners`,
+  `successors`).
 - **Lines and signatures** (7): a line is its signed versions, wherever
   stored. Signature files `extensions/opensheaf-witnesses/<v>/signature-<k>.json`
   (`object`, `version`, `inventorySha512`, `signer`, `key`, `keyLog` as a
@@ -176,7 +189,8 @@ questions are listed at the end of the sections they concern.
   withdrawn. Every removal of a sealed object is a **takedown**, which
   leaves a **tombstone** (`id`, `kind`, `name`, `owner`, `genesisName`,
   `lastVersion`, `inventorySha512`, `date`, `reason`); owner objects others
-  need stay.
+  need stay, and are taken down only by law, at the keeper's request or
+  after an ending version, never on a request signed by current keys.
 - **Verification** (14): findings are **errors** (breaches of MUST, an
   archive or object without errors passes), **warnings** (SHOULD, breaches
   the archive cannot repair, checks not made) and **results** (statuses,

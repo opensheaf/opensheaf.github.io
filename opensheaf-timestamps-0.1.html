@@ -77,8 +77,10 @@
       specification: it never changes the meaning of what the specification
       defines, nor relaxes its requirements, never changes the status of a
       signature or a version, never ends an owner or decides a fork, and never
-      lets a version into an archive. A reader that does not know it ignores
-      the files and data it defines.
+      lets a version into an archive by itself: its dates are evidence that an
+      archive MAY weigh where the specification allows it (section 6.4 of the
+      specification). A reader that does not know it ignores the files and
+      data it defines.
     </p>
     <h2 id="auto-4"><a id="3-timestamps"></a>3. Timestamps<span style="margin-left: 1em"></span></h2>
     <p>
@@ -128,9 +130,10 @@
     </p>
     <h2 id="auto-5"><a id="4-the-owners-declaration"></a>4. The owner's declaration<span style="margin-left: 1em"></span></h2>
     <p>
-      An owner adopts this extension in its key log: a version of the key log
-      holds, in its <tt class="verbatim">keys.json</tt>, under <tt class="verbatim">extensions</tt>
-      (section 6.1 of the specification), an entry keyed by <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>,
+      An owner adopts this extension in its key log: its genesis record, for
+      the first version of the key log, or the <tt class="verbatim">keys.json</tt> of a
+      later version holds, under <tt class="verbatim">extensions</tt> (sections 5.1 and
+      6.1 of the specification), an entry keyed by <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.1</tt>,
       an object with:
     </p>
     <ul>
@@ -141,9 +144,10 @@
           fingerprint (lowercase hexadecimal) of the authority's signing
           certificate or of the root certificate of its chain. The authorities
           trusted for a signature file are those listed in the key-log version
-          its <tt class="verbatim">keyLog</tt> names and in the versions before it, so
-          that no one can add an authority later to date earlier signatures.
-          Without any, only OpenTimestamps proofs are used.
+          its <tt class="verbatim">keyLog</tt> names and in the versions before it (for
+          the first version, in the genesis record), so that no one can add an
+          authority later to date earlier signatures. Without any, only
+          OpenTimestamps proofs are used.
         </p>
       </li>
     </ul>
@@ -153,7 +157,8 @@
     </p>
     <p>
       The declaration validates against the schema of appendix A, and is part
-      of the key-log version, signed with it.
+      of the genesis record, fixed by the owner name, or of the key-log
+      version, signed with it.
     </p>
     <h2 id="auto-6"><a id="5-checking-a-timestamp"></a>5. Checking a timestamp<span style="margin-left: 1em"></span></h2>
     <p>
@@ -207,23 +212,25 @@
       them in the format. For an owner that has ended, and for exposed keys
       (sections 6.3 and 6.4 of the specification), a reader MAY trust the
       versions dated before the time it believes a key was exposed, and SHOULD
-      say on what evidence. The time of the version that ends the owner or
-      exposes keys bounds when the owner knew, and the times of the versions a
-      fork record carries, when the fork was made. A branch keeps the
-      timestamp files of its parent's signatures beside them in <tt class="verbatim">parent.signatures/</tt>
-      (section 9.2 of the specification), without the <tt class="verbatim">&lt;version&gt;/</tt>
-      folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>);
-      a pending proof kept there can never be completed, and counts for
-      nothing (section 5); the timestamp files of key logs are in their owner
-      objects.
+      say on what evidence. An archive MAY add a version that needs an exposed
+      key when dates it trusts show it signed before the key was exposed
+      (section 6.4 of the specification), and SHOULD say so. The time of the
+      version that ends the owner or exposes keys bounds when the owner knew,
+      and the times of the versions a fork record carries, when the fork was
+      made. A branch keeps the timestamp files of its parent's signatures
+      beside them in <tt class="verbatim">parent.signatures/</tt> (section 9.2 of the
+      specification), without the <tt class="verbatim">&lt;version&gt;/</tt> folder (<tt
+      class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>); a
+      pending proof kept there can never be completed, and counts for nothing
+      (section 5); the timestamp files of key logs are in their owner objects.
     </p>
     <p>
-      Tools that create an owner SHOULD offer to adopt this extension in the
-      first version of its key log, and SHOULD timestamp each signature when
-      they make it, before a version leaves its owner's hands: with an RFC
-      3161 token where an owner cannot wait for an OpenTimestamps proof to
-      complete, and with an OpenTimestamps proof beside it where an owner
-      wants evidence that rests on no authority.
+      Tools that create an owner SHOULD offer to adopt this extension in its
+      genesis record, and so from the first version of its key log, and SHOULD
+      timestamp each signature when they make it, before a version leaves its
+      owner's hands: with an RFC 3161 token where an owner cannot wait for an
+      OpenTimestamps proof to complete, and with an OpenTimestamps proof
+      beside it where an owner wants evidence that rests on no authority.
     </p>
     <h2 id="auto-8"><a id="7-verification"></a>7. Verification<span style="margin-left: 1em"></span></h2>
     <p>
@@ -265,24 +272,28 @@
     <h2 id="auto-10"><a id="appendix-a-json-schema-normative"></a>Appendix A. JSON Schema (normative)<span style="margin-left: 1em"></span></h2>
     <p>
       The data of the declaration, the value of <tt class="verbatim">extensions[&quot;https://opensheaf.org/opensheaf-timestamps-0.1&quot;]</tt>
-      in <tt class="verbatim">keys.json</tt>, validates against <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json">opensheaf-timestamps-0.1.schema.json</a>
+      in the genesis record of an owner or in <tt class="verbatim">keys.json</tt>,
+      validates against <a href="https://opensheaf.org/schemas/opensheaf-timestamps-0.1.schema.json">opensheaf-timestamps-0.1.schema.json</a>
       (JSON Schema 2020-12, CC0 1.0).
     </p>
     <h2 id="auto-11"><a id="appendix-b-example-non-normative"></a>Appendix B. Example (non-normative)<span style="margin-left: 1em"></span></h2>
     <p>
-      The <tt class="verbatim">keys.json</tt> of the first version of an owner's key
-      log, adopting the extension from the start, with one RFC 3161 authority
-      (a placeholder fingerprint) and OpenTimestamps; two current keys, on the
-      owner's laptop and desktop, and the digests of three rotation keys, two
-      of which sign the next version; its genesis record lists the same <tt
-      class="verbatim">keys</tt>, <tt class="verbatim">threshold</tt>, <tt class="verbatim">next</tt> and
-      <tt class="verbatim">nextThreshold</tt>:
+      The genesis record of an owner adopting the extension from the start,
+      with one RFC 3161 authority (a placeholder fingerprint) and
+      OpenTimestamps; two current keys, on the owner's laptop and desktop, and
+      the digests of three rotation keys, two of which sign the next version;
+      the <tt class="verbatim">keys.json</tt> of the first version of its key log holds
+      only the same <tt class="verbatim">keys</tt>, <tt class="verbatim">threshold</tt>, <tt
+      class="verbatim">next</tt> and <tt class="verbatim">nextThreshold</tt> (placeholder nonce):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 {
-  &quot;format&quot;: &quot;opensheaf-keys/0.1&quot;,
+  &quot;format&quot;: &quot;opensheaf-genesis/0.1&quot;,
+  &quot;kind&quot;: &quot;owner&quot;,
+  &quot;created&quot;: &quot;2026-01-10T09:00:00Z&quot;,
+  &quot;nonce&quot;: &quot;3f9c2a7d41e85b06c9d2f1a4e7b03c58&quot;,
   &quot;keys&quot;: [ &quot;did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK&quot;,
             &quot;did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH&quot; ],
   &quot;threshold&quot;: 1,
@@ -383,6 +394,17 @@ extensions/opensheaf-witnesses/v1/signature-qvi7ibhm7zsahqx6.json.yq77barzw3gj7d
           folders can be listed (section 3), and pending proofs in a branch
           count for nothing (section 6); after a second audit, keys nullified
           by a version of the key log as well as at a fork (sections 1 and 6).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.1 (draft), 19 November 2026, after an audit of
+          pre-rotation (PR #30):</strong> following the specification, the
+          declaration of the first version of a key log is in the owner's
+          genesis record, fixed by the owner name (sections 4 and 6,
+          appendices A and B); dates are evidence an archive may weigh to add
+          a version that needs an exposed key, which it otherwise never adds
+          (sections 2 and 6).
         </p>
       </li>
       <li>

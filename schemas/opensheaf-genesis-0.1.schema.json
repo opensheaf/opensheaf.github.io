@@ -62,6 +62,27 @@
     "nextThreshold": {
       "type": "integer",
       "minimum": 1
+    },
+    "keeper": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://(orcid\\.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]|[a-z0-9.-]+/)$"
+      },
+      "$comment": "optional, for an owner only (sections 5.1 and 6.6): who answers for the owner, an ORCID iD or a domain, fixed by the owner name"
+    },
+    "extensions": {
+      "type": "object",
+      "$comment": "optional, for an owner only (sections 2, 5.1 and 6.1): the data of extensions concerning its key log as of the first version, keyed by their names (URIs); each value is an object, validated by the schema of its extension",
+      "propertyNames": {
+        "format": "uri",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "object"
+      }
     }
   },
   "allOf": [
@@ -110,6 +131,16 @@
             {
               "required": [
                 "nextThreshold"
+              ]
+            },
+            {
+              "required": [
+                "keeper"
+              ]
+            },
+            {
+              "required": [
+                "extensions"
               ]
             }
           ]
