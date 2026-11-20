@@ -93,8 +93,10 @@ on GitHub, and archives made with them.
 - **Archives**
   - [Papers of Massimiliano Gubinelli](https://mgubi.org/papers/)
     (repository [mgubi/papers](https://github.com/mgubi/papers)): the first
-    OpenSheaf archive, following version 0.1, with TeXmacs sources, HTML
-    versions and PDFs (profile `texmacs`).
+    OpenSheaf archive, following version 0.2 since its rebuild on 20 November
+    2026 (its owner has a key log, and the versions of its lines are
+    signed), with TeXmacs sources, HTML versions and PDFs (profile
+    `texmacs`).
 - **Tools:** [opensheaf-py](https://github.com/opensheaf/opensheaf-py)
   (Python, the `osheaf` command, written as a
   [literate program](https://opensheaf.org/opensheaf-py/) that explains it
