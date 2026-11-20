@@ -66,10 +66,17 @@ def emphasis(p):
 LINK_MAP = {}   # Markdown target -> TeXmacs target (set by --map)
 
 
+def literal(t):
+    """Code as typed: a no-break between two hyphens or dots keeps the HTML
+    export from writing an en dash for `--` (options such as `--pdf`) and an
+    ellipsis for `...`."""
+    return re.sub(r'([-.])(?=\1)', r'\1<no-break>', t)
+
+
 def code_and_emphasis(t):
     out = []
     for i, part in enumerate(re.split(r'`([^`]*)`', t)):
-        out.append(f'<verbatim|{esc(part)}>' if i % 2 else terms(part))
+        out.append(f'<verbatim|{literal(esc(part))}>' if i % 2 else terms(part))
     return ''.join(out)
 
 
@@ -110,7 +117,7 @@ def code_line(c):
         return ''
     n = len(c) - len(c.lstrip(' '))
     rest = re.sub(r' {2,}', lambda m: ' ' + '\\ ' * (len(m.group()) - 1),
-                  esc(c.lstrip(' ')))
+                  literal(esc(c.lstrip(' '))))
     return '    ' + '\\ ' * n + rest
 
 

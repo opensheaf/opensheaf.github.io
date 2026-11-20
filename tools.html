@@ -1,0 +1,878 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:x="https://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <head>
+    <title>OpenSheaf</title>
+    <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
+    <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
+    <script src="resources/theme.js" language="javascript"></script>
+    <link href="resources/brand/favicon.svg" rel="icon"></link>
+    <link href="resources/opensheaf.css" type="text/css" rel="stylesheet"></link>
+    <script src="resources/highlight.pack.js" language="javascript" defer></script>
+    <script src="resources/highlight-lean.js" language="javascript" defer></script>
+    <script src="resources/notes-base.js" language="javascript" defer></script>
+    <script language="javascript" defer>var bs = String.fromCharCode(92), sp =
+    String.fromCharCode(32); window.MathJax = {tex: {macros: {xequal: [bs +
+    'xlongequal[#1]{#2}', 2, ''], marked: [bs + 'class{tm-marked}{#1}', 1],
+    llbracket: bs + 'mathopen{' + bs + 'unicode{x27E6}}', rrbracket: bs +
+    'mathclose{' + bs + 'unicode{x27E7}}', hyperref: ['#2', 2, ''], rotatebox:
+    [bs + 'style{display:inline-block;transform:rotate(calc(-1deg' + sp + '*'
+    + sp + '#2))}{#3}', 3, '']}}};</script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" language="javascript"></script>
+  </head>
+  <body>
+    <div class="notes-header">
+      <p>
+        [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.2.html">specification</a>] [<a href="use-cases.html">use
+        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="tools.html">tools</a>] [<a href="formal-model.html">formal
+        model</a>] [<a href="https://mgubi.org/papers/">first archive</a>]<em class="notes-header-name">OpenSheaf</em>
+      </p>
+    </div>
+    <h1 id="auto-1">The command-line tools<span style="margin-left: 1em"></span></h1>
+    <div class="notes-abstract">
+      <tt class="verbatim">osheaf</tt> is the command that keeps an OpenSheaf archive on
+      your computer: it deposits your papers and their new versions, signs
+      them, keeps collections of papers from any archive, writes the website,
+      verifies the whole, imports papers from arXiv and gets DOIs from Zenodo.
+      This page shows how to use it, task by task. It is part of <a href="https://github.com/opensheaf/opensheaf-py">opensheaf-py</a>,
+      the reference implementation of the <a href="opensheaf-specification-0.2.html">specification</a>.
+    </div>
+    <div class="os-alert os-warning">
+      <font class="os-alert-label">Warning.</font> <strong>Under development.</strong> The
+      tools follow version 0.2 of the specification, a draft, and change with
+      it. Archives made now may have to be rebuilt when the format changes. Do
+      not rely on them yet for anything you cannot redo.
+    </div>
+    <h2 id="auto-2"><a id="running-it"></a>Running it<span style="margin-left: 1em"></span></h2>
+    <p>
+      The tools need Python 3.9 or later. The simplest way to run them while
+      they are developed is <a href="https://docs.astral.sh/uv/">uv</a>, which fetches the latest version
+      from GitHub and runs it without installing anything:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+uvx --python 3.13 --from &quot;opensheaf[validate,keys] @ git+https://github.com/opensheaf/opensheaf-py&quot; osheaf --help</pre>
+      </div>
+    </div>
+    <p>
+      Give it a short name once, in your shell's configuration (<tt class="verbatim">~/.zshrc</tt>
+      on a Mac):
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+alias osheaf='uvx --python 3.13 --from &quot;opensheaf[validate,keys] @ git+https://github.com/opensheaf/opensheaf-py&quot; osheaf'</pre>
+      </div>
+    </div>
+    <p>
+      uv keeps what it fetched; to move to the latest version of the tools,
+      run the same line once with <tt class="verbatim">--refresh</tt> after <tt class="verbatim">uvx</tt>.
+      Naming the Python (<tt class="verbatim">--python 3.13</tt>) matters on a Mac: see
+      the keychain, below.
+    </p>
+    <p>
+      To install the command instead, with uv or with pipx:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+uv tool install &quot;opensheaf[validate,keys] @ git+https://github.com/opensheaf/opensheaf-py&quot;
+pipx install &quot;opensheaf[validate,keys] @ git+https://github.com/opensheaf/opensheaf-py&quot;</pre>
+      </div>
+    </div>
+    <p>
+      The extras add what is optional: <tt class="verbatim">validate</tt> lets <tt
+      class="verbatim">osheaf verify</tt> also check the files against the JSON Schemas
+      and the storage root with an independent OCFL validator; <tt class="verbatim">keys</tt>
+      keeps your keys in the system's credential store. Nothing else is
+      needed, unless you deposit TeXmacs documents, which the archive typesets
+      itself: then <a href="https://www.texmacs.org">GNU TeXmacs</a> (by default the macOS application,
+      or wherever <tt class="verbatim">TEXMACS_BIN</tt> says) and the TeXmacs plugins
+      your archive names in its configuration.
+    </p>
+    <p>
+      <strong>The keychain on a Mac.</strong> When a Python other than the one
+      that stored your key reads it, macOS asks: &quot;python3.13 wants to use
+      your confidential information stored in opensheaf-current-key&quot;.
+      Answer <strong>Always Allow</strong>, with your login password, and that
+      Python is not asked again. A different Python is asked anew, which is
+      why the line above names one. If you would rather keep no key on the
+      computer at all, see <a href="#where-the-keys-are-kept">Where the keys are kept</a>.
+    </p>
+    <p>
+      <tt class="verbatim">osheaf --help</tt> lists the commands, and <tt class="verbatim">osheaf
+      COMMAND --help</tt> (for instance <tt class="verbatim">osheaf collection add
+      --help</tt>) gives the options of each. <tt class="verbatim">osheaf
+      help-config</tt> describes the configuration file of an archive.
+    </p>
+    <h2 id="auto-3"><a id="your-first-archive"></a>Your first archive<span style="margin-left: 1em"></span></h2>
+    <p>
+      An archive is a folder. <tt class="verbatim">osheaf init</tt> makes it, together
+      with its <dfn>owner</dfn>: the keyed identity that signs every version
+      of your papers (section 6 of the <a href="opensheaf-specification-0.2.html#6-owners">specification</a>).
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://janedoe.github.io/papers/ \
+  --curator &quot;Doe, Jane&quot; --affiliation &quot;Example University&quot; \
+  --new-owner --export /Volumes/USB/opensheaf-keys --print
+cd my-papers</pre>
+      </div>
+    </div>
+    <p>
+      <tt class="verbatim">--base-url</tt> is the address where the archive will be
+      served. Every later command is run inside the folder (or given it with
+      <tt class="verbatim">--root</tt>).
+    </p>
+    <h3 id="auto-4"><a id="choosing-where-the-keys-live"></a>Choosing where the keys live<span style="margin-left: 1em"></span></h3>
+    <p>
+      An owner has two kinds of keys. <strong>Current keys</strong> sign your
+      papers; each computer has its own. <strong>Rotation keys</strong>, three
+      by default, of which any two are needed, change the current keys: they
+      add a new computer, retire an old one, or declare a stolen one. Whoever
+      holds two rotation keys controls the owner, so where they live is the
+      owner's <strong>security level</strong>, chosen with <tt class="verbatim">--keys</tt>
+      when the owner is made:
+    </p>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">--keys offline</tt> (the default, and the safest). The
+          rotation keys are written once, encrypted under a passphrase you
+          choose, to the folder of <tt class="verbatim">--export</tt> (a USB stick),
+          and, with <tt class="verbatim">--print</tt>, printed on sheets. <tt class="verbatim">init</tt>
+          asks you to type back the check of each key once it is put away.
+          They are never kept on the computer: store the stick and the sheets
+          apart from it, and from each other.
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">--keys github:OWNER/REPO</tt>, a key wallet in a private
+          GitHub repository of its own (create it by hand first, for instance
+          with <tt class="verbatim">gh repo create me/opensheaf-keys --private</tt>; the
+          tools refuse a public one, or the archive's own). The rotation keys
+          and the current keys are kept there, encrypted under the passphrase,
+          and a new computer gets its key from the wallet. It needs the <a
+          href="https://cli.github.com">GitHub CLI</a>, signed in once with <tt class="verbatim">gh auth
+          login</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">--keys command</tt>, a key wallet in your password
+          manager (1Password's <tt class="verbatim">op</tt>, Bitwarden's <tt class="verbatim">bw</tt>,
+          <tt class="verbatim">pass</tt>): the same, through a <tt class="verbatim">read</tt> and
+          a <tt class="verbatim">write</tt> command, given in the environment variable
+          <tt class="verbatim">OPENSHEAF_WALLET</tt> as a JSON object, <tt class="verbatim">{&quot;wallet&quot;:
+          &quot;command&quot;, &quot;read&quot;: READ, &quot;write&quot;:
+          WRITE}</tt>, where READ prints a key and WRITE stores one (for
+          1Password, READ is <tt class="verbatim">op read
+          'op://Private/opensheaf-{owner}-{k}/notesPlain'</tt>). Chapter 9 of
+          the <a href="https://opensheaf.org/opensheaf-py/">literate program</a> gives the commands for the three
+          managers.
+        </p>
+      </li>
+    </ul>
+    <p>
+      A wallet trades security for convenience: whoever controls the wallet
+      and knows the passphrase controls the owner, and the tools say so each
+      time they put keys in one. Keep the passphrase elsewhere than the
+      wallet. You can move up to <tt class="verbatim">offline</tt> at any time with one
+      rotation (see <a href="#keys">Keys</a>).
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://janedoe.github.io/papers/ \
+  --curator &quot;Doe, Jane&quot; --new-owner --keys github:janedoe/opensheaf-keys</pre>
+      </div>
+    </div>
+    <p>
+      <tt class="verbatim">--keeper</tt> names who answers for the owner, an ORCID iD or
+      a domain of yours (<tt class="verbatim">--keeper
+      https://orcid.org/0000-0002-1825-0097</tt>, or <tt class="verbatim">--keeper
+      https://example.org/</tt>; section <a href="opensheaf-specification-0.2.html#66-keepers">6.6</a>). An owner can keep
+      several archives: <tt class="verbatim">osheaf init</tt> with <tt class="verbatim">--owner
+      OWNER --key-log DIR</tt> instead of <tt class="verbatim">--new-owner</tt> starts
+      an archive with an owner you already have, copying its key log from
+      another archive.
+    </p>
+    <h3 id="auto-5"><a id="what-appears-in-the-folder"></a>What appears in the folder<span style="margin-left: 1em"></span></h3>
+    <ul>
+      <li>
+        <p>
+          <tt class="verbatim">osheaf.json</tt>: the settings of the archive (name,
+          address, owner, curator, the wallet if any);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">ocfl/</tt>: the storage itself, one folder per work, with
+          the key log of the owner at <tt class="verbatim">ocfl/&lt;owner&gt;/&lt;owner&gt;/</tt>;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf.json</tt>: the discovery document, which
+          readers and tools start from, with the labels of your papers;
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>:
+          indexes for looking things up;
+        </p>
+      </li>
+      <li>
+        <p>
+          the website: <tt class="verbatim">index.html</tt>, a page per paper at <tt
+          class="verbatim">paper/&lt;label&gt;/</tt>, a page per owner at <tt class="verbatim">owner/&lt;owner&gt;/</tt>,
+          <tt class="verbatim">sitemap.xml</tt>, and the templates they are made from in
+          <tt class="verbatim">templates/</tt>, which you can edit.
+        </p>
+      </li>
+    </ul>
+    <p>
+      With <tt class="verbatim">--index texmacs</tt>, the home page is instead a TeXmacs
+      document made from a template (<tt class="verbatim">--index-template FILE</tt>),
+      with HTML versions of TeXmacs papers in <tt class="verbatim">site/</tt>; the
+      landing pages are the same. <tt class="verbatim">--curated</tt> makes a main
+      catalogue that you choose by hand rather than one that lists every
+      paper.
+    </p>
+    <h2 id="auto-6"><a id="daily-work"></a>Daily work<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-7"><a id="depositing-a-paper"></a>Depositing a paper<span style="margin-left: 1em"></span></h3>
+    <p>
+      A new paper gets a <strong>label</strong> of your choice, which names it
+      in your archive and gives the address of its page, <tt class="verbatim">paper/&lt;label&gt;/</tt>.
+      <tt class="verbatim">--new</tt> makes the new work; the deposit prints its
+      permanent name, a <tt class="verbatim">sheaf:</tt> URI.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf deposit kpz-uniqueness paper.tex --pdf paper.pdf --new \
+  --extra-source refs.bib --extra-source figures/fig1.pdf=figures/fig1.pdf \
+  --title &quot;Energy solutions of KPZ are unique&quot; \
+  --author &quot;Doe, Jane|Example University&quot; --author &quot;Roe, Richard|Another University&quot; \
+  --abstract-file abstract.txt --keyword &quot;stochastic PDE&quot; \
+  --rights cc-by-4.0 --available 2015-08-31</pre>
+      </div>
+    </div>
+    <p>
+      Any source works (LaTeX, Markdown, &hellip;) with its PDF; a TeXmacs
+      source (<tt class="verbatim">.tm</tt>) needs no PDF, since the archive typesets
+      it. A paper whose sources are lost is deposited as a PDF alone, saying
+      why: <tt class="verbatim">--no-source &quot;the sources are lost&quot;</tt>; <tt
+      class="verbatim">osheaf complete LABEL --version N --source paper.tex</tt> adds
+      them later. Files are kept byte for byte.
+    </p>
+    <p>
+      The options can also come from a YAML or JSON file, with the same names,
+      which is handy for papers with many authors or for several deposits at
+      once (a list in the file):
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf deposit --from kpz.yaml</pre>
+      </div>
+    </div>
+    <div class="language-yaml">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+id: kpz-uniqueness
+source: paper.tex
+pdf: paper.pdf
+extra-sources: [refs.bib]
+title: Energy solutions of KPZ are unique
+authors:
+  - Doe, Jane|Example University
+abstract: |
+  We prove that energy solutions of the KPZ equation are unique.
+rights: cc-by-4.0
+available: 2015-08-31</pre>
+      </div>
+    </div>
+    <h3 id="auto-8"><a id="new-versions"></a>New versions<span style="margin-left: 1em"></span></h3>
+    <p>
+      The same command without <tt class="verbatim">--new</tt> adds a version, signed,
+      to the paper with that label. It keeps the abstract, keywords and
+      licence of the previous version unless you give them again:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf deposit kpz-uniqueness paper.tex --pdf paper.pdf --changes &quot;Typos corrected.&quot; \
+  --title &quot;Energy solutions of KPZ are unique&quot; --author &quot;Doe, Jane|Example University&quot;</pre>
+      </div>
+    </div>
+    <p>
+      Dates follow the specification: <tt class="verbatim">--available</tt> (when this
+      version became public; by default today), <tt class="verbatim">--created</tt> for
+      a version that was not public at the time, <tt class="verbatim">--issued</tt> for
+      the first appearance of the work. A version found later, which belongs
+      earlier in the history, is placed with <tt class="verbatim">--after N</tt>. The
+      publication stage is <tt class="verbatim">--stage</tt> (<tt class="verbatim">AM</tt> for an
+      accepted manuscript, <tt class="verbatim">VoR</tt> for the version of record,
+      &hellip;).
+    </p>
+    <h3 id="auto-9"><a id="notices-corrections-and-withdrawals"></a>Notices, corrections and withdrawals<span style="margin-left: 1em"></span></h3>
+    <p>
+      These change what is said about a paper without changing its files. Each
+      makes a new version that holds only the description.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf notice kpz-uniqueness --about 1 --text &quot;Lemma 2 is wrong as stated; see version 2.&quot;
+osheaf describe kpz-uniqueness --title &quot;Energy solutions of the KPZ equation are unique&quot;
+osheaf relicense kpz-uniqueness --rights cc-by-4.0 --method &quot;confirmed by email&quot;
+osheaf relate kpz-uniqueness --to arxiv:1508.07764 --relation IsIdenticalTo
+osheaf withdraw kpz-uniqueness --reason &quot;Superseded by a joint paper.&quot;</pre>
+      </div>
+    </div>
+    <p>
+      A notice is about one version and stays in every later one (<tt class="verbatim">--file</tt>
+      adds a full statement, such as an erratum). <tt class="verbatim">describe</tt>
+      corrects the title, the abstract, the keywords or the authors. <tt
+      class="verbatim">relicense</tt> records a new licence with the authors' agreement.
+      <tt class="verbatim">relate</tt> links the same work elsewhere (on arXiv, or by a
+      DOI). <tt class="verbatim">withdraw</tt> withdraws the paper: the content stays,
+      no new versions are added, and every page that shows it shows the
+      withdrawal (section <a href="opensheaf-specification-0.2.html#13-withdrawal-takedown-and-tombstones">13</a>).
+    </p>
+    <h3 id="auto-10"><a id="updating-the-archive-and-checking-it"></a>Updating the archive and checking it<span style="margin-left: 1em"></span></h3>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf collect   # a new version of the main catalogue, listing the latest versions
+osheaf index     # rewrite opensheaf.json, the indexes and the website
+osheaf verify    # check everything, as section 14 of the specification asks</pre>
+      </div>
+    </div>
+    <p>
+      The website is written again after every command that changes the
+      archive, so <tt class="verbatim">osheaf index</tt> is only needed to rewrite
+      everything. <tt class="verbatim">osheaf verify</tt> reports errors, warnings and
+      the status of every signature and member; <tt class="verbatim">--remote</tt> also
+      checks the members of your collections held in other archives, and <tt
+      class="verbatim">--json</tt> prints the findings for a program. The same checks
+      can be run on a published archive from the browser, with the <a href="https://opensheaf.org/explorer/">Explorer</a>.
+    </p>
+    <h3 id="auto-11"><a id="publishing"></a>Publishing<span style="margin-left: 1em"></span></h3>
+    <p>
+      An archive is plain files: serve the folder from any static web server,
+      at the address given as <tt class="verbatim">--base-url</tt>. With git and GitHub
+      Pages, the easiest start is the <a href="https://github.com/opensheaf/archive-template">archive template</a>, which has
+      the right <tt class="verbatim">.gitattributes</tt> (so that git keeps every file
+      byte for byte), the workflows and Pages already set up. A folder made
+      with <tt class="verbatim">osheaf init</tt> needs the <tt class="verbatim">.gitattributes</tt>
+      of section <a href="opensheaf-git-0.2.html#41-attributes">4.1</a> of <a href="opensheaf-git-0.2.html">OpenSheaf archives in git</a>
+      before its first commit. Then, after each change:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf verify
+git add -A &amp;&amp; git commit -m &quot;A new version of kpz-uniqueness&quot; &amp;&amp; git push</pre>
+      </div>
+    </div>
+    <p>
+      On GitHub, turn Pages on once (<strong>Settings</strong>,
+      <strong>Pages</strong>, <strong>Deploy from a branch</strong>, <tt
+      class="verbatim">main</tt>, <tt class="verbatim">/ (root)</tt>). The archive is only ever
+      added to: never rewrite the history of a published branch.
+    </p>
+    <h2 id="auto-12"><a id="keys"></a>Keys<span style="margin-left: 1em"></span></h2>
+    <p>
+      The owner's <dfn>key log</dfn> is kept in the archive, and travels with
+      every copy of your papers, so that anyone can check that a version was
+      signed by you (section <a href="opensheaf-specification-0.2.html#6-owners">6</a>). The private keys are never in
+      the archive.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf owner show   # the key log: current keys, rotation keys committed, keeper
+osheaf key list     # what the key wallet holds (never a secret)</pre>
+      </div>
+    </div>
+    <h3 id="auto-13"><a id="a-new-computer"></a>A new computer<span style="margin-left: 1em"></span></h3>
+    <p>
+      With a key wallet, a new computer takes the current key from it:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf key pull     # asks the passphrase (or the passkey), keeps the key here</pre>
+      </div>
+    </div>
+    <p>
+      With the offline level, a new computer makes its own key, which two
+      rotation keys add to the key log:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf key new      # on the new computer: prints its did:key
+osheaf owner rotate --add did:key:z6Mk... \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-1.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-2.txt \
+  --export /Volumes/USB/opensheaf-keys-2 --print</pre>
+      </div>
+    </div>
+    <p>
+      Each rotation uses up the rotation keys that sign it and makes new ones,
+      exported as the first were; destroy the old ones once it is done. <tt
+      class="verbatim">owner rotate --retire DID</tt> retires a key you no longer use.
+    </p>
+    <h3 id="auto-14"><a id="unlocking-with-a-passkey"></a>Unlocking with a passkey<span style="margin-left: 1em"></span></h3>
+    <p>
+      With a key wallet, a <strong>passkey</strong> (Touch ID on a Mac, or a
+      security key) can replace the passphrase:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf key enroll   # once: asks the passphrase, then makes the passkey in the browser
+osheaf key unlock   # on another computer: Touch ID, and the current keys are pulled</pre>
+      </div>
+    </div>
+    <p>
+      <tt class="verbatim">key enroll</tt> opens a page of <a href="https://opensheaf.org/manager/unlock.html">opensheaf.org</a> in
+      the browser, which makes a passkey for OpenSheaf and hands a secret back
+      to <tt class="verbatim">osheaf</tt> on your own computer, encrypted; the keys in
+      the wallet then open with it as well as with the passphrase. A passkey
+      kept in iCloud Keychain is on all your Macs. From then on, whenever <tt
+      class="verbatim">osheaf</tt> needs a key of the wallet, the page asks you to click
+      <strong>Unlock</strong> and for Touch ID. The passphrase remains the way
+      back: <tt class="verbatim">osheaf</tt> asks for it if the page reports an error,
+      after two minutes without an answer, or when you press Ctrl-C while it
+      waits. Run <tt class="verbatim">osheaf key enroll</tt> again after a rotation that
+      did not unlock with the passkey, so that it opens the new keys too. <tt
+      class="verbatim">--no-browser</tt> prints the address instead of opening it.
+    </p>
+    <h3 id="auto-15"><a id="where-the-keys-are-kept"></a>Where the keys are kept<span style="margin-left: 1em"></span></h3>
+    <p>
+      On each computer, the current key is kept in the system's credential
+      store (the macOS keychain), or else in a file under <tt class="verbatim">~/.config/opensheaf/keys</tt>
+      readable only by you. The environment variable <tt class="verbatim">OPENSHEAF_KEY_STORE</tt>
+      chooses: <tt class="verbatim">keyring</tt>, <tt class="verbatim">security</tt> (the macOS
+      keychain through its own command) or <tt class="verbatim">file</tt> use that store
+      alone, and **<tt class="verbatim">none</tt>** keeps no key on the computer at all:
+      every command that signs opens the key from the wallet (one Touch ID, or
+      the passphrase) and forgets it when it ends. <tt class="verbatim">none</tt> needs
+      a key wallet, and suits <tt class="verbatim">uvx</tt>, whose Pythons come and go:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+export OPENSHEAF_KEY_STORE=none</pre>
+      </div>
+    </div>
+    <p>
+      Other variables: <tt class="verbatim">OPENSHEAF_WALLET</tt> names the wallet
+      instead of <tt class="verbatim">osheaf.json</tt> (to keep its name out of a public
+      archive); <tt class="verbatim">OPENSHEAF_PASSPHRASE_COMMAND</tt> names a command
+      that prints the passphrase (for instance <tt class="verbatim">security
+      find-generic-password -w -s opensheaf-passphrase</tt>); <tt class="verbatim">OPENSHEAF_UNLOCK=passphrase</tt>
+      skips the passkey. In a workflow on GitHub, a key of its own, added with
+      <tt class="verbatim">owner rotate --add</tt>, is given in the secret <tt class="verbatim">OPENSHEAF_SIGNING_KEY</tt>;
+      the template's README shows how.
+    </p>
+    <p>
+      A key also moves through a password manager by the clipboard: <tt class="verbatim">osheaf
+      key export --clipboard</tt> (with <tt class="verbatim">--encrypt</tt> to encrypt
+      it under the passphrase), and <tt class="verbatim">osheaf key import
+      --clipboard</tt> on the other computer.
+    </p>
+    <h3 id="auto-16"><a id="moving-up-to-offline"></a>Moving up to offline<span style="margin-left: 1em"></span></h3>
+    <p>
+      A wallet's rotation keys can be replaced by offline ones in one
+      rotation, after which those in the wallet are used up and can be
+      removed:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf owner rotate --keys offline --export /Volumes/USB/opensheaf-keys --print
+osheaf key forget --wallet --used</pre>
+      </div>
+    </div>
+    <h3 id="auto-17"><a id="if-a-computer-is-lost-or-stolen"></a>If a computer is lost or stolen<span style="margin-left: 1em"></span></h3>
+    <p>
+      Its current key must be treated as known to someone else. From another
+      computer, make a new key and <strong>expose</strong> the old one: a new
+      version of the key log, signed by two rotation keys, which a thief
+      holding only the current key cannot contest (section <a href="opensheaf-specification-0.2.html#63-ending-exposed-keys-and-forks">6.3</a>).
+      <tt class="verbatim">osheaf owner show</tt> gives the <tt class="verbatim">did:key</tt> of
+      the lost key.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf key new                                   # prints did:key:NEW
+osheaf owner expose did:key:OLD --add did:key:NEW \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-1.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-2.txt \
+  --export /Volumes/USB/opensheaf-keys-2 --print</pre>
+      </div>
+    </div>
+    <p>
+      With a key wallet, leave out <tt class="verbatim">--rotation-key</tt> and <tt
+      class="verbatim">--export</tt>: the rotation keys are read from the wallet. If the
+      passphrase of the wallet may also be known, move up to offline at the
+      same time (<tt class="verbatim">--keys offline --export DIR</tt>). Versions that
+      only the exposed key signed are now <strong>contested</strong>; if you
+      made them, sign them again with the new key:
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf sign kpz-uniqueness --version v3</pre>
+      </div>
+    </div>
+    <p>
+      Publish the result at once, so that readers learn of the exposure.
+    </p>
+    <h3 id="auto-18"><a id="ending-an-owner"></a>Ending an owner<span style="margin-left: 1em"></span></h3>
+    <p>
+      <tt class="verbatim">osheaf owner end</tt> signs the last version of the key log,
+      with two rotation keys, for instance when the work moves to another
+      owner (<tt class="verbatim">--successor OWNER</tt>), or when rotation keys may
+      have been stolen, which is the one thing an exposure cannot repair; <tt
+      class="verbatim">--expose DID</tt> also exposes keys. An ended owner signs nothing
+      more; what it signed before stays good.
+    </p>
+    <h2 id="auto-19"><a id="collections-and-other-archives"></a>Collections and other archives<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-20"><a id="collections"></a>Collections<span style="margin-left: 1em"></span></h3>
+    <p>
+      A <dfn>collection</dfn> gathers papers of any archive, each pinned to a
+      version (section <a href="opensheaf-specification-0.2.html#8-collections">8</a>). A <strong>catalogue</strong> may
+      follow its papers to their new versions; a <strong>selection</strong>,
+      such as a reading list or a journal issue, lists only the versions you
+      vetted.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf collection new reading --type selection --title &quot;Reading list&quot;
+osheaf collection add reading &quot;sheaf:&lt;name&gt;:&lt;owner&gt;?at=https%3A%2F%2Fother.example%2Fpapers%2F&quot; --revision 2
+osheaf collection add reading kpz-uniqueness --revision 1
+osheaf collection status reading</pre>
+      </div>
+    </div>
+    <p>
+      A member is given by its <tt class="verbatim">sheaf:</tt> URI (shown on its page),
+      with <tt class="verbatim">at</tt> or <tt class="verbatim">--at URL</tt> saying where to find
+      it, or by a label of your own archive; only verified versions are
+      pinned. In a catalogue, <tt class="verbatim">--follow</tt> (or <tt class="verbatim">osheaf
+      collection follow</tt>) follows a paper; <tt class="verbatim">osheaf collection
+      update</tt> then moves it to the latest signed version, and for a
+      selection lists the versions not yet vetted. <tt class="verbatim">collection
+      remove</tt> removes a member or a revision, and <tt class="verbatim">collection
+      sync LABEL --from collection.yaml</tt> writes a whole collection from a
+      file. To show a collection first on the home page, set <tt class="verbatim">&quot;featured&quot;:
+      &quot;reading&quot;</tt> under <tt class="verbatim">index</tt>, <tt class="verbatim">html</tt>
+      in <tt class="verbatim">osheaf.json</tt>.
+    </p>
+    <h3 id="auto-21"><a id="finding-a-paper"></a>Finding a paper<span style="margin-left: 1em"></span></h3>
+    <p>
+      <tt class="verbatim">osheaf resolve</tt> finds and checks what a <tt class="verbatim">sheaf:</tt>
+      URI names, in any archive: every copy found is checked against its
+      owner's key log, and the URI resolves to the latest signed version among
+      the copies that agree (section <a href="opensheaf-specification-0.2.html#123-resolution">12.3</a>).
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf resolve &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://mgubi.org/papers/</pre>
+      </div>
+    </div>
+    <h3 id="auto-22"><a id="mirrors"></a>Mirrors<span style="margin-left: 1em"></span></h3>
+    <p>
+      A library, or a colleague keeping a preservation copy,
+      <strong>mirrors</strong> a paper written elsewhere: a byte-for-byte
+      copy, checked, with its owner's key log (section <a href="opensheaf-specification-0.2.html#11-copies-and-mirrors">11</a>). It is
+      refused unless every version is under an open licence, or you confirm
+      with <tt class="verbatim">--licence-checked</tt> that copying is allowed. <tt
+      class="verbatim">osheaf mirror --all</tt> brings every mirror up to date.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf mirror &quot;sheaf:&lt;name&gt;:&lt;owner&gt;&quot; --at https://mgubi.org/papers/ --label kpz-copy</pre>
+      </div>
+    </div>
+    <h3 id="auto-23"><a id="branches-and-accepted-copies"></a>Branches and accepted copies<span style="margin-left: 1em"></span></h3>
+    <p>
+      A <strong>branch</strong> continues a signed version of someone else's
+      paper as a paper of your own, keeping the evidence of where it started
+      (section <a href="opensheaf-specification-0.2.html#9-branches-and-accepted-copies">9</a>). A journal <strong>accepts</strong> a paper as
+      an accepted copy, a branch listed by one of its selections (section <a
+      href="opensheaf-specification-0.2.html#96-accepted-copies">9.6</a>); its own typeset version is then deposited as a later
+      version of that copy, with <tt class="verbatim">--stage VoR</tt> and <tt class="verbatim">--agreement</tt>.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf branch &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v3&quot; --at https://other.example/papers/ --label kpz-continued
+osheaf accept &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://other.example/papers/ --selection issue-1</pre>
+      </div>
+    </div>
+    <h3 id="auto-24"><a id="key-logs-of-other-owners"></a>Key logs of other owners<span style="margin-left: 1em"></span></h3>
+    <p>
+      <tt class="verbatim">osheaf owner pull URL</tt> compares your copy of an owner's
+      key log with the copy at another archive: it extends yours, or, if the
+      two disagree, records a fork, which freezes that owner.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf owner pull https://other.example/papers/ --owner &lt;owner&gt;</pre>
+      </div>
+    </div>
+    <h3 id="auto-25"><a id="drafts-and-sealing"></a>Drafts and sealing<span style="margin-left: 1em"></span></h3>
+    <p>
+      A <strong>draft</strong> is unsigned work in progress at <tt class="verbatim">draft/&lt;id&gt;/</tt>,
+      listed apart in the discovery document and deleted without a trace
+      (section <a href="opensheaf-specification-0.2.html#10-drafts-and-sealing">10</a>). It takes the options of <tt class="verbatim">deposit</tt>.
+      <strong>Sealing</strong> makes it a signed paper, version 1.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf draft new notes notes.tex --pdf notes.pdf --title &quot;Notes on KPZ&quot; --author &quot;Doe, Jane&quot;
+osheaf draft deposit notes notes.tex --pdf notes.pdf --replace
+osheaf seal notes --label kpz-notes --delete-draft</pre>
+      </div>
+    </div>
+    <h3 id="auto-26"><a id="taking-down"></a>Taking down<span style="margin-left: 1em"></span></h3>
+    <p>
+      <tt class="verbatim">osheaf takedown</tt> deletes an object, leaving a tombstone
+      in the discovery document. It is for what must not be served (by law,
+      for a breach of rights, to erase personal data) or a paper the archive
+      stops keeping, not for a paper that is merely wrong, which is withdrawn
+      instead (section <a href="opensheaf-specification-0.2.html#13-withdrawal-takedown-and-tombstones">13</a>).
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf takedown kpz-notes --reason &quot;Deposited by mistake.&quot;</pre>
+      </div>
+    </div>
+    <h2 id="auto-27"><a id="arxiv-and-zenodo"></a>arXiv and Zenodo<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-28"><a id="importing-from-arxiv"></a>Importing from arXiv<span style="margin-left: 1em"></span></h3>
+    <p>
+      <tt class="verbatim">osheaf arxiv fetch</tt> downloads papers from arXiv, every
+      version with its licence and comments (it needs no archive, and can be
+      run again: what is already downloaded is not fetched again). <tt class="verbatim">osheaf
+      arxiv import</tt> makes one signed paper per arXiv paper, one version
+      per arXiv version, with arXiv's files byte for byte; the labels come
+      from <tt class="verbatim">identifiers.json</tt> in the downloads folder.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf arxiv fetch downloads --author doe_j_1        # or arXiv identifiers
+echo '{&quot;1508.07764&quot;: &quot;kpz-uniqueness&quot;}' &gt; downloads/identifiers.json
+osheaf arxiv import downloads --agreement &quot;deposited by an author&quot;
+osheaf arxiv fetch downloads --refresh 1508.07764    # later: new arXiv versions
+osheaf arxiv import downloads 1508.07764 --update</pre>
+      </div>
+    </div>
+    <p>
+      <tt class="verbatim">--dry-run</tt> shows what would be imported, and <tt class="verbatim">--versions
+      v1,v3</tt> imports only some versions.
+    </p>
+    <h3 id="auto-29"><a id="dois-from-zenodo"></a>DOIs from Zenodo<span style="margin-left: 1em"></span></h3>
+    <p>
+      <tt class="verbatim">osheaf zenodo LABEL</tt> deposits the current version of a
+      paper on Zenodo and records its DOI in a new, signed version (appendix
+      <a href="opensheaf-specification-0.2.html#a1-zenodo-zenodo">A.1</a>). By default it uses the Zenodo
+      <strong>sandbox</strong>, on a copy, leaving the archive unchanged: try
+      it there first. <tt class="verbatim">--production</tt> deposits on zenodo.org for
+      real.
+    </p>
+    <div class="language-bash">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
+osheaf zenodo kpz-uniqueness                  # the sandbox
+osheaf zenodo kpz-uniqueness --production</pre>
+      </div>
+    </div>
+    <p>
+      The tokens are read from <tt class="verbatim">ZENODO_SANDBOX_TOKEN</tt> and <tt
+      class="verbatim">ZENODO_TOKEN</tt>, or from the credential store under <tt class="verbatim">zenodo-sandbox-token</tt>
+      and <tt class="verbatim">zenodo-token</tt>.
+    </p>
+    <h2 id="auto-30"><a id="command-reference"></a>Command reference<span style="margin-left: 1em"></span></h2>
+    <p>
+      <table style="display: inline-table; vertical-align: middle">
+        <tbody><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid; border-top: 1px solid">Command</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-top: 1px solid">What it does</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">init</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">create an archive: <tt class="verbatim">osheaf.json</tt>, storage,
+          owner, main catalogue</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">deposit LABEL SOURCE</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">deposit a paper (<tt class="verbatim">--new</tt>) or a new version
+          of it</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">notice LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">a notice about a version (<tt class="verbatim">--about N</tt>)</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">describe LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">correct the title, abstract, keywords or authors</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">relicense LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">record a new licence, with the authors' agreement</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">relate LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">link the same work elsewhere (arXiv, DOI)</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">withdraw LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">withdraw a paper; the content stays</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">complete LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">add the sources of a version deposited without them</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">collect</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">a new version of the main catalogue, when needed</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">index</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">rewrite <tt class="verbatim">opensheaf.json</tt>, the indexes and
+          the website</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">verify</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">check the archive (<tt class="verbatim">--remote</tt>, <tt class="verbatim">--json</tt>)</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">collection new</tt>, <tt class="verbatim">add</tt>, <tt
+          class="verbatim">remove</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">make a collection, add or remove members</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">collection follow</tt>, <tt class="verbatim">update</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">follow members to their new versions</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">collection status</tt>, <tt class="verbatim">sync</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the status of members; write from a file</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">resolve URI</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">find and check what a <tt class="verbatim">sheaf:</tt> URI
+          names</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">mirror URI</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">copy a paper written elsewhere (<tt class="verbatim">--all</tt>:
+          update every mirror)</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">branch URI</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">continue another owner's version as a paper of yours</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">accept URI</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">an accepted copy, listed by a selection</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">draft new</tt>, <tt class="verbatim">deposit</tt>, <tt
+          class="verbatim">delete</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">unsigned work in progress</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">seal ID</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">seal a draft as a new paper</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">takedown LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">delete an object, leaving a tombstone</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner init</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">make an owner (done by <tt class="verbatim">init
+          --new-owner</tt>)</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner show</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">show the key log</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner rotate</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">add or retire current keys, new rotation keys</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner expose DID</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">declare stolen or leaked keys</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner end</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the last version of the key log</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner pull URL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">meet another copy of a key log</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">sign LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">sign again a version contested by an exposed key</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key new</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">a new current key for this computer</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key push</tt>, <tt class="verbatim">pull</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">current keys to and from the key wallet</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key list</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">what the key wallet holds</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key forget</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">remove keys from this computer (<tt class="verbatim">--wallet</tt>:
+          from the wallet)</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key export</tt>, <tt class="verbatim">import</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">a key to and from a password manager</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key enroll</tt>, <tt class="verbatim">unlock</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">open the keys of the wallet with a passkey</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">arxiv fetch</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">download papers from arXiv</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">arxiv import DOWNLOADS</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">import them, one signed paper each</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">zenodo LABEL</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">a DOI from Zenodo (sandbox, or <tt class="verbatim">--production</tt>)</td>
+        </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">help-config</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">describe <tt class="verbatim">osheaf.json</tt></td>
+        </tr></tbody>
+      </table>
+    </p>
+    <h2 id="auto-31"><a id="where-to-go-next"></a>Where to go next<span style="margin-left: 1em"></span></h2>
+    <ul>
+      <li>
+        <p>
+          To keep an archive from the browser, without the command line: the
+          <a href="https://github.com/opensheaf/archive-template">archive template</a>, whose README also walks through the
+          key ceremony, and the <a href="https://opensheaf.org/manager/">OpenSheaf Manager</a>, which keeps an
+          archive made from the template from a page. Both run <tt class="verbatim">osheaf</tt>
+          for you.
+        </p>
+      </li>
+      <li>
+        <p>
+          To look at an archive and check it: the <a href="https://opensheaf.org/explorer/">Explorer</a>, for
+          instance on the <a href="https://opensheaf.org/explorer/?url=https://mgubi.org/papers/">first archive</a>, <a href="https://mgubi.org/papers/">mgubi.org/papers</a>,
+          which is kept with these tools.
+        </p>
+      </li>
+      <li>
+        <p>
+          To understand how the tools work: the <a href="https://opensheaf.org/opensheaf-py/">literate program</a>,
+          which explains the code along the specification.
+        </p>
+      </li>
+      <li>
+        <p>
+          Problems, questions and ideas about the tools: the <a href="https://github.com/opensheaf/opensheaf-py/issues">issues
+          of opensheaf-py</a>; about the format: the <a href="https://github.com/opensheaf/opensheaf.github.io/issues">issues of the
+          specification</a>.
+        </p>
+      </li>
+    </ul>
+  </body>
+</html>

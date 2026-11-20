@@ -258,7 +258,8 @@ evidence (a timestamp) dates them before. A fork **freezes** the owner:
 archives that know of it add nothing more to its lines, unless such evidence
 dates it before the fork, and the work continues under a successor; after an
 ending without a fork, archives take the owner's lines only from copies, never
-as new deposits.
+as new deposits. [The command-line tools](TOOLS.md#if-a-computer-is-lost-or-stolen)
+show what to do when a computer is lost or stolen.
 
 ## Who answers for an owner?
 
@@ -391,7 +392,10 @@ those held in the archive in every earlier version (optionally, those held
 elsewhere). It reports errors (breaches of what
 the specification requires), warnings, and results that are neither (the
 status of each signature and member, forks, ended owners, withdrawals). The
-specification (section 14) lists the checks.
+specification (section 14) lists the checks. `osheaf verify` runs them on
+an archive on your computer, and the
+[Explorer](https://opensheaf.org/explorer/) on a published one (see [the
+command-line tools](TOOLS.md#updating-the-archive-and-checking-it)).
 
 ## Is the format stable?
 

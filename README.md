@@ -105,7 +105,8 @@ on GitHub, and archives made with them.
   across archives, mirrors objects and keeps accepted copies of vetted
   versions, writes the discovery document and a website with landing pages,
   deposits on Zenodo, imports from arXiv, and verifies an archive (also with
-  the JSON Schemas and the `ocfl-py` validator).
+  the JSON Schemas and the `ocfl-py` validator). [The command-line
+  tools](TOOLS.md) shows how to use it, task by task.
 - **Explorer:** the [OpenSheaf Explorer](https://opensheaf.org/explorer/)
   ([opensheaf/explorer](https://github.com/opensheaf/explorer), also a
   [literate program](https://opensheaf.org/explorer/source/)) shows an
@@ -143,6 +144,8 @@ on GitHub, and archives made with them.
 - [`FAQ.md`](FAQ.md): answers to common questions about the design.
 - [`USE-CASES.md`](USE-CASES.md): how the specification adapts to authors,
   archives and selections (non-normative).
+- [`TOOLS.md`](TOOLS.md): how to keep an archive with the `osheaf`
+  command (non-normative).
 - [`FORMAL-MODEL.md`](FORMAL-MODEL.md): the formal model of the specification
   in Lean, with glimpses of its code and theorems (non-normative).
 - [`opensheaf-git-0.2.md`](opensheaf-git-0.2.md): OpenSheaf archives in git,
@@ -179,6 +182,7 @@ on GitHub, and archives made with them.
   [`opensheaf-specification-0.2.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.2.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-specification-0.2.html),
   [`faq.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.tm)/[`faq.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/faq.html),
   [`use-cases.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.tm)/[`use-cases.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/use-cases.html),
+  [`tools.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/tools.tm)/[`tools.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/tools.html),
   [`opensheaf-git-0.2.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.2.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-git-0.2.html),
   [`opensheaf-timestamps-0.2.tm`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.2.tm)/[`.html`](https://github.com/opensheaf/opensheaf.github.io/blob/main/opensheaf-timestamps-0.2.html),
   and those of version 0.1: the pages of the site,

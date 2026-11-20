@@ -24,8 +24,8 @@
     <div class="notes-header">
       <p>
         [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.2.html">specification</a>] [<a href="use-cases.html">use
-        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="formal-model.html">formal model</a>] [<a href="https://mgubi.org/papers/">first
-        archive</a>]<em class="notes-header-name">OpenSheaf</em>
+        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="tools.html">tools</a>] [<a href="formal-model.html">formal
+        model</a>] [<a href="https://mgubi.org/papers/">first archive</a>]<em class="notes-header-name">OpenSheaf</em>
       </p>
     </div>
     <h1 id="auto-1">OpenSheaf: frequently asked questions<span style="margin-left: 1em"></span></h1>
@@ -318,7 +318,8 @@
       nothing more to its lines, unless such evidence dates it before the
       fork, and the work continues under a successor; after an ending without
       a fork, archives take the owner's lines only from copies, never as new
-      deposits.
+      deposits. <a href="tools.html#if-a-computer-is-lost-or-stolen">The command-line tools</a> show what to do when a
+      computer is lost or stolen.
     </p>
     <h2 id="auto-21"><a id="who-answers-for-an-owner"></a>Who answers for an owner?<span style="margin-left: 1em"></span></h2>
     <p>
@@ -465,7 +466,9 @@
       (optionally, those held elsewhere). It reports errors (breaches of what
       the specification requires), warnings, and results that are neither (the
       status of each signature and member, forks, ended owners, withdrawals).
-      The specification (section 14) lists the checks.
+      The specification (section 14) lists the checks. <tt class="verbatim">osheaf
+      verify</tt> runs them on an archive on your computer, and the <a href="https://opensheaf.org/explorer/">Explorer</a>
+      on a published one (see <a href="tools.html#updating-the-archive-and-checking-it">the command-line tools</a>).
     </p>
     <h2 id="auto-31"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
     <p>

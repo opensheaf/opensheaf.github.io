@@ -19,7 +19,8 @@ notes are for anyone, person or agent, changing it.
 - Edit only the Markdown sources: `README.md` (also the home page),
   `opensheaf-specification-0.2.md`, `FAQ.md`, `USE-CASES.md`,
   `FORMAL-MODEL.md` (the formal model in Lean, whose code is quoted from
-  `opensheaf/opensheaf-lean` and kept in step with it),
+  `opensheaf/opensheaf-lean` and kept in step with it), `TOOLS.md` (the
+  `osheaf` command, kept in step with `opensheaf/opensheaf-py`),
   `opensheaf-git-0.2.md` (archives in git, a companion to the
   specification), `opensheaf-timestamps-0.2.md` (the timestamps extension);
   and the schemas `schemas/opensheaf-*-0.2.schema.json`.

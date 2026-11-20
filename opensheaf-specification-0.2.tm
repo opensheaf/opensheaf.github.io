@@ -128,7 +128,7 @@
 
     <item>version directories MUST NOT be zero-padded (<verbatim|v1>, not <verbatim|v001>);
 
-    <item>logical paths MUST be in UTF-8 and Unicode normalisation form C, and MUST NOT begin or end with <verbatim|/>, or contain empty, <verbatim|.> or <verbatim|..> segments, or <verbatim|\\>.
+    <item>logical paths MUST be in UTF-8 and Unicode normalisation form C, and MUST NOT begin or end with <verbatim|/>, or contain empty, <verbatim|.> or <verbatim|.<no-break>.> segments, or <verbatim|\\>.
   </itemize>
 
   <strong|Deposits.> Each version in the inventory MUST have a <verbatim|user> with a <verbatim|name>, SHOULD give its <verbatim|address> (an ORCID iD, a <verbatim|mailto:> URI or another URI identifying the depositor), and MUST have a <verbatim|message> describing the change, except the first version of a key log, which has neither (section 6.1). The <verbatim|created> date and <verbatim|user> of an object version record its <dfn|deposit>, not repeated in <verbatim|object.json>; the deposit of a document version is that of the first object version holding it.
@@ -429,7 +429,7 @@
 
   <subsection*|6.6 Keepers><label|66-keepers>
 
-  An owner MAY name, in <verbatim|keeper> of its genesis record (section 5.1), a single person or institution who answers for it, as a list of one URI: an ORCID iD (<verbatim|https://orcid.org/...>), whose last character is a check digit (ISO 7064 MOD 11-2) that verifiers check (section 14.3), since no schema pattern can, or a domain written as <verbatim|https://\<less\>domain\<gtr\>/>. The keeper is fixed by the owner name: no version of the key log names or changes it, and another keeper means another owner. The keeper MAY confirm it, in a place only the keeper controls: a link naming the owner in its ORCID record, or the file <verbatim|https://\<less\>domain\<gtr\>/.well-known/opensheaf> on its domain, a JSON object with <verbatim|format> <verbatim|"opensheaf-keeper/0.2">, <verbatim|owners>, the owner names it answers for, and OPTIONALLY <verbatim|successors>, an object mapping owner names it answers for to their successors (on ORCID, a link naming both).
+  An owner MAY name, in <verbatim|keeper> of its genesis record (section 5.1), a single person or institution who answers for it, as a list of one URI: an ORCID iD (<verbatim|https://orcid.org/.<no-break>.<no-break>.>), whose last character is a check digit (ISO 7064 MOD 11-2) that verifiers check (section 14.3), since no schema pattern can, or a domain written as <verbatim|https://\<less\>domain\<gtr\>/>. The keeper is fixed by the owner name: no version of the key log names or changes it, and another keeper means another owner. The keeper MAY confirm it, in a place only the keeper controls: a link naming the owner in its ORCID record, or the file <verbatim|https://\<less\>domain\<gtr\>/.well-known/opensheaf> on its domain, a JSON object with <verbatim|format> <verbatim|"opensheaf-keeper/0.2">, <verbatim|owners>, the owner names it answers for, and OPTIONALLY <verbatim|successors>, an object mapping owner names it answers for to their successors (on ORCID, a link naming both).
 
   <strong|Successors.> An owner has at most one <dfn|accepted successor>: the one named by an ending version of its key log before any fork point (section 6.3); failing that, the one its keeper names in the place it controls, as above. The keeper MAY name one for an owner that can no longer change its key log (fewer than <verbatim|nextThreshold> rotation keys left), that a fork has ended, or that ended without naming one; that successor is reported as named by the keeper, and does not by itself end the owner. Any other successor, named in a version of either side of a fork from the fork point on, or by the keeper when an ending version before any fork point names another, is reported as a claim.
 
@@ -1699,7 +1699,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "rightsIdentifier": "cc-by-4.0", "rightsIdentifierScheme": "SPDX" } ],
 
-    \ \ "descriptions": [ { "description": "We present a new, simple ...",
+    \ \ "descriptions": [ { "description": "We present a new, simple .<no-break>.<no-break>.",
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "descriptionType": "Abstract" } ],
 

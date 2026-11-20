@@ -4,7 +4,8 @@
 README.md becomes the home page (index.tm, index.html), the specification
 opensheaf-specification-0.2.md (the current draft) its own page, FAQ.md the
 page faq.html, USE-CASES.md the page use-cases.html, FORMAL-MODEL.md the
-page formal-model.html (the formal model in Lean), and the companions
+page formal-model.html (the formal model in Lean), TOOLS.md the page
+tools.html (the osheaf command), and the companions
 opensheaf-git-0.2.md (archives in git) and opensheaf-timestamps-0.2.md (the
 timestamps extension) their own pages. Version 0.1, kept as published
 (opensheaf-specification-0.1.md and opensheaf-git-0.1.md), is built too.
@@ -41,6 +42,7 @@ PAGES = {
     "FAQ.md": "faq.tm",
     "USE-CASES.md": "use-cases.tm",
     "FORMAL-MODEL.md": "formal-model.tm",
+    "TOOLS.md": "tools.tm",
     "opensheaf-git-0.2.md": "opensheaf-git-0.2.tm",
     "opensheaf-timestamps-0.2.md": "opensheaf-timestamps-0.2.tm",
     # version 0.1, kept as published

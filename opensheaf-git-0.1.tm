@@ -235,7 +235,7 @@
     <item>move to a host with other limits, or to its own server.
   </itemize>
 
-  Tools working on a large archive MAY use a partial clone (<verbatim|git clone --filter=blob:none>) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the flat-direct layout reaches its limits first: every deposit rewrites the tree of <verbatim|ocfl/>, which lists every object, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 5 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19>.)
+  Tools working on a large archive MAY use a partial clone (<verbatim|git clone -<no-break>-filter=blob:none>) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the flat-direct layout reaches its limits first: every deposit rewrites the tree of <verbatim|ocfl/>, which lists every object, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 5 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19>.)
 
   <section*|9. Takedown><label|9-takedown>
 
@@ -246,7 +246,7 @@
   <\enumerate>
     <item>commit the removal of the object folder and the tombstone, as in section 5.1, item 6;
 
-    <item>rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with <verbatim|git filter-repo --invert-paths --path ocfl/\<less\>path\<gtr\>/>, with the object's path in the layout);
+    <item>rewrite the history of every branch of the repository to remove the object's files from every commit (for instance with <verbatim|git filter-repo -<no-break>-invert-paths -<no-break>-path ocfl/\<less\>path\<gtr\>/>, with the object's path in the layout);
 
     <item>force-push the rewritten branches, and delete tags that point to commits holding the files;
 

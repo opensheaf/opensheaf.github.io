@@ -24,8 +24,8 @@
     <div class="notes-header">
       <p>
         [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.2.html">specification</a>] [<a href="use-cases.html">use
-        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="formal-model.html">formal model</a>] [<a href="https://mgubi.org/papers/">first
-        archive</a>]<em class="notes-header-name">OpenSheaf</em>
+        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="tools.html">tools</a>] [<a href="formal-model.html">formal
+        model</a>] [<a href="https://mgubi.org/papers/">first archive</a>]<em class="notes-header-name">OpenSheaf</em>
       </p>
     </div>
     <h1 id="auto-1">A formal model in Lean<span style="margin-left: 1em"></span></h1>
@@ -132,10 +132,10 @@ structure Pin (D : Type) where
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 inductive Step : World D &rarr; World D &rarr; Prop
-  | newArchive &hellip;
-  | create &hellip;
-  | append &hellip;
-  | witness &hellip;</pre>
+  | newArchive ...
+  | create ...
+  | append ...
+  | witness ...</pre>
       </div>
     </div>
     <p>

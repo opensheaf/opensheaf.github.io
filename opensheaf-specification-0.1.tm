@@ -187,7 +187,7 @@
 
   Each version in the inventory MUST have a <verbatim|user> with a <verbatim|name>, and SHOULD have an <verbatim|address> (an ORCID iD, a <verbatim|mailto:> URI or another URI identifying the depositor), and MUST have a <verbatim|message> describing the change. The inventory is the record of deposits: the <verbatim|created> date and the <verbatim|user> of an object version are when and by whom it was deposited, and the deposit of a document version is that of the first object version holding it. They are not repeated in <verbatim|object.json>.
 
-  Logical paths MUST be encoded in UTF-8 in Unicode normalisation form C, MUST NOT begin with <verbatim|/>, and MUST NOT contain <verbatim|.> or <verbatim|..> segments.
+  Logical paths MUST be encoded in UTF-8 in Unicode normalisation form C, MUST NOT begin with <verbatim|/>, and MUST NOT contain <verbatim|.> or <verbatim|.<no-break>.> segments.
 
   <subsection*|7.2 Documents><label|72-documents>
 
@@ -496,7 +496,7 @@
   <section*|15. Security considerations><label|15-security-considerations>
 
   <\itemize>
-    <item><strong|Untrusted inventories.> Inventories, logical paths and member lists from other archives are untrusted input. Verifiers MUST reject logical paths that break the rules of section 7.1 (absolute, with <verbatim|.> or <verbatim|..> segments, not in Unicode normalisation form C), and SHOULD limit the size of the files they fetch.
+    <item><strong|Untrusted inventories.> Inventories, logical paths and member lists from other archives are untrusted input. Verifiers MUST reject logical paths that break the rules of section 7.1 (absolute, with <verbatim|.> or <verbatim|.<no-break>.> segments, not in Unicode normalisation form C), and SHOULD limit the size of the files they fetch.
 
     <item><strong|Archives of sources.> Tools unpacking source archives (appendix A) MUST guard against paths leaving the target folder and against archives that expand to excessive sizes.
 
@@ -637,11 +637,11 @@
 
     \ \ \ \ { "id": "fractional-phi42-mass-gap", "kind": "document", "head": "v1",
 
-    \ \ \ \ \ \ "inventorySha512": "9a0c...", "status": "active" },
+    \ \ \ \ \ \ "inventorySha512": "9a0c.<no-break>.<no-break>.", "status": "active" },
 
     \ \ \ \ { "id": "collection-papers", "kind": "collection", "head": "v1",
 
-    \ \ \ \ \ \ "inventorySha512": "51be...", "status": "active" }
+    \ \ \ \ \ \ "inventorySha512": "51be.<no-break>.<no-break>.", "status": "active" }
 
     \ \ ]
 
@@ -729,7 +729,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "rightsIdentifier": "cc-by-4.0", "rightsIdentifierScheme": "SPDX" } ],
 
-    \ \ "descriptions": [ { "description": "We present a new, simple ...", "descriptionType": "Abstract" } ],
+    \ \ "descriptions": [ { "description": "We present a new, simple .<no-break>.<no-break>.", "descriptionType": "Abstract" } ],
 
     \ \ "formats": [ "application/x-texmacs", "application/pdf" ],
 
@@ -749,7 +749,7 @@
 
     \ \ "format": "opensheaf-object/0.1",
 
-    \ \ ...
+    \ \ .<no-break>.<no-break>.
 
     \ \ "documentVersion": 3,
 
@@ -801,7 +801,7 @@
 
     \ \ \ \ \ \ "version": "v3",
 
-    \ \ \ \ \ \ "inventorySha512": "9a0c...",
+    \ \ \ \ \ \ "inventorySha512": "9a0c.<no-break>.<no-break>.",
 
     \ \ \ \ \ \ "follow": "latest",
 
@@ -837,9 +837,9 @@
 
     \ \ \ \ \ \ "revisions": [
 
-    \ \ \ \ \ \ \ \ { "documentVersion": 2, "version": "v2", "inventorySha512": "4f1e..." },
+    \ \ \ \ \ \ \ \ { "documentVersion": 2, "version": "v2", "inventorySha512": "4f1e.<no-break>.<no-break>." },
 
-    \ \ \ \ \ \ \ \ { "documentVersion": 3, "version": "v4", "inventorySha512": "c07a..." } ],
+    \ \ \ \ \ \ \ \ { "documentVersion": 3, "version": "v4", "inventorySha512": "c07a.<no-break>.<no-break>." } ],
 
     \ \ \ \ \ \ "cite": { "title": "Quantum network discrimination", "creators": ["C. Hirche"], "year": 2021 } },
 
@@ -851,7 +851,7 @@
 
     \ \ \ \ \ \ "id": "collection-seminar-2026",
 
-    \ \ \ \ \ \ "revisions": [ { "documentVersion": 3, "version": "v3", "inventorySha512": "7d21..." } ] }
+    \ \ \ \ \ \ "revisions": [ { "documentVersion": 3, "version": "v3", "inventorySha512": "7d21.<no-break>.<no-break>." } ] }
 
     \ \ ]
 
@@ -891,7 +891,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "label": "network-discrimination v2",
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "files": [ { "name": "inventory.json", "sha512": "4f1e..." } ] } ],
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "files": [ { "name": "inventory.json", "sha512": "4f1e.<no-break>.<no-break>." } ] } ],
 
     \ \ "status": "active"
 

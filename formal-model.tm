@@ -67,13 +67,13 @@
   <\verbatim-code>
     inductive Step : World D \<rightarrow\> World D \<rightarrow\> Prop
 
-    \ \ \| newArchive ...
+    \ \ \| newArchive .<no-break>.<no-break>.
 
-    \ \ \| create ...
+    \ \ \| create .<no-break>.<no-break>.
 
-    \ \ \| append ...
+    \ \ \| append .<no-break>.<no-break>.
 
-    \ \ \| witness ...
+    \ \ \| witness .<no-break>.<no-break>.
   </verbatim-code>
   </html-div-class>
 

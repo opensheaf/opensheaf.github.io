@@ -53,19 +53,19 @@
 
     osheaf deposit kpz-uniqueness paper.tex \\
 
-    \ \ --pdf paper.pdf \\
+    \ \ -<no-break>-pdf paper.pdf \\
 
-    \ \ --extra-source refs.bib \\
+    \ \ -<no-break>-extra-source refs.bib \\
 
-    \ \ --extra-source figures/fixed-point.pdf=figures/fixed-point.pdf \\
+    \ \ -<no-break>-extra-source figures/fixed-point.pdf=figures/fixed-point.pdf \\
 
-    \ \ --title "Uniqueness of the KPZ fixed point" \\
+    \ \ -<no-break>-title "Uniqueness of the KPZ fixed point" \\
 
-    \ \ --author "Doe, Jane\|University of Example" \\
+    \ \ -<no-break>-author "Doe, Jane\|University of Example" \\
 
-    \ \ --rights cc-by-4.0 \\
+    \ \ -<no-break>-rights cc-by-4.0 \\
 
-    \ \ --stage AO
+    \ \ -<no-break>-stage AO
 
 
 
@@ -75,21 +75,21 @@
 
     osheaf deposit kpz-uniqueness paper.tex \\
 
-    \ \ --pdf paper.pdf \\
+    \ \ -<no-break>-pdf paper.pdf \\
 
-    \ \ --extra-source refs.bib \\
+    \ \ -<no-break>-extra-source refs.bib \\
 
-    \ \ --extra-source figures/fixed-point.pdf=figures/fixed-point.pdf \\
+    \ \ -<no-break>-extra-source figures/fixed-point.pdf=figures/fixed-point.pdf \\
 
-    \ \ --title "Uniqueness of the KPZ fixed point" \\
+    \ \ -<no-break>-title "Uniqueness of the KPZ fixed point" \\
 
-    \ \ --author "Doe, Jane\|University of Example" \\
+    \ \ -<no-break>-author "Doe, Jane\|University of Example" \\
 
-    \ \ --rights cc-by-4.0 \\
+    \ \ -<no-break>-rights cc-by-4.0 \\
 
-    \ \ --changes "Corrected the proof of Lemma 3; new appendix." \\
+    \ \ -<no-break>-changes "Corrected the proof of Lemma 3; new appendix." \\
 
-    \ \ --stage AM
+    \ \ -<no-break>-stage AM
 
 
 
@@ -97,9 +97,9 @@
 
     osheaf notice kpz-uniqueness \\
 
-    \ \ --about 1 \\
+    \ \ -<no-break>-about 1 \\
 
-    \ \ --text "Lemma 3 is wrong as stated; corrected in version 2."
+    \ \ -<no-break>-text "Lemma 3 is wrong as stated; corrected in version 2."
 
 
 
@@ -109,9 +109,9 @@
 
     # versions of papers already in the archive
 
-    osheaf arxiv fetch downloads --refresh
+    osheaf arxiv fetch downloads -<no-break>-refresh
 
-    osheaf arxiv import downloads --update
+    osheaf arxiv import downloads -<no-break>-update
 
 
 
@@ -175,7 +175,7 @@
 
     # in one step)
 
-    osheaf collection sync preserved --from preserved.yaml
+    osheaf collection sync preserved -<no-break>-from preserved.yaml
 
 
 
@@ -187,7 +187,7 @@
 
     osheaf index
 
-    osheaf verify --remote
+    osheaf verify -<no-break>-remote
   </verbatim-code>
   </html-div-class>
 
@@ -231,7 +231,7 @@
 
   <\html-div-class|language-bash>
   <\verbatim-code>
-    # keep an accepted copy of the version the editors vetted; --version names
+    # keep an accepted copy of the version the editors vetted; -<no-break>-version names
 
     # the object version vetted (vN in the authors' storage), not the document
 
@@ -239,11 +239,11 @@
 
     osheaf accept https://authors.example.org/ network-discrimination \\
 
-    \ \ --version v3 \\
+    \ \ -<no-break>-version v3 \\
 
-    \ \ --stage VoR \\
+    \ \ -<no-break>-stage VoR \\
 
-    \ \ --agreement "the journal's publication terms"
+    \ \ -<no-break>-agreement "the journal's publication terms"
 
 
 
@@ -255,7 +255,7 @@
 
     # collection.
 
-    osheaf collection sync issue-7 --from issue-7.yaml
+    osheaf collection sync issue-7 -<no-break>-from issue-7.yaml
   </verbatim-code>
   </html-div-class>
 
@@ -296,7 +296,7 @@
   <\itemize>
     <item><strong|Two documents, not one.> Each has its own versions, licence and history: the detailed argument may change often (a gap closed, a step expanded after a machine check) while the account stays as it is. Each is a line of hers, with the labels <verbatim|kpz-account> and <verbatim|kpz-details>. The detailed argument says how it was made in its <verbatim|datacite.json> (a description of type <verbatim|Methods>: the AI system and its version, what the authors checked and how), and lists in its <verbatim|toolchain> the tools needed to rebuild it and its formal checks; its creators are the persons who answer for it.
 
-    <item><strong|The account focuses on the detailed argument.> The core of the format has no relation of this kind, and needs none: the link is made from inside. The account cites, in its text, the exact object version of the detailed argument, as a <verbatim|sheaf:> URI with the digest of its inventory (<verbatim|sheaf:\<less\>name\<gtr\>/v3?sha512=...>, section 12.1), and its <verbatim|datacite.json> links that URI with <verbatim|IsSupplementedBy>; the detailed argument may link back with <verbatim|IsSupplementTo>, added by a description-only version. Since the digest is in the account's own files, a pin of the account fixes the detailed argument too: the hash tree goes on through the link, though only readers, and tools that read the text, see it.
+    <item><strong|The account focuses on the detailed argument.> The core of the format has no relation of this kind, and needs none: the link is made from inside. The account cites, in its text, the exact object version of the detailed argument, as a <verbatim|sheaf:> URI with the digest of its inventory (<verbatim|sheaf:\<less\>name\<gtr\>/v3?sha512=.<no-break>.<no-break>.>, section 12.1), and its <verbatim|datacite.json> links that URI with <verbatim|IsSupplementedBy>; the detailed argument may link back with <verbatim|IsSupplementTo>, added by a description-only version. Since the digest is in the account's own files, a pin of the account fixes the detailed argument too: the hash tree goes on through the link, though only readers, and tools that read the text, see it.
 
     <item><strong|The journal vets the pair.> Its issue is a <strong|selection> whose member is the account: an accepted copy of the vetted revision, or the journal's own version of record made from it. The detailed argument is not published by the journal, but the version it reviewed is fixed by the account's pin. So that plain verifiers check it as well, the journal may keep a second selection beside the issue (say <verbatim|issue-7-details>), pinning the revisions of the detailed arguments it reviewed.
 
@@ -311,15 +311,15 @@
 
     # argument, and lists both in selections (issue-7.yaml, issue-7-details.yaml)
 
-    osheaf accept https://authors.example.org/ kpz-account --version v3 --stage VoR \\
+    osheaf accept https://authors.example.org/ kpz-account -<no-break>-version v3 -<no-break>-stage VoR \\
 
-    \ \ --agreement "the journal's publication terms"
+    \ \ -<no-break>-agreement "the journal's publication terms"
 
     osheaf mirror https://authors.example.org/ kpz-details
 
-    osheaf collection sync issue-7 --from issue-7.yaml
+    osheaf collection sync issue-7 -<no-break>-from issue-7.yaml
 
-    osheaf collection sync issue-7-details --from issue-7-details.yaml
+    osheaf collection sync issue-7-details -<no-break>-from issue-7-details.yaml
   </verbatim-code>
   </html-div-class>
 
@@ -347,7 +347,7 @@
 
     \ \ \ \ \ \ \ \ "revisions": [
 
-    \ \ \ \ \ \ \ \ \ \ { "documentVersion": 3, "version": "v3", "inventorySha512": "9f2c..." }
+    \ \ \ \ \ \ \ \ \ \ { "documentVersion": 3, "version": "v3", "inventorySha512": "9f2c.<no-break>.<no-break>." }
 
     \ \ \ \ \ \ \ \ ]
 

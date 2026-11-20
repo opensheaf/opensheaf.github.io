@@ -24,8 +24,8 @@
     <div class="notes-header">
       <p>
         [<a href="index.html">OpenSheaf</a>] [<a href="opensheaf-specification-0.2.html">specification</a>] [<a href="use-cases.html">use
-        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="formal-model.html">formal model</a>] [<a href="https://mgubi.org/papers/">first
-        archive</a>]<em class="notes-header-name">OpenSheaf</em>
+        cases</a>] [<a href="faq.html">FAQ</a>] [<a href="tools.html">tools</a>] [<a href="formal-model.html">formal
+        model</a>] [<a href="https://mgubi.org/papers/">first archive</a>]<em class="notes-header-name">OpenSheaf</em>
       </p>
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
@@ -615,7 +615,7 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
     </ul>
     <p>
       Tools working on a large archive MAY use a partial clone (<tt class="verbatim">git
-      clone &ndash;filter=blob:none</tt>) or a sparse checkout, since adding a
+      clone --filter=blob:none</tt>) or a sparse checkout, since adding a
       version to an object needs only that object's folder and the discovery
       document. In git, the flat-direct layout reaches its limits first: every
       deposit rewrites the tree of <tt class="verbatim">ocfl/</tt>, which lists every
@@ -649,8 +649,8 @@ witnesses/**   -text -filter -ident -working-tree-encoding -export-subst -merge<
         <p>
           rewrite the history of every branch of the repository to remove the
           object's files from every commit (for instance with <tt class="verbatim">git
-          filter-repo &ndash;invert-paths &ndash;path ocfl/&lt;path&gt;/</tt>,
-          with the object's path in the layout);
+          filter-repo --invert-paths --path ocfl/&lt;path&gt;/</tt>, with the
+          object's path in the layout);
         </p>
       </li>
       <li>
