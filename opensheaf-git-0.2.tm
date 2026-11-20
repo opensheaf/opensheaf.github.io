@@ -320,7 +320,7 @@
 
     <item><strong|Scale> (section 8): indexes and the size of git trees for very large archives, in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19> and <hlink|issue #32|https://github.com/opensheaf/opensheaf.github.io/issues/32>.
 
-    <item><strong|Objects held by others> (<hlink|issue #13|https://github.com/opensheaf/opensheaf.github.io/issues/13>): whether objects controlled by their authors and kept by custodians call for one repository per object, and how such repositories make up an archive without submodules.
+    <item><strong|Objects held by others> (<hlink|issue #39|https://github.com/opensheaf/opensheaf.github.io/issues/39>): whether objects controlled by their authors and kept by custodians call for one repository per object, and how such repositories make up an archive without submodules.
   </enumerate>
 
   <section*|14. Changelog><label|14-changelog>
@@ -341,6 +341,8 @@
     <item><strong|0.2 (draft), 19 November 2026:> named version 0.2, with version 0.2 of the specification; version 0.1 kept as published; links to the specification and the timestamps extension set to 0.2.
 
     <item><strong|0.2 (draft), 20 November 2026:> GitHub Pages sets no <verbatim|Content-Security-Policy>, so it cannot sandbox the files of objects as section 15.3 of the specification recommends (section 7.2).
+
+    <item><strong|0.2 (draft), 20 November 2026:> open question 6 pointed to issue #39 (custodians' copies), issue #13 being closed.
   </itemize>
 
 </body>

@@ -125,6 +125,11 @@ The sources, the renditions and the change note (`changes`, section 4.3) are the
 
 **Notices.** A <dfn>notice</dfn> is a statement about a document version made after it, since the version cannot change (that a theorem of version 2 is wrong as stated, and corrected in version 3). Notices are added to `notices` by description-only versions, and stay, unchanged, in every later object version (for a branch whose branch point moves, see section 9); a notice is corrected or withdrawn only by a later notice. Presentations showing a document version SHOULD show the current notices about it.
 
+**Open questions.**
+
+- What a description-only version may change: which fields of `object.json` besides the state and the notices (`external`, the licence, `toolchain`, the media types of renditions), and whether a description-only version of a collection may hold an earlier member list (#24).
+- How notices are identified, so that a later notice can correct or withdraw an earlier one, what makes a notice current, and what its `date` is (#26).
+
 ### 4.3 The object record: object.json
 
 Every object version MUST contain `object.json`, the record of the object's identity, content, versions and state; it names no archive. It MUST contain:
@@ -328,7 +333,7 @@ When a keeper is named, a verifier MAY check both directions, and reports the li
 - The field names of `keys.json`, among them `next`, `nextThreshold` and `exposed` (#55).
 - Pre-rotation, provisional (#58; `drafts/keys-and-forks.md` and `drafts/federated-identity.md` on `main`): weighted thresholds for groups, as KERI's; witnesses that record which version of a key log they saw first, as an extension; and what a reader holding only one side of a fork can know.
 - Whether exposing keys from when an archive learns of it, rather than dating signatures (revocation dated by trusted time, transparency logs), is enough against backdating (#55, #58).
-- The form of a keeper's confirmation on ORCID, which depends on an `https` form of `sheaf:<owner>`, and so on the gateway (section 12; #13, #35).
+- The form of a keeper's confirmation on ORCID, which depends on an `https` form of `sheaf:<owner>`, and so on the gateway (section 12; #35).
 
 ## 7. Lines and signatures
 
@@ -701,7 +706,7 @@ Expansions may differ between resolvers and over time, so every file defined by 
 
 **Copies, forks and ended owners.** Since a copy that stops early looks complete, a resolver uses the latest signed version among the copies it found that agree (section 7.4), and says where it found them. A fork of the line (section 7.4) is reported with the status of each side; the resolver uses only signed versions and does not choose between signed sides. A fork of a key log is not one of a line: it ends and freezes the owner (sections 6.3 and 7.5), and signatures naming versions of either side are checked against them, wherever held, the versions they sign being contested from the fork point on (section 7.3). A resolver reports an owner that has ended, by an ending version or a fork, or has exposed keys (section 6.3), with any successor, its own or named by its keeper (section 6.6), and never follows a successor by itself.
 
-**Tombstones.** A tombstone (section 13) is not signed: a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
+**Tombstones.** Provisionally (#66): a tombstone (section 13) is not signed, and a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
 
 **External records.** A deposit with an external service (`external`, section 4.3; appendix A) or a software archive snapshot is a witness (section 7.2), not a copy: it holds no inventory, so it is never checked against a pin and resolves nothing; a resolver MAY report it as a place where the files may be found. A snapshot holding an archive's storage root (an archive kept in git) is read as that archive.
 
@@ -736,9 +741,9 @@ A gateway serves a URI at its base URL followed by the URI unchanged (`https://o
 
 - Registering the scheme `sheaf` with IANA, as a provisional scheme (RFC 7595), until which DataCite records `sheaf:` URIs as `URL` (section 4.4) (#36).
 - Whether the project runs a gateway, on which domain, and whether a domain used only for resolution drops `sheaf:` from the path, as `https://doi.org/` drops `doi:` (#35).
-- Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#13, #20).
+- Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#20).
 - Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's `swhid`) (#22).
-- Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13).
+- Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13; #66).
 - The numbering of document versions on a branch, which `/v<n>` follows (section 9; #57).
 
 ## 13. Withdrawal, takedown and tombstones
@@ -773,7 +778,7 @@ A tombstone is never removed, except when its line returns: it keeps the line ta
 
 **Open questions.**
 
-- Whether a tombstone in one archive stops resolution at copies elsewhere, and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
+- Whether a tombstone in one archive stops resolution at copies elsewhere (#66), and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
 - The form of an owner's signed request for a takedown, and of a keeper's (#33).
 - Whether a tombstone lists the inventory digests of every version taken down, so that a pin of a removed version is told from a pin that never named one; meanwhile the archive's `sha512/` index keeps them (section 12.5; #33).
 - Whether a withdrawn line takes new document versions; whether and how it is reinstated; whether `withdrawal` stays in later versions; what a verifier reports for a pin of an earlier version of a withdrawn line; and how the line of an ended owner, which signs nothing, is withdrawn (#25).
@@ -944,6 +949,7 @@ Before 1.0, a minor version MAY be incompatible with the one before it. Version 
 - **0.2 (draft), 19 November 2026:** the text of PR #30 named version 0.2, version 0.1 being kept as published: format names, `specification`, the extension URI of the timestamps extension, the schemas and their file names set to 0.2, and the examples of appendix C recomputed, since format names enter names and signatures; section 16.1 states how 0.2 and 0.1 differ.
 - **0.2 (draft), 20 November 2026:** editorial: the link to the KERI specification, which has moved, updated (appendix E).
 - **0.2 (draft), 20 November 2026:** ambiguities found while implementing the reference tools resolved. Clarified: a reader's configuration may map locations (section 12.3); an owner part of 52 characters is of algorithm 0 (section 12.1); the checksum file and the inventory bytes give the same digest (section 4); `status` of a copy without a signed version (section 3.1); the main catalogue may be curated (section 8.1); a version signed directly with an exposed key and vouched for cleanly is not contested (section 7.3); a fork record copied byte for byte from a longer copy, and readers meeting copies of a key log (sections 6.3 and 6.5); the `sha512/` entries of a removed object (section 12.5); indexes not checked complete over HTTP (section 14.1); telling 0.1 from 0.2 (section 16.1); Zenodo, an owner ended during a deposit, and the genesis record uploaded (appendix A.1). Decided: numbers are integers, exactly, in genesis records and `keys.json` also in extensions (section 2); signatures in canonical base64, and `R` canonical (section 7.2); copies agree at their latest signed versions, versions after them making no fork (sections 7.4, 7.5 and 15.1); a version is unchecked when the threshold of the key-log version named is unknown, and when a reader without the key log cannot find signature files (section 7.3); owner tools sign over versions not signed only once the owner acknowledges them (section 7.3); files beside carried signatures read as witnesses, and carried inventories checked by their signatures only (section 6.3); `parent.signatures/` holds good signature files only (section 9.2); a branch of the same parent line at the same or an earlier point refused, not renamed (section 9.4); selections of one owner share its accepted copy (sections 9.6 and 14.5); what sealing keeps from a draft (section 10.2); unknown parameters of `sheaf:` URIs anywhere, written last (section 12.1); finding the archive of `parent.url` (section 12.3); landing pages give the canonical form and have an address per line (section 12.2, appendix A.3); a line returns only from a copy holding the pinned version (section 13.2); the main catalogue drops a line taken down (section 13.2); the index page when the main catalogue has no signed version (appendix A.3). Open: hosts that set no headers and `Content-Security-Policy: sandbox` (section 15.3); depositing branches on Zenodo (appendix A.1).
+- **0.2 (draft), 20 November 2026:** editorial, from a triage of the issues: the rule that a tombstone does not stop resolution at copies elsewhere (section 12.3) marked provisional, as sections 12.6 and 13.3 list it as open (#66); open questions added to section 4.2 for what a description-only version may change (#24) and for the identity of notices (#26); two open questions pointed to the issues that hold them (#35, #20).
 
 ## Appendix A. Profiles (normative for archives declaring them)
 

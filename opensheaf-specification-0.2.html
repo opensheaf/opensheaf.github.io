@@ -618,6 +618,27 @@
       or withdrawn only by a later notice. Presentations showing a document
       version SHOULD show the current notices about it.
     </p>
+    <p>
+      <strong>Open questions.</strong>
+    </p>
+    <ul>
+      <li>
+        <p>
+          What a description-only version may change: which fields of <tt
+          class="verbatim">object.json</tt> besides the state and the notices (<tt
+          class="verbatim">external</tt>, the licence, <tt class="verbatim">toolchain</tt>, the
+          media types of renditions), and whether a description-only version
+          of a collection may hold an earlier member list (#24).
+        </p>
+      </li>
+      <li>
+        <p>
+          How notices are identified, so that a later notice can correct or
+          withdraw an earlier one, what makes a notice current, and what its
+          <tt class="verbatim">date</tt> is (#26).
+        </p>
+      </li>
+    </ul>
     <h3 id="auto-10"><a id="43-the-object-record-objectjson"></a>4.3 The object record: object.json<span style="margin-left: 1em"></span></h3>
     <p>
       Every object version MUST contain <tt class="verbatim">object.json</tt>, the
@@ -1640,7 +1661,7 @@
         <p>
           The form of a keeper's confirmation on ORCID, which depends on an
           <tt class="verbatim">https</tt> form of <tt class="verbatim">sheaf:&lt;owner&gt;</tt>,
-          and so on the gateway (section 12; #13, #35).
+          and so on the gateway (section 12; #35).
         </p>
       </li>
     </ul>
@@ -3058,9 +3079,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       itself.
     </p>
     <p>
-      <strong>Tombstones.</strong> A tombstone (section 13) is not signed: a
-      resolver that meets one keeps looking, and when it finds a copy that
-      passes the checks, reports the copy and the tombstone.
+      <strong>Tombstones.</strong> Provisionally (#66): a tombstone (section
+      13) is not signed, and a resolver that meets one keeps looking, and when
+      it finds a copy that passes the checks, reports the copy and the
+      tombstone.
     </p>
     <p>
       <strong>External records.</strong> A deposit with an external service
@@ -3227,7 +3249,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           Who keeps indexes of many archives, so that a line can be found once
-          its archives have gone, and how resolvers find them (#13, #20).
+          its archives have gone, and how resolvers find them (#20).
         </p>
       </li>
       <li>
@@ -3241,7 +3263,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           Whether a tombstone in one archive should stop resolution at copies
-          elsewhere (section 13).
+          elsewhere (section 13; #66).
         </p>
       </li>
       <li>
@@ -3363,9 +3385,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           Whether a tombstone in one archive stops resolution at copies
-          elsewhere, and whether mirrors, branches holding the version taken
-          down, indexes kept by others and gateways follow a takedown (#33,
-          #39).
+          elsewhere (#66), and whether mirrors, branches holding the version
+          taken down, indexes kept by others and gateways follow a takedown
+          (#33, #39).
         </p>
       </li>
       <li>
@@ -4264,6 +4286,17 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           hosts that set no headers and <tt class="verbatim">Content-Security-Policy:
           sandbox</tt> (section 15.3); depositing branches on Zenodo (appendix
           A.1).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 20 November 2026:</strong> editorial, from a
+          triage of the issues: the rule that a tombstone does not stop
+          resolution at copies elsewhere (section 12.3) marked provisional, as
+          sections 12.6 and 13.3 list it as open (#66); open questions added
+          to section 4.2 for what a description-only version may change (#24)
+          and for the identity of notices (#26); two open questions pointed to
+          the issues that hold them (#35, #20).
         </p>
       </li>
     </ul>

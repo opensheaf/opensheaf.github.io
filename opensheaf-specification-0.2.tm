@@ -163,6 +163,14 @@
 
   <strong|Notices.> A <dfn|notice> is a statement about a document version made after it, since the version cannot change (that a theorem of version 2 is wrong as stated, and corrected in version 3). Notices are added to <verbatim|notices> by description-only versions, and stay, unchanged, in every later object version (for a branch whose branch point moves, see section 9); a notice is corrected or withdrawn only by a later notice. Presentations showing a document version SHOULD show the current notices about it.
 
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>What a description-only version may change: which fields of <verbatim|object.json> besides the state and the notices (<verbatim|external>, the licence, <verbatim|toolchain>, the media types of renditions), and whether a description-only version of a collection may hold an earlier member list (#24).
+
+    <item>How notices are identified, so that a later notice can correct or withdraw an earlier one, what makes a notice current, and what its <verbatim|date> is (#26).
+  </itemize>
+
   <subsection*|4.3 The object record: object.json><label|43-the-object-record-objectjson>
 
   Every object version MUST contain <verbatim|object.json>, the record of the object's identity, content, versions and state; it names no archive. It MUST contain:
@@ -444,7 +452,7 @@
 
     <item>Whether exposing keys from when an archive learns of it, rather than dating signatures (revocation dated by trusted time, transparency logs), is enough against backdating (#55, #58).
 
-    <item>The form of a keeper's confirmation on ORCID, which depends on an <verbatim|https> form of <verbatim|sheaf:\<less\>owner\<gtr\>>, and so on the gateway (section 12; #13, #35).
+    <item>The form of a keeper's confirmation on ORCID, which depends on an <verbatim|https> form of <verbatim|sheaf:\<less\>owner\<gtr\>>, and so on the gateway (section 12; #35).
   </itemize>
 
   <section*|7. Lines and signatures><label|7-lines-and-signatures>
@@ -915,7 +923,7 @@
 
   <strong|Copies, forks and ended owners.> Since a copy that stops early looks complete, a resolver uses the latest signed version among the copies it found that agree (section 7.4), and says where it found them. A fork of the line (section 7.4) is reported with the status of each side; the resolver uses only signed versions and does not choose between signed sides. A fork of a key log is not one of a line: it ends and freezes the owner (sections 6.3 and 7.5), and signatures naming versions of either side are checked against them, wherever held, the versions they sign being contested from the fork point on (section 7.3). A resolver reports an owner that has ended, by an ending version or a fork, or has exposed keys (section 6.3), with any successor, its own or named by its keeper (section 6.6), and never follows a successor by itself.
 
-  <strong|Tombstones.> A tombstone (section 13) is not signed: a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
+  <strong|Tombstones.> Provisionally (#66): a tombstone (section 13) is not signed, and a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
 
   <strong|External records.> A deposit with an external service (<verbatim|external>, section 4.3; appendix A) or a software archive snapshot is a witness (section 7.2), not a copy: it holds no inventory, so it is never checked against a pin and resolves nothing; a resolver MAY report it as a place where the files may be found. A snapshot holding an archive's storage root (an archive kept in git) is read as that archive.
 
@@ -962,11 +970,11 @@
 
     <item>Whether the project runs a gateway, on which domain, and whether a domain used only for resolution drops <verbatim|sheaf:> from the path, as <verbatim|https://doi.org/> drops <verbatim|doi:> (#35).
 
-    <item>Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#13, #20).
+    <item>Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#20).
 
     <item>Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's <verbatim|swhid>) (#22).
 
-    <item>Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13).
+    <item>Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13; #66).
 
     <item>The numbering of document versions on a branch, which <verbatim|/v\<less\>n\<gtr\>> follows (section 9; #57).
   </itemize>
@@ -1010,7 +1018,7 @@
   <strong|Open questions.>
 
   <\itemize>
-    <item>Whether a tombstone in one archive stops resolution at copies elsewhere, and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
+    <item>Whether a tombstone in one archive stops resolution at copies elsewhere (#66), and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
 
     <item>The form of an owner's signed request for a takedown, and of a keeper's (#33).
 
@@ -1257,6 +1265,8 @@
     <item><strong|0.2 (draft), 20 November 2026:> editorial: the link to the KERI specification, which has moved, updated (appendix E).
 
     <item><strong|0.2 (draft), 20 November 2026:> ambiguities found while implementing the reference tools resolved. Clarified: a reader's configuration may map locations (section 12.3); an owner part of 52 characters is of algorithm 0 (section 12.1); the checksum file and the inventory bytes give the same digest (section 4); <verbatim|status> of a copy without a signed version (section 3.1); the main catalogue may be curated (section 8.1); a version signed directly with an exposed key and vouched for cleanly is not contested (section 7.3); a fork record copied byte for byte from a longer copy, and readers meeting copies of a key log (sections 6.3 and 6.5); the <verbatim|sha512/> entries of a removed object (section 12.5); indexes not checked complete over HTTP (section 14.1); telling 0.1 from 0.2 (section 16.1); Zenodo, an owner ended during a deposit, and the genesis record uploaded (appendix A.1). Decided: numbers are integers, exactly, in genesis records and <verbatim|keys.json> also in extensions (section 2); signatures in canonical base64, and <verbatim|R> canonical (section 7.2); copies agree at their latest signed versions, versions after them making no fork (sections 7.4, 7.5 and 15.1); a version is unchecked when the threshold of the key-log version named is unknown, and when a reader without the key log cannot find signature files (section 7.3); owner tools sign over versions not signed only once the owner acknowledges them (section 7.3); files beside carried signatures read as witnesses, and carried inventories checked by their signatures only (section 6.3); <verbatim|parent.signatures/> holds good signature files only (section 9.2); a branch of the same parent line at the same or an earlier point refused, not renamed (section 9.4); selections of one owner share its accepted copy (sections 9.6 and 14.5); what sealing keeps from a draft (section 10.2); unknown parameters of <verbatim|sheaf:> URIs anywhere, written last (section 12.1); finding the archive of <verbatim|parent.url> (section 12.3); landing pages give the canonical form and have an address per line (section 12.2, appendix A.3); a line returns only from a copy holding the pinned version (section 13.2); the main catalogue drops a line taken down (section 13.2); the index page when the main catalogue has no signed version (appendix A.3). Open: hosts that set no headers and <verbatim|Content-Security-Policy: sandbox> (section 15.3); depositing branches on Zenodo (appendix A.1).
+
+    <item><strong|0.2 (draft), 20 November 2026:> editorial, from a triage of the issues: the rule that a tombstone does not stop resolution at copies elsewhere (section 12.3) marked provisional, as sections 12.6 and 13.3 list it as open (#66); open questions added to section 4.2 for what a description-only version may change (#24) and for the identity of notices (#26); two open questions pointed to the issues that hold them (#35, #20).
   </itemize>
 
   <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>
