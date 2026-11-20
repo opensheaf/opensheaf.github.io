@@ -131,6 +131,10 @@ of it: they are pages of their own, with a look of their own.
   numbers and comments grey. On this site, highlight.js 10.3.2
   (`resources/highlight.pack.js`) marks the tokens; Lean, which it lacks,
   is added by `resources/highlight-lean.js` (blocks marked ```lean).
+  Lean code is the one exception to "no colour", for now: keywords and
+  logical symbols, declared names, type names and literals in the muted
+  tones of the site-only tokens `--os-lean-*` (light, dark, black in
+  print), defined in `resources/opensheaf.css` only.
 - **Lists of documents.** Entries divided by hairlines, as in a
   bibliography: the title a little larger than the text, the authors in
   italics, then a line of facts in the small sans.
