@@ -117,7 +117,8 @@ def code_line(c):
 # languages of fenced code blocks, as named by highlight.js on the web pages
 LANGUAGES = {'sh': 'bash', 'shell': 'bash', 'bash': 'bash', 'console': 'bash',
              'json': 'json', 'yaml': 'yaml', 'yml': 'yaml', 'python': 'python',
-             'py': 'python', 'xml': 'xml', 'latex': 'latex', 'tex': 'latex'}
+             'py': 'python', 'xml': 'xml', 'latex': 'latex', 'tex': 'latex',
+             'lean': 'lean'}  # Lean: resources/highlight-lean.js
 
 SITE_HERO_RE = re.compile(r'^<!--\s*site hero:\s*(\S+)\s*-->\s*$')
 IMAGE_RE = re.compile(r'^!\[([^\]]*)\]\(([^)\s]+)\)\s*$')

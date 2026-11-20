@@ -9,6 +9,7 @@
     <link href="resources/brand/favicon.svg" rel="icon"></link>
     <link href="resources/opensheaf.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/highlight.pack.js" language="javascript" defer></script>
+    <script src="resources/highlight-lean.js" language="javascript" defer></script>
     <script src="resources/notes-base.js" language="javascript" defer></script>
     <script language="javascript" defer>var bs = String.fromCharCode(92), sp =
     String.fromCharCode(32); window.MathJax = {tex: {macros: {xequal: [bs +
@@ -86,13 +87,15 @@
       Digests, the names of genesis records and signatures are given by an
       environment, about which almost nothing is assumed:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 structure Env (D : Type) where
   hash : Hash D
   keyDigest : Key &rarr; D
   nameOf : Genesis D &rarr; Nat &rarr; Name
   verifies : Sig D &rarr; Bool</pre>
+      </div>
     </div>
     <p>
       <tt class="verbatim">hash</tt> gives the digest of an inventory and <tt class="verbatim">keyDigest</tt>
@@ -109,13 +112,15 @@ structure Env (D : Type) where
       A pin is the pin of the specification, with its hints (<tt class="verbatim">at</tt>),
       which are not part of what it names:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 structure Pin (D : Type) where
   line : LineId
   version : Nat
   digest : D
   hints : List ArchiveId := []</pre>
+      </div>
     </div>
     <h2 id="auto-4"><a id="archives-change-only-by-adding"></a>Archives change only by adding<span style="margin-left: 1em"></span></h2>
     <p>
@@ -123,22 +128,26 @@ structure Pin (D : Type) where
       archive is one of four steps: a new archive, a new object, a new
       version, new signature files.
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 inductive Step : World D &rarr; World D &rarr; Prop
   | newArchive &hellip;
   | create &hellip;
   | append &hellip;
   | witness &hellip;</pre>
+      </div>
     </div>
     <p>
       The first theorem is immutability: once a pin resolves to a version at
       an archive, no step changes what it resolves to there.
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 theorem Step.resolveAt_ok {w w' : World D} (hs : Step w w') {b : ArchiveId} {p : Pin D}
     {v : Version D} (h : resolveAt hash w b p = .ok v) : resolveAt hash w' b p = .ok v</pre>
+      </div>
     </div>
     <p>
       The valid steps add the checks of the specification: identity, document
@@ -146,12 +155,14 @@ theorem Step.resolveAt_ok {w w' : World D} (hs : Step w w') {b : ArchiveId} {p :
       that the archive's copy of the owner's key log is valid, not frozen by a
       fork, and signs the version without an exposed key (section 7.5):
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 def LineOk (w : World D) (a : ArchiveId) (ar : Archive D) (l : LineId) (o : Obj D) : Prop :=
   &exist; kl, lookup w a (.line (keyLogLine l.owner)) = some (.live kl) &and; KeyLogOk E l.owner kl &and;
     &not; Frozen kl &and; SignedClean E kl l o o.versions.length &and;
     ((l.owner &isin; ar.owners &and; &not; HasEnding kl) &or; CopyOf w a o)</pre>
+      </div>
     </div>
     <h2 id="auto-5"><a id="key-logs-and-pre-rotation"></a>Key logs and pre-rotation<span style="margin-left: 1em"></span></h2>
     <p>
@@ -161,20 +172,23 @@ def LineOk (w : World D) (a : ArchiveId) (ar : Archive D) (l : LineId) (o : Obj 
       A new version of a key log needs <tt class="verbatim">nextThreshold</tt> distinct
       committed rotation keys of the version before:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 def RotationSigned (X : OwnerName) (o : Obj D) (n : Nat) (pk : Keys D) : Prop :=
   pk.ended = false &and; pk.nextThreshold &#x2A7D;
     (rotationSigners E (keyLogLine X) (n + 1) (E.hash (o.inventory (n + 1))) (keyPin E X o n)
       pk o.sigs).length</pre>
+      </div>
     </div>
     <p>
       From the rules of section 6.1 the model proves that no key is ever both
       a current key and a rotation key, and so that whoever holds only current
       keys, the owner's or stolen ones, cannot change the key log:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 theorem current_keys_cannot_extend {X : OwnerName} {o : Obj D} {x : Version D}
     {ss : List (Sig D)} (hne : o.versions &ne; []) {k : Keys D} (hx : x.keys = some k)
     (hcur : &forall; s &isin; o.sigs ++ ss, E.verifies s = true &rarr; s.line = keyLogLine X &rarr;
@@ -182,6 +196,7 @@ theorem current_keys_cannot_extend {X : OwnerName} {o : Obj D} {x : Version D}
       &exist; i, &exist; hi : i &lt; o.versions.length, &exist; ki, (o.versions[i]'hi).keys = some ki &and;
         s.key &isin; ki.keys) :
     &not; KeyLogOk E X (o.append x ss)</pre>
+      </div>
     </div>
     <p>
       Nor can they make a fork record, nor prevent an exposure, which depends
@@ -189,8 +204,9 @@ theorem current_keys_cannot_extend {X : OwnerName} {o : Obj D} {x : Version D}
       freezes the owner there for ever: no later change adds anything to its
       lines in that archive.
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 theorem Events.fork_freezes_forever {w w' : World D} (hs : Events E w w') {a : ArchiveId}
     {X : OwnerName} {kl : Obj D} (hkl : lookup w a (.line (keyLogLine X)) = some (.live kl))
     (hf : Frozen kl) :
@@ -198,19 +214,22 @@ theorem Events.fork_freezes_forever {w w' : World D} (hs : Events E w w') {a : A
       Frozen kl') &and;
     &forall; l, l.owner = X &rarr; l &ne; keyLogLine X &rarr; &forall; o', lookup w' a (.line l) = some (.live o') &rarr;
       &exist; o, lookup w a (.line l) = some (.live o) &and; o'.versions = o.versions</pre>
+      </div>
     </div>
     <h2 id="auto-6"><a id="owners-sign-places-host"></a>Owners sign, places host<span style="margin-left: 1em"></span></h2>
     <p>
       A signature counts as the owner's in a world when it is made with a
       current key of a version of the owner's key log that the world holds:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 def OwnerKey (w : World D) (X : OwnerName) (s : Sig D) : Prop :=
   s.keyLog.line = keyLogLine X &and; &exist; b kl, lookup w b (.line (keyLogLine X)) = some (.live kl) &and;
     &exist; v, kl.versionAt s.keyLog.version = some v &and;
       E.hash (kl.inventory s.keyLog.version) = s.keyLog.digest &and;
       &exist; kv, v.keys = some kv &and; kv.ended = false &and; s.key &isin; kv.keys</pre>
+      </div>
     </div>
     <p>
       In every world built by valid steps and takedowns, the head of every
@@ -218,13 +237,15 @@ def OwnerKey (w : World D) (X : OwnerName) (s : Sig D) : Prop :=
       every version before it. Stated as a contrapositive: if nobody holding
       such a key signed a version of a line, no archive holds a copy of it.
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 theorem forgery_needs_owner_key {w : World D}
     (hs : Events E (fun _ =&gt; (none : Option (Archive D))) w) {l : LineId}
     (hno : &forall; s, E.verifies s = true &rarr; s.line = l &rarr; &not; OwnerKey E w l.owner s)
     {b : ArchiveId} {o : Obj D} (hl : lookup w b (.line l) = some (.live o))
     (hk : o.kind &ne; .owner) : False</pre>
+      </div>
     </div>
     <p>
       Such keys are the owner's, or those that whoever holds its rotation keys
@@ -241,8 +262,9 @@ theorem forgery_needs_owner_key {w : World D}
       thief's, sign what they sign. Copies of a line agree when the owner
       signs one history, and no copy the world holds collides with it:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 def SignsHistory (w : World D) (l : LineId) (g : Option (Genesis D)) (H : List (Version D)) :
     Prop :=
   &forall; s, E.verifies s = true &rarr; s.line = l &rarr; OwnerKey E w l.owner s &rarr;
@@ -254,18 +276,21 @@ def NoCollisionWith (w : World D) (l : LineId) (g : Option (Genesis D)) (H : Lis
 theorem Events.copiesAgree {w : World D}
     (hs : Events E (fun _ =&gt; (none : Option (Archive D))) w) {l : LineId}
     (h1 : OneHistory E w l) : CopiesAgree w l</pre>
+      </div>
     </div>
     <p>
       With it, section 8.5's &quot;pins cannot form cycles&quot; is a theorem
       about every world built by valid steps, whatever the digest beyond the
       pairs compared:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 theorem no_cycles {w : World D}
     (hs : ValidSteps E (fun _ =&gt; (none : Option (Archive D))) w)
     (hh : &forall; l, l &ne; keyLogLine l.owner &rarr; OneHistory E w l)
     (s : LineId &times; Nat) : &not; Chain (PinsTo w) s s</pre>
+      </div>
     </div>
     <h2 id="auto-8"><a id="a-readers-check"></a>A reader's check<span style="margin-left: 1em"></span></h2>
     <p>
@@ -274,11 +299,13 @@ theorem no_cycles {w : World D}
       of the model defines what a reader checks of one copy, with a copy of
       the owner's key log, wherever they came from:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 def ReaderAccepts (kl : Obj D) (l : LineId) (o : Obj D) : Prop :=
   o.id = .line l &and; o.kind &ne; .owner &and; o.versions &ne; [] &and; IdentityOk E l o &and;
     KeyLogOk E l.owner kl &and; &not; Frozen kl &and; SignedClean E kl l o o.versions.length</pre>
+      </div>
     </div>
     <p>
       and proves, for any objects at all, that what a reader accepts was
@@ -286,13 +313,15 @@ def ReaderAccepts (kl : Obj D) (l : LineId) (o : Obj D) : Prop :=
       owner's genesis record; and that, if the owner's keys sign one history,
       every copy a reader accepts is a prefix of it:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 theorem ReaderAccepts.no_forgery {kl : Obj D} {l : LineId} {o : Obj D}
     (h : ReaderAccepts E kl l o) {g : Option (Genesis D)} {H : List (Version D)}
     (hsign : KeysSignHistory E kl l g H)
     (hcol : NoCollision E (o.inventory o.versions.length) (histInv l g H o.versions.length)) :
     o.versions.length &#x2A7D; H.length &and; o.versions = H.take o.versions.length &and; o.genesis = g</pre>
+      </div>
     </div>
     <p>
       The only assumptions are that a signature verifies only when made with
@@ -309,11 +338,13 @@ theorem ReaderAccepts.no_forgery {kl : Obj D} {l : LineId} {o : Obj D}
       The main theorem says that the sections of a world glue into exactly
       one:
     </p>
-    <div class="tmweb-code">
-      <pre class="verbatim" xml:space="preserve">
+    <div class="language-lean">
+      <div class="tmweb-code">
+        <pre class="verbatim" xml:space="preserve">
 theorem world_glues {w : World D}
     (hs : Events E (fun _ =&gt; (none : Option (Archive D))) w) {H : Histories D} (hh : Honest E H w) :
     &exist; g, Glues (sections w) g &and; &forall; g', Glues (sections w) g' &rarr; g' = g</pre>
+      </div>
     </div>
     <p>
       When they do not glue, a fork of a line is the reason: two copies,

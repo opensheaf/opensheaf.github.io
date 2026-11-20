@@ -101,7 +101,7 @@
 
   <assign|html-extra-css|<tuple|resources/opensheaf.css>>
 
-  <assign|html-extra-javascript-src|<tuple|resources/highlight.pack.js|resources/notes-base.js>>
+  <assign|html-extra-javascript-src|<tuple|resources/highlight.pack.js|resources/highlight-lean.js|resources/notes-base.js>>
 </body>
 
 <\initial>

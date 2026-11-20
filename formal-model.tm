@@ -27,6 +27,7 @@
 
   The model keeps what the properties depend on, and nothing else. Digests, the names of genesis records and signatures are given by an environment, about which almost nothing is assumed:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     structure Env (D : Type) where
 
@@ -38,11 +39,13 @@
 
     \ \ verifies : Sig D \<rightarrow\> Bool
   </verbatim-code>
+  </html-div-class>
 
   <verbatim|hash> gives the digest of an inventory and <verbatim|keyDigest> that of a key; <verbatim|nameOf> gives the 16 names of a genesis record; <verbatim|verifies> says which signature files verify, that is, were made with their keys. Immutability, for instance, holds for any digest function at all, even a constant one: pins stay valid because archives only add versions, not because SHA-512 is hard to break. Where a theorem needs more, it says so, and asks only that the two inventories it compares do not collide, never that the digest function be injective, which no real digest is.
 
   A pin is the pin of the specification, with its hints (<verbatim|at>), which are not part of what it names:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     structure Pin (D : Type) where
 
@@ -54,11 +57,13 @@
 
     \ \ hints : List ArchiveId := []
   </verbatim-code>
+  </html-div-class>
 
   <section*|Archives change only by adding><label|archives-change-only-by-adding>
 
   A world is a map from locations to archives, and every change of an archive is one of four steps: a new archive, a new object, a new version, new signature files.
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     inductive Step : World D \<rightarrow\> World D \<rightarrow\> Prop
 
@@ -70,17 +75,21 @@
 
     \ \ \| witness ...
   </verbatim-code>
+  </html-div-class>
 
   The first theorem is immutability: once a pin resolves to a version at an archive, no step changes what it resolves to there.
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     theorem Step.resolveAt_ok {w w' : World D} (hs : Step w w') {b : ArchiveId} {p : Pin D}
 
     \ \ \ \ {v : Version D} (h : resolveAt hash w b p = .ok v) : resolveAt hash w' b p = .ok v
   </verbatim-code>
+  </html-div-class>
 
   The valid steps add the checks of the specification: identity, document versions, member lists, branch points, and, for a new version of a line, that the archive's copy of the owner's key log is valid, not frozen by a fork, and signs the version without an exposed key (section 7.5):
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     def LineOk (w : World D) (a : ArchiveId) (ar : Archive D) (l : LineId) (o : Obj D) : Prop :=
 
@@ -90,11 +99,13 @@
 
     \ \ \ \ ((l.owner \<in\> ar.owners \<wedge\> \<neg\> HasEnding kl) \<vee\> CopyOf w a o)
   </verbatim-code>
+  </html-div-class>
 
   <section*|Key logs and pre-rotation><label|key-logs-and-pre-rotation>
 
   The key log of an owner is modelled as section 6 writes it: a first version computed from the genesis record, then versions each signed by the rotation keys that the version before committed to by their digests. A new version of a key log needs <verbatim|nextThreshold> distinct committed rotation keys of the version before:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     def RotationSigned (X : OwnerName) (o : Obj D) (n : Nat) (pk : Keys D) : Prop :=
 
@@ -104,9 +115,11 @@
 
     \ \ \ \ \ \ pk o.sigs).length
   </verbatim-code>
+  </html-div-class>
 
   From the rules of section 6.1 the model proves that no key is ever both a current key and a rotation key, and so that whoever holds only current keys, the owner's or stolen ones, cannot change the key log:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     theorem current_keys_cannot_extend {X : OwnerName} {o : Obj D} {x : Version D}
 
@@ -122,9 +135,11 @@
 
     \ \ \ \ \<neg\> KeyLogOk E X (o.append x ss)
   </verbatim-code>
+  </html-div-class>
 
   Nor can they make a fork record, nor prevent an exposure, which depends only on signatures by rotation keys. A fork, once an archive records it, freezes the owner there for ever: no later change adds anything to its lines in that archive.
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     theorem Events.fork_freezes_forever {w w' : World D} (hs : Events E w w') {a : ArchiveId}
 
@@ -140,11 +155,13 @@
 
     \ \ \ \ \ \ \<exists\> o, lookup w a (.line l) = some (.live o) \<wedge\> o'.versions = o.versions
   </verbatim-code>
+  </html-div-class>
 
   <section*|Owners sign, places host><label|owners-sign-places-host>
 
   A signature counts as the owner's in a world when it is made with a current key of a version of the owner's key log that the world holds:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     def OwnerKey (w : World D) (X : OwnerName) (s : Sig D) : Prop :=
 
@@ -156,9 +173,11 @@
 
     \ \ \ \ \ \ \<exists\> kv, v.keys = some kv \<wedge\> kv.ended = false \<wedge\> s.key \<in\> kv.keys
   </verbatim-code>
+  </html-div-class>
 
   In every world built by valid steps and takedowns, the head of every copy of every line, mirrors included, is signed so, and vouches for every version before it. Stated as a contrapositive: if nobody holding such a key signed a version of a line, no archive holds a copy of it.
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     theorem forgery_needs_owner_key {w : World D}
 
@@ -170,6 +189,7 @@
 
     \ \ \ \ (hk : o.kind \<neq\> .owner) : False
   </verbatim-code>
+  </html-div-class>
 
   Such keys are the owner's, or those that whoever holds its rotation keys committed in a new version of its key log, which the key log then shows; the model proves this too, and proves the residual risks of section 15.1 possible, on concrete worlds: an archive that has not seen an exposure accepts what an up-to-date one refuses, a thief who forks a key log can make the owner's past contested without forging anything, a retired key never exposed still signs.
 
@@ -177,6 +197,7 @@
 
   An owner may write a line in several archives, and its keys, or a thief's, sign what they sign. Copies of a line agree when the owner signs one history, and no copy the world holds collides with it:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     def SignsHistory (w : World D) (l : LineId) (g : Option (Genesis D)) (H : List (Version D)) :
 
@@ -204,9 +225,11 @@
 
     \ \ \ \ (h1 : OneHistory E w l) : CopiesAgree w l
   </verbatim-code>
+  </html-div-class>
 
   With it, section 8.5's "pins cannot form cycles" is a theorem about every world built by valid steps, whatever the digest beyond the pairs compared:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     theorem no_cycles {w : World D}
 
@@ -216,11 +239,13 @@
 
     \ \ \ \ (s : LineId \<times\> Nat) : \<neg\> Chain (PinsTo w) s s
   </verbatim-code>
+  </html-div-class>
 
   <section*|A reader's check><label|a-readers-check>
 
   The guarantees above hold for worlds built by the rules. A reader cannot assume that the archive serving a copy followed them. The last chapter of the model defines what a reader checks of one copy, with a copy of the owner's key log, wherever they came from:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     def ReaderAccepts (kl : Obj D) (l : LineId) (o : Obj D) : Prop :=
 
@@ -228,9 +253,11 @@
 
     \ \ \ \ KeyLogOk E l.owner kl \<wedge\> \<neg\> Frozen kl \<wedge\> SignedClean E kl l o o.versions.length
   </verbatim-code>
+  </html-div-class>
 
   and proves, for any objects at all, that what a reader accepts was signed with a current key of a key-log version that goes back to the owner's genesis record; and that, if the owner's keys sign one history, every copy a reader accepts is a prefix of it:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     theorem ReaderAccepts.no_forgery {kl : Obj D} {l : LineId} {o : Obj D}
 
@@ -242,6 +269,7 @@
 
     \ \ \ \ o.versions.length \<leqslant\> H.length \<wedge\> o.versions = H.take o.versions.length \<wedge\> o.genesis = g
   </verbatim-code>
+  </html-div-class>
 
   The only assumptions are that a signature verifies only when made with its key, and that the two inventories compared do not collide. This is the formal content of section 15.1: "a host or a network therefore cannot forge a version, nor add one to another owner's line".
 
@@ -249,6 +277,7 @@
 
   The second literate program reads the worlds of the model as sheaves. The base is the set of named document versions, a line and a document version number, ordered by deposit; each object version, wherever it is kept, is a section, giving each document version it holds its content. The main theorem says that the sections of a world glue into exactly one:
 
+  <\html-div-class|language-lean>
   <\verbatim-code>
     theorem world_glues {w : World D}
 
@@ -256,6 +285,7 @@
 
     \ \ \ \ \<exists\> g, Glues (sections w) g \<wedge\> \<forall\> g', Glues (sections w) g' \<rightarrow\> g' = g
   </verbatim-code>
+  </html-div-class>
 
   When they do not glue, a fork of a line is the reason: two copies, neither extending the other, each signed with keys of the owner's key log. Names keep their content for ever, what a collection pins lies below it in the order with pins, and verification is local, needing only what lies below.
 

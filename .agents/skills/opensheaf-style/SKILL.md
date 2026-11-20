@@ -128,7 +128,9 @@ of it: they are pages of their own, with a look of their own.
   capitals of the apparatus.
 - **Code.** Blocks on the surface, without a frame; inline code on the
   same tint. No syntax colours: keywords a little stronger, strings,
-  numbers and comments grey.
+  numbers and comments grey. On this site, highlight.js 10.3.2
+  (`resources/highlight.pack.js`) marks the tokens; Lean, which it lacks,
+  is added by `resources/highlight-lean.js` (blocks marked ```lean).
 - **Lists of documents.** Entries divided by hairlines, as in a
   bibliography: the title a little larger than the text, the authors in
   italics, then a line of facts in the small sans.
