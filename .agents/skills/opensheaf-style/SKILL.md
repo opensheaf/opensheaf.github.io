@@ -62,8 +62,8 @@ well-set mathematical text.
    its ligatures). The Explorer and the pages of an archive still use
    Geist and Source Code Pro, from before this choice; they follow it
    when they are next changed.
-3. **No colour.** Hierarchy comes from size, space and weight, not from
-   hue: headings are in bold; links
+3. **No colour**, but in highlighted code. Hierarchy comes from size,
+   space and weight, not from hue: headings are in bold; links
    are in ink with a thin grey underline. Three quiet tones only say a
    state, always with a text label: green for verified or current, red for
    errors and withdrawals, amber for warnings.
@@ -127,14 +127,13 @@ of it: they are pages of their own, with a look of their own.
   foot, hairlines between rows, no vertical rules; the header in the small
   capitals of the apparatus.
 - **Code.** Blocks on the surface, without a frame; inline code on the
-  same tint. No syntax colours: keywords a little stronger, strings,
-  numbers and comments grey. On this site, highlight.js 10.3.2
+  same tint. Highlighted code is the one place in colour, in muted tones
+  of the site-only tokens `--os-code-*` (light, dark, black in print),
+  defined in `resources/opensheaf.css` only: keywords (and Lean's logical
+  symbols) a little stronger, declared names and the keys of JSON and YAML,
+  type names, values; comments grey. On this site, highlight.js 10.3.2
   (`resources/highlight.pack.js`) marks the tokens; Lean, which it lacks,
   is added by `resources/highlight-lean.js` (blocks marked ```lean).
-  Lean code is the one exception to "no colour", for now: keywords and
-  logical symbols, declared names, type names and literals in the muted
-  tones of the site-only tokens `--os-lean-*` (light, dark, black in
-  print), defined in `resources/opensheaf.css` only.
 - **Lists of documents.** Entries divided by hairlines, as in a
   bibliography: the title a little larger than the text, the authors in
   italics, then a line of facts in the small sans.

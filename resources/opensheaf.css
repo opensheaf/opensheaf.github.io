@@ -34,10 +34,10 @@
     --os-bad-bg: #f6e4e0;
     --os-warn: #7d5200;
     --os-warn-bg: #f5ecd6;
-    --os-lean-keyword: #7b3f8c;
-    --os-lean-title: #1f5b8f;
-    --os-lean-type: #2c6a64;
-    --os-lean-literal: #8a5a14;
+    --os-code-keyword: #7b3f8c;
+    --os-code-title: #1f5b8f;
+    --os-code-type: #2c6a64;
+    --os-code-literal: #8a5a14;
     --os-serif: "CMU Serif", "Latin Modern Roman", "Computer Modern", "Times New Roman", serif;
     --os-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --os-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -57,10 +57,10 @@
         --os-bad-bg: #342025;
         --os-warn: #e7c277;
         --os-warn-bg: #2d281c;
-        --os-lean-keyword: #cfa6dd;
-        --os-lean-title: #9cc3ea;
-        --os-lean-type: #8ccbc1;
-        --os-lean-literal: #e2bd7e;
+        --os-code-keyword: #cfa6dd;
+        --os-code-title: #9cc3ea;
+        --os-code-type: #8ccbc1;
+        --os-code-literal: #e2bd7e;
     }
 }
 :root[data-theme="dark"] {
@@ -77,10 +77,10 @@
     --os-bad-bg: #342025;
     --os-warn: #e7c277;
     --os-warn-bg: #2d281c;
-    --os-lean-keyword: #cfa6dd;
-    --os-lean-title: #9cc3ea;
-    --os-lean-type: #8ccbc1;
-    --os-lean-literal: #e2bd7e;
+    --os-code-keyword: #cfa6dd;
+    --os-code-title: #9cc3ea;
+    --os-code-type: #8ccbc1;
+    --os-code-literal: #e2bd7e;
 }
 @media print {
     :root, :root[data-theme] {
@@ -97,10 +97,10 @@
         --os-bad-bg: #fff !important;
         --os-warn: #000 !important;
         --os-warn-bg: #fff !important;
-        --os-lean-keyword: #000 !important;
-        --os-lean-title: #000 !important;
-        --os-lean-type: #000 !important;
-        --os-lean-literal: #000 !important;
+        --os-code-keyword: #000 !important;
+        --os-code-title: #000 !important;
+        --os-code-type: #000 !important;
+        --os-code-literal: #000 !important;
     }
 }
 
@@ -325,9 +325,8 @@ div.os-alert.os-note .os-alert-label { color: inherit; }
 
 /* 9. Code on the surface, without a frame (TeXmacs wraps blocks in
    div.tmweb-code, which highlight.js also styles); inline verbatim (file
-   names, JSON fields) on the same tint. No syntax colours: keywords a
-   little stronger, values and comments in grey; Lean code alone is in
-   colour, below. */
+   names, JSON fields) on the same tint. Highlighted code in muted
+   colours, below. */
 pre, code, .hljs {
     color: inherit;
     background: transparent;
@@ -355,21 +354,24 @@ tt.verbatim {
 }
 div.tmweb-code tt.verbatim, pre tt.verbatim { background: transparent; padding: 0; font-size: inherit; }
 .hljs * { color: inherit; background: transparent; font-weight: inherit; font-style: inherit; }
+/* Highlighted code in muted tones (tokens --os-code-*, light and dark,
+   black in print): keywords (and Lean's logical symbols), the names being
+   declared or the keys of JSON and YAML, type names, and values (strings,
+   numbers, literals); keywords a little stronger, comments grey. */
 .hljs .hljs-built_in, .hljs .hljs-keyword, .hljs .hljs-selector-tag,
 .hljs .hljs-section, .hljs .hljs-title { font-weight: 600; }
+.hljs .hljs-keyword, .hljs .hljs-built_in, .hljs .hljs-selector-tag,
+.hljs .hljs-meta { color: var(--os-code-keyword); }
+.hljs .hljs-title, .hljs .hljs-section, .hljs .hljs-attr, .hljs .hljs-attribute,
+.hljs .hljs-name, .hljs .hljs-variable, .hljs .hljs-template-variable {
+    color: var(--os-code-title);
+}
+.hljs .hljs-type, .hljs .hljs-class .hljs-title { color: var(--os-code-type); }
 .hljs .hljs-string, .hljs .hljs-subst, .hljs .hljs-regexp, .hljs .hljs-number,
-.hljs .hljs-literal, .hljs .hljs-symbol, .hljs .hljs-bullet, .hljs .hljs-meta {
-    color: var(--os-muted);
+.hljs .hljs-literal, .hljs .hljs-symbol, .hljs .hljs-bullet {
+    color: var(--os-code-literal);
 }
 .hljs .hljs-comment, .hljs .hljs-quote { color: var(--os-muted); font-style: italic; }
-/* Lean code, the one place in colour (the formal model page): keywords and
-   logical symbols, the names being declared, type names, literals, in
-   muted tones of the --os-lean-* tokens; comments stay grey. */
-.language-lean .hljs-keyword { color: var(--os-lean-keyword); }
-.language-lean .hljs-title { color: var(--os-lean-title); }
-.language-lean .hljs-type, .language-lean .hljs-built_in { color: var(--os-lean-type); }
-.language-lean .hljs-literal, .language-lean .hljs-number,
-.language-lean .hljs-string { color: var(--os-lean-literal); }
 
 /* 10. Tables from the Markdown sources, ruled as in a book: a rule in ink
    at the head and at the foot, hairlines between the rows, no vertical

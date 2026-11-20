@@ -1,8 +1,8 @@
 /* Lean 4 for the site's highlight.js (10.3.2, resources/highlight.pack.js),
    which has no Lean of its own: code blocks marked ```lean in the Markdown
-   sources (FORMAL-MODEL.md). Lean code is the one place of the site shown in
-   colour (opensheaf.css, section 9): keywords and logical symbols, the names
-   being declared, type names, literals and comments. */
+   sources (FORMAL-MODEL.md), coloured as all code is (opensheaf.css,
+   section 9): keywords and logical symbols, the names being declared, type
+   names, literals and comments. */
 (function () {
   'use strict';
   if (typeof hljs === 'undefined') { return; }
