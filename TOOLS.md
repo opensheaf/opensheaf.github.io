@@ -59,7 +59,8 @@ computer at all, see [Where the keys are kept](#where-the-keys-are-kept).
 
 `osheaf --help` lists the commands, and `osheaf COMMAND --help` (for
 instance `osheaf collection add --help`) gives the options of each.
-`osheaf help-config` describes the configuration file of an archive.
+`osheaf help-config` describes the configuration file of an archive,
+`osheaf.json`, and your own, `~/.config/opensheaf/config.json`.
 
 ## Your first archive
 
@@ -101,12 +102,17 @@ owner, so where they live is the owner's **security level**, chosen with
   signed in once with `gh auth login`.
 - `--keys command`, a key wallet in your password manager (1Password's
   `op`, Bitwarden's `bw`, `pass`): the same, through a `read` and a `write`
-  command, given in the environment variable `OPENSHEAF_WALLET` as a JSON
-  object, `{"wallet": "command", "read": READ, "write": WRITE}`, where
-  READ prints a key and WRITE stores one (for 1Password, READ is
-  `op read 'op://Private/opensheaf-{owner}-{k}/notesPlain'`).
-  Chapter 9 of the [literate program](https://opensheaf.org/opensheaf-py/)
-  gives the commands for the three managers.
+  command, given as a JSON object,
+  `{"wallet": "command", "read": READ, "write": WRITE}`, where READ prints
+  a key and WRITE stores one (for 1Password, READ is
+  `op read 'op://Private/opensheaf-{owner}-{k}/notesPlain'`). Since these
+  commands run on your computer, they are read only from your own
+  configuration: the environment variable `OPENSHEAF_WALLET`, or `"keys"`
+  in `~/.config/opensheaf/config.json`; never from an archive's
+  `osheaf.json`, which anyone may have written, and which is refused if it
+  names one. Chapter 9 of the
+  [literate program](https://opensheaf.org/opensheaf-py/) gives the
+  commands for the three managers.
 
 A wallet trades security for convenience: whoever controls the wallet and
 knows the passphrase controls the owner, and the tools say so each time
@@ -130,7 +136,11 @@ archive.
 ### What appears in the folder
 
 - `osheaf.json`: the settings of the archive (name, address, owner,
-  curator, the wallet if any);
+  curator, the GitHub wallet if any);
+- `.gitattributes`, unless the folder has one already: it tells git to keep
+  every file of the archive byte for byte (section
+  [4.1](opensheaf-git-0.2.md#41-attributes) of
+  [OpenSheaf archives in git](opensheaf-git-0.2.md));
 - `ocfl/`: the storage itself, one folder per work, with the key log of the
   owner at `ocfl/<owner>/<owner>/`;
 - `opensheaf.json`: the discovery document, which readers and tools start
@@ -162,7 +172,10 @@ osheaf deposit kpz-uniqueness paper.tex --pdf paper.pdf --new \
   --rights cc-by-4.0 --available 2015-08-31
 ```
 
-Any source works (LaTeX, Markdown, ...) with its PDF; a TeXmacs source
+`--rights` takes an SPDX key (`cc-by-4.0`, `cc-by-sa-4.0`, `cc0-1.0`,
+`gpl-3.0-only`, `gpl-3.0-or-later`) or a statement in plain text; by
+default a new version keeps the licence of the previous one, and a new
+paper is "All rights reserved". Any source works (LaTeX, Markdown, ...) with its PDF; a TeXmacs source
 (`.tm`) needs no PDF, since the archive typesets it. A paper whose sources
 are lost is deposited as a PDF alone, saying why:
 `--no-source "the sources are lost"`; `osheaf complete LABEL --version N
@@ -221,13 +234,15 @@ osheaf relate kpz-uniqueness --to arxiv:1508.07764 --relation IsIdenticalTo
 osheaf withdraw kpz-uniqueness --reason "Superseded by a joint paper."
 ```
 
-A notice is about one version and stays in every later one (`--file` adds a
-full statement, such as an erratum). `describe` corrects the title, the
-abstract, the keywords or the authors. `relicense` records a new licence
-with the authors' agreement. `relate` links the same work elsewhere (on
+A notice is about one version (`--about`) and stays in every later one;
+its `--text` is required, and `--file` adds a full statement, such as an
+erratum. `describe` corrects the title, the abstract, the keywords or the
+authors. `relicense` records a new licence with the authors' agreement;
+its `--rights` takes the same values as that of `deposit`. `relate` links the same work elsewhere (on
 arXiv, or by a DOI). `withdraw` withdraws the paper: the content stays, no
 new versions are added, and every page that shows it shows the withdrawal
-(section [13](opensheaf-specification-0.2.md#13-withdrawal-takedown-and-tombstones)).
+(section [13](opensheaf-specification-0.2.md#13-withdrawal-takedown-and-tombstones));
+its `--reason` is required.
 
 ### Updating the archive and checking it
 
@@ -250,12 +265,9 @@ can be run on a published archive from the browser, with the
 An archive is plain files: serve the folder from any static web server, at
 the address given as `--base-url`. With git and GitHub Pages, the easiest
 start is the [archive template](https://github.com/opensheaf/archive-template),
-which has the right `.gitattributes` (so that git keeps every file byte for
-byte), the workflows and Pages already set up. A folder made with
-`osheaf init` needs the `.gitattributes` of section
-[4.1](opensheaf-git-0.2.md#41-attributes) of
-[OpenSheaf archives in git](opensheaf-git-0.2.md) before its first commit.
-Then, after each change:
+which has the workflows and Pages already set up. A folder made with
+`osheaf init` is ready for git as it is: `init` wrote its `.gitattributes`,
+so that git keeps every file byte for byte. Then, after each change:
 
 ```sh
 osheaf verify
@@ -277,6 +289,11 @@ The private keys are never in the archive.
 osheaf owner show   # the key log: current keys, rotation keys committed, keeper
 osheaf key list     # what the key wallet holds (never a secret)
 ```
+
+The `key` commands use the configured wallet: `OPENSHEAF_WALLET`, else
+`"keys"` in `~/.config/opensheaf/config.json`, else the GitHub wallet named
+in `osheaf.json`. `--wallet github:OWNER/REPO` (or `--wallet command`)
+names another.
 
 ### A new computer
 
@@ -311,22 +328,53 @@ osheaf key enroll   # once: asks the passphrase, then makes the passkey in the b
 osheaf key unlock   # on another computer: Touch ID, and the current keys are pulled
 ```
 
-`key enroll` opens a page of [opensheaf.org](https://opensheaf.org/manager/unlock.html)
-in the browser, which makes a passkey for OpenSheaf and hands a secret back
-to `osheaf` on your own computer, encrypted; the keys in the wallet then
-open with it as well as with the passphrase. A passkey kept in iCloud
-Keychain is on all your Macs. From then on, whenever `osheaf` needs a key
-of the wallet, the page asks you to click **Unlock** and for Touch ID. The
-passphrase remains the way back: `osheaf` asks for it if the page reports
-an error, after two minutes without an answer, or when you press Ctrl-C
-while it waits. Run `osheaf key enroll` again after a rotation that did not
-unlock with the passkey, so that it opens the new keys too. `--no-browser` prints the address instead
-of opening it.
+`key enroll` opens the page
+[unlock.opensheaf.org](https://unlock.opensheaf.org/) in the browser, which
+makes a passkey for `unlock.opensheaf.org` and hands a secret derived from
+it back to `osheaf` on your own computer. `osheaf` opens the page a second
+time, to check that the new passkey alone gives the same secret, and only
+then locks the keys of the owner in the wallet under that secret as well as
+under the passphrase. A passkey kept in iCloud Keychain is on all your
+Macs. From then on, whenever `osheaf` needs a key of the wallet, it opens
+the page, which asks for Touch ID. The page needs a recent browser (Safari
+17, Chrome 133, Firefox 130 or later) and a passkey provider that supports
+the PRF extension (iCloud Keychain, Google Password Manager, 1Password, or
+a security key).
+
+**Check the code.** Each time, `osheaf` prints a code of six digits ("Check
+that the browser shows the code 123 456"), and the page shows one too. The
+page does nothing until you tick **The terminal shows the same code**; a
+page that shows another code was not opened by this `osheaf`: close it.
+
+The passphrase remains the way back: `osheaf` asks for it if the page
+reports an error, after two minutes without an answer, when you press
+Ctrl-C while it waits, or when the browser's answer does not open a key.
+Writing new keys into the wallet still needs the passphrase. Run
+`osheaf key enroll` again after a rotation that did not unlock with the
+passkey, so that it opens the new keys too; `--new-passkey` adds a passkey
+of another provider. `--no-browser` prints the address instead of opening
+it.
+
+**Passkeys made on opensheaf.org.** The first version of the page, at
+`opensheaf.org/manager/unlock.html`, made passkeys for `opensheaf.org`,
+which `osheaf` no longer asks the browser for; the keys they locked still
+open with the passphrase. Move once, to a passkey for
+`unlock.opensheaf.org`, then remove the old locks (the passphrase lock
+stays):
+
+```sh
+osheaf key enroll --new-passkey
+osheaf key forget --rp opensheaf.org
+```
+
+`osheaf key forget --passkey CRED` likewise removes the locks of one
+passkey, named by its credential.
 
 ### Where the keys are kept
 
 On each computer, the current key is kept in the system's credential store
-(the macOS keychain), or else in a file under `~/.config/opensheaf/keys`
+(the macOS keychain, with the extra `keys`), or else in the keychain through
+the `security` command, or else in a file under `~/.config/opensheaf/keys`
 readable only by you. The environment variable `OPENSHEAF_KEY_STORE`
 chooses: `keyring`, `security` (the macOS keychain through its own
 command) or `file` use that store alone, and **`none`** keeps no key on the
@@ -339,10 +387,12 @@ export OPENSHEAF_KEY_STORE=none
 ```
 
 Other variables: `OPENSHEAF_WALLET` names the wallet instead of
-`osheaf.json` (to keep its name out of a public archive);
+`osheaf.json` (to keep its name out of a public archive, or for a command
+wallet);
 `OPENSHEAF_PASSPHRASE_COMMAND` names a command that prints the passphrase
 (for instance `security find-generic-password -w -s opensheaf-passphrase`);
-`OPENSHEAF_UNLOCK=passphrase` skips the passkey. In a workflow on GitHub, a
+`OPENSHEAF_UNLOCK=passphrase` skips the passkey, as does
+`OPENSHEAF_PASSPHRASE` (the passphrase itself, for scripts). In a workflow on GitHub, a
 key of its own, added with `owner rotate --add`, is given in the secret
 `OPENSHEAF_SIGNING_KEY`; the template's README shows how.
 
@@ -357,7 +407,7 @@ after which those in the wallet are used up and can be removed:
 
 ```sh
 osheaf owner rotate --keys offline --export /Volumes/USB/opensheaf-keys --print
-osheaf key forget --wallet --used
+osheaf key forget --from-wallet --used
 ```
 
 ### If a computer is lost or stolen
@@ -541,25 +591,26 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | Command | What it does |
 |---|---|
 | `init` | create an archive: `osheaf.json`, storage, owner, main catalogue |
-| `deposit LABEL SOURCE` | deposit a paper (`--new`) or a new version of it |
-| `notice LABEL` | a notice about a version (`--about N`) |
+| `deposit LABEL [SOURCE]` | deposit a paper (`--new`) or a new version of it |
+| `notice LABEL` | a notice about a version (`--about N --text TEXT`) |
 | `describe LABEL` | correct the title, abstract, keywords or authors |
 | `relicense LABEL` | record a new licence, with the authors' agreement |
 | `relate LABEL` | link the same work elsewhere (arXiv, DOI) |
-| `withdraw LABEL` | withdraw a paper; the content stays |
+| `withdraw LABEL` | withdraw a paper (`--reason TEXT`); the content stays |
 | `complete LABEL` | add the sources of a version deposited without them |
 | `collect` | a new version of the main catalogue, when needed |
 | `index` | rewrite `opensheaf.json`, the indexes and the website |
 | `verify` | check the archive (`--remote`, `--json`) |
-| `collection new`, `add`, `remove` | make a collection, add or remove members |
+| `collection new LABEL` | make a collection (`--type`, `--title`) |
+| `collection add`, `remove` | add or remove members |
 | `collection follow`, `update` | follow members to their new versions |
 | `collection status`, `sync` | the status of members; write from a file |
 | `resolve URI` | find and check what a `sheaf:` URI names |
 | `mirror URI` | copy a paper written elsewhere (`--all`: update every mirror) |
 | `branch URI` | continue another owner's version as a paper of yours |
 | `accept URI` | an accepted copy, listed by a selection |
-| `draft new`, `deposit`, `delete` | unsigned work in progress |
-| `seal ID` | seal a draft as a new paper |
+| `draft new DRAFT`, `deposit`, `delete` | unsigned work in progress |
+| `seal DRAFT` | seal a draft as a new paper (`--label LABEL`) |
 | `takedown LABEL` | delete an object, leaving a tombstone |
 | `owner init` | make an owner (done by `init --new-owner`) |
 | `owner show` | show the key log |
@@ -567,17 +618,18 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `owner expose DID` | declare stolen or leaked keys |
 | `owner end` | the last version of the key log |
 | `owner pull URL` | meet another copy of a key log |
-| `sign LABEL` | sign again a version contested by an exposed key |
+| `sign LABEL` | sign again a version contested by an exposed key (`--version vN`) |
 | `key new` | a new current key for this computer |
-| `key push`, `pull` | current keys to and from the key wallet |
+| `key push`, `pull` | current keys to and from the key wallet (`--wallet WALLET`) |
 | `key list` | what the key wallet holds |
-| `key forget` | remove keys from this computer (`--wallet`: from the wallet) |
+| `key forget` | remove keys from this computer (`--from-wallet`: also from the wallet) |
+| `key forget --rp RP`, `--passkey CRED` | remove the passkey locks of a relying party or a passkey |
 | `key export`, `import` | a key to and from a password manager |
 | `key enroll`, `unlock` | open the keys of the wallet with a passkey |
 | `arxiv fetch` | download papers from arXiv |
 | `arxiv import DOWNLOADS` | import them, one signed paper each |
 | `zenodo LABEL` | a DOI from Zenodo (sandbox, or `--production`) |
-| `help-config` | describe `osheaf.json` |
+| `help-config` | describe `osheaf.json` and `~/.config/opensheaf/config.json` |
 
 ## Where to go next
 

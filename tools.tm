@@ -45,7 +45,7 @@
 
   <strong|The keychain on a Mac.> When a Python other than the one that stored your key reads it, macOS asks: "python3.13 wants to use your confidential information stored in opensheaf-current-key". Answer <strong|Always Allow>, with your login password, and that Python is not asked again. A different Python is asked anew, which is why the line above names one. If you would rather keep no key on the computer at all, see <hlink|Where the keys are kept|#where-the-keys-are-kept>.
 
-  <verbatim|osheaf -<no-break>-help> lists the commands, and <verbatim|osheaf COMMAND -<no-break>-help> (for instance <verbatim|osheaf collection add -<no-break>-help>) gives the options of each. <verbatim|osheaf help-config> describes the configuration file of an archive.
+  <verbatim|osheaf -<no-break>-help> lists the commands, and <verbatim|osheaf COMMAND -<no-break>-help> (for instance <verbatim|osheaf collection add -<no-break>-help>) gives the options of each. <verbatim|osheaf help-config> describes the configuration file of an archive, <verbatim|osheaf.json>, and your own, <verbatim|~/.config/opensheaf/config.json>.
 
   <section*|Your first archive><label|your-first-archive>
 
@@ -74,7 +74,7 @@
 
     <item><verbatim|-<no-break>-keys github:OWNER/REPO>, a key wallet in a private GitHub repository of its own (create it by hand first, for instance with <verbatim|gh repo create me/opensheaf-keys -<no-break>-private>; the tools refuse a public one, or the archive's own). The rotation keys and the current keys are kept there, encrypted under the passphrase, and a new computer gets its key from the wallet. It needs the <hlink|GitHub CLI|https://cli.github.com>, signed in once with <verbatim|gh auth login>.
 
-    <item><verbatim|-<no-break>-keys command>, a key wallet in your password manager (1Password's <verbatim|op>, Bitwarden's <verbatim|bw>, <verbatim|pass>): the same, through a <verbatim|read> and a <verbatim|write> command, given in the environment variable <verbatim|OPENSHEAF_WALLET> as a JSON object, <verbatim|{"wallet": "command", "read": READ, "write": WRITE}>, where READ prints a key and WRITE stores one (for 1Password, READ is <verbatim|op read 'op://Private/opensheaf-{owner}-{k}/notesPlain'>). Chapter 9 of the <hlink|literate program|https://opensheaf.org/opensheaf-py/> gives the commands for the three managers.
+    <item><verbatim|-<no-break>-keys command>, a key wallet in your password manager (1Password's <verbatim|op>, Bitwarden's <verbatim|bw>, <verbatim|pass>): the same, through a <verbatim|read> and a <verbatim|write> command, given as a JSON object, <verbatim|{"wallet": "command", "read": READ, "write": WRITE}>, where READ prints a key and WRITE stores one (for 1Password, READ is <verbatim|op read 'op://Private/opensheaf-{owner}-{k}/notesPlain'>). Since these commands run on your computer, they are read only from your own configuration: the environment variable <verbatim|OPENSHEAF_WALLET>, or <verbatim|"keys"> in <verbatim|~/.config/opensheaf/config.json>; never from an archive's <verbatim|osheaf.json>, which anyone may have written, and which is refused if it names one. Chapter 9 of the <hlink|literate program|https://opensheaf.org/opensheaf-py/> gives the commands for the three managers.
   </itemize>
 
   A wallet trades security for convenience: whoever controls the wallet and knows the passphrase controls the owner, and the tools say so each time they put keys in one. Keep the passphrase elsewhere than the wallet. You can move up to <verbatim|offline> at any time with one rotation (see <hlink|Keys|#keys>).
@@ -92,7 +92,9 @@
   <subsection*|What appears in the folder><label|what-appears-in-the-folder>
 
   <\itemize>
-    <item><verbatim|osheaf.json>: the settings of the archive (name, address, owner, curator, the wallet if any);
+    <item><verbatim|osheaf.json>: the settings of the archive (name, address, owner, curator, the GitHub wallet if any);
+
+    <item><verbatim|.gitattributes>, unless the folder has one already: it tells git to keep every file of the archive byte for byte (section <hlink|4.1|opensheaf-git-0.2.tm#41-attributes> of <hlink|OpenSheaf archives in git|opensheaf-git-0.2.tm>);
 
     <item><verbatim|ocfl/>: the storage itself, one folder per work, with the key log of the owner at <verbatim|ocfl/\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/>;
 
@@ -127,7 +129,7 @@
   </verbatim-code>
   </html-div-class>
 
-  Any source works (LaTeX, Markdown, ...) with its PDF; a TeXmacs source (<verbatim|.tm>) needs no PDF, since the archive typesets it. A paper whose sources are lost is deposited as a PDF alone, saying why: <verbatim|-<no-break>-no-source "the sources are lost">; <verbatim|osheaf complete LABEL -<no-break>-version N -<no-break>-source paper.tex> adds them later. Files are kept byte for byte.
+  <verbatim|-<no-break>-rights> takes an SPDX key (<verbatim|cc-by-4.0>, <verbatim|cc-by-sa-4.0>, <verbatim|cc0-1.0>, <verbatim|gpl-3.0-only>, <verbatim|gpl-3.0-or-later>) or a statement in plain text; by default a new version keeps the licence of the previous one, and a new paper is "All rights reserved". Any source works (LaTeX, Markdown, ...) with its PDF; a TeXmacs source (<verbatim|.tm>) needs no PDF, since the archive typesets it. A paper whose sources are lost is deposited as a PDF alone, saying why: <verbatim|-<no-break>-no-source "the sources are lost">; <verbatim|osheaf complete LABEL -<no-break>-version N -<no-break>-source paper.tex> adds them later. Files are kept byte for byte.
 
   The options can also come from a YAML or JSON file, with the same names, which is handy for papers with many authors or for several deposits at once (a list in the file):
 
@@ -195,7 +197,7 @@
   </verbatim-code>
   </html-div-class>
 
-  A notice is about one version and stays in every later one (<verbatim|-<no-break>-file> adds a full statement, such as an erratum). <verbatim|describe> corrects the title, the abstract, the keywords or the authors. <verbatim|relicense> records a new licence with the authors' agreement. <verbatim|relate> links the same work elsewhere (on arXiv, or by a DOI). <verbatim|withdraw> withdraws the paper: the content stays, no new versions are added, and every page that shows it shows the withdrawal (section <hlink|13|opensheaf-specification-0.2.tm#13-withdrawal-takedown-and-tombstones>).
+  A notice is about one version (<verbatim|-<no-break>-about>) and stays in every later one; its <verbatim|-<no-break>-text> is required, and <verbatim|-<no-break>-file> adds a full statement, such as an erratum. <verbatim|describe> corrects the title, the abstract, the keywords or the authors. <verbatim|relicense> records a new licence with the authors' agreement; its <verbatim|-<no-break>-rights> takes the same values as that of <verbatim|deposit>. <verbatim|relate> links the same work elsewhere (on arXiv, or by a DOI). <verbatim|withdraw> withdraws the paper: the content stays, no new versions are added, and every page that shows it shows the withdrawal (section <hlink|13|opensheaf-specification-0.2.tm#13-withdrawal-takedown-and-tombstones>); its <verbatim|-<no-break>-reason> is required.
 
   <subsection*|Updating the archive and checking it><label|updating-the-archive-and-checking-it>
 
@@ -213,7 +215,7 @@
 
   <subsection*|Publishing><label|publishing>
 
-  An archive is plain files: serve the folder from any static web server, at the address given as <verbatim|-<no-break>-base-url>. With git and GitHub Pages, the easiest start is the <hlink|archive template|https://github.com/opensheaf/archive-template>, which has the right <verbatim|.gitattributes> (so that git keeps every file byte for byte), the workflows and Pages already set up. A folder made with <verbatim|osheaf init> needs the <verbatim|.gitattributes> of section <hlink|4.1|opensheaf-git-0.2.tm#41-attributes> of <hlink|OpenSheaf archives in git|opensheaf-git-0.2.tm> before its first commit. Then, after each change:
+  An archive is plain files: serve the folder from any static web server, at the address given as <verbatim|-<no-break>-base-url>. With git and GitHub Pages, the easiest start is the <hlink|archive template|https://github.com/opensheaf/archive-template>, which has the workflows and Pages already set up. A folder made with <verbatim|osheaf init> is ready for git as it is: <verbatim|init> wrote its <verbatim|.gitattributes>, so that git keeps every file byte for byte. Then, after each change:
 
   <\html-div-class|language-bash>
   <\verbatim-code>
@@ -236,6 +238,8 @@
     osheaf key list \ \ \ \ # what the key wallet holds (never a secret)
   </verbatim-code>
   </html-div-class>
+
+  The <verbatim|key> commands use the configured wallet: <verbatim|OPENSHEAF_WALLET>, else <verbatim|"keys"> in <verbatim|~/.config/opensheaf/config.json>, else the GitHub wallet named in <verbatim|osheaf.json>. <verbatim|-<no-break>-wallet github:OWNER/REPO> (or <verbatim|-<no-break>-wallet command>) names another.
 
   <subsection*|A new computer><label|a-new-computer>
 
@@ -277,11 +281,27 @@
   </verbatim-code>
   </html-div-class>
 
-  <verbatim|key enroll> opens a page of <hlink|opensheaf.org|https://opensheaf.org/manager/unlock.html> in the browser, which makes a passkey for OpenSheaf and hands a secret back to <verbatim|osheaf> on your own computer, encrypted; the keys in the wallet then open with it as well as with the passphrase. A passkey kept in iCloud Keychain is on all your Macs. From then on, whenever <verbatim|osheaf> needs a key of the wallet, the page asks you to click <strong|Unlock> and for Touch ID. The passphrase remains the way back: <verbatim|osheaf> asks for it if the page reports an error, after two minutes without an answer, or when you press Ctrl-C while it waits. Run <verbatim|osheaf key enroll> again after a rotation that did not unlock with the passkey, so that it opens the new keys too. <verbatim|-<no-break>-no-browser> prints the address instead of opening it.
+  <verbatim|key enroll> opens the page <hlink|unlock.opensheaf.org|https://unlock.opensheaf.org/> in the browser, which makes a passkey for <verbatim|unlock.opensheaf.org> and hands a secret derived from it back to <verbatim|osheaf> on your own computer. <verbatim|osheaf> opens the page a second time, to check that the new passkey alone gives the same secret, and only then locks the keys of the owner in the wallet under that secret as well as under the passphrase. A passkey kept in iCloud Keychain is on all your Macs. From then on, whenever <verbatim|osheaf> needs a key of the wallet, it opens the page, which asks for Touch ID. The page needs a recent browser (Safari 17, Chrome 133, Firefox 130 or later) and a passkey provider that supports the PRF extension (iCloud Keychain, Google Password Manager, 1Password, or a security key).
+
+  <strong|Check the code.> Each time, <verbatim|osheaf> prints a code of six digits ("Check that the browser shows the code 123 456"), and the page shows one too. The page does nothing until you tick <strong|The terminal shows the same code>; a page that shows another code was not opened by this <verbatim|osheaf>: close it.
+
+  The passphrase remains the way back: <verbatim|osheaf> asks for it if the page reports an error, after two minutes without an answer, when you press Ctrl-C while it waits, or when the browser's answer does not open a key. Writing new keys into the wallet still needs the passphrase. Run <verbatim|osheaf key enroll> again after a rotation that did not unlock with the passkey, so that it opens the new keys too; <verbatim|-<no-break>-new-passkey> adds a passkey of another provider. <verbatim|-<no-break>-no-browser> prints the address instead of opening it.
+
+  <strong|Passkeys made on opensheaf.org.> The first version of the page, at <verbatim|opensheaf.org/manager/unlock.html>, made passkeys for <verbatim|opensheaf.org>, which <verbatim|osheaf> no longer asks the browser for; the keys they locked still open with the passphrase. Move once, to a passkey for <verbatim|unlock.opensheaf.org>, then remove the old locks (the passphrase lock stays):
+
+  <\html-div-class|language-bash>
+  <\verbatim-code>
+    osheaf key enroll -<no-break>-new-passkey
+
+    osheaf key forget -<no-break>-rp opensheaf.org
+  </verbatim-code>
+  </html-div-class>
+
+  <verbatim|osheaf key forget -<no-break>-passkey CRED> likewise removes the locks of one passkey, named by its credential.
 
   <subsection*|Where the keys are kept><label|where-the-keys-are-kept>
 
-  On each computer, the current key is kept in the system's credential store (the macOS keychain), or else in a file under <verbatim|~/.config/opensheaf/keys> readable only by you. The environment variable <verbatim|OPENSHEAF_KEY_STORE> chooses: <verbatim|keyring>, <verbatim|security> (the macOS keychain through its own command) or <verbatim|file> use that store alone, and <strong|<verbatim|none>> keeps no key on the computer at all: every command that signs opens the key from the wallet (one Touch ID, or the passphrase) and forgets it when it ends. <verbatim|none> needs a key wallet, and suits <verbatim|uvx>, whose Pythons come and go:
+  On each computer, the current key is kept in the system's credential store (the macOS keychain, with the extra <verbatim|keys>), or else in the keychain through the <verbatim|security> command, or else in a file under <verbatim|~/.config/opensheaf/keys> readable only by you. The environment variable <verbatim|OPENSHEAF_KEY_STORE> chooses: <verbatim|keyring>, <verbatim|security> (the macOS keychain through its own command) or <verbatim|file> use that store alone, and <strong|<verbatim|none>> keeps no key on the computer at all: every command that signs opens the key from the wallet (one Touch ID, or the passphrase) and forgets it when it ends. <verbatim|none> needs a key wallet, and suits <verbatim|uvx>, whose Pythons come and go:
 
   <\html-div-class|language-bash>
   <\verbatim-code>
@@ -289,7 +309,7 @@
   </verbatim-code>
   </html-div-class>
 
-  Other variables: <verbatim|OPENSHEAF_WALLET> names the wallet instead of <verbatim|osheaf.json> (to keep its name out of a public archive); <verbatim|OPENSHEAF_PASSPHRASE_COMMAND> names a command that prints the passphrase (for instance <verbatim|security find-generic-password -w -s opensheaf-passphrase>); <verbatim|OPENSHEAF_UNLOCK=passphrase> skips the passkey. In a workflow on GitHub, a key of its own, added with <verbatim|owner rotate -<no-break>-add>, is given in the secret <verbatim|OPENSHEAF_SIGNING_KEY>; the template's README shows how.
+  Other variables: <verbatim|OPENSHEAF_WALLET> names the wallet instead of <verbatim|osheaf.json> (to keep its name out of a public archive, or for a command wallet); <verbatim|OPENSHEAF_PASSPHRASE_COMMAND> names a command that prints the passphrase (for instance <verbatim|security find-generic-password -w -s opensheaf-passphrase>); <verbatim|OPENSHEAF_UNLOCK=passphrase> skips the passkey, as does <verbatim|OPENSHEAF_PASSPHRASE> (the passphrase itself, for scripts). In a workflow on GitHub, a key of its own, added with <verbatim|owner rotate -<no-break>-add>, is given in the secret <verbatim|OPENSHEAF_SIGNING_KEY>; the template's README shows how.
 
   A key also moves through a password manager by the clipboard: <verbatim|osheaf key export -<no-break>-clipboard> (with <verbatim|-<no-break>-encrypt> to encrypt it under the passphrase), and <verbatim|osheaf key import -<no-break>-clipboard> on the other computer.
 
@@ -301,7 +321,7 @@
   <\verbatim-code>
     osheaf owner rotate -<no-break>-keys offline -<no-break>-export /Volumes/USB/opensheaf-keys -<no-break>-print
 
-    osheaf key forget -<no-break>-wallet -<no-break>-used
+    osheaf key forget -<no-break>-from-wallet -<no-break>-used
   </verbatim-code>
   </html-div-class>
 
@@ -461,7 +481,7 @@
 
   <section*|Command reference><label|command-reference>
 
-  <block|<tformat|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-hyphen|t>|<table|<row|<cell|Command>|<cell|What it does>>|<row|<cell|<verbatim|init>>|<cell|create an archive: <verbatim|osheaf.json>, storage, owner, main catalogue>>|<row|<cell|<verbatim|deposit LABEL SOURCE>>|<cell|deposit a paper (<verbatim|-<no-break>-new>) or a new version of it>>|<row|<cell|<verbatim|notice LABEL>>|<cell|a notice about a version (<verbatim|-<no-break>-about N>)>>|<row|<cell|<verbatim|describe LABEL>>|<cell|correct the title, abstract, keywords or authors>>|<row|<cell|<verbatim|relicense LABEL>>|<cell|record a new licence, with the authors' agreement>>|<row|<cell|<verbatim|relate LABEL>>|<cell|link the same work elsewhere (arXiv, DOI)>>|<row|<cell|<verbatim|withdraw LABEL>>|<cell|withdraw a paper; the content stays>>|<row|<cell|<verbatim|complete LABEL>>|<cell|add the sources of a version deposited without them>>|<row|<cell|<verbatim|collect>>|<cell|a new version of the main catalogue, when needed>>|<row|<cell|<verbatim|index>>|<cell|rewrite <verbatim|opensheaf.json>, the indexes and the website>>|<row|<cell|<verbatim|verify>>|<cell|check the archive (<verbatim|-<no-break>-remote>, <verbatim|-<no-break>-json>)>>|<row|<cell|<verbatim|collection new>, <verbatim|add>, <verbatim|remove>>|<cell|make a collection, add or remove members>>|<row|<cell|<verbatim|collection follow>, <verbatim|update>>|<cell|follow members to their new versions>>|<row|<cell|<verbatim|collection status>, <verbatim|sync>>|<cell|the status of members; write from a file>>|<row|<cell|<verbatim|resolve URI>>|<cell|find and check what a <verbatim|sheaf:> URI names>>|<row|<cell|<verbatim|mirror URI>>|<cell|copy a paper written elsewhere (<verbatim|-<no-break>-all>: update every mirror)>>|<row|<cell|<verbatim|branch URI>>|<cell|continue another owner's version as a paper of yours>>|<row|<cell|<verbatim|accept URI>>|<cell|an accepted copy, listed by a selection>>|<row|<cell|<verbatim|draft new>, <verbatim|deposit>, <verbatim|delete>>|<cell|unsigned work in progress>>|<row|<cell|<verbatim|seal ID>>|<cell|seal a draft as a new paper>>|<row|<cell|<verbatim|takedown LABEL>>|<cell|delete an object, leaving a tombstone>>|<row|<cell|<verbatim|owner init>>|<cell|make an owner (done by <verbatim|init -<no-break>-new-owner>)>>|<row|<cell|<verbatim|owner show>>|<cell|show the key log>>|<row|<cell|<verbatim|owner rotate>>|<cell|add or retire current keys, new rotation keys>>|<row|<cell|<verbatim|owner expose DID>>|<cell|declare stolen or leaked keys>>|<row|<cell|<verbatim|owner end>>|<cell|the last version of the key log>>|<row|<cell|<verbatim|owner pull URL>>|<cell|meet another copy of a key log>>|<row|<cell|<verbatim|sign LABEL>>|<cell|sign again a version contested by an exposed key>>|<row|<cell|<verbatim|key new>>|<cell|a new current key for this computer>>|<row|<cell|<verbatim|key push>, <verbatim|pull>>|<cell|current keys to and from the key wallet>>|<row|<cell|<verbatim|key list>>|<cell|what the key wallet holds>>|<row|<cell|<verbatim|key forget>>|<cell|remove keys from this computer (<verbatim|-<no-break>-wallet>: from the wallet)>>|<row|<cell|<verbatim|key export>, <verbatim|import>>|<cell|a key to and from a password manager>>|<row|<cell|<verbatim|key enroll>, <verbatim|unlock>>|<cell|open the keys of the wallet with a passkey>>|<row|<cell|<verbatim|arxiv fetch>>|<cell|download papers from arXiv>>|<row|<cell|<verbatim|arxiv import DOWNLOADS>>|<cell|import them, one signed paper each>>|<row|<cell|<verbatim|zenodo LABEL>>|<cell|a DOI from Zenodo (sandbox, or <verbatim|-<no-break>-production>)>>|<row|<cell|<verbatim|help-config>>|<cell|describe <verbatim|osheaf.json>>>>>>
+  <block|<tformat|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-hyphen|t>|<table|<row|<cell|Command>|<cell|What it does>>|<row|<cell|<verbatim|init>>|<cell|create an archive: <verbatim|osheaf.json>, storage, owner, main catalogue>>|<row|<cell|<verbatim|deposit LABEL [SOURCE]>>|<cell|deposit a paper (<verbatim|-<no-break>-new>) or a new version of it>>|<row|<cell|<verbatim|notice LABEL>>|<cell|a notice about a version (<verbatim|-<no-break>-about N -<no-break>-text TEXT>)>>|<row|<cell|<verbatim|describe LABEL>>|<cell|correct the title, abstract, keywords or authors>>|<row|<cell|<verbatim|relicense LABEL>>|<cell|record a new licence, with the authors' agreement>>|<row|<cell|<verbatim|relate LABEL>>|<cell|link the same work elsewhere (arXiv, DOI)>>|<row|<cell|<verbatim|withdraw LABEL>>|<cell|withdraw a paper (<verbatim|-<no-break>-reason TEXT>); the content stays>>|<row|<cell|<verbatim|complete LABEL>>|<cell|add the sources of a version deposited without them>>|<row|<cell|<verbatim|collect>>|<cell|a new version of the main catalogue, when needed>>|<row|<cell|<verbatim|index>>|<cell|rewrite <verbatim|opensheaf.json>, the indexes and the website>>|<row|<cell|<verbatim|verify>>|<cell|check the archive (<verbatim|-<no-break>-remote>, <verbatim|-<no-break>-json>)>>|<row|<cell|<verbatim|collection new LABEL>>|<cell|make a collection (<verbatim|-<no-break>-type>, <verbatim|-<no-break>-title>)>>|<row|<cell|<verbatim|collection add>, <verbatim|remove>>|<cell|add or remove members>>|<row|<cell|<verbatim|collection follow>, <verbatim|update>>|<cell|follow members to their new versions>>|<row|<cell|<verbatim|collection status>, <verbatim|sync>>|<cell|the status of members; write from a file>>|<row|<cell|<verbatim|resolve URI>>|<cell|find and check what a <verbatim|sheaf:> URI names>>|<row|<cell|<verbatim|mirror URI>>|<cell|copy a paper written elsewhere (<verbatim|-<no-break>-all>: update every mirror)>>|<row|<cell|<verbatim|branch URI>>|<cell|continue another owner's version as a paper of yours>>|<row|<cell|<verbatim|accept URI>>|<cell|an accepted copy, listed by a selection>>|<row|<cell|<verbatim|draft new DRAFT>, <verbatim|deposit>, <verbatim|delete>>|<cell|unsigned work in progress>>|<row|<cell|<verbatim|seal DRAFT>>|<cell|seal a draft as a new paper (<verbatim|-<no-break>-label LABEL>)>>|<row|<cell|<verbatim|takedown LABEL>>|<cell|delete an object, leaving a tombstone>>|<row|<cell|<verbatim|owner init>>|<cell|make an owner (done by <verbatim|init -<no-break>-new-owner>)>>|<row|<cell|<verbatim|owner show>>|<cell|show the key log>>|<row|<cell|<verbatim|owner rotate>>|<cell|add or retire current keys, new rotation keys>>|<row|<cell|<verbatim|owner expose DID>>|<cell|declare stolen or leaked keys>>|<row|<cell|<verbatim|owner end>>|<cell|the last version of the key log>>|<row|<cell|<verbatim|owner pull URL>>|<cell|meet another copy of a key log>>|<row|<cell|<verbatim|sign LABEL>>|<cell|sign again a version contested by an exposed key (<verbatim|-<no-break>-version vN>)>>|<row|<cell|<verbatim|key new>>|<cell|a new current key for this computer>>|<row|<cell|<verbatim|key push>, <verbatim|pull>>|<cell|current keys to and from the key wallet (<verbatim|-<no-break>-wallet WALLET>)>>|<row|<cell|<verbatim|key list>>|<cell|what the key wallet holds>>|<row|<cell|<verbatim|key forget>>|<cell|remove keys from this computer (<verbatim|-<no-break>-from-wallet>: also from the wallet)>>|<row|<cell|<verbatim|key forget -<no-break>-rp RP>, <verbatim|-<no-break>-passkey CRED>>|<cell|remove the passkey locks of a relying party or a passkey>>|<row|<cell|<verbatim|key export>, <verbatim|import>>|<cell|a key to and from a password manager>>|<row|<cell|<verbatim|key enroll>, <verbatim|unlock>>|<cell|open the keys of the wallet with a passkey>>|<row|<cell|<verbatim|arxiv fetch>>|<cell|download papers from arXiv>>|<row|<cell|<verbatim|arxiv import DOWNLOADS>>|<cell|import them, one signed paper each>>|<row|<cell|<verbatim|zenodo LABEL>>|<cell|a DOI from Zenodo (sandbox, or <verbatim|-<no-break>-production>)>>|<row|<cell|<verbatim|help-config>>|<cell|describe <verbatim|osheaf.json> and <verbatim|~/.config/opensheaf/config.json>>>>>>
 
   <section*|Where to go next><label|where-to-go-next>
 
