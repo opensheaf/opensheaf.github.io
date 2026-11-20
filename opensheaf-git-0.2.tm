@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf archives in git>
 
-  <notes-abstract|Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 19 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
+  <notes-abstract|Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 20 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
 
   <os-alert|warning|Warning.|<strong|Draft for discussion.> This document is a first draft. Its open questions are listed in section 13; none of them is settled.>
 
@@ -209,7 +209,7 @@
 
   A branch published directly is served whole, and is processed by Jekyll unless the branch has a <verbatim|.nojekyll> file at the top of the published folder. Jekyll leaves out files and folders whose names begin with <verbatim|_> or <verbatim|.>, which sources often have (<verbatim|_preamble.tex>, <verbatim|.latexmkrc>). A repository published from a branch MUST therefore contain <verbatim|.nojekyll>.
 
-  GitHub Pages compresses responses (<verbatim|Content-Encoding: gzip>); the bytes after decoding are those stored, as the specification requires. It allows cross-origin requests (<verbatim|Access-Control-Allow-Origin: *>), as the specification recommends. Its limits are in section 8.
+  GitHub Pages compresses responses (<verbatim|Content-Encoding: gzip>); the bytes after decoding are those stored, as the specification requires. It allows cross-origin requests (<verbatim|Access-Control-Allow-Origin: *>), as the specification recommends. It sets no other response headers, and serves the storage root from the origin of the presentation files, so it cannot keep the files of objects from running scripts there, with <verbatim|Content-Security-Policy: sandbox> or another origin, as section 15.3 of the specification recommends; that section says what presentation files then avoid, and the question is open there. Its limits are in section 8.
 
   <subsection*|7.3 Other hosts><label|73-other-hosts>
 
@@ -339,6 +339,8 @@
     <item><strong|0.2 (draft), 19 November 2026 (PR #30):> following the rebuilt specification and its pre-rotation of key logs (#58): section references updated; <verbatim|mirrors> dropped, a raw file server or a served clone being another location of the same archive (sections 7.4 and 11); every removal is a takedown, and the history of the published branch is rewritten only for one (sections 1 and 9); a fork of a key log is recorded by a fork record added as a new version after the latest held, never by replacing versions, so that repairs are the only changes of a sealed version folder (section 5.1), and at a merge the other side is carried by a fork record (section 6.3); the first version of a key log is computed from the genesis record and not signed; every version added MUST be signed, and versions that are contested, needing a key exposed on either side of a fork or naming a key-log version from a fork point on, are never added, from a copy or as a deposit; versions of the lines of an owner whose key log has a fork record are not added unless other evidence dates them before the fork, and those of an owner with an ending version only from copies (sections 5.1 and 10); the breaches that fail a commit are errors of the commit check, stricter than the warnings of section 14 of the specification, and findings are errors, warnings and results (section 10); in the owner-name layout the storage root holds <verbatim|opensheaf-owner-name-storage-layout.md> instead of <verbatim|ocfl_layout.json>, which names only registered OCFL extensions (section 5.1, item 5).
 
     <item><strong|0.2 (draft), 19 November 2026:> named version 0.2, with version 0.2 of the specification; version 0.1 kept as published; links to the specification and the timestamps extension set to 0.2.
+
+    <item><strong|0.2 (draft), 20 November 2026:> GitHub Pages sets no <verbatim|Content-Security-Policy>, so it cannot sandbox the files of objects as section 15.3 of the specification recommends (section 7.2).
   </itemize>
 
 </body>

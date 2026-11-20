@@ -29,8 +29,8 @@
     },
     "signature": {
       "type": "string",
-      "pattern": "^[A-Za-z0-9+/]{86}==$",
-      "$comment": "an Ed25519 signature (64 bytes) in base64"
+      "pattern": "^[A-Za-z0-9+/]{85}[AQgw]==$",
+      "$comment": "an Ed25519 signature (64 bytes) in canonical base64, the unused bits of the last character zero"
     },
     "object": {
       "type": "string",

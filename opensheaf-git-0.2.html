@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf archives in git, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 19 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a..."></meta>
+    <meta name="description" content="Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 20 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -32,7 +32,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 19
+      Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 20
       November 2026. How to keep an OpenSheaf archive in a git repository,
       publish it from there and copy it, without git changing a byte of what
       the archive holds. It adds nothing to the format: readers of an archive
@@ -590,7 +590,13 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       GitHub Pages compresses responses (<tt class="verbatim">Content-Encoding:
       gzip</tt>); the bytes after decoding are those stored, as the
       specification requires. It allows cross-origin requests (<tt class="verbatim">Access-Control-Allow-Origin:
-      *</tt>), as the specification recommends. Its limits are in section 8.
+      *</tt>), as the specification recommends. It sets no other response
+      headers, and serves the storage root from the origin of the presentation
+      files, so it cannot keep the files of objects from running scripts
+      there, with <tt class="verbatim">Content-Security-Policy: sandbox</tt> or another
+      origin, as section 15.3 of the specification recommends; that section
+      says what presentation files then avoid, and the question is open there.
+      Its limits are in section 8.
     </p>
     <h3 id="auto-21"><a id="73-other-hosts"></a>7.3 Other hosts<span style="margin-left: 1em"></span></h3>
     <p>
@@ -1077,6 +1083,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           with version 0.2 of the specification; version 0.1 kept as
           published; links to the specification and the timestamps extension
           set to 0.2.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 20 November 2026:</strong> GitHub Pages sets no
+          <tt class="verbatim">Content-Security-Policy</tt>, so it cannot sandbox the
+          files of objects as section 15.3 of the specification recommends
+          (section 7.2).
         </p>
       </li>
     </ul>
