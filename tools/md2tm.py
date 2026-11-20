@@ -74,10 +74,14 @@ def literal(t):
 
 
 def code_and_emphasis(t):
-    out = []
-    for i, part in enumerate(re.split(r'`([^`]*)`', t)):
-        out.append(f'<verbatim|{literal(esc(part))}>' if i % 2 else terms(part))
-    return ''.join(out)
+    """Code spans are set aside while terms and emphasis are read, so that
+    **bold with `code` in it** is still bold."""
+    codes = []
+    def hold(m):
+        codes.append(f'<verbatim|{literal(esc(m.group(1)))}>')
+        return f'\x00{len(codes) - 1}\x00'
+    text = terms(re.sub(r'`([^`]*)`', hold, t))
+    return re.sub(r'\x00(\d+)\x00', lambda m: codes[int(m.group(1))], text)
 
 
 def terms(t):

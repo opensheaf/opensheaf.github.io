@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf: an open format for document archives and collections>
 
-  <notes-abstract|Specification, version 0.2 (draft), 19 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
+  <notes-abstract|Specification, version 0.2 (draft), 20 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
 
   <os-alert|warning|Warning.|<strong|Draft.> Until version 1.0, any revision may change the format in incompatible ways. Version 0.2 is incompatible with <hlink|version 0.1|opensheaf-specification-0.1.tm>, which is kept as published (section 16.1). The text before its rebuild, with the changelog of every revision of the draft, is kept as the <hlink|reference text|reference/opensheaf-specification-0.1-full.md>.>
 
@@ -1251,6 +1251,8 @@
     <item><strong|0.2 (draft), 19 November 2026 (PR #30):> the rebuilt text completed and audited. Appendices A (profiles), B (JSON Schemas) and C (examples, computed and checked against the schemas) rebuilt; DOIs written bare; conformance classes; one status rule for lines, read from the latest signed version (section 13.1); signature files closed to other properties, and owner names, <verbatim|did:key> URIs and ORCID check digits checked exactly (appendix B, sections 6.6 and 14.3). Key logs, provisional (#58), replacing the fork records that nullified keys and the healing of the rebuilt text: pre-rotation, as in KERI, current keys (<verbatim|keys>, <verbatim|threshold>) signing lines, and each version committing in <verbatim|next> and <verbatim|nextThreshold> to the digests of the rotation keys that alone sign the next one, each committed in one version only and never made current, with three rotation keys and a threshold of 2 recommended and one offline key with a threshold of 1 allowed, its risk stated (sections 6.1 and 6.2); the first version of a key log computed from the owner's genesis record, byte for byte, and never signed (section 6.1); the keeper, at most one, and the data of extensions of the first version fixed in that genesis record (sections 5.1 and 6.6); <verbatim|exposed>, in a version that whoever holds current keys cannot contest, an exposure counting in any version, on either side of a fork (section 6.3); an ending version without keys, and at most one accepted successor (sections 6.3 and 6.6); a fork of a key log ends the owner, the archive keeping the side it saw first and appending a fork record that carries the other, and freezes it, nothing more being added unless trusted evidence dates it before the fork (sections 6.3 and 7.5); one status, contested, for versions of lines that need an exposed key or name a key-log version from a fork point on, which owner tools show before extending them, and which an owner not ended may sign again (sections 6.4, 7.1 and 7.3); owner objects taken down only by law or at the keeper's request (section 13.2); strict Ed25519 verification (section 7.2). The inventory chain: every sealed version after the first has <verbatim|previous> in <verbatim|object.json>, the digest of the inventory file before it, so that signing a version fixes the bytes of every earlier inventory, and pins of versions vouched for are as reliable as those of versions signed directly (sections 4, 4.3, 7.3 and 14.2; #46). The owner-name layout is described by the plain text file <verbatim|opensheaf-owner-name-storage-layout.md> in the storage root instead of <verbatim|ocfl_layout.json>, which names only registered OCFL extensions, the discovery document being authoritative (sections 3.2 and 14.2). Readability: the rules of sections 6.1, 6.3, 7.3 and 14.3 numbered, a walkthrough of the common path at the head of appendix C, and clarifications on names of algorithms 1 to 15 (section 5.2), the owners of the main catalogue (section 8.1), drafts and OCFL (section 10.1), rules not checked from the files (section 14) and the validation of <verbatim|datacite.json> (appendix B); rules stated once; the checks of section 14 and the risks of section 15.1 completed.
 
     <item><strong|0.2 (draft), 19 November 2026:> the text of PR #30 named version 0.2, version 0.1 being kept as published: format names, <verbatim|specification>, the extension URI of the timestamps extension, the schemas and their file names set to 0.2, and the examples of appendix C recomputed, since format names enter names and signatures; section 16.1 states how 0.2 and 0.1 differ.
+
+    <item><strong|0.2 (draft), 20 November 2026:> editorial: the link to the KERI specification, which has moved, updated (appendix E).
   </itemize>
 
   <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>
@@ -2196,7 +2198,7 @@
 
     <item><strong|Why identifiers from lines, and two layouts.> Identifiers chosen by archives clash once an archive keeps copies of another's objects; lines never clash (#52). The owner-name layout keeps each owner in one folder, which moves by copying; the hashed layout serves archives too large for that, mostly in git.
 
-    <item>**Why no <verbatim|ocfl_layout.json> for the owner-name layout.** OCFL allows in it only the name of a registered extension (OCFL 1.1, section 4.1), which the owner-name layout is not; OCFL lets a plain text file in the storage root document a local arrangement (section 4.5), and the discovery document names the layout for readers, who compute paths from it.
+    <item><strong|Why no <verbatim|ocfl_layout.json> for the owner-name layout.> OCFL allows in it only the name of a registered extension (OCFL 1.1, section 4.1), which the owner-name layout is not; OCFL lets a plain text file in the storage root document a local arrangement (section 4.5), and the discovery document names the layout for readers, who compute paths from it.
 
     <item><strong|Why document and object versions.> Readers and DOI services see versions of the work; the storage keeps every change, a corrected description or a notice included, each fixed by its pin.
 
@@ -2256,7 +2258,7 @@
 
     <item><strong|Why a signed version vouches for its past.> An inventory fixes every earlier version, so one signature covers them all, as Radicle's canonical head vouches for the commits it reaches.
 
-    <item>**Why <verbatim|previous> chains inventories.** As a git commit names its parents by digest, each version names the digest of the inventory file before it. OCFL chains content, not inventories: an inventory records the digests of earlier versions' files, and earlier inventories need only state the same versions as JSON values (OCFL 1.1, section 3.7). A pin is the digest of an inventory's bytes, so without the chain a version vouched for would be fixed in its files but not in the bytes its pin names, and its pin would be less reliable than that of a version signed directly (#46).
+    <item><strong|Why <verbatim|previous> chains inventories.> As a git commit names its parents by digest, each version names the digest of the inventory file before it. OCFL chains content, not inventories: an inventory records the digests of earlier versions' files, and earlier inventories need only state the same versions as JSON values (OCFL 1.1, section 3.7). A pin is the digest of an inventory's bytes, so without the chain a version vouched for would be fixed in its files but not in the bytes its pin names, and its pin would be less reliable than that of a version signed directly (#46).
 
     <item><strong|Where witnesses live.> A witness follows its version, so it cannot be in it, and a new version for each would mix evidence with the work. OCFL closes the object folder, and its <verbatim|logs/> are not covered by digests; extension folders hold data outside every version, as the mutable-head extension does.
 
@@ -2272,7 +2274,7 @@
 
     <item><strong|Why catalogues and selections.> Keeping and vetting are different acts. A catalogue keeps every version without judging it; a selection attests particular revisions, so a later version cannot enter by itself, and a change of what is vetted is an editorial act in the selection's history.
 
-    <item>**Why <verbatim|follow> is a setting.** A collection version states exactly what it contains; a floating "latest" would change its meaning over time.
+    <item><strong|Why <verbatim|follow> is a setting.> A collection version states exactly what it contains; a floating "latest" would change its meaning over time.
   </itemize>
 
   <subsection*|D.6 Branches and accepted copies><label|d6-branches-and-accepted-copies>
@@ -2306,11 +2308,11 @@
   <subsection*|D.9 Identifiers><label|d9-identifiers>
 
   <\itemize>
-    <item>**Why <verbatim|sheaf:> URIs.** Earlier global names built on an archive's identifier (<verbatim|tag:> or ARK URIs) tied lines to places (#14, #52). One scheme writes lines, versions, pins and owners, and signatures name key-log versions with it.
+    <item><strong|Why <verbatim|sheaf:> URIs.> Earlier global names built on an archive's identifier (<verbatim|tag:> or ARK URIs) tied lines to places (#14, #52). One scheme writes lines, versions, pins and owners, and signatures name key-log versions with it.
 
     <item><strong|Why the owner part defaults to the originator.> The genesis record every copy carries names the originator, so the URI is fixed by the work; "the latest" line would depend on what a resolver knows.
 
-    <item>**Why <verbatim|/v\<less\>n\<gtr\>> is a document version.** Readers cite versions of the work; object versions change at every notice, and a citation that must not move carries the digest.
+    <item><strong|Why <verbatim|/v\<less\>n\<gtr\>> is a document version.> Readers cite versions of the work; object versions change at every notice, and a citation that must not move carries the digest.
 
     <item><strong|Why short forms are only for people.> Eight characters are 40 bits: another owner can make a short form ambiguous, never take it over, and resolvers may know different lines.
 
@@ -2370,7 +2372,7 @@
 
     <item><strong|Why some schemas are closed.> Genesis records, key logs and keeper files decide names and keys, and a signature file holds exactly what it signs; an extra property there would seem committed to.
 
-    <item>**Why <verbatim|datacite.json> is validated through XML.** It keeps the form of the REST API, and DataCite publishes no JSON Schema.
+    <item><strong|Why <verbatim|datacite.json> is validated through XML.> It keeps the form of the REST API, and DataCite publishes no JSON Schema.
   </itemize>
 
   <section*|Appendix E. References><label|appendix-e-references>
@@ -2416,7 +2418,7 @@
 
     <item><hlink|Radicle protocol guide|https://radicle.xyz/guides/protocol> and <hlink|The Update Framework|https://theupdateframework.io/>: identities and key logs compared in appendix D
 
-    <item><hlink|KERI specification|https://trustoverip.github.io/tswg-keri-specification/> (Trust over IP Foundation) and <hlink|the KERI white paper|https://arxiv.org/abs/1907.02143> (S. M. Smith): pre-rotation of keys; <hlink|Sidetree|https://identity.foundation/sidetree/spec/> (Decentralized Identity Foundation): commitments to the next update keys
+    <item><hlink|KERI specification|https://trustoverip.github.io/kswg-keri-specification/> (Trust over IP Foundation) and <hlink|the KERI white paper|https://arxiv.org/abs/1907.02143> (S. M. Smith): pre-rotation of keys; <hlink|Sidetree|https://identity.foundation/sidetree/spec/> (Decentralized Identity Foundation): commitments to the next update keys
   </itemize>
 
   <strong|Companion documents.> <hlink|OpenSheaf archives in git|opensheaf-git-0.2.tm>, for archives kept in git repositories, and the <hlink|timestamps extension|opensheaf-timestamps-0.2.tm>, for dating signatures with RFC 3161 tokens and OpenTimestamps proofs.

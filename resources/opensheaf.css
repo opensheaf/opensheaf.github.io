@@ -345,7 +345,11 @@ div.tmweb-code, div.tmweb-code.hljs {
    characters). */
 pre, code, tt, .hljs { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
 div.tmweb-code pre.verbatim { margin: 0; padding: 0; font-size: inherit; }
+/* The empty spacer TeXmacs ends a title with would widen a phone's page
+   when the title fills the line. */
+h1 > span:empty { display: none; }
 tt.verbatim {
+    overflow-wrap: anywhere; /* long pins and digests wrap rather than widen the page */
     font-size: 0.88em;
     font-variant-numeric: normal;
     background: var(--os-surface);

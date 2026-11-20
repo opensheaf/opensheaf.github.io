@@ -281,7 +281,7 @@
 
   <subsection*|Where the keys are kept><label|where-the-keys-are-kept>
 
-  On each computer, the current key is kept in the system's credential store (the macOS keychain), or else in a file under <verbatim|~/.config/opensheaf/keys> readable only by you. The environment variable <verbatim|OPENSHEAF_KEY_STORE> chooses: <verbatim|keyring>, <verbatim|security> (the macOS keychain through its own command) or <verbatim|file> use that store alone, and **<verbatim|none>** keeps no key on the computer at all: every command that signs opens the key from the wallet (one Touch ID, or the passphrase) and forgets it when it ends. <verbatim|none> needs a key wallet, and suits <verbatim|uvx>, whose Pythons come and go:
+  On each computer, the current key is kept in the system's credential store (the macOS keychain), or else in a file under <verbatim|~/.config/opensheaf/keys> readable only by you. The environment variable <verbatim|OPENSHEAF_KEY_STORE> chooses: <verbatim|keyring>, <verbatim|security> (the macOS keychain through its own command) or <verbatim|file> use that store alone, and <strong|<verbatim|none>> keeps no key on the computer at all: every command that signs opens the key from the wallet (one Touch ID, or the passphrase) and forgets it when it ends. <verbatim|none> needs a key wallet, and suits <verbatim|uvx>, whose Pythons come and go:
 
   <\html-div-class|language-bash>
   <\verbatim-code>

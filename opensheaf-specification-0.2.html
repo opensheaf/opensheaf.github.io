@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:x="https://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:x="https://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML">
   <head>
-    <title>OpenSheaf</title>
+    <title>OpenSheaf: an open format for document archives and collections, version 0.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+    <meta name="description" content="Specification, version 0.2 (draft), 20 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -31,7 +33,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.2 (draft), 19 November 2026. OpenSheaf is a
+      Specification, version 0.2 (draft), 20 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). The text is licensed under CC
@@ -4120,6 +4122,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           names and signatures; section 16.1 states how 0.2 and 0.1 differ.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 20 November 2026:</strong> editorial: the link
+          to the KERI specification, which has moved, updated (appendix E).
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -5234,12 +5242,12 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
-          **Why no <tt class="verbatim">ocfl_layout.json</tt> for the owner-name
-          layout.** OCFL allows in it only the name of a registered extension
-          (OCFL 1.1, section 4.1), which the owner-name layout is not; OCFL
-          lets a plain text file in the storage root document a local
-          arrangement (section 4.5), and the discovery document names the
-          layout for readers, who compute paths from it.
+          <strong>Why no <tt class="verbatim">ocfl_layout.json</tt> for the owner-name
+          layout.</strong> OCFL allows in it only the name of a registered
+          extension (OCFL 1.1, section 4.1), which the owner-name layout is
+          not; OCFL lets a plain text file in the storage root document a
+          local arrangement (section 4.5), and the discovery document names
+          the layout for readers, who compute paths from it.
         </p>
       </li>
       <li>
@@ -5487,15 +5495,16 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
-          **Why <tt class="verbatim">previous</tt> chains inventories.** As a git commit
-          names its parents by digest, each version names the digest of the
-          inventory file before it. OCFL chains content, not inventories: an
-          inventory records the digests of earlier versions' files, and
-          earlier inventories need only state the same versions as JSON values
-          (OCFL 1.1, section 3.7). A pin is the digest of an inventory's
-          bytes, so without the chain a version vouched for would be fixed in
-          its files but not in the bytes its pin names, and its pin would be
-          less reliable than that of a version signed directly (#46).
+          <strong>Why <tt class="verbatim">previous</tt> chains inventories.</strong> As
+          a git commit names its parents by digest, each version names the
+          digest of the inventory file before it. OCFL chains content, not
+          inventories: an inventory records the digests of earlier versions'
+          files, and earlier inventories need only state the same versions as
+          JSON values (OCFL 1.1, section 3.7). A pin is the digest of an
+          inventory's bytes, so without the chain a version vouched for would
+          be fixed in its files but not in the bytes its pin names, and its
+          pin would be less reliable than that of a version signed directly
+          (#46).
         </p>
       </li>
       <li>
@@ -5543,9 +5552,9 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
-          **Why <tt class="verbatim">follow</tt> is a setting.** A collection version
-          states exactly what it contains; a floating &quot;latest&quot; would
-          change its meaning over time.
+          <strong>Why <tt class="verbatim">follow</tt> is a setting.</strong> A
+          collection version states exactly what it contains; a floating
+          &quot;latest&quot; would change its meaning over time.
         </p>
       </li>
     </ul>
@@ -5626,10 +5635,11 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
     <ul>
       <li>
         <p>
-          **Why <tt class="verbatim">sheaf:</tt> URIs.** Earlier global names built on
-          an archive's identifier (<tt class="verbatim">tag:</tt> or ARK URIs) tied
-          lines to places (#14, #52). One scheme writes lines, versions, pins
-          and owners, and signatures name key-log versions with it.
+          <strong>Why <tt class="verbatim">sheaf:</tt> URIs.</strong> Earlier global
+          names built on an archive's identifier (<tt class="verbatim">tag:</tt> or ARK
+          URIs) tied lines to places (#14, #52). One scheme writes lines,
+          versions, pins and owners, and signatures name key-log versions with
+          it.
         </p>
       </li>
       <li>
@@ -5642,9 +5652,10 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
-          **Why <tt class="verbatim">/v&lt;n&gt;</tt> is a document version.** Readers
-          cite versions of the work; object versions change at every notice,
-          and a citation that must not move carries the digest.
+          <strong>Why <tt class="verbatim">/v&lt;n&gt;</tt> is a document
+          version.</strong> Readers cite versions of the work; object versions
+          change at every notice, and a citation that must not move carries
+          the digest.
         </p>
       </li>
       <li>
@@ -5805,9 +5816,9 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
-          **Why <tt class="verbatim">datacite.json</tt> is validated through XML.** It
-          keeps the form of the REST API, and DataCite publishes no JSON
-          Schema.
+          <strong>Why <tt class="verbatim">datacite.json</tt> is validated through
+          XML.</strong> It keeps the form of the REST API, and DataCite
+          publishes no JSON Schema.
         </p>
       </li>
     </ul>
@@ -5940,7 +5951,7 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
-          <a href="https://trustoverip.github.io/tswg-keri-specification/">KERI specification</a> (Trust over IP Foundation) and <a
+          <a href="https://trustoverip.github.io/kswg-keri-specification/">KERI specification</a> (Trust over IP Foundation) and <a
           href="https://arxiv.org/abs/1907.02143">the KERI white paper</a> (S. M. Smith): pre-rotation of keys;
           <a href="https://identity.foundation/sidetree/spec/">Sidetree</a> (Decentralized Identity Foundation):
           commitments to the next update keys
