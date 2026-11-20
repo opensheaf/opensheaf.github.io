@@ -72,6 +72,8 @@
 
     <item><strong|Template:> <hlink|archive-template|https://github.com/opensheaf/archive-template>, a ready repository for an archive of papers and for collections of papers from any archive (a reading list or a journal issue, written as a selection, or a catalogue), kept from the browser with GitHub's forms or with <verbatim|osheaf>, and published with GitHub Pages; it is also a testing ground that runs every workflow of the tools on every push.
 
+    <item><strong|Formal model:> <hlink|opensheaf-lean|https://github.com/opensheaf/opensheaf-lean>, a model of the specification in Lean 4, written as a <hlink|literate program|https://opensheaf.org/opensheaf-lean/>: the format and its changes as definitions, and the properties the specification states in prose, among them its security claims, proved as theorems (see <hlink|the formal model|formal-model.tm>).
+
     <item><strong|Test data:> <hlink|example-papers|https://github.com/opensheaf/example-papers>, papers to deposit (invented ones, TeXmacs papers and slides, real openly licensed preprints from arXiv and slides from Zenodo) with their metadata.
   </itemize>
 
@@ -85,6 +87,8 @@
     <item><hlink|<verbatim|FAQ.md>|faq.tm>: answers to common questions about the design.
 
     <item><hlink|<verbatim|USE-CASES.md>|use-cases.tm>: how the specification adapts to authors, archives and selections (non-normative).
+
+    <item><hlink|<verbatim|FORMAL-MODEL.md>|formal-model.tm>: the formal model of the specification in Lean, with glimpses of its code and theorems (non-normative).
 
     <item><hlink|<verbatim|opensheaf-git-0.2.md>|opensheaf-git-0.2.tm>: OpenSheaf archives in git, a companion to the specification: how to keep, publish and copy an archive in a git repository without changing its bytes.
 

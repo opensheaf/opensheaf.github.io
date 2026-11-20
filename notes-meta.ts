@@ -28,7 +28,8 @@
 
   <assign|notes-header-links|<macro|[<hlink|OpenSheaf|index.tm>]
   [<hlink|specification|opensheaf-specification-0.2.tm>] [<hlink|use
-  cases|use-cases.tm>] [<hlink|FAQ|faq.tm>]
+  cases|use-cases.tm>] [<hlink|FAQ|faq.tm>] [<hlink|formal
+  model|formal-model.tm>]
   [<hlink|first archive|https://mgubi.org/papers/>]>>
 
   <assign|notes-header-name|OpenSheaf>

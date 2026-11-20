@@ -120,6 +120,12 @@ on GitHub, and archives made with them.
   selection, or a catalogue), kept from the browser with GitHub's forms or
   with `osheaf`, and published with GitHub Pages; it is also a testing ground
   that runs every workflow of the tools on every push.
+- **Formal model:** [opensheaf-lean](https://github.com/opensheaf/opensheaf-lean),
+  a model of the specification in Lean 4, written as a
+  [literate program](https://opensheaf.org/opensheaf-lean/): the format and
+  its changes as definitions, and the properties the specification states
+  in prose, among them its security claims, proved as theorems (see
+  [the formal model](FORMAL-MODEL.md)).
 - **Test data:** [example-papers](https://github.com/opensheaf/example-papers),
   papers to deposit (invented ones, TeXmacs papers and slides, real openly
   licensed preprints from arXiv and slides from Zenodo) with their metadata.
@@ -137,6 +143,8 @@ on GitHub, and archives made with them.
 - [`FAQ.md`](FAQ.md): answers to common questions about the design.
 - [`USE-CASES.md`](USE-CASES.md): how the specification adapts to authors,
   archives and selections (non-normative).
+- [`FORMAL-MODEL.md`](FORMAL-MODEL.md): the formal model of the specification
+  in Lean, with glimpses of its code and theorems (non-normative).
 - [`opensheaf-git-0.2.md`](opensheaf-git-0.2.md): OpenSheaf archives in git,
   a companion to the specification: how to keep, publish and copy an archive
   in a git repository without changing its bytes.

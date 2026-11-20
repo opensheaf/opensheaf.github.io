@@ -8,7 +8,8 @@ description: The look and brand of the OpenSheaf site and documents, and the des
 ## How the pages are made
 
 - Edit only the Markdown sources: `README.md` (home page and GitHub README),
-  `opensheaf-specification-0.2.md`, `FAQ.md`, `USE-CASES.md`, the companions
+  `opensheaf-specification-0.2.md`, `FAQ.md`, `USE-CASES.md`,
+  `FORMAL-MODEL.md` (the formal model in Lean), the companions
   `opensheaf-git-0.2.md` and `opensheaf-timestamps-0.2.md`, and version 0.1
   (`opensheaf-specification-0.1.md`, `opensheaf-git-0.1.md`), kept as
   published and not edited.

@@ -18,6 +18,8 @@ notes are for anyone, person or agent, changing it.
 
 - Edit only the Markdown sources: `README.md` (also the home page),
   `opensheaf-specification-0.2.md`, `FAQ.md`, `USE-CASES.md`,
+  `FORMAL-MODEL.md` (the formal model in Lean, whose code is quoted from
+  `opensheaf/opensheaf-lean` and kept in step with it),
   `opensheaf-git-0.2.md` (archives in git, a companion to the
   specification), `opensheaf-timestamps-0.2.md` (the timestamps extension);
   and the schemas `schemas/opensheaf-*-0.2.schema.json`.
@@ -32,7 +34,9 @@ notes are for anyone, person or agent, changing it.
   `max-html` plugins (see the style skill).
 - Keep the Markdown sources in ASCII: the converter writes Latin-1 and stops
   on other characters (write `...`, not an ellipsis, and `->`, not an
-  arrow).
+  arrow). The one exception is the Lean code quoted in `FORMAL-MODEL.md`,
+  whose few mathematical symbols the converter maps to TeXmacs symbols
+  (`SYMBOLS` in `tools/md2tm.py`).
 - `drafts/` holds working papers (positions, ideas, comparisons): plain
   Markdown, non-normative, not built into the site; see its README.
 - Check that the schemas still parse (`python3 -c "import json; json.load(open(F))"`)

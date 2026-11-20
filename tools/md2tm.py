@@ -32,15 +32,28 @@ The output uses the `notes` style of the author's website with the package
 `notes-meta.ts` of this repository. Strings are written for TeXmacs files:
 `<`, `>`, `|` and backslashes are escaped, leading and repeated spaces in
 code are made explicit, and the file is written in Latin-1 (the
-specification is kept in ASCII).
+specification is kept in ASCII). The few mathematical symbols of the Lean
+code quoted on the page about the formal model (FORMAL-MODEL.md) are written
+as TeXmacs symbols (SYMBOLS); any other character outside Latin-1 stops the
+conversion.
 """
 
 import re
 import sys
 
 
+# Unicode symbols of Lean code, as TeXmacs symbols, escaped as `<` is (a bare
+# `<neg>` would be read as a tag); exported to HTML as the same characters
+SYMBOLS = {c: f'\\<{name}\\>' for c, name in {
+    '\u2200': 'forall', '\u2203': 'exists', '\u2192': 'rightarrow',
+    '\u2194': 'leftrightarrow', '\u2227': 'wedge', '\u2228': 'vee', '\u00ac': 'neg',
+    '\u2264': 'leqslant', '\u2265': 'geqslant', '\u2260': 'neq', '\u2208': 'in',
+    '\u2209': 'nin', '\u27e8': 'langle', '\u27e9': 'rangle', '\u00d7': 'times'}.items()}
+
+
 def esc(t):
     table = {'\\': '\\\\', '<': '\\<less\\>', '>': '\\<gtr\\>', '|': '\\|'}
+    table.update(SYMBOLS)
     return ''.join(table.get(c, c) for c in t)
 
 
@@ -309,7 +322,7 @@ def main():
     sys.argv[1:] = args
     md = open(sys.argv[1], encoding='utf-8').read()
     try:
-        md.encode('latin-1')
+        ''.join(c for c in md if c not in SYMBOLS).encode('latin-1')
     except UnicodeEncodeError as e:
         sys.exit(f'{sys.argv[1]}: keep the specification in ASCII ({e})')
     with open(sys.argv[2], 'w', encoding='latin-1', newline='') as f:
