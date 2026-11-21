@@ -148,7 +148,7 @@ work will need.
 ## 4. Point by point
 
 **Fixity.** Hexagon publishes a SHA-256 digest of every file of a version,
-which is more than arXiv or alphaXiv shows. But the digests are served by
+which the pages of alphaXiv read for [its paper](alphaxiv.md) do not. But the digests are served by
 the same host as the files, and nothing fixes the set: there is no digest of
 the version as a whole, so a citation cannot carry a pin, and a reader who
 trusts a copy of a file has only Hexagon's word that it belongs to that
@@ -162,21 +162,23 @@ manifest published with the identifier.
 **Who stands behind a version.** On Hexagon, an account signed in with an
 ORCID iD; the version is authentic because Hexagon says who deposited it.
 In OpenSheaf, an owner's keys sign each version (section 7), and the
-signature is checked without asking the host; ORCID enters only as a keeper
-who answers for an owner (section 6.6). For a repository that wants to be
+signature is checked without asking the host; ORCID enters as a keeper who
+answers for an owner (section 6.6), and as identifiers of creators in the
+description (section 4.4). For a repository that wants to be
 trusted while it lasts, the first is enough; for a record that should be
 believed after its host has gone, or in copies kept elsewhere, it is not.
 
 **Names.** `hexagon:2611.00802v1` is a name in one repository, as
-`arXiv:2611.00802v1` is, resolved by it; DOIs will add a resolver run by
-DataCite. A `sheaf:` URI is resolved from any copy that passes the checks
+`arXiv:2611.00802v1` is, resolved by it; DOIs, when they come, will add the
+resolver of the DOI system. A `sheaf:` URI is resolved from any copy that passes the checks
 (section 12.3). The forms are close (a work, a version number), and a
 Hexagon identifier fits as an external label of an OpenSheaf version
 (`external`, section 4.3).
 
 **Versions.** Close in intent: every version kept and citable, withdrawal
 leaving the record in place. Hexagon changes some fields of a published
-version in place (the arXiv identifier, formalisations, tags); in
+version in place (the API sets the arXiv identifier, formalisations and
+tags of a work; the pages do not say whether earlier values are kept); in
 OpenSheaf any change is a new object version, a description-only one when
 the document does not change (section 4.2), so that what a version said
 can be read back. Links to formalisations are exactly the kind of field
@@ -213,23 +215,27 @@ OpenSheaf has nothing for. `authorshipMode`, `humanUnderstanding`,
 `provenance` and `tools` are statements of the contributors about how a
 version was made, recorded per version and searchable. OpenSheaf's
 `toolchain` (section 4.3) lists the tools that build the renditions, not
-those that wrote the mathematics, and DataCite has no fields for it. Such a
+those that wrote the mathematics, and DataCite has no fields made for it
+(a description of type `Methods` or `TechnicalInfo` could hold free text). Such a
 statement belongs to a version, should be fixed with it, and, since it is a
-claim, should be signed by those who make it: three things OpenSheaf does
-and Hexagon does not.
+claim, should be signed by whoever makes it. OpenSheaf fixes and signs each
+version, though by its owner, not by each contributor; Hexagon does
+neither.
 
 **Formalisation.** Hexagon links formal proofs (Mathlib, Palomar,
-Prove2.me, Tau Ceti) but does not hold them. A link to a formalisation says
-that a proof exists somewhere, not which version of the paper it checks,
-nor which version of the proof. In OpenSheaf, a formalisation can be a
+Prove2.me, Tau Ceti) but does not hold them. A link is attached to the
+record of the paper and may be set after publication; whether it fixes a
+version of the proof depends on the link (a Mathlib commit does, the page
+of a project may not), and nothing checks it against the files. In OpenSheaf, a formalisation can be a
 document of its own, versioned, with a relation to the version it
 formalises, and a statement that it checks can be a member of a selection
 pinning both. Whether a formal proof is a document, a dataset or software,
 and how relations between them are written, is open
 ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)).
 
-**Discussion.** Neither has any. Hexagon takes feedback privately;
-OpenSheaf's question is open
+**Discussion.** Neither has any. Hexagon takes feedback by mail, a report
+form and a feedback repository on GitHub; OpenSheaf has only the owner's
+notices, and the question is open
 ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)).
 
 **Machine readers.** Hexagon has a JSON API with an OpenAPI description, an
@@ -252,8 +258,9 @@ are static files that anyone can copy, check and serve.
   with rules.
 - **It makes provenance a field.** Who or what wrote the text, how much of
   it a human understood, which systems were used: recorded per version,
-  queryable, the basis on which others can filter. None of the other
-  services compared here records it per version.
+  queryable, the basis on which others can filter. alphaXiv sorts its
+  submissions into a human-written and an AI track; Hexagon records more,
+  and per version.
 - **It is honest about what acceptance means.** Screening is not review,
   and says so; the record of a version is separated from any judgement of
   it. This is the separation of record and filter that
@@ -261,7 +268,8 @@ are static files that anyone can copy, check and serve.
 - **Its rights allow copying.** Open licences only, a perpetual licence
   that passes to a successor, copies to other archives allowed.
 - **Its community.** Run by a foundation whose board and advisers are known
-  mathematicians, with formalisation people among them.
+  mathematicians, among them Kevin Buzzard, who works on formalisation in
+  Lean.
 - **Its interfaces.** An arXiv-compatible API means existing tools work;
   per-file digests are already published.
 
@@ -273,8 +281,8 @@ are static files that anyone can copy, check and serve.
 - **Trust by account.** Provenance statements are claims; they are
   recorded under an account, not signed by those who make them, and can be
   checked only by asking Hexagon who deposited what.
-- **Mutable fields.** Some metadata of a published version changes in
-  place, with no record of what it said before.
+- **Mutable fields.** Some metadata of a published version is set in
+  place, and the pages do not say whether what it said before is kept.
 - **Filtering is left to others, who have nothing to work with.** Hexagon
   rightly declines to judge, but provides no form in which someone else's
   judgement (a check by a referee, a formalisation completed, an error found)
@@ -297,8 +305,9 @@ are static files that anyone can copy, check and serve.
 
 Hexagon is the kind of archive OpenSheaf was designed to hold, kept by the
 kind of party it was designed for: a community institution, with open
-licences, versions that stay, withdrawal that keeps the record. It would
-lose nothing by being an OpenSheaf archive, and gain what it lacks: a pin for
+licences, versions that stay, withdrawal that keeps the record. Becoming an
+OpenSheaf archive would cost it work (keys, signing, a layout of files),
+and would give it what it lacks: a pin for
 each version, signatures for what its contributors state, copies that
 others can keep and check, and a form in which filters (referees,
 formalisers, overlay journals) can state what they vetted. OpenSheaf, for
@@ -349,8 +358,10 @@ issue before anything changes.
 - **A suggestion to Hexagon.** Publish, for each version, a manifest of its
   files with their digests, and a digest of the manifest beside the
   identifier, so that a version can be cited by a pin and checked anywhere.
-  An OCFL inventory is such a manifest, and would make every Hexagon version
-  readable as an OpenSheaf object version without anything else.
+  An OCFL inventory is such a manifest, and would be a first step towards
+  reading Hexagon versions as OpenSheaf object versions, which also need
+  their object record, description, genesis record and signatures
+  (sections 4 and 7).
 
 ## 7. Experiments
 
@@ -390,5 +401,5 @@ asking it. What OpenSheaf lacks is what Hexagon is for: a community with
 content, and a record of how a work was made. The most useful step for
 OpenSheaf is to take provenance seriously, starting from Hexagon's fields;
 the most useful step for Hexagon, should it want one, is a digest of each
-version, which would make its records checkable anywhere and readable as
-OpenSheaf objects.
+version, which would make its records checkable anywhere and a first step
+towards reading them as OpenSheaf objects.
