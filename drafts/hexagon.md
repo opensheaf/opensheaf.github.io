@@ -148,16 +148,16 @@ work will need.
 ## 4. Point by point
 
 **Fixity.** Hexagon publishes a SHA-256 digest of every file of a version,
-which the pages of alphaXiv read for [its paper](alphaxiv.md) do not. But the digests are served by
-the same host as the files, and nothing fixes the set: there is no digest of
-the version as a whole, so a citation cannot carry a pin, and a reader who
-trusts a copy of a file has only Hexagon's word that it belongs to that
-version. In OpenSheaf the inventory lists every file with its SHA-512, and
-its own digest is the pin (sections 4 and 7.6): one value fixes the version,
-can be written in a citation (`?sha512=`, section 12.1), and is checked
-against any copy from anywhere. A Hexagon version could be made checkable
-in this sense with little: a manifest of its files, and a digest of the
-manifest published with the identifier.
+which the pages of alphaXiv read for [its paper](alphaxiv.md) do not. But the
+digests are served by the same host as the files, and nothing fixes the set:
+there is no digest of the version as a whole, so a citation cannot carry a
+pin, and a reader who trusts a copy of a file has only Hexagon's word that it
+belongs to that version. In OpenSheaf the inventory lists every file with its
+SHA-512, and its own digest is the pin (sections 4 and 7.6): one value fixes
+the version, can be written in a citation (`?sha512=`, section 12.1), and is
+checked against any copy from anywhere. A Hexagon version could be made
+checkable in this sense with little: a manifest of its files, and a digest of
+the manifest published with the identifier.
 
 **Who stands behind a version.** On Hexagon, an account signed in with an
 ORCID iD; the version is authentic because Hexagon says who deposited it.
@@ -170,10 +170,10 @@ believed after its host has gone, or in copies kept elsewhere, it is not.
 
 **Names.** `hexagon:2611.00802v1` is a name in one repository, as
 `arXiv:2611.00802v1` is, resolved by it; DOIs, when they come, will add the
-resolver of the DOI system. A `sheaf:` URI is resolved from any copy that passes the checks
-(section 12.3). The forms are close (a work, a version number), and a
-Hexagon identifier fits as an external label of an OpenSheaf version
-(`external`, section 4.3).
+resolver of the DOI system. A `sheaf:` URI is resolved from any copy that
+passes the checks (section 12.3). The forms are close (a work, a version
+number), and a Hexagon identifier fits as an external label of an OpenSheaf
+version (`external`, section 4.3).
 
 **Versions.** Close in intent: every version kept and citable, withdrawal
 leaving the record in place. Hexagon changes some fields of a published
@@ -213,24 +213,23 @@ lack the institution that lasts.
 **Provenance of AI-generated work.** Hexagon's main contribution, and one
 OpenSheaf has nothing for. `authorshipMode`, `humanUnderstanding`,
 `provenance` and `tools` are statements of the contributors about how a
-version was made, recorded per version and searchable. OpenSheaf's
-`toolchain` (section 4.3) lists the tools that build the renditions, not
-those that wrote the mathematics, and DataCite has no fields made for it
-(a description of type `Methods` or `TechnicalInfo` could hold free text). Such a
-statement belongs to a version, should be fixed with it, and, since it is a
-claim, should be signed by whoever makes it. OpenSheaf fixes and signs each
-version, though by its owner, not by each contributor; Hexagon does
-neither.
+version was made, recorded per version and searchable. OpenSheaf's `toolchain`
+(section 4.3) lists the tools that build the renditions, not those that wrote
+the mathematics, and DataCite has no fields made for it (a description of type
+`Methods` or `TechnicalInfo` could hold free text). Such a statement belongs
+to a version, should be fixed with it, and, since it is a claim, should be
+signed by whoever makes it. OpenSheaf fixes and signs each version, though by
+its owner, not by each contributor; Hexagon does neither.
 
-**Formalisation.** Hexagon links formal proofs (Mathlib, Palomar,
-Prove2.me, Tau Ceti) but does not hold them. A link is attached to the
-record of the paper and may be set after publication; whether it fixes a
-version of the proof depends on the link (a Mathlib commit does, the page
-of a project may not), and nothing checks it against the files. In OpenSheaf, a formalisation can be a
-document of its own, versioned, with a relation to the version it
+**Formalisation.** Hexagon links formal proofs (Mathlib, Palomar, Prove2.me,
+Tau Ceti) but does not hold them. A link is attached to the record of the
+paper and may be set after publication; whether it fixes a version of the
+proof depends on the link (a Mathlib commit does, the page of a project may
+not), and nothing checks it against the files. In OpenSheaf, a formalisation
+can be a document of its own, versioned, with a relation to the version it
 formalises, and a statement that it checks can be a member of a selection
-pinning both. Whether a formal proof is a document, a dataset or software,
-and how relations between them are written, is open
+pinning both. Whether a formal proof is a document, a dataset or software, and
+how relations between them are written, is open
 ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)).
 
 **Discussion.** Neither has any. Hexagon takes feedback by mail, a report
