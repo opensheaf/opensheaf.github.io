@@ -13,11 +13,15 @@ proposals, experiments and open questions.*
 
 > [!NOTE]
 > The facts on alphaXiv were read on 21 November 2026 from its home page, its
-> submission policy (`/docs/submission-policy`), the documentation of its MCP
-> server (`/docs/mcp`), its list of submissions, its blog and the page of its
-> Autoresearch application (`openresearch.sh`). Points marked *(unverified)*
-> come from earlier knowledge and were not found on those pages. Services
-> change: check them before relying on them. Section numbers are those of
+> about page (`/about`), its submission policy (`/docs/submission-policy`),
+> the documentation of its MCP server (`/docs/mcp`), its list of
+> submissions, its blog, the page of a paper (`/abs/1706.03762`) and the page
+> of its Autoresearch application (`openresearch.sh`); from the abstract
+> page of the same paper on arXiv and the showcase of arXivLabs; and, for
+> its history, from an interview with a cofounder (D. Genkina, "AlphaXiv
+> Wants to Be the Public Square for Scientific Discourse", IEEE Spectrum, 25
+> March 2025, <https://spectrum.ieee.org/alphaxiv>). Services change: check
+> them before relying on them. Section numbers are those of
 > [version 0.2](../opensheaf-specification-0.2.md) of the specification.
 
 ## 1. The question
@@ -35,7 +39,13 @@ what OpenSheaf lacks?
 
 ## 2. What alphaXiv is
 
-As its pages describe it on 21 November 2026:
+It calls itself "an open research platform where researchers read, discuss
+and publish papers", and is "operated by alphaXiv, Inc." It began as a
+student project at Stanford University, by Rehaan Ahmad and Raj Palleti, as
+"a version of Stack Overflow for papers", where readers "highlight sections
+and leave in-line comments" on arXiv papers; in March 2025 it had "been
+around for a year and a half" (IEEE Spectrum). As its pages describe it on
+21 November 2026:
 
 - **A reading and discovery service.** The home page is a feed of papers,
   with explainer videos, counts (unlabelled on the page), and the researchers
@@ -76,10 +86,14 @@ As its pages describe it on 21 November 2026:
   its cross-origin access is limited to its own sites. A desktop application,
   Autoresearch, turns coding agents into "research agents that review
   literature, develop hypotheses, and run experiments".
-- **Discussion.** *(Unverified.)* alphaXiv began in 2024 as a place to
-  comment on arXiv papers, line by line, and was linked from arXiv's
-  abstract pages through arXivLabs. The pages read neither show nor describe
-  comments today.
+- **Discussion.** The page of each paper has a discussion: threads, each
+  with its author, date and replies, and numbers beside the comments
+  (votes, presumably; they are unlabelled). The page of a paper also has an
+  "AI Overview", and saving a paper needs an account.
+- **A link from arXiv.** arXiv's abstract pages link alphaXiv among the
+  "Code, Data and Media" associated with an article, and alphaXiv's about
+  page says it is supported by arXivLabs, arXiv's programme for projects
+  with outside collaborators; the showcase of arXivLabs does not list it.
 
 Not found on the pages read: a business model or prices, DOIs, a bulk export,
 a public API other than the MCP server, any way to run it elsewhere.
@@ -167,9 +181,10 @@ they stood. OpenSheaf's collections are themselves signed, versioned objects
 that pin their members (section 8), held by anyone, citable at each
 version.
 
-**Discussion.** alphaXiv's original feature *(unverified)*, not described on
-the pages read; OpenSheaf has no form for it.
-Comments, reviews and replies about a version are an open design question
+**Discussion.** alphaXiv's original feature, still on the page of every
+paper, in threads attached to the paper; the page does not say which
+version a comment is about, and none is fixed by a digest. OpenSheaf has
+no form for discussion. Comments, reviews and replies about a version are an open design question
 ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)), and so
 is blind review
 ([#63](https://github.com/opensheaf/opensheaf.github.io/issues/63)); the
