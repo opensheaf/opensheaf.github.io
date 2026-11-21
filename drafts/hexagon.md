@@ -186,15 +186,15 @@ is open in OpenSheaf too
 
 **Withdrawal and removal.** Hexagon's withdrawal is OpenSheaf's (section
 13.1): the work stays, marked, with a reason. Its removal is a takedown
-(section 13.2), but leaves no tombstone that a copy elsewhere could be
-checked against; Hexagon says plainly that copies held elsewhere are not its
+(section 13.2); the pages do not say what stays at the address of a removed
+work, and nothing like a tombstone with a pin is described. Hexagon says plainly that copies held elsewhere are not its
 business, which is also where OpenSheaf is undecided
 ([#33](https://github.com/opensheaf/opensheaf.github.io/issues/33),
 [#66](https://github.com/opensheaf/opensheaf.github.io/issues/66)).
 
 **Rights.** Hexagon's three licences, CC BY, CC BY-SA and CC0, all allow
-redistribution: every work on Hexagon meets the rule OpenSheaf requires of a
-mirror (section 11.2) and the one proposed in
+redistribution: every work on Hexagon meets the condition on licences that
+OpenSheaf sets for mirrors (section 11.2) and the one proposed in
 [#34](https://github.com/opensheaf/opensheaf.github.io/issues/34). Its own
 licence, transferable to a successor, and its explicit permission to send
 copies to other archives, are what a custodian needs. Of the services
@@ -251,8 +251,8 @@ are static files that anyone can copy, check and serve.
   with rules.
 - **It makes provenance a field.** Who or what wrote the text, how much of
   it a human understood, which systems were used: recorded per version,
-  queryable, the basis on which others can filter. Nobody else records
-  this systematically.
+  queryable, the basis on which others can filter. None of the other
+  services compared here records it per version.
 - **It is honest about what acceptance means.** Screening is not review,
   and says so; the record of a version is separated from any judgement of
   it. This is the separation of record and filter that
@@ -318,9 +318,10 @@ copies:
   first, whose signatures would say only that Hexagon holds a version, not
   who wrote it, is a question in itself.
 - **Selections over Hexagon.** A selection of works checked by a referee, or
-  whose formalisation is complete, pins exactly the versions concerned; it
-  needs copies of them, which the licences allow (accepted copies, section
-  9.6).
+  whose formalisation is complete, pins exactly the versions concerned. Its
+  members are lines, so the works are first imported (above), and a
+  selection that keeps its own copies keeps accepted copies of them
+  (section 9.6); the licences allow both.
 
 ## 6. Proposals
 
