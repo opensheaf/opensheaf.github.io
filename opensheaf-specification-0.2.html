@@ -574,16 +574,22 @@
       the document version. Branches number as section 9 says.
     </p>
     <p>
-      <strong>New versions.</strong> A new document version is made exactly
-      when the document's own files change (a file added, changed or removed,
-      the change note included), except when a version without sources is
-      completed (below); an object version holding the same own files as an
-      earlier document version keeps its number. A collection makes a new
-      document version exactly when its member list changes (section 8). A
-      version not public at the time (the manuscript submitted to a journal),
-      deposited later, is a document version like any other; a version
-      published by someone else (the journal's version of record) is not, and
-      is linked by a relation (section 4.4).
+      <strong>New versions.</strong> The own files of a document version are
+      compared as pairs of a logical path and a digest, so that a renamed file
+      is a change. A new document version is made exactly when the document's
+      own files differ from those of the current version (a file added,
+      changed, renamed or removed, the change note included), except when a
+      version without sources is completed (below). An object version that
+      holds an existing document version (a description-only version, a
+      completion) holds exactly its own files. Own files that are those of an
+      earlier document version other than the current one, deposited again,
+      are a <dfn>revert</dfn>: a new document version, with the next number,
+      whose change note SHOULD name the version it returns to. A collection
+      makes a new document version exactly when its member list changes
+      (section 8). A version not public at the time (the manuscript submitted
+      to a journal), deposited later, is a document version like any other; a
+      version published by someone else (the journal's version of record) is
+      not, and is linked by a relation (section 4.4).
     </p>
     <p>
       <strong>Description-only versions.</strong> A <dfn>description-only
@@ -3744,9 +3750,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
-          The parts of section 4.2 that the files do not decide: whether a
-          version deposited out of order wrote <tt class="verbatim">history</tt> (#51),
-          and when a document version is new (#23).
+          The part of section 4.2 that the files do not decide: whether a
+          version deposited out of order wrote <tt class="verbatim">history</tt> (#51).
         </p>
       </li>
       <li>
@@ -4319,6 +4324,17 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           fork, and verifiers report the key-log version they judged against
           (section 6.5); weighted thresholds (#69) and witnesses of the
           versions of key logs seen first (#70) are left for after 0.2.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 21 November 2026:</strong> decided in #23: a
+          new document version is made when the own files differ from those of
+          the current version, compared by logical path and digest, so that a
+          rename is a change; an object version holding an existing document
+          version holds exactly its files; files of an earlier version
+          deposited again are a revert, a new document version (section 4.2,
+          appendix D).
         </p>
       </li>
     </ul>
@@ -5465,6 +5481,16 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           <strong>Why the owner numbers its document versions.</strong>
           External numberings have gaps and miss versions never public there;
           external labels are kept beside the owner's numbers.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a revert is a new version.</strong> The current version
+          is the last of the history, so a revert holding the earlier number
+          would leave the reverted version current; and readers who cited the
+          later version need to see that the work went back. Files are
+          compared with their paths, since <tt class="verbatim">object.json</tt>, links
+          and citations name files by path (#23).
         </p>
       </li>
       <li>

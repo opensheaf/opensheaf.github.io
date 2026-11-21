@@ -159,7 +159,7 @@
 
   <strong|Numbering.> The owner of the line numbers document versions from 1, without gaps, independently of any external numbering: a work whose versions 1, 3 and 4 are on arXiv has document versions 1, 2 and 3. External labels (arXiv's <verbatim|v3>) are recorded in <verbatim|external> (section 4.3); presentations SHOULD show them with the document version. Branches number as section 9 says.
 
-  <strong|New versions.> A new document version is made exactly when the document's own files change (a file added, changed or removed, the change note included), except when a version without sources is completed (below); an object version holding the same own files as an earlier document version keeps its number. A collection makes a new document version exactly when its member list changes (section 8). A version not public at the time (the manuscript submitted to a journal), deposited later, is a document version like any other; a version published by someone else (the journal's version of record) is not, and is linked by a relation (section 4.4).
+  <strong|New versions.> The own files of a document version are compared as pairs of a logical path and a digest, so that a renamed file is a change. A new document version is made exactly when the document's own files differ from those of the current version (a file added, changed, renamed or removed, the change note included), except when a version without sources is completed (below). An object version that holds an existing document version (a description-only version, a completion) holds exactly its own files. Own files that are those of an earlier document version other than the current one, deposited again, are a <dfn|revert>: a new document version, with the next number, whose change note SHOULD name the version it returns to. A collection makes a new document version exactly when its member list changes (section 8). A version not public at the time (the manuscript submitted to a journal), deposited later, is a document version like any other; a version published by someone else (the journal's version of record) is not, and is linked by a relation (section 4.4).
 
   <strong|Description-only versions.> A <dfn|description-only version> holds an existing document version with its files unchanged, and changes only its description (<verbatim|datacite.json>: a DOI, a link to the published article), its <verbatim|stage>, the state of the object or its notices. It MAY hold any document version, so that an earlier one can be described; tools otherwise hold the current version. If the object has <verbatim|history>, the entry of that document version becomes the new object version.
 
@@ -1122,7 +1122,7 @@
 
     <item>Whether digests in OCFL files must be in lower case (#49).
 
-    <item>The parts of section 4.2 that the files do not decide: whether a version deposited out of order wrote <verbatim|history> (#51), and when a document version is new (#23).
+    <item>The part of section 4.2 that the files do not decide: whether a version deposited out of order wrote <verbatim|history> (#51).
 
     <item>How a verifier tells a licence from a rights statement in <verbatim|rightsList> (#50), and which licences allow a mirror (#34), which is therefore not checked.
 
@@ -1265,6 +1265,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> decided in #55: the field names of <verbatim|keys.json>, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, <verbatim|inventorySha512> and <verbatim|keyLog> (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder <verbatim|parent/>, with <verbatim|parent/inventory.json>, <verbatim|parent/object.json>, <verbatim|parent/signatures/> and <verbatim|parent/parent/> for a branch of a branch, <verbatim|parent> being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
 
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
+
+    <item><strong|0.2 (draft), 21 November 2026:> decided in #23: a new document version is made when the own files differ from those of the current version, compared by logical path and digest, so that a rename is a change; an object version holding an existing document version holds exactly its files; files of an earlier version deposited again are a revert, a new document version (section 4.2, appendix D).
   </itemize>
 
   <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>
@@ -2215,6 +2217,8 @@
     <item><strong|Why document and object versions.> Readers and DOI services see versions of the work; the storage keeps every change, a corrected description or a notice included, each fixed by its pin.
 
     <item><strong|Why the owner numbers its document versions.> External numberings have gaps and miss versions never public there; external labels are kept beside the owner's numbers.
+
+    <item><strong|Why a revert is a new version.> The current version is the last of the history, so a revert holding the earlier number would leave the reverted version current; and readers who cited the later version need to see that the work went back. Files are compared with their paths, since <verbatim|object.json>, links and citations name files by path (#23).
 
     <item><strong|Why an explicit history.> Dates may be approximate or unknown, and fixed versions cannot correct pointers to their predecessors when a version is found later. A list of object versions, read from the latest signed version, can be corrected; it cannot list digests, since a version cannot contain the digest of its own inventory.
 
