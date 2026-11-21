@@ -187,8 +187,9 @@ is open in OpenSheaf too
 **Withdrawal and removal.** Hexagon's withdrawal is OpenSheaf's (section
 13.1): the work stays, marked, with a reason. Its removal is a takedown
 (section 13.2); the pages do not say what stays at the address of a removed
-work, and nothing like a tombstone with a pin is described. Hexagon says plainly that copies held elsewhere are not its
-business, which is also where OpenSheaf is undecided
+work, and nothing like a tombstone with a pin is described. Hexagon says
+plainly that copies held elsewhere are not its business, which is also
+where OpenSheaf is undecided
 ([#33](https://github.com/opensheaf/opensheaf.github.io/issues/33),
 [#66](https://github.com/opensheaf/opensheaf.github.io/issues/66)).
 
