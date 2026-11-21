@@ -107,8 +107,8 @@ owner, so where they live is the owner's **security level**, chosen with
   a key and WRITE stores one (for 1Password, READ is
   `op read 'op://Private/opensheaf-{owner}-{k}/notesPlain'`). Since these
   commands run on your computer, they are read only from your own
-  configuration: the environment variable `OPENSHEAF_WALLET`, or `"keys"`
-  in `~/.config/opensheaf/config.json`; never from an archive's
+  configuration: the environment variable `OPENSHEAF_WALLET`, or
+  `~/.config/opensheaf/config.json`; never from an archive's
   `osheaf.json`, which anyone may have written, and which is refused if it
   names one. Chapter 9 of the
   [literate program](https://opensheaf.org/opensheaf-py/) gives the
@@ -161,7 +161,8 @@ catalogue that you choose by hand rather than one that lists every paper.
 
 A new paper gets a **label** of your choice, which names it in your archive
 and gives the address of its page, `paper/<label>/`. `--new` makes the new
-work; the deposit prints its permanent name, a `sheaf:` URI.
+work; the deposit prints its permanent name, a `sheaf:` URI. A label may
+change later (`osheaf label`, below); the permanent name does not.
 
 ```sh
 osheaf deposit kpz-uniqueness paper.tex --pdf paper.pdf --new \
@@ -244,6 +245,29 @@ new versions are added, and every page that shows it shows the withdrawal
 (section [13](opensheaf-specification-0.2.md#13-withdrawal-takedown-and-tombstones));
 its `--reason` is required.
 
+### Changing a label
+
+A label is your archive's choice, and may change
+(section [3.1](opensheaf-specification-0.2.md#31-the-discovery-document));
+the permanent name of a paper, its `sheaf:` URI, does not.
+
+```sh
+osheaf label kpz-uniqueness kpz-energy-solutions    # a paper or a collection, by its label
+osheaf label "sheaf:<name>:<owner>" kpz-copy        # a line without a label, by its identifier
+osheaf label --owner <owner> jane-doe               # the owner object
+osheaf label kpz-copy --unset                       # no label: the page is at paper/<name>/
+```
+
+The discovery document, the indexes and the website are written again;
+the main catalogue and the featured collection are renamed in
+`osheaf.json` too. The page moves to `paper/<new>/`, and the HTML version
+of a TeXmacs paper to `site/<new>/<new>.html`, with its images. The
+versions already deposited give the old address in their descriptions,
+and links to it are out in the world, so the old address leads to the
+new one: `osheaf.json` records it in `formerAddresses`, and the website
+keeps a small page there that sends the reader on. A takedown removes
+them with the paper.
+
 ### Updating the archive and checking it
 
 ```sh
@@ -290,10 +314,32 @@ osheaf owner show   # the key log: current keys, rotation keys committed, keeper
 osheaf key list     # what the key wallet holds (never a secret)
 ```
 
-The `key` commands use the configured wallet: `OPENSHEAF_WALLET`, else
-`"keys"` in `~/.config/opensheaf/config.json`, else the GitHub wallet named
-in `osheaf.json`. `--wallet github:OWNER/REPO` (or `--wallet command`)
-names another.
+Wallets and owners are many to many: one wallet may hold the keys of
+several owners (an institution's), several people may share one owner's
+keys in a wallet, each with a passkey of their own, and the keys of one
+owner may be in several wallets. Two lists say where keys are looked for:
+
+- your own wallets, in `~/.config/opensheaf/config.json`,
+  `{"wallets": ["github:me/opensheaf-keys", "github:institute/keys"]}`;
+- for each owner of an archive, the wallets that hold its keys, as hints
+  in its `osheaf.json`, `"keys": {"<owner>": {"wallets": [...]}}`
+  (GitHub wallets only), written by `init`, `owner init` and `owner
+  rotate` with `--keys github:...`, and by `key push --wallet github:...`.
+
+The `key` commands look for the keys of an owner in the wallets hinted
+for it, then in yours, in order, and use the first that holds them;
+`OPENSHEAF_WALLET` wins over both, and `--wallet github:OWNER/REPO` (or
+`--wallet command`) names another. The earlier forms are still read: a
+single `"keys": {"wallet": ...}` in `osheaf.json` is a hint for every
+owner, and in your file comes after your `wallets`.
+
+```sh
+osheaf key wallet                    # where the keys of the owner are looked for, in order
+osheaf key wallet --owner OWNER --add github:me/opensheaf-keys     # a hint in osheaf.json
+osheaf key wallet --remove github:me/old-keys
+osheaf key wallets                   # your wallets, the owners each holds, their locks
+osheaf key wallets --add github:institute/keys                     # in your configuration file
+```
 
 ### A new computer
 
@@ -651,6 +697,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `accept URI` | an accepted copy, listed by a selection |
 | `draft new DRAFT`, `deposit`, `delete` | unsigned work in progress |
 | `seal DRAFT` | seal a draft as a new paper (`--label LABEL`) |
+| `label LINE LABEL` | give a paper or collection a new label (`--unset`; `--owner OWNER`: the owner object) |
 | `takedown LABEL` | delete an object, leaving a tombstone |
 | `owner init` | make an owner (done by `init --new-owner`) |
 | `owner show` | show the key log |
@@ -662,6 +709,8 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `key new` | a new current key for this computer |
 | `key push`, `pull` | current keys to and from the key wallet (`--wallet WALLET`) |
 | `key list` | what the key wallet holds |
+| `key wallet` | the wallets an owner's keys are looked for in; hints in `osheaf.json` (`--add`, `--remove`) |
+| `key wallets` | your wallets and the owners each holds (`--add`, `--remove`) |
 | `key forget` | remove keys from this computer (`--from-wallet`: also from the wallet) |
 | `key forget --rp RP`, `--passkey CRED` | remove the passkey locks of a relying party or a passkey |
 | `key export`, `import` | a key to and from a password manager |
