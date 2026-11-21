@@ -3,18 +3,19 @@
 *Working paper, draft of 21 November 2026. Non-normative: ideas and positions,
 not decisions. arXiv is the preprint server of physics, mathematics, computer
 science and several other fields, and since July 2026 an independent
-nonprofit. It is the record and the announcement channel that most of the
+nonprofit. It is the record and the announcement channel that many of the
 papers OpenSheaf archives would hold already have. This paper describes what
 arXiv offers, sets it against OpenSheaf function by function (in the division
 of [positioning.md](positioning.md)) and point by point, and evaluates the
 position of each. It builds on sections 1 to 3 of the positioning paper,
 which already place arXiv among the bundles of scholarly communication, and
 continues the comparisons with [alphaXiv](alphaxiv.md), an overlay on arXiv,
-and [Hexagon](hexagon.md), a repository made for the AI-generated mathematics
-that arXiv declined. Its main findings: arXiv's record is permanent but fixed
-only by its word; its default licence lets nobody but arXiv redistribute, so
-most arXiv papers cannot be mirrored under section 11.2; and its interfaces
-for machines are better than anything OpenSheaf has. It ends with proposals,
+and [Hexagon](hexagon.md), a repository made for AI-generated mathematics
+that, in its founders' account, arXiv would not take. Its main findings:
+arXiv's record is permanent but fixed only by its word; its default licence
+gives arXiv a right to distribute that it cannot pass on, so most arXiv
+papers cannot be mirrored under section 11.2; and its interfaces for machines
+are better than anything OpenSheaf has. It ends with proposals,
 experiments and open questions.*
 
 > [!NOTE]
@@ -57,13 +58,13 @@ here: "A selection of arXiv papers can name the version it vetted
 
 The other comparisons were with newcomers. [alphaXiv](alphaxiv.md) grew from
 reading arXiv papers into a service of its own; [Hexagon](hexagon.md) was
-founded because arXiv was not going to take results found with language
-models. arXiv is the incumbent: the record that most papers in mathematics,
-physics and computer science already have, and the record from which the
-only real OpenSheaf archive was built. Three questions follow. What does
-arXiv do that OpenSheaf should not try to do? What does OpenSheaf add to a
-paper that is already on arXiv? And what, in arXiv's rules, limits what
-OpenSheaf can do with arXiv papers?
+founded, in its founder's account, because arXiv was not going to be the home
+of results found with language models. arXiv is the incumbent: the record
+that, in mathematics, physics and computer science, many papers already have,
+and the record from which the only real OpenSheaf archive was built. Three
+questions follow. What does arXiv do that OpenSheaf should not try to do? What
+does OpenSheaf add to a paper that is already on arXiv? And what, in arXiv's
+rules, limits what OpenSheaf can do with arXiv papers?
 
 ## 2. What arXiv is
 
@@ -93,8 +94,8 @@ submissions" (blog, 21 January 2026).
 Moderators expect submissions "to be of scholarly archival interest", may
 decline one that "lacks originality, novelty, significance", reclassify, and
 "arXiv, in its sole discretion, may decline to post works". Research
-articles are the primary content; theses, proceedings, lecture notes,
-translations and comments are accepted types.
+articles are the primary content; the content types also cover theses,
+proceedings, books, lecture notes, translations, and comments and replies.
 
 **Generative AI.** Authors must report significant use of sophisticated
 tools, "text-to-text generative AI" included; each author takes "full
@@ -208,15 +209,15 @@ table of section 2:
 | Assign merit | little; links to citation services of others | none counted; the evidence made checkable |
 
 arXiv is the bundle that [positioning.md](positioning.md) describes, and a
-mild one: it filters as little as it can, takes no copyright, and asks for no
-payment. Its hold on the other functions comes from announcement. Unlike
-alphaXiv, it has added no function lately; the pressure of AI-generated work
-has instead pushed it to filter more (endorsement, moderation, the CS rule).
+mild one: it filters lightly (moderation, not review), takes no copyright, and
+asks for no payment. Its hold on the other functions comes from announcement.
+The volume of submissions, to which generative AI adds by arXiv's own account,
+has pushed it to filter more (endorsement, the CS rule).
 
 ## 4. Point by point
 
-**Fixity.** An arXiv version does not change once announced, by arXiv's rule
-and practice, and its sources are kept with it. But nothing outside arXiv
+**Fixity.** An arXiv version does not change once announced, by arXiv's rule,
+and its source, when there is one, is kept with it. But nothing outside arXiv
 fixes it: the abstract page shows sizes, not digests, and the MD5 sums of the
 bulk data check a download of a tar file, not the identity of a version. A
 citation of `arXiv:1406.7675v5` names bytes that only arXiv can produce and
@@ -283,29 +284,30 @@ elsewhere is open in OpenSheaf
 [#66](https://github.com/opensheaf/opensheaf.github.io/issues/66)); for
 arXiv papers there are few copies elsewhere, for the reason that follows.
 
-**Rights and licences.** This is the point that matters most for OpenSheaf.
-An author who submits under arXiv's default licence keeps the copyright and
-grants arXiv alone a right to distribute. OpenSheaf allows a mirror only if
-the licences of every version copied allow redistribution (section 11.2), and
-a branch, an accepted copy included, needs the right to redistribute its
-parent versions (sections 9.7 and 15.6). The proposal of
-[#34](https://github.com/opensheaf/opensheaf.github.io/issues/34) names
-"arXiv's distribution licence" among what "cannot be mirrored". The
+**Rights and licences.** This is the point that matters most for OpenSheaf. An
+author who submits under arXiv's default licence keeps the copyright and
+grants arXiv a right to distribute, which arXiv cannot pass on to anyone.
+OpenSheaf allows a mirror only if the licences of every version copied allow
+redistribution (section 11.2), and a branch, an accepted copy included, needs
+the right to redistribute its parent versions (sections 9.7 and 15.6). The
+proposal of [#34](https://github.com/opensheaf/opensheaf.github.io/issues/34)
+names "arXiv's distribution licence" among what "cannot be mirrored". The
 reference archive shows the scale. Of its 81 lines imported from arXiv, the
 latest version of 52 carries arXiv's default licence, 20 the assumed licence
 of 1991-2003, 8 CC BY 4.0 and 1 CC0. Only 3 lines carry an open licence in
-every version; in the 8 others whose licence changes, each change goes from
-a restrictive licence (or "All rights reserved") to an open one, the case
-of #34 in which the open head reuses files of a restricted version. So 3 of
-81 lines could be mirrored as they stand. The author, who holds the rights,
-may keep and serve the archive; a custodian, a mirror or a journal keeping an
-accepted copy needs the authors' agreement, recorded minimally in
-`agreement` (section 4.3), and copying by agreement is itself open
-([#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)). A
+every version. In 8 the licence changes between versions: 6 of them reach CC
+BY or CC0 only after restricted versions (arXiv's licence, or "All rights
+reserved" for a draft never on arXiv), the case of #34 in which the open head
+reuses files of a restricted version, and 2 change between restrictive
+licences. So 3 of 81 lines could be mirrored as they stand. The author, who
+holds the rights, may keep and serve the archive; a custodian, a mirror or a
+journal keeping an accepted copy needs the authors' agreement, recorded
+minimally in `agreement` (section 4.3), and copying by agreement is itself
+open ([#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)). A
 reference needs no permission (section 8.5), but a selection can only pin
 lines, so a paper that is only on arXiv is first imported into an archive
 ([use cases](../USE-CASES.md)). How a verifier tells a licence from a rights
-statement such as arXiv's licence URL is open too
+statement, such as arXiv's licence, which has no SPDX identifier, is open too
 ([#50](https://github.com/opensheaf/opensheaf.github.io/issues/50)).
 
 **Preservation.** arXiv's own collection, and dark copies at Portico and TIB
@@ -319,33 +321,33 @@ against a version, or serve them. In OpenSheaf any copy is checked by its pin,
 but only openly licensed lines may be copied at all.
 
 **Moderation and AI-generated work.** arXiv filters at the door, and its
-filtering is growing under the volume of generated papers: endorsement
-tightened, prior peer review for CS reviews and position papers, and,
-reportedly, suspensions for unchecked AI output. AI use is to be disclosed;
-the pages read do not define a field for it. [Hexagon](hexagon.md) exists
-because arXiv declined such work, and records how a version was made in
-fields of its own. OpenSheaf has no door: anyone can publish an archive, and
-filtering falls to the selections and announcement services built over
-archives ([positioning.md](positioning.md), section 6, "Abuse and noise").
-That frees the record from moderation, and leaves the volume to filters that
-do not exist yet. OpenSheaf has no field for provenance either; the
-[Hexagon paper](hexagon.md) proposes one.
+filtering is growing under the volume of submissions, generated ones among
+them: endorsement tightened, prior peer review for CS reviews and position
+papers, and, reportedly, suspensions for unchecked AI output. AI use is to be
+disclosed; the pages read do not define a field for it. [Hexagon](hexagon.md)
+exists, in its founders' account, because arXiv would not take such work, and
+records how a version was made in fields of its own. OpenSheaf has no door:
+anyone can publish an archive, and filtering falls to the selections and
+announcement services built over archives ([positioning.md](positioning.md),
+section 6, "Abuse and noise"). That frees the record from moderation, and
+leaves the volume to filters that do not exist yet. OpenSheaf has no field for
+provenance either; the [Hexagon paper](hexagon.md) proposes one.
 
 **Discussion.** arXiv has none on its own pages; comments and replies are
-papers, and discussion lives in services linked through arXivLabs, alphaXiv
-among them, which do not fix which version they discuss
+papers, and discussion lives in services linked through arXivLabs, such as
+alphaXiv, whose threads do not say which version they discuss
 ([alphaxiv.md](alphaxiv.md)). OpenSheaf has no form for it either
 ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)).
 
-**Machine readers.** arXiv's strongest point after announcement: metadata
-by OAI-PMH, with the history of versions and the licence of each, under CC0;
-a query API; bulk PDFs and sources; a dataset on Kaggle; documented rate
-limits and terms. The terms keep the full text with arXiv: indexes may be
-built, copies may not be served. OpenSheaf archives are files that any
-program can read and check, with indexes (section 12.5) and a feed (section
-3.1); the website profile MAY publish a static OAI-PMH repository (appendix
-A.3). But there is no aggregate: no harvestable view across archives, no
-resolver to call, no gateway yet
+**Machine readers.** arXiv's strongest point after announcement: metadata by
+OAI-PMH, with the history of versions (`arXivRaw`) and licences (`arXiv`
+format), under CC0; a query API; bulk PDFs and sources; a dataset on Kaggle;
+documented rate limits and terms. The terms keep the full text with arXiv:
+indexes may be built, copies may not be served. OpenSheaf archives are files
+that any program can read and check, with indexes (section 12.5) and a feed
+(section 3.1); the website profile MAY publish a static OAI-PMH repository
+(appendix A.3). But there is no aggregate: no harvestable view across
+archives, no resolver to call, no gateway yet
 ([#19](https://github.com/opensheaf/opensheaf.github.io/issues/19),
 [#20](https://github.com/opensheaf/opensheaf.github.io/issues/20),
 [#35](https://github.com/opensheaf/opensheaf.github.io/issues/35)).
@@ -364,7 +366,7 @@ issues.
 ### What arXiv does well
 
 - **It is where the readers are.** The daily listings are how many
-  mathematicians and physicists learn of new work
+  mathematicians learn of new work
   ([positioning.md](positioning.md), section 1). No format replaces that.
 - **Its record is careful.** No change without a new version, every version
   public, withdrawal without removal, a reason given against backdating.
@@ -384,13 +386,13 @@ issues.
   check, and an AI service or an overlay that reads arXiv cannot either.
 - **Its default licence locks the copies in.** arXiv cannot grant others the
   right to distribute, its terms forbid serving its e-prints, and its dark
-  archives are its own. Most of the record of whole disciplines can be
-  served, legally, from one place.
+  archives are its own. Most arXiv papers may be served only by arXiv and
+  by their authors.
 - **Its DOIs name articles, not versions.** The identifier with `vN` is
   precise; the DOI, which most citation systems prefer, is not.
 - **Moderation carries the weight of volume.** As generated papers grow, a
-  central door must filter more, and filtering at the door is the function
-  arXiv was least meant to carry.
+  central door, kept by volunteer moderators, must filter more; the rules of
+  2025 and 2026 show the strain.
 - **Trust is by account.** Endorsement and certification are records in
   arXiv's database, not statements others can check.
 
@@ -418,7 +420,7 @@ version by a pin, signs it, keeps versions that were never on arXiv (drafts,
 the accepted manuscript, the original TeXmacs sources, as in the reference
 archive), and lets selections pin what they vetted. The flow is one way: from
 arXiv into archives, through `osheaf arxiv import` ([TOOLS.md](../TOOLS.md)),
-which needs nothing from arXiv beyond its public pages. The FAQ calls
+which reads what arXiv makes public and asks nothing of it. The FAQ calls
 OpenSheaf "a lean alternative to arXiv"; as far as announcement and audience
 go, this comparison suggests a complement.
 
@@ -442,14 +444,14 @@ issue before anything changes.
   way to open a line, and it reuses the files of the restricted ones (case 2
   of #34).
 - **An arXiv import, written down.** The mapping that `osheaf arxiv import`
-  follows (arXiv as an external record of role `source`, `vN` as `label`,
-  the files received with their SHA-512 in `files`, `IsIdenticalTo` the
-  versioned identifier, `IsVersionOf` the arXiv DOI, arXiv's licence URL in
+  follows (arXiv as an external record of role `source`, `vN` as `label`, the
+  files received with their SHA-512 in `files`, `IsIdenticalTo` the versioned
+  identifier, `IsVersionOf` the arXiv DOI, arXiv's licence URL in
   `rightsList`, `sourcesMissing` when arXiv has no source, comments as
   `changes`, the version's date as `Available`) could become a profile beside
   Zenodo's (appendix A), or a section of the use cases, so that other tools
-  import alike. Withdrawn arXiv versions and versions arXiv no longer serves
-  need a rule ([#25](https://github.com/opensheaf/opensheaf.github.io/issues/25)).
+  import alike. Withdrawn arXiv versions need a rule
+  ([#25](https://github.com/opensheaf/opensheaf.github.io/issues/25)).
 - **Witnessed digests of arXiv versions.** A custodian could publish the
   SHA-512 digests of arXiv versions as first fetched, without the files, so
   that a selection or an AI answer naming `arXiv:...vN` could also name the
@@ -474,9 +476,9 @@ issue before anything changes.
   the reference archive, and compare their SHA-512 with those recorded in
   `external`: do arXiv's bytes for a version stay the same over time (a PDF
   regenerated, a source repackaged)?
-- Harvest a month of `arXivRaw` by OAI-PMH and count licences per version:
-  the share of new arXiv papers that could be mirrored under section 11.2,
-  and how often a line changes licence.
+- Harvest a month of metadata by OAI-PMH and count licences: the share of
+  new arXiv papers that could be mirrored under section 11.2, and how often a
+  line changes licence.
 - Compare a version's source in the S3 bulk data with the one served by the
   abstract page.
 - Import, in a test archive, an arXiv paper with a withdrawn version, and one
@@ -488,8 +490,8 @@ issue before anything changes.
 ## 8. Open questions
 
 - Should an archive import arXiv papers of which its owner is not an author?
-  The licence lets arXiv alone distribute them; a selection needs them as
-  lines.
+  The default licence gives others no right to distribute them; a selection
+  needs them as lines.
 - What does a signature on an imported version mean to a reader: that the
   owner received these bytes from arXiv, or that the owner vouches for the
   version? The [keys and forks paper](keys-and-forks.md) discusses what a
@@ -503,15 +505,14 @@ issue before anything changes.
 ## 9. Conclusion
 
 arXiv is the record and the announcement channel of the fields OpenSheaf
-starts from, run carefully and now by an institution of its own. Its rules
-on versions and withdrawal are those OpenSheaf writes into its format. It
-differs in two things that matter: its record is fixed only by its word,
-since no digests are published, and its default licence makes arXiv the
-only place most papers may be served from, which rules out mirrors under
-section 11.2 for all but a few of them. OpenSheaf can add to an arXiv paper
-what arXiv does not give: a pin for each version, signatures, versions that
-were never on arXiv, and selections that say exactly what they vetted. It
-cannot take arXiv's place as announcer, nor copy freely what authors licensed
-to arXiv alone. The most useful steps are modest: write down how arXiv papers
-are imported, help authors choose open licences, and ask arXiv to publish
-digests.
+starts from, run carefully and now by an institution of its own. Its rules on
+versions and withdrawal are those OpenSheaf writes into its format. It differs
+in two things that matter: its record is fixed only by its word, since no
+digests are published, and its default licence makes arXiv, with the authors,
+the only ones who may serve most papers, which rules out mirrors under section
+11.2 for all but a few of them. OpenSheaf can add to an arXiv paper what arXiv
+does not give: a pin for each version, signatures, versions that were never on
+arXiv, and selections that say exactly what they vetted. It cannot take
+arXiv's place as announcer, nor copy freely what authors licensed to arXiv
+alone. The most useful steps are modest: write down how arXiv papers are
+imported, help authors choose open licences, and ask arXiv to publish digests.
