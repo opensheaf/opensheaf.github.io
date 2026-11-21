@@ -512,7 +512,19 @@ osheaf key unlock   # on another computer: Touch ID, and the current keys are pu
       does, and adds the lock of a passkey made by the same page of <tt class="verbatim">unlock.opensheaf.org</tt>,
       opened as a popup of the Manager, as <tt class="verbatim">osheaf key enroll</tt>
       does. The files are the same, and <tt class="verbatim">osheaf key pull</tt> and
-      <tt class="verbatim">osheaf key unlock</tt> read them.
+      <tt class="verbatim">osheaf key unlock</tt> read them. When the current key is not
+      at hand, the page can make a new one instead (&quot;Create a new key
+      here&quot;): it adds the key to the owner's key log by a new version, as
+      <tt class="verbatim">osheaf owner rotate --add</tt> does, signed by the rotation
+      keys you give it (the files <tt class="verbatim">--export</tt> wrote, or those the
+      wallet keeps at the security level <tt class="verbatim">--keys
+      github:OWNER/REPO</tt>), commits that version to the archive and puts
+      the key in the wallet. With files, the new rotation keys are given back
+      as files of the same names and text (and the sheets of <tt class="verbatim">--print</tt>),
+      locked with the passphrase, and the version is committed only once you
+      have typed their checks; with the wallet, the new ones are put there.
+      The rotation keys then pass through the page's memory: the maximum
+      security level keeps them offline, used by <tt class="verbatim">osheaf</tt> alone.
     </p>
     <p>
       <strong>Passkeys made on opensheaf.org.</strong> The first version of

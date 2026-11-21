@@ -363,7 +363,18 @@ private repository you created, locked with the passphrase, as `osheaf key
 push` does, and adds the lock of a passkey made by the same page of
 `unlock.opensheaf.org`, opened as a popup of the Manager, as `osheaf key
 enroll` does. The files are the same, and `osheaf key pull` and `osheaf
-key unlock` read them.
+key unlock` read them. When the current key is not at hand, the page can
+make a new one instead ("Create a new key here"): it adds the key to the
+owner's key log by a new version, as `osheaf owner rotate --add` does,
+signed by the rotation keys you give it (the files `--export` wrote, or
+those the wallet keeps at the security level `--keys github:OWNER/REPO`),
+commits that version to the archive and puts the key in the wallet. With
+files, the new rotation keys are given back as files of the same names
+and text (and the sheets of `--print`), locked with the passphrase, and
+the version is committed only once you have typed their checks; with the
+wallet, the new ones are put there. The rotation keys then pass through
+the page's memory: the maximum security level keeps them offline, used by
+`osheaf` alone.
 
 **Passkeys made on opensheaf.org.** The first version of the page, at
 `opensheaf.org/manager/unlock.html`, made passkeys for `opensheaf.org`,
