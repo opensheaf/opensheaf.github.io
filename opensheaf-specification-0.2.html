@@ -516,16 +516,15 @@
       class="verbatim">datacite.json</tt> (section 4.4), except in an owner object; and
       the genesis record <tt class="verbatim">genesis.json</tt> (section 5), except in a
       draft. Every version of a branch also holds the evidence of its branch
-      point: <tt class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">parent.object.json</tt>,
-      <tt class="verbatim">parent.signatures/</tt> and, for a branch of a branch, <tt
-      class="verbatim">parent.chain/</tt> (section 9). The genesis record and this
-      evidence are the <dfn>identity files</dfn> of the object, never files of
-      the document's own. The names of every file this specification defines
-      at the top level of the content (<tt class="verbatim">object.json</tt>, <tt class="verbatim">datacite.json</tt>,
-      <tt class="verbatim">genesis.json</tt>, <tt class="verbatim">members.json</tt>, <tt class="verbatim">keys.json</tt>,
-      <tt class="verbatim">forked</tt>, <tt class="verbatim">parent.inventory.json</tt>, <tt
-      class="verbatim">parent.object.json</tt>, <tt class="verbatim">parent.signatures</tt>, <tt
-      class="verbatim">parent.chain</tt>) are reserved for those files. A collection
+      point, in the folder <tt class="verbatim">parent/</tt>: <tt class="verbatim">parent/inventory.json</tt>,
+      <tt class="verbatim">parent/object.json</tt>, <tt class="verbatim">parent/signatures/</tt>
+      and, for a branch of a branch, <tt class="verbatim">parent/parent/</tt> (section
+      9). The genesis record and this evidence are the <dfn>identity
+      files</dfn> of the object, never files of the document's own. The names
+      of every file this specification defines at the top level of the content
+      (<tt class="verbatim">object.json</tt>, <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">genesis.json</tt>,
+      <tt class="verbatim">members.json</tt>, <tt class="verbatim">keys.json</tt>, <tt class="verbatim">forked</tt>,
+      <tt class="verbatim">parent</tt>) are reserved for those files. A collection
       version also holds <tt class="verbatim">members.json</tt> (section 8). An owner
       object holds <tt class="verbatim">genesis.json</tt> and <tt class="verbatim">keys.json</tt>
       (section 6), a fork record <tt class="verbatim">forked/</tt> instead of <tt class="verbatim">keys.json</tt>
@@ -1578,18 +1577,18 @@
       Every copy of an object, in any archive, MUST hold beside it, as owner
       objects in the same storage root at their paths (section 3.2), the key
       logs of the owner of its line and, for a branch, of the owner of each
-      parent whose signatures its evidence holds, in <tt class="verbatim">parent.signatures/</tt>
-      and at every level of <tt class="verbatim">parent.chain/</tt> (section 9). Each is
-      copied up to the latest version that whoever makes the copy knows, and
-      at least up to the versions its signatures name, or up to a fork record
-      that carries them (section 6.3). The key logs of third parties whose
-      witnesses a copy holds (section 7) MAY be copied too. Key logs are never
-      copied into an object's content. An archive MUST keep an owner object as
-      long as it keeps an object whose signatures need it, unless the owner
-      object is itself taken down; a tombstone then stands in for it, and a
-      takedown of a line leaves its owner objects in place (section 13). An
-      owner object MAY also be copied on its own, to keep a fresher copy of
-      its key log.
+      parent whose signatures its evidence holds, in <tt class="verbatim">parent/signatures/</tt>
+      and at every level of <tt class="verbatim">parent/parent/</tt> (section 9). Each
+      is copied up to the latest version that whoever makes the copy knows,
+      and at least up to the versions its signatures name, or up to a fork
+      record that carries them (section 6.3). The key logs of third parties
+      whose witnesses a copy holds (section 7) MAY be copied too. Key logs are
+      never copied into an object's content. An archive MUST keep an owner
+      object as long as it keeps an object whose signatures need it, unless
+      the owner object is itself taken down; a tombstone then stands in for
+      it, and a takedown of a line leaves its owner objects in place (section
+      13). An owner object MAY also be copied on its own, to keep a fresher
+      copy of its key log.
     </p>
     <p>
       Of two copies of a key log, compared up to their fork records (section
@@ -1655,24 +1654,11 @@
     <ul>
       <li>
         <p>
-          The field names of <tt class="verbatim">keys.json</tt>, among them <tt class="verbatim">next</tt>,
-          <tt class="verbatim">nextThreshold</tt> and <tt class="verbatim">exposed</tt> (#55).
-        </p>
-      </li>
-      <li>
-        <p>
           Pre-rotation, provisional (#58; <tt class="verbatim">drafts/keys-and-forks.md</tt>
           and <tt class="verbatim">drafts/federated-identity.md</tt> on <tt class="verbatim">main</tt>):
           weighted thresholds for groups, as KERI's; witnesses that record
           which version of a key log they saw first, as an extension; and what
           a reader holding only one side of a fork can know.
-        </p>
-      </li>
-      <li>
-        <p>
-          Whether exposing keys from when an archive learns of it, rather than
-          dating signatures (revocation dated by trusted time, transparency
-          logs), is enough against backdating (#55, #58).
         </p>
       </li>
       <li>
@@ -1802,19 +1788,21 @@
 opensheaf-signature/0.2
 object &lt;the value of object&gt;
 version &lt;the value of version&gt;
-inventory &lt;the value of inventorySha512&gt;
-keylog &lt;the value of keyLog&gt;</pre>
+inventorySha512 &lt;the value of inventorySha512&gt;
+keyLog &lt;the value of keyLog&gt;</pre>
     </div>
     <p>
       The first line keeps these signatures apart from any other use of the
-      key; the others bind the signature to one object version, its inventory
-      and one key-log version. A verifier rebuilds the message from the fields
-      of the signature file and verifies the signature as RFC 8032 (section
-      5.1.7) says, without the cofactor, and MUST reject it when its <tt
-      class="verbatim">S</tt> is not less than the group order L, or when the key is not
-      the canonical encoding of a point or is a point of small order, or <tt
-      class="verbatim">R</tt> is not the canonical encoding of a point or is a point of
-      small order; tools make keys as RFC 8032 (section 5.1.5) says.
+      key; each of the others is the name of a field of the signature file, a
+      space and its value, and they bind the signature to one object version,
+      its inventory and one key-log version. A verifier rebuilds the message
+      from the fields of the signature file and verifies the signature as RFC
+      8032 (section 5.1.7) says, without the cofactor, and MUST reject it when
+      its <tt class="verbatim">S</tt> is not less than the group order L, or when the
+      key is not the canonical encoding of a point or is a point of small
+      order, or <tt class="verbatim">R</tt> is not the canonical encoding of a point or
+      is a point of small order; tools make keys as RFC 8032 (section 5.1.5)
+      says.
     </p>
     <p>
       <strong>Others' witnesses.</strong> A signature by someone other than
@@ -1861,7 +1849,7 @@ keylog &lt;the value of keyLog&gt;</pre>
         <p>
           its <tt class="verbatim">object</tt>, <tt class="verbatim">version</tt> and <tt class="verbatim">inventorySha512</tt>
           are not those of the version whose folder holds it (the digest also
-          as its checksum file states it; in <tt class="verbatim">parent.signatures/</tt>,
+          as its checksum file states it; in <tt class="verbatim">parent/signatures/</tt>,
           those of the parent version, section 9; in <tt class="verbatim">forked/&lt;d&gt;/</tt>,
           those of the version carried, section 6.3);
         </p>
@@ -2072,11 +2060,6 @@ keylog &lt;the value of keyLog&gt;</pre>
       <strong>Open questions.</strong>
     </p>
     <ul>
-      <li>
-        <p>
-          The field names and the format of signature files (#55).
-        </p>
-      </li>
       <li>
         <p>
           Exposed keys and fork records, provisional (sections 6.3 and 6.4;
@@ -2490,27 +2473,28 @@ keylog &lt;the value of keyLog&gt;</pre>
       parent version, the genesis record included, except its <tt class="verbatim">datacite.json</tt>,
       its <tt class="verbatim">object.json</tt> and its own evidence; the branch's own
       <tt class="verbatim">datacite.json</tt> and <tt class="verbatim">object.json</tt>; and the
-      <dfn>evidence</dfn> of the branch point, as files of its content:
+      <dfn>evidence</dfn> of the branch point, as files of its content in the
+      folder <tt class="verbatim">parent/</tt>:
     </p>
     <ul>
       <li>
         <p>
-          <tt class="verbatim">parent.inventory.json</tt>: the inventory of the parent
+          <tt class="verbatim">parent/inventory.json</tt>: the inventory of the parent
           version;
         </p>
       </li>
       <li>
         <p>
-          <tt class="verbatim">parent.object.json</tt>: its <tt class="verbatim">object.json</tt>;
+          <tt class="verbatim">parent/object.json</tt>: its <tt class="verbatim">object.json</tt>;
         </p>
       </li>
       <li>
         <p>
-          <tt class="verbatim">parent.signatures/</tt>: the parent owner's signature
+          <tt class="verbatim">parent/signatures/</tt>: the parent owner's signature
           files of the parent version that are good when the branch is made
           (section 7.3; an archive adds no invalid signature file, section
           7.5), named as in its witness folder without the <tt class="verbatim">&lt;version&gt;/</tt>
-          folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json</tt>,
+          folder (<tt class="verbatim">parent/signatures/signature-&lt;k&gt;.json</tt>,
           section 7.2), with the witnesses kept beside them, if any
           (timestamps); other witnesses of the parent version (a third party's
           signature) MAY be kept with them;
@@ -2518,18 +2502,18 @@ keylog &lt;the value of keyLog&gt;</pre>
       </li>
       <li>
         <p>
-          <tt class="verbatim">parent.chain/</tt>, when the parent is itself a branch:
-          the parent version's own evidence, so that the grandparent's is at
-          <tt class="verbatim">parent.chain/parent.inventory.json</tt>, the
-          great-grandparent's at <tt class="verbatim">parent.chain/parent.chain/parent.inventory.json</tt>,
+          <tt class="verbatim">parent/parent/</tt>, when the parent is itself a branch:
+          the parent version's own evidence, its folder <tt class="verbatim">parent/</tt>,
+          so that the grandparent's inventory is at <tt class="verbatim">parent/parent/inventory.json</tt>,
+          the great-grandparent's at <tt class="verbatim">parent/parent/parent/inventory.json</tt>,
           and so on back to a version of the originator's line.
         </p>
       </li>
     </ul>
     <p>
       Every file copied is copied byte for byte, and never re-serialised or
-      replaced. A branch MUST hold <tt class="verbatim">parent.signatures/</tt> at every
-      branch point, and <tt class="verbatim">parent.chain/</tt> when its parent is a
+      replaced. A branch MUST hold <tt class="verbatim">parent/signatures/</tt> at every
+      branch point, and <tt class="verbatim">parent/parent/</tt> when its parent is a
       branch. The evidence is covered by the branch's own inventories and
       signatures; with the genesis record it forms the branch's identity files
       (section 4.1). The key logs that the evidence needs are kept beside
@@ -2552,9 +2536,9 @@ keylog &lt;the value of keyLog&gt;</pre>
       </li>
       <li>
         <p>
-          <strong>the pin:</strong> the SHA-512 digest of <tt class="verbatim">parent.inventory.json</tt>
+          <strong>the pin:</strong> the SHA-512 digest of <tt class="verbatim">parent/inventory.json</tt>
           is <tt class="verbatim">parent.inventorySha512</tt>, its <tt class="verbatim">head</tt>
-          is <tt class="verbatim">parent.objectVersion</tt>, and <tt class="verbatim">parent.object.json</tt>
+          is <tt class="verbatim">parent.objectVersion</tt>, and <tt class="verbatim">parent/object.json</tt>
           has the digest it records for <tt class="verbatim">object.json</tt> in its
           head state;
         </p>
@@ -2562,7 +2546,7 @@ keylog &lt;the value of keyLog&gt;</pre>
       <li>
         <p>
           <strong>the files:</strong> every file of the head state of <tt
-          class="verbatim">parent.inventory.json</tt>, <tt class="verbatim">genesis.json</tt>
+          class="verbatim">parent/inventory.json</tt>, <tt class="verbatim">genesis.json</tt>
           included, except <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>
           and the parent's evidence, is present at the same logical path with
           the same digest; no other file is present besides the branch's <tt
@@ -2573,16 +2557,16 @@ keylog &lt;the value of keyLog&gt;</pre>
         <p>
           <strong>the parent:</strong> <tt class="verbatim">parent.owner</tt>, <tt
           class="verbatim">parent.name</tt> and <tt class="verbatim">parent.documentVersion</tt>
-          are those of <tt class="verbatim">parent.object.json</tt>; the branch's owner
+          are those of <tt class="verbatim">parent/object.json</tt>; the branch's owner
           is neither the parent's owner nor the originator; and either the
-          parent's owner is the originator and <tt class="verbatim">parent.object.json</tt>
+          parent's owner is the originator and <tt class="verbatim">parent/object.json</tt>
           has no <tt class="verbatim">parent</tt>, or it has one;
         </p>
       </li>
       <li>
         <p>
           <strong>the signatures:</strong> the parent version is signed
-          (section 7.3), by the signature files of <tt class="verbatim">parent.signatures/</tt>
+          (section 7.3), by the signature files of <tt class="verbatim">parent/signatures/</tt>
           against the parent owner's key log kept beside the branch, or
           vouched for by a signed version of the parent's line that the
           verifier finds; or it is unchecked;
@@ -2590,13 +2574,14 @@ keylog &lt;the value of keyLog&gt;</pre>
       </li>
       <li>
         <p>
-          <strong>the chain:</strong> when <tt class="verbatim">parent.object.json</tt>
-          has a <tt class="verbatim">parent</tt>, <tt class="verbatim">parent.chain/</tt> holds
-          that evidence, each file with the digest <tt class="verbatim">parent.inventory.json</tt>
-          records for it, and it passes these checks in turn, level by level,
-          up to the originator's line, except the files, checked at the first
-          level only (a parent version may be a later version of its own
-          branch).
+          <strong>the chain:</strong> when <tt class="verbatim">parent/object.json</tt>
+          has a <tt class="verbatim">parent</tt>, <tt class="verbatim">parent/parent/</tt> holds
+          that evidence, each file <tt class="verbatim">parent/parent/&lt;path&gt;</tt>
+          with the digest <tt class="verbatim">parent/inventory.json</tt> records for
+          <tt class="verbatim">parent/&lt;path&gt;</tt>, and it passes these checks in
+          turn, level by level, up to the originator's line, except the files,
+          checked at the first level only (a parent version may be a later
+          version of its own branch).
         </p>
       </li>
     </ul>
@@ -2757,11 +2742,6 @@ keylog &lt;the value of keyLog&gt;</pre>
           Moving a branch point when the branch has files of its own (of its
           notes, a withdrawal, a version of record): probably a merge keeping
           both, with evidence that tells them apart (#57).
-        </p>
-      </li>
-      <li>
-        <p>
-          The field and folder names of the evidence (#55).
         </p>
       </li>
     </ul>
@@ -3512,8 +3492,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           every JSON file this specification defines against its schema
           (section 2), formats (dates, URIs) included as assertions, which
           JSON Schema 2020-12 leaves optional: the discovery document, the
-          files of every object version (<tt class="verbatim">parent.object.json</tt>
-          and the files of <tt class="verbatim">parent.chain/</tt> included), the files
+          files of every object version (<tt class="verbatim">parent/object.json</tt>
+          and the files of <tt class="verbatim">parent/parent/</tt> included), the files
           of witness folders, the indexes, and a keeper's file when it reads
           one; a malformed file of a witness folder is a warning (section
           7.2);
@@ -4327,6 +4307,23 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           any order (section 12.3).
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 21 November 2026:</strong> decided in #55: the
+          field names of <tt class="verbatim">keys.json</tt>, of signature files and of
+          the evidence of branches are those of the text; the lines of the
+          signed message are named as the fields of the signature file, <tt
+          class="verbatim">inventorySha512</tt> and <tt class="verbatim">keyLog</tt> (section
+          7.2), so every signature changes (appendix C recomputed); the
+          evidence of a branch point is the folder <tt class="verbatim">parent/</tt>,
+          with <tt class="verbatim">parent/inventory.json</tt>, <tt class="verbatim">parent/object.json</tt>,
+          <tt class="verbatim">parent/signatures/</tt> and <tt class="verbatim">parent/parent/</tt>
+          for a branch of a branch, <tt class="verbatim">parent</tt> being the reserved
+          name (sections 4.1 and 9.2); exposing keys from when an archive
+          learns of it, with no dated signatures in the core, is kept against
+          backdating (section 6.4 and appendix D).
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -4448,8 +4445,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     </ul>
     <p>
       <strong>Open question.</strong> How a branch is deposited: the evidence
-      of its branch point (<tt class="verbatim">parent.signatures/</tt>, <tt class="verbatim">parent.chain/</tt>)
-      has folders, which records do not, and is not sources, which <tt class="verbatim">sources.zip</tt>
+      of its branch point (the folder <tt class="verbatim">parent/</tt>) has folders,
+      which records do not, and is not sources, which <tt class="verbatim">sources.zip</tt>
       holds (#65).
     </p>
     <h3 id="auto-82"><a id="a2-texmacs-texmacs"></a>A.2 TeXmacs (<tt class="verbatim">texmacs</tt>)<span style="margin-left: 1em"></span></h3>
@@ -4567,7 +4564,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           <tt class="verbatim">opensheaf-object-0.2.schema.json</tt>: <tt class="verbatim">object.json</tt>,
-          also as <tt class="verbatim">parent.object.json</tt> and in <tt class="verbatim">parent.chain/</tt>
+          also as <tt class="verbatim">parent/object.json</tt> and in <tt class="verbatim">parent/parent/</tt>
           (sections 4.3 and 9.2);
         </p>
       </li>
@@ -4662,10 +4659,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
-          The field names of <tt class="verbatim">keys.json</tt>, signature files and
-          the evidence of branches, which the schemas follow (#55); <tt class="verbatim">next</tt>,
-          <tt class="verbatim">nextThreshold</tt>, <tt class="verbatim">exposed</tt> and the files
-          of fork records, provisional (#58).
+          Pre-rotation, and with it <tt class="verbatim">next</tt>, <tt class="verbatim">nextThreshold</tt>,
+          <tt class="verbatim">exposed</tt> and the files of fork records, provisional
+          (#58).
         </p>
       </li>
       <li>
@@ -4894,7 +4890,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;signer&quot;: &quot;56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot;,
   &quot;key&quot;: &quot;did:key:z6Mkh5i2epG9LsWNnYbBHG7ctEiNLZPjsBNXxNUcsaYgEtNm&quot;,
   &quot;keyLog&quot;: &quot;sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v1?sha512=afaabe7b9489bc408ecbb20e8477a7eeb4e8a0ebde0dc15e32d30be17d922207504953e3e52101015f770844449c8382c4c4d9bec472a908ed47200efaef1220&quot;,
-  &quot;signature&quot;: &quot;MyYYLDn6FPmfVz478eKdcQF2FOkRTL8/ZV9qV35/PuC5u09ZYwDVxunX3S4Z1jWHICWsxgA+/L3MW49O0Z7vCA==&quot;
+  &quot;signature&quot;: &quot;1SHM2Xc8RX7/lE8fJq4cbJ/iNV5+v3jji4ObMcjjJZdDKjxsV+j3SKMn8g2kGnf6QCe0FOfPenFkXcjWYGauAQ==&quot;
 }</pre>
       </div>
     </div>
@@ -5061,7 +5057,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
   &quot;signer&quot;: &quot;56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot;,
   &quot;key&quot;: &quot;did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn&quot;,
   &quot;keyLog&quot;: &quot;sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84&quot;,
-  &quot;signature&quot;: &quot;0j2Xy5fRv+1ajlCCkmCXAOZj1U8CUeiYA1jP08kJevQH27QnXHLZ7TeF+WwxzYB+ad2OepksXgSCzP1KoCEYCg==&quot;
+  &quot;signature&quot;: &quot;Gf9KOxH/6Bg4HzaXGt/HHP+iwdDkSpc/3laukJ5YDSxT6Vy7YDJslpFB3zsi1H/L6QsIaf+mNFhsLCYYqipyBA==&quot;
 }</pre>
       </div>
     </div>
@@ -5073,8 +5069,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
 opensheaf-signature/0.2
 object sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa
 version v2
-inventory e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25
-keylog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84</pre>
+inventorySha512 e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25
+keyLog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84</pre>
     </div>
     <p>
       With a threshold of 1, this one good signature makes the version signed
@@ -5181,9 +5177,9 @@ keylog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673
       Its content holds the files of the parent version except <tt class="verbatim">datacite.json</tt>
       and <tt class="verbatim">object.json</tt> (<tt class="verbatim">genesis.json</tt>, the
       source and the PDF), its own <tt class="verbatim">datacite.json</tt> and <tt
-      class="verbatim">object.json</tt>, and the evidence (section 9.2): <tt class="verbatim">parent.inventory.json</tt>,
-      the authors' <tt class="verbatim">v2/inventory.json</tt>; <tt class="verbatim">parent.object.json</tt>,
-      their <tt class="verbatim">object.json</tt> of that version; and <tt class="verbatim">parent.signatures/signature-4hz7zgsiazl6hx7i.json</tt>,
+      class="verbatim">object.json</tt>, and the evidence (section 9.2): <tt class="verbatim">parent/inventory.json</tt>,
+      the authors' <tt class="verbatim">v2/inventory.json</tt>; <tt class="verbatim">parent/object.json</tt>,
+      their <tt class="verbatim">object.json</tt> of that version; and <tt class="verbatim">parent/signatures/signature-4hz7zgsiazl6hx7i.json</tt>,
       the file of section C.3, byte for byte. Its witness folder holds two
       signature files of the journal's keys, naming the first version of the
       journal's key log. The journal's storage root keeps beside it the owner
@@ -5349,7 +5345,7 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
   &quot;signer&quot;: &quot;56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot;,
   &quot;key&quot;: &quot;did:key:z6MksaMy3cmXbnUKqzGv18xhbBreY6berNYVtTZyDrYRb1Hn&quot;,
   &quot;keyLog&quot;: &quot;sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84&quot;,
-  &quot;signature&quot;: &quot;lAQKAGCR6HxrUX+mv5DbqOFehbfo1zlLtYVPrNmyG+Wq5p0RuWEC+PyL7c0amQ+lRc0EKgJpfY5eRAt9oGU8Dw==&quot;
+  &quot;signature&quot;: &quot;1zEI4EoFG/ZJlZ+e2Y0iswNCCi4oceb8k/gTR8KV+qKM8FAcJocW/eCfJ2zLYhjRlguS1lpoVwGnxBX8lMGKCg==&quot;
 }</pre>
       </div>
     </div>
@@ -5637,7 +5633,9 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           undone: the owner exposes the keys, what needs them is contested,
           never added to an archive unless other evidence dates it before the
           exposure, and readers weigh the past by other evidence (section
-          6.4).
+          6.4). Dating every signature (a timestamp on each, a transparency
+          log) would need a service online at signing time; such evidence can
+          be added later as witnesses without changing any archive (#55).
         </p>
       </li>
       <li>

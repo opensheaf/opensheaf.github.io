@@ -430,7 +430,7 @@ mirrors its companions too, or reports that their licences forbid it. Keeping
 an accepted copy of the account does the same, and records the relation again
 in the copy's own `object.json`, since an accepted copy is a line of its own,
 which keeps the original's `object.json` only as evidence, in
-`parent.object.json` (section 9.2). Presentations show "the full argument,
+`parent/object.json` (section 9.2). Presentations show "the full argument,
 version 3, as reviewed" beside the account. A selection could also treat the
 companions, in their pinned versions, as vetted with the account; whether an
 extension may do so is one of the questions of #28, and in the core the

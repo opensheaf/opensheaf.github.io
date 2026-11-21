@@ -199,8 +199,9 @@ questions are listed at the end of the sections they concern.
   `name`, `owner`, `at` (equal hints); member statuses verified, mismatch,
   contested, unchecked, not a version, unavailable, removed (8.5).
 - **Branches** (9): a line of another owner from a signed parent version,
-  declared in `parent`; evidence `parent.inventory.json`,
-  `parent.object.json`, `parent.signatures/`, `parent.chain/`; verdicts
+  declared in `parent`; evidence in the folder `parent/`
+  (`parent/inventory.json`, `parent/object.json`, `parent/signatures/`,
+  `parent/parent/`); verdicts
   inconsistent, confirmed, unchecked; the branch point only moves forward.
   **Accepted copy** (9.6): a branch kept by a selection's owner, never a
   mirror.
@@ -244,7 +245,7 @@ questions are listed at the end of the sections they concern.
 
 `schemas/opensheaf-archive-0.2.schema.json` (`opensheaf.json`),
 `opensheaf-object-0.2.schema.json` (`object.json`, also as
-`parent.object.json`), `opensheaf-collection-0.2.schema.json`
+`parent/object.json`), `opensheaf-collection-0.2.schema.json`
 (`members.json`), `opensheaf-genesis-0.2.schema.json` (`genesis.json`),
 `opensheaf-keys-0.2.schema.json` (`keys.json`, also as carried by fork
 records), `opensheaf-signature-0.2.schema.json` (signature files and

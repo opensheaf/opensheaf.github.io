@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf timestamps, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Extension to the OpenSheaf specification 0.2. Version 0.2 (draft), 19 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that..."></meta>
+    <meta name="description" content="Extension to the OpenSheaf specification 0.2. Version 0.2 (draft), 21 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -32,7 +32,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf timestamps<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Extension to the OpenSheaf specification 0.2. Version 0.2 (draft), 19
+      Extension to the OpenSheaf specification 0.2. Version 0.2 (draft), 21
       November 2026. How an owner dates its signatures with RFC 3161 tokens or
       OpenTimestamps proofs, and declares in its key log that it does so, so
       that readers can tell which versions existed by a date, for instance
@@ -238,9 +238,9 @@
       time of the version that ends the owner or exposes keys bounds when the
       owner knew, and the times of the versions a fork record carries, when
       the fork was made. A branch keeps the timestamp files of its parent's
-      signatures beside them in <tt class="verbatim">parent.signatures/</tt> (section
+      signatures beside them in <tt class="verbatim">parent/signatures/</tt> (section
       9.2 of the specification), without the <tt class="verbatim">&lt;version&gt;/</tt>
-      folder (<tt class="verbatim">parent.signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>);
+      folder (<tt class="verbatim">parent/signatures/signature-&lt;k&gt;.json.&lt;e&gt;.tsr</tt>);
       a pending proof kept there can never be completed, and counts for
       nothing (section 5); the timestamp files of key logs are in their owner
       objects.
@@ -441,6 +441,14 @@ extensions/opensheaf-witnesses/v2/signature-bla7pvxpfmk4o2z2.json.yq77barzw3gj7d
           with version 0.2 of the specification, which it extends; its URI is
           <tt class="verbatim">https://opensheaf.org/opensheaf-timestamps-0.2</tt>, and
           its schema <tt class="verbatim">opensheaf-timestamps-0.2.schema.json</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 21 November 2026:</strong> the evidence of a
+          branch point is now the folder <tt class="verbatim">parent/</tt> of the
+          specification (#55): a branch keeps the timestamp files of its
+          parent's signatures in <tt class="verbatim">parent/signatures/</tt>.
         </p>
       </li>
     </ul>

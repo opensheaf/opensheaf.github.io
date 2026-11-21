@@ -104,7 +104,7 @@ Every object MUST be a valid OCFL 1.1 object, and:
 
 **Deposits.** Each version in the inventory MUST have a `user` with a `name`, SHOULD give its `address` (an ORCID iD, a `mailto:` URI or another URI identifying the depositor), and MUST have a `message` describing the change, except the first version of a key log, which has neither (section 6.1). The `created` date and `user` of an object version record its <dfn>deposit</dfn>, not repeated in `object.json`; the deposit of a document version is that of the first object version holding it.
 
-**Content.** Every object version MUST contain, at the top level of its content, `object.json` (section 4.3); `datacite.json` (section 4.4), except in an owner object; and the genesis record `genesis.json` (section 5), except in a draft. Every version of a branch also holds the evidence of its branch point: `parent.inventory.json`, `parent.object.json`, `parent.signatures/` and, for a branch of a branch, `parent.chain/` (section 9). The genesis record and this evidence are the <dfn>identity files</dfn> of the object, never files of the document's own. The names of every file this specification defines at the top level of the content (`object.json`, `datacite.json`, `genesis.json`, `members.json`, `keys.json`, `forked`, `parent.inventory.json`, `parent.object.json`, `parent.signatures`, `parent.chain`) are reserved for those files. A collection version also holds `members.json` (section 8). An owner object holds `genesis.json` and `keys.json` (section 6), a fork record `forked/` instead of `keys.json` (section 6.3), and no `datacite.json`; it has no document versions, and is never withdrawn or branched. Signatures and other witnesses are kept outside every version, in the object's extension folder `extensions/opensheaf-witnesses/` (section 7).
+**Content.** Every object version MUST contain, at the top level of its content, `object.json` (section 4.3); `datacite.json` (section 4.4), except in an owner object; and the genesis record `genesis.json` (section 5), except in a draft. Every version of a branch also holds the evidence of its branch point, in the folder `parent/`: `parent/inventory.json`, `parent/object.json`, `parent/signatures/` and, for a branch of a branch, `parent/parent/` (section 9). The genesis record and this evidence are the <dfn>identity files</dfn> of the object, never files of the document's own. The names of every file this specification defines at the top level of the content (`object.json`, `datacite.json`, `genesis.json`, `members.json`, `keys.json`, `forked`, `parent`) are reserved for those files. A collection version also holds `members.json` (section 8). An owner object holds `genesis.json` and `keys.json` (section 6), a fork record `forked/` instead of `keys.json` (section 6.3), and no `datacite.json`; it has no document versions, and is never withdrawn or branched. Signatures and other witnesses are kept outside every version, in the object's extension folder `extensions/opensheaf-witnesses/` (section 7).
 
 ### 4.2 Documents and document versions
 
@@ -319,7 +319,7 @@ The signatures of an ended owner, and those made with exposed keys, stay good, s
 
 A key log checks itself from its owner name: its first version is computed from the genesis record, which lists the first current keys and the digests of the first rotation keys, and each later version is signed by the rotation keys that the one before commits to. A copy from any source is therefore as good as the original, and a line can be checked without trusting any host, also after the archives that served it have gone.
 
-Every copy of an object, in any archive, MUST hold beside it, as owner objects in the same storage root at their paths (section 3.2), the key logs of the owner of its line and, for a branch, of the owner of each parent whose signatures its evidence holds, in `parent.signatures/` and at every level of `parent.chain/` (section 9). Each is copied up to the latest version that whoever makes the copy knows, and at least up to the versions its signatures name, or up to a fork record that carries them (section 6.3). The key logs of third parties whose witnesses a copy holds (section 7) MAY be copied too. Key logs are never copied into an object's content. An archive MUST keep an owner object as long as it keeps an object whose signatures need it, unless the owner object is itself taken down; a tombstone then stands in for it, and a takedown of a line leaves its owner objects in place (section 13). An owner object MAY also be copied on its own, to keep a fresher copy of its key log.
+Every copy of an object, in any archive, MUST hold beside it, as owner objects in the same storage root at their paths (section 3.2), the key logs of the owner of its line and, for a branch, of the owner of each parent whose signatures its evidence holds, in `parent/signatures/` and at every level of `parent/parent/` (section 9). Each is copied up to the latest version that whoever makes the copy knows, and at least up to the versions its signatures name, or up to a fork record that carries them (section 6.3). The key logs of third parties whose witnesses a copy holds (section 7) MAY be copied too. Key logs are never copied into an object's content. An archive MUST keep an owner object as long as it keeps an object whose signatures need it, unless the owner object is itself taken down; a tombstone then stands in for it, and a takedown of a line leaves its owner objects in place (section 13). An owner object MAY also be copied on its own, to keep a fresher copy of its key log.
 
 Of two copies of a key log, compared up to their fork records (section 6.3), either one extends the other, and readers use the longer, or they differ from a fork point, as section 6.3 says. A reader that meets copies that differ from a fork point reads them, writing nothing, as an archive holding one of them would once it has appended a fork record carrying the other: the owner is ended at the fork point, and signatures naming versions of either side are judged against them (section 7.3). No one can prove offline that a key log is complete: a copy that stops early may hide that the owner has ended.
 
@@ -335,9 +335,7 @@ When a keeper is named, a verifier MAY check both directions, and reports the li
 
 **Open questions.**
 
-- The field names of `keys.json`, among them `next`, `nextThreshold` and `exposed` (#55).
 - Pre-rotation, provisional (#58; `drafts/keys-and-forks.md` and `drafts/federated-identity.md` on `main`): weighted thresholds for groups, as KERI's; witnesses that record which version of a key log they saw first, as an extension; and what a reader holding only one side of a fork can know.
-- Whether exposing keys from when an archive learns of it, rather than dating signatures (revocation dated by trusted time, transparency logs), is enough against backdating (#55, #58).
 - The form of a keeper's confirmation on ORCID, which depends on an `https` form of `sheaf:<owner>`, and so on the gateway (section 12; #35).
 
 ## 7. Lines and signatures
@@ -369,11 +367,11 @@ A <dfn>witness</dfn> is evidence about an object version made after it: a signat
 opensheaf-signature/0.2
 object <the value of object>
 version <the value of version>
-inventory <the value of inventorySha512>
-keylog <the value of keyLog>
+inventorySha512 <the value of inventorySha512>
+keyLog <the value of keyLog>
 ```
 
-The first line keeps these signatures apart from any other use of the key; the others bind the signature to one object version, its inventory and one key-log version. A verifier rebuilds the message from the fields of the signature file and verifies the signature as RFC 8032 (section 5.1.7) says, without the cofactor, and MUST reject it when its `S` is not less than the group order L, or when the key is not the canonical encoding of a point or is a point of small order, or `R` is not the canonical encoding of a point or is a point of small order; tools make keys as RFC 8032 (section 5.1.5) says.
+The first line keeps these signatures apart from any other use of the key; each of the others is the name of a field of the signature file, a space and its value, and they bind the signature to one object version, its inventory and one key-log version. A verifier rebuilds the message from the fields of the signature file and verifies the signature as RFC 8032 (section 5.1.7) says, without the cofactor, and MUST reject it when its `S` is not less than the group order L, or when the key is not the canonical encoding of a point or is a point of small order, or `R` is not the canonical encoding of a point or is a point of small order; tools make keys as RFC 8032 (section 5.1.5) says.
 
 **Others' witnesses.** A signature by someone other than the owner of the line, attesting a version, is a witness, not a signature of the line, and never a signature file: it is `<version>/witness-<label>.json`, where `<label>` is chosen by whoever adds it and matches `^[a-z0-9]+(-[a-z0-9]+)*$`. It has the fields and the signed message of a signature file, with `signer` and `keyLog` naming the signer's own owner object, which MUST NOT be the line's owner; its key log MAY be copied beside the object (section 6.5).
 
@@ -387,7 +385,7 @@ A signature file is <dfn>invalid</dfn> when:
 
 1. it is malformed, or its name does not match the digest of its key;
 2. its signature does not verify;
-3. its `object`, `version` and `inventorySha512` are not those of the version whose folder holds it (the digest also as its checksum file states it; in `parent.signatures/`, those of the parent version, section 9; in `forked/<d>/`, those of the version carried, section 6.3);
+3. its `object`, `version` and `inventorySha512` are not those of the version whose folder holds it (the digest also as its checksum file states it; in `parent/signatures/`, those of the parent version, section 9; in `forked/<d>/`, those of the version carried, section 6.3);
 4. its `signer` is not the line's owner;
 5. the reader reaches the key-log version named, with that digest (also as carried by a fork record, section 6.3), and the key is not in its `keys` (for a signature of a key-log version, is not one of its rotation keys, section 6.1);
 6. the version named is not a version of the key log, or is a fork record; or
@@ -436,7 +434,6 @@ Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in th
 
 **Open questions.**
 
-- The field names and the format of signature files (#55).
 - Exposed keys and fork records, provisional (sections 6.3 and 6.4; #58).
 
 ## 8. Collections
@@ -548,25 +545,25 @@ The branch's `owner` MUST differ from `parent.owner`. Only a signed version is b
 
 ### 9.2 The first version and its evidence
 
-The first object version of a branch holds exactly the files of the parent version, the genesis record included, except its `datacite.json`, its `object.json` and its own evidence; the branch's own `datacite.json` and `object.json`; and the <dfn>evidence</dfn> of the branch point, as files of its content:
+The first object version of a branch holds exactly the files of the parent version, the genesis record included, except its `datacite.json`, its `object.json` and its own evidence; the branch's own `datacite.json` and `object.json`; and the <dfn>evidence</dfn> of the branch point, as files of its content in the folder `parent/`:
 
-- `parent.inventory.json`: the inventory of the parent version;
-- `parent.object.json`: its `object.json`;
-- `parent.signatures/`: the parent owner's signature files of the parent version that are good when the branch is made (section 7.3; an archive adds no invalid signature file, section 7.5), named as in its witness folder without the `<version>/` folder (`parent.signatures/signature-<k>.json`, section 7.2), with the witnesses kept beside them, if any (timestamps); other witnesses of the parent version (a third party's signature) MAY be kept with them;
-- `parent.chain/`, when the parent is itself a branch: the parent version's own evidence, so that the grandparent's is at `parent.chain/parent.inventory.json`, the great-grandparent's at `parent.chain/parent.chain/parent.inventory.json`, and so on back to a version of the originator's line.
+- `parent/inventory.json`: the inventory of the parent version;
+- `parent/object.json`: its `object.json`;
+- `parent/signatures/`: the parent owner's signature files of the parent version that are good when the branch is made (section 7.3; an archive adds no invalid signature file, section 7.5), named as in its witness folder without the `<version>/` folder (`parent/signatures/signature-<k>.json`, section 7.2), with the witnesses kept beside them, if any (timestamps); other witnesses of the parent version (a third party's signature) MAY be kept with them;
+- `parent/parent/`, when the parent is itself a branch: the parent version's own evidence, its folder `parent/`, so that the grandparent's inventory is at `parent/parent/inventory.json`, the great-grandparent's at `parent/parent/parent/inventory.json`, and so on back to a version of the originator's line.
 
-Every file copied is copied byte for byte, and never re-serialised or replaced. A branch MUST hold `parent.signatures/` at every branch point, and `parent.chain/` when its parent is a branch. The evidence is covered by the branch's own inventories and signatures; with the genesis record it forms the branch's identity files (section 4.1). The key logs that the evidence needs are kept beside every copy of the branch, never in it (section 6.5).
+Every file copied is copied byte for byte, and never re-serialised or replaced. A branch MUST hold `parent/signatures/` at every branch point, and `parent/parent/` when its parent is a branch. The evidence is covered by the branch's own inventories and signatures; with the genesis record it forms the branch's identity files (section 4.1). The key logs that the evidence needs are kept beside every copy of the branch, never in it (section 6.5).
 
 ### 9.3 Checking a branch
 
 The evidence shows, without access to the parent's line, that a branch point is the parent owner's. A branch point is consistent when:
 
 - **the name:** the branch's `name` and `parent.name` are names of `genesis.json` (section 5.2), and the branch's `name` is `parent.name` unless it was renamed after a clash, by a greater algorithm number (section 5.3);
-- **the pin:** the SHA-512 digest of `parent.inventory.json` is `parent.inventorySha512`, its `head` is `parent.objectVersion`, and `parent.object.json` has the digest it records for `object.json` in its head state;
-- **the files:** every file of the head state of `parent.inventory.json`, `genesis.json` included, except `datacite.json`, `object.json` and the parent's evidence, is present at the same logical path with the same digest; no other file is present besides the branch's `datacite.json`, `object.json` and evidence;
-- **the parent:** `parent.owner`, `parent.name` and `parent.documentVersion` are those of `parent.object.json`; the branch's owner is neither the parent's owner nor the originator; and either the parent's owner is the originator and `parent.object.json` has no `parent`, or it has one;
-- **the signatures:** the parent version is signed (section 7.3), by the signature files of `parent.signatures/` against the parent owner's key log kept beside the branch, or vouched for by a signed version of the parent's line that the verifier finds; or it is unchecked;
-- **the chain:** when `parent.object.json` has a `parent`, `parent.chain/` holds that evidence, each file with the digest `parent.inventory.json` records for it, and it passes these checks in turn, level by level, up to the originator's line, except the files, checked at the first level only (a parent version may be a later version of its own branch).
+- **the pin:** the SHA-512 digest of `parent/inventory.json` is `parent.inventorySha512`, its `head` is `parent.objectVersion`, and `parent/object.json` has the digest it records for `object.json` in its head state;
+- **the files:** every file of the head state of `parent/inventory.json`, `genesis.json` included, except `datacite.json`, `object.json` and the parent's evidence, is present at the same logical path with the same digest; no other file is present besides the branch's `datacite.json`, `object.json` and evidence;
+- **the parent:** `parent.owner`, `parent.name` and `parent.documentVersion` are those of `parent/object.json`; the branch's owner is neither the parent's owner nor the originator; and either the parent's owner is the originator and `parent/object.json` has no `parent`, or it has one;
+- **the signatures:** the parent version is signed (section 7.3), by the signature files of `parent/signatures/` against the parent owner's key log kept beside the branch, or vouched for by a signed version of the parent's line that the verifier finds; or it is unchecked;
+- **the chain:** when `parent/object.json` has a `parent`, `parent/parent/` holds that evidence, each file `parent/parent/<path>` with the digest `parent/inventory.json` records for `parent/<path>`, and it passes these checks in turn, level by level, up to the originator's line, except the files, checked at the first level only (a parent version may be a later version of its own branch).
 
 A chain is finite, since each level is fixed by a digest in the level below. Verifiers MAY bound the depth they follow, and report where they stop; a branch point checked only down to that bound is unchecked.
 
@@ -614,7 +611,6 @@ A version the selection makes itself, such as a typeset version of record, is a 
 
 - The numbering of document versions on a branch: continued from the branch point (provisional), or numbered from it (3.1, 3.2), which makes `documentVersion` more than an integer; `/v<n>` of a `sheaf:` URI follows it (#57).
 - Moving a branch point when the branch has files of its own (of its notes, a withdrawal, a version of record): probably a merge keeping both, with evidence that tells them apart (#57).
-- The field and folder names of the evidence (#55).
 
 ## 10. Drafts and sealing
 
@@ -808,7 +804,7 @@ A verifier reports every finding with its place (the archive, an object, a versi
 
 The verifier checks:
 
-- every JSON file this specification defines against its schema (section 2), formats (dates, URIs) included as assertions, which JSON Schema 2020-12 leaves optional: the discovery document, the files of every object version (`parent.object.json` and the files of `parent.chain/` included), the files of witness folders, the indexes, and a keeper's file when it reads one; a malformed file of a witness folder is a warning (section 7.2);
+- every JSON file this specification defines against its schema (section 2), formats (dates, URIs) included as assertions, which JSON Schema 2020-12 leaves optional: the discovery document, the files of every object version (`parent/object.json` and the files of `parent/parent/` included), the files of witness folders, the indexes, and a keeper's file when it reads one; a malformed file of a witness folder is a warning (section 7.2);
 - that the storage root and every object are valid OCFL 1.1, with an OCFL validator or equivalent checks, leaving out the warnings validators give on witness folders (section 7.2); a draft is checked as it stands (section 10.1);
 - the layout that `storageLayout` names (section 3.2): for the hashed layout, that `ocfl_layout.json` names it with its parameters; for the owner-name layout, that the storage root has no `ocfl_layout.json`, and, a breach being a warning, that it holds `opensheaf-owner-name-storage-layout.md`; and that every object is at the path its identifier gives in that layout;
 - the rules of section 4.1 in every object version, and that the inventory of each version folder is the inventory as of that version: its `head` is that version, and its `versions` are those of the head inventory up to it, equal as JSON values;
@@ -956,6 +952,7 @@ Before 1.0, a minor version MAY be incompatible with the one before it. Version 
 - **0.2 (draft), 20 November 2026:** ambiguities found while implementing the reference tools resolved. Clarified: a reader's configuration may map locations (section 12.3); an owner part of 52 characters is of algorithm 0 (section 12.1); the checksum file and the inventory bytes give the same digest (section 4); `status` of a copy without a signed version (section 3.1); the main catalogue may be curated (section 8.1); a version signed directly with an exposed key and vouched for cleanly is not contested (section 7.3); a fork record copied byte for byte from a longer copy, and readers meeting copies of a key log (sections 6.3 and 6.5); the `sha512/` entries of a removed object (section 12.5); indexes not checked complete over HTTP (section 14.1); telling 0.1 from 0.2 (section 16.1); Zenodo, an owner ended during a deposit, and the genesis record uploaded (appendix A.1). Decided: numbers are integers, exactly, in genesis records and `keys.json` also in extensions (section 2); signatures in canonical base64, and `R` canonical (section 7.2); copies agree at their latest signed versions, versions after them making no fork (sections 7.4, 7.5 and 15.1); a version is unchecked when the threshold of the key-log version named is unknown, and when a reader without the key log cannot find signature files (section 7.3); owner tools sign over versions not signed only once the owner acknowledges them (section 7.3); files beside carried signatures read as witnesses, and carried inventories checked by their signatures only (section 6.3); `parent.signatures/` holds good signature files only (section 9.2); a branch of the same parent line at the same or an earlier point refused, not renamed (section 9.4); selections of one owner share its accepted copy (sections 9.6 and 14.5); what sealing keeps from a draft (section 10.2); unknown parameters of `sheaf:` URIs anywhere, written last (section 12.1); finding the archive of `parent.url` (section 12.3); landing pages give the canonical form and have an address per line (section 12.2, appendix A.3); a line returns only from a copy holding the pinned version (section 13.2); the main catalogue drops a line taken down (section 13.2); the index page when the main catalogue has no signed version (appendix A.3). Open: hosts that set no headers and `Content-Security-Policy: sandbox` (section 15.3); depositing branches on Zenodo (appendix A.1).
 - **0.2 (draft), 20 November 2026:** editorial, from a triage of the issues: the rule that a tombstone does not stop resolution at copies elsewhere (section 12.3) marked provisional, as sections 12.6 and 13.3 list it as open (#66); open questions added to section 4.2 for what a description-only version may change (#24) and for the identity of notices (#26); two open questions pointed to the issues that hold them (#35, #20).
 - **0.2 (draft), 21 November 2026:** editorial: open questions added to section 3.1 for paging the discovery document (#19) and for archives serving part of their lines (#29); the open question of #37 in section 14.6 restated, locations being tried in any order (section 12.3).
+- **0.2 (draft), 21 November 2026:** decided in #55: the field names of `keys.json`, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, `inventorySha512` and `keyLog` (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder `parent/`, with `parent/inventory.json`, `parent/object.json`, `parent/signatures/` and `parent/parent/` for a branch of a branch, `parent` being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
 
 ## Appendix A. Profiles (normative for archives declaring them)
 
@@ -974,7 +971,7 @@ Zenodo registers DataCite DOIs (prefix `10.5281`) and keeps files permanently. A
 - **Metadata.** Zenodo's DataCite record of a DOI has Zenodo's landing page as `url`, Zenodo as `publisher` (which `datacite.json` MAY also name, section 4.4), relations of its own, and only the properties Zenodo keeps. `datacite.json` stays authoritative; verifiers compare the DOI, `titles`, `creators`, `publicationYear` and `version` of the two, a difference being a warning.
 - **Collections.** A collection MAY be deposited when its curator releases it, not at every change, as a record of type `other` whose files include `members.json`. A Zenodo community MAY group an archive's records for browsing; it is not authoritative.
 
-**Open question.** How a branch is deposited: the evidence of its branch point (`parent.signatures/`, `parent.chain/`) has folders, which records do not, and is not sources, which `sources.zip` holds (#65).
+**Open question.** How a branch is deposited: the evidence of its branch point (the folder `parent/`) has folders, which records do not, and is not sources, which `sources.zip` holds (#65).
 
 ### A.2 TeXmacs (`texmacs`)
 
@@ -1001,7 +998,7 @@ Presentation files (section 3) are generated from the storage root, never edited
 The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.org/schemas/<file>`, their `$id`, and dedicated to the public domain under CC0 1.0 (section 15.6). They validate:
 
 - `opensheaf-archive-0.2.schema.json`: `opensheaf.json` (section 3.1);
-- `opensheaf-object-0.2.schema.json`: `object.json`, also as `parent.object.json` and in `parent.chain/` (sections 4.3 and 9.2);
+- `opensheaf-object-0.2.schema.json`: `object.json`, also as `parent/object.json` and in `parent/parent/` (sections 4.3 and 9.2);
 - `opensheaf-collection-0.2.schema.json`: `members.json` (section 8.2);
 - `opensheaf-genesis-0.2.schema.json`: `genesis.json` (section 5.1);
 - `opensheaf-keys-0.2.schema.json`: `keys.json`, also as carried by fork records (section 6);
@@ -1020,7 +1017,7 @@ The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.
 - Registering DOIs with an archive's own DataCite prefix (a `datacite` profile), and documents that already have a DOI elsewhere (#8).
 - Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
 - Whether a takedown reaches the records of external services (#33).
-- The field names of `keys.json`, signature files and the evidence of branches, which the schemas follow (#55); `next`, `nextThreshold`, `exposed` and the files of fork records, provisional (#58).
+- Pre-rotation, and with it `next`, `nextThreshold`, `exposed` and the files of fork records, provisional (#58).
 - Which converter is the reference for validating `datacite.json` through XML, since DataCite documents the correspondence but specifies no converter for it (#60).
 
 ## Appendix C. Examples (non-normative)
@@ -1128,7 +1125,7 @@ When the laptop is replaced, the second version lists the new laptop's key and r
   "signer": "56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa",
   "key": "did:key:z6Mkh5i2epG9LsWNnYbBHG7ctEiNLZPjsBNXxNUcsaYgEtNm",
   "keyLog": "sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v1?sha512=afaabe7b9489bc408ecbb20e8477a7eeb4e8a0ebde0dc15e32d30be17d922207504953e3e52101015f770844449c8382c4c4d9bec472a908ed47200efaef1220",
-  "signature": "MyYYLDn6FPmfVz478eKdcQF2FOkRTL8/ZV9qV35/PuC5u09ZYwDVxunX3S4Z1jWHICWsxgA+/L3MW49O0Z7vCA=="
+  "signature": "1SHM2Xc8RX7/lE8fJq4cbJ/iNV5+v3jji4ObMcjjJZdDKjxsV+j3SKMn8g2kGnf6QCe0FOfPenFkXcjWYGauAQ=="
 }
 ```
 
@@ -1245,7 +1242,7 @@ The signature of that version by the new laptop's key, `extensions/opensheaf-wit
   "signer": "56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa",
   "key": "did:key:z6MkugKqPPkysjyartSzszBbMh8fVhENmqGXvddtD8DDvThn",
   "keyLog": "sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84",
-  "signature": "0j2Xy5fRv+1ajlCCkmCXAOZj1U8CUeiYA1jP08kJevQH27QnXHLZ7TeF+WwxzYB+ad2OepksXgSCzP1KoCEYCg=="
+  "signature": "Gf9KOxH/6Bg4HzaXGt/HHP+iwdDkSpc/3laukJ5YDSxT6Vy7YDJslpFB3zsi1H/L6QsIaf+mNFhsLCYYqipyBA=="
 }
 ```
 
@@ -1255,8 +1252,8 @@ The message it signs, each line ended by a line feed (section 7.2):
 opensheaf-signature/0.2
 object sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa
 version v2
-inventory e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25
-keylog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84
+inventorySha512 e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25
+keyLog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84
 ```
 
 With a threshold of 1, this one good signature makes the version signed (section 7.3).
@@ -1340,7 +1337,7 @@ The `object.json` of the first version of the journal's accepted copy, a branch 
 }
 ```
 
-Its content holds the files of the parent version except `datacite.json` and `object.json` (`genesis.json`, the source and the PDF), its own `datacite.json` and `object.json`, and the evidence (section 9.2): `parent.inventory.json`, the authors' `v2/inventory.json`; `parent.object.json`, their `object.json` of that version; and `parent.signatures/signature-4hz7zgsiazl6hx7i.json`, the file of section C.3, byte for byte. Its witness folder holds two signature files of the journal's keys, naming the first version of the journal's key log. The journal's storage root keeps beside it the owner objects of the journal and of the authors (section 6.5).
+Its content holds the files of the parent version except `datacite.json` and `object.json` (`genesis.json`, the source and the PDF), its own `datacite.json` and `object.json`, and the evidence (section 9.2): `parent/inventory.json`, the authors' `v2/inventory.json`; `parent/object.json`, their `object.json` of that version; and `parent/signatures/signature-4hz7zgsiazl6hx7i.json`, the file of section C.3, byte for byte. Its witness folder holds two signature files of the journal's keys, naming the first version of the journal's key log. The journal's storage root keeps beside it the owner objects of the journal and of the authors (section 6.5).
 
 ### C.6 The archive
 
@@ -1476,7 +1473,7 @@ The first of its signature files:
   "signer": "56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa",
   "key": "did:key:z6MksaMy3cmXbnUKqzGv18xhbBreY6berNYVtTZyDrYRb1Hn",
   "keyLog": "sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84",
-  "signature": "lAQKAGCR6HxrUX+mv5DbqOFehbfo1zlLtYVPrNmyG+Wq5p0RuWEC+PyL7c0amQ+lRc0EKgJpfY5eRAt9oGU8Dw=="
+  "signature": "1zEI4EoFG/ZJlZ+e2Y0iswNCCi4oceb8k/gTR8KV+qKM8FAcJocW/eCfJ2zLYhjRlguS1lpoVwGnxBX8lMGKCg=="
 }
 ```
 
@@ -1534,7 +1531,7 @@ The reasons for the main choices, in the order of the sections.
 - **Why revealed rotation keys do not become current keys.** KERI makes them current, and detects a thief's competing versions by witnesses and watchers, which OpenSheaf does not have. A rotation key that became current would be in daily use, so its theft would again let a thief contest the key log.
 - **Why the first seen is kept.** Without witnesses, an archive cannot tell which side of a fork came first elsewhere; it keeps what it holds, which no one can then remove, and appends a fork record carrying the other side, so that nothing a signature names is dropped and every copy shows the fork. Meeting both sides at once, it may keep either: each ends the owner.
 - **Why a fork freezes the owner.** Only rotation keys, kept apart and used once, can fork a key log, so a fork is rare and shows that they were exposed; the format cannot tell the owner's side, and healing, tried before, did not settle against a thief ([keys and forks](https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/keys-and-forks.md)). Without a clock, no rule can tell what the owner signed before the fork from what a thief signs after it, also with old current keys naming earlier versions of the key log, and each attempt to salvage part of it (taking a forked owner's versions only from copies, for instance) made new edge cases. So a fork ends the owner and freezes it: archives keep what they hold, signatures stay good, nothing more is added unless evidence dates it before the fork, and, as in Radicle, where a compromised key means a new identity, the work continues under a successor.
-- **Why exposed keys are exposed, never revoked.** Signatures carry no time, so nothing tells what a key signed before it leaked from what a thief signs after; revocation would need trusted time to decide which signatures count. So no signature is undone: the owner exposes the keys, what needs them is contested, never added to an archive unless other evidence dates it before the exposure, and readers weigh the past by other evidence (section 6.4).
+- **Why exposed keys are exposed, never revoked.** Signatures carry no time, so nothing tells what a key signed before it leaked from what a thief signs after; revocation would need trusted time to decide which signatures count. So no signature is undone: the owner exposes the keys, what needs them is contested, never added to an archive unless other evidence dates it before the exposure, and readers weigh the past by other evidence (section 6.4). Dating every signature (a timestamp on each, a transparency log) would need a service online at signing time; such evidence can be added later as witnesses without changing any archive (#55).
 - **Why one status, contested.** An exposed key and a fork of a key log raise one question, whether a good signature may be a thief's, so one status answers both, once, for archives (never added), readers (never the latest signed version), branches and collections, and the same evidence lifts it. An exposure counts in any version, on either side of a fork: the format cannot tell which side is the owner's, and an exposure only makes versions contested, never signed, so counting a thief's costs trust in the owner's past at most, while ignoring the owner's would let what the thief signs with a stolen key pass. Versions of key logs are never contested: current keys never sign them.
 - **Why key logs travel beside objects.** A key log checks itself from its owner name, so any copy will do; as an owner object it is copied once per storage root and grows without changing the lines it signs.
 - **Why timestamps are an extension.** A single researcher needs none, since signatures stay good; an institution may want signatures dated by a provider it names, to tell what came before an exposure. The extension keeps the trade-offs of RFC 3161 authorities and OpenTimestamps out of the core; timestamps change no status by themselves, and section 7.3 admits trusted dates as evidence against `contested`.
