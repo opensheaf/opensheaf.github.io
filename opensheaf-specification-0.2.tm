@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf: an open format for document archives and collections>
 
-  <notes-abstract|Specification, version 0.2 (draft), 20 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
+  <notes-abstract|Specification, version 0.2 (draft), 21 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
 
   <os-alert|warning|Warning.|<strong|Draft.> Until version 1.0, any revision may change the format in incompatible ways. Version 0.2 is incompatible with <hlink|version 0.1|opensheaf-specification-0.1.tm>, which is kept as published (section 16.1). The text before its rebuild, with the changelog of every revision of the draft, is kept as the <hlink|reference text|reference/opensheaf-specification-0.1-full.md>.>
 
@@ -92,6 +92,14 @@
   The discovery document is rewritten whenever an object is added or changed. It is a map, not a witness: everything it states about objects MUST agree with the storage root, which verifiers check (section 14), and it lists what the archive holds, not every line an owner has elsewhere.
 
   <strong|Labels.> A <dfn|label> is a short readable name an archive MAY give a line it holds, for readable URLs on its website: it matches <verbatim|^[a-z0-9]+(-[a-z0-9]+)*$>, has at most 64 characters, and is unique in the discovery document. It is the archive's choice, may change, and is not an identifier; permanent links use <verbatim|sheaf:> URIs (section 12). Labels SHOULD be chosen by the depositor, not derived from the title.
+
+  <strong|Open questions.>
+
+  <\itemize>
+    <item>Archives with millions of objects: whether <verbatim|objects> and the feed are paged, and how (#19).
+
+    <item>Whether an archive may serve only part of its lines (a private archive publishing some of them), and how its discovery document says so (#29).
+  </itemize>
 
   <subsection*|3.2 The storage root><label|32-the-storage-root>
 
@@ -1124,7 +1132,7 @@
   <strong|Open questions.>
 
   <\itemize>
-    <item>Which status a member has when the checksum file of its inventory is missing or wrong (#48), and whether a mismatch at the member's archive falls through to mirrors (#37).
+    <item>Which status a member has when the checksum file of its inventory is missing or wrong (#48), and which status it has when one location serves a copy that does not match and another one that matches (#37).
 
     <item>Whether digests in OCFL files must be in lower case (#49).
 
@@ -1267,6 +1275,8 @@
     <item><strong|0.2 (draft), 20 November 2026:> ambiguities found while implementing the reference tools resolved. Clarified: a reader's configuration may map locations (section 12.3); an owner part of 52 characters is of algorithm 0 (section 12.1); the checksum file and the inventory bytes give the same digest (section 4); <verbatim|status> of a copy without a signed version (section 3.1); the main catalogue may be curated (section 8.1); a version signed directly with an exposed key and vouched for cleanly is not contested (section 7.3); a fork record copied byte for byte from a longer copy, and readers meeting copies of a key log (sections 6.3 and 6.5); the <verbatim|sha512/> entries of a removed object (section 12.5); indexes not checked complete over HTTP (section 14.1); telling 0.1 from 0.2 (section 16.1); Zenodo, an owner ended during a deposit, and the genesis record uploaded (appendix A.1). Decided: numbers are integers, exactly, in genesis records and <verbatim|keys.json> also in extensions (section 2); signatures in canonical base64, and <verbatim|R> canonical (section 7.2); copies agree at their latest signed versions, versions after them making no fork (sections 7.4, 7.5 and 15.1); a version is unchecked when the threshold of the key-log version named is unknown, and when a reader without the key log cannot find signature files (section 7.3); owner tools sign over versions not signed only once the owner acknowledges them (section 7.3); files beside carried signatures read as witnesses, and carried inventories checked by their signatures only (section 6.3); <verbatim|parent.signatures/> holds good signature files only (section 9.2); a branch of the same parent line at the same or an earlier point refused, not renamed (section 9.4); selections of one owner share its accepted copy (sections 9.6 and 14.5); what sealing keeps from a draft (section 10.2); unknown parameters of <verbatim|sheaf:> URIs anywhere, written last (section 12.1); finding the archive of <verbatim|parent.url> (section 12.3); landing pages give the canonical form and have an address per line (section 12.2, appendix A.3); a line returns only from a copy holding the pinned version (section 13.2); the main catalogue drops a line taken down (section 13.2); the index page when the main catalogue has no signed version (appendix A.3). Open: hosts that set no headers and <verbatim|Content-Security-Policy: sandbox> (section 15.3); depositing branches on Zenodo (appendix A.1).
 
     <item><strong|0.2 (draft), 20 November 2026:> editorial, from a triage of the issues: the rule that a tombstone does not stop resolution at copies elsewhere (section 12.3) marked provisional, as sections 12.6 and 13.3 list it as open (#66); open questions added to section 4.2 for what a description-only version may change (#24) and for the identity of notices (#26); two open questions pointed to the issues that hold them (#35, #20).
+
+    <item><strong|0.2 (draft), 21 November 2026:> editorial: open questions added to section 3.1 for paging the discovery document (#19) and for archives serving part of their lines (#29); the open question of #37 in section 14.6 restated, locations being tried in any order (section 12.3).
   </itemize>
 
   <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>

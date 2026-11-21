@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf: an open format for document archives and collections, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Specification, version 0.2 (draft), 20 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
+    <meta name="description" content="Specification, version 0.2 (draft), 21 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -33,7 +33,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.2 (draft), 20 November 2026. OpenSheaf is a
+      Specification, version 0.2 (draft), 21 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). The text is licensed under CC
@@ -327,6 +327,24 @@
       class="verbatim">sheaf:</tt> URIs (section 12). Labels SHOULD be chosen by the
       depositor, not derived from the title.
     </p>
+    <p>
+      <strong>Open questions.</strong>
+    </p>
+    <ul>
+      <li>
+        <p>
+          Archives with millions of objects: whether <tt class="verbatim">objects</tt>
+          and the feed are paged, and how (#19).
+        </p>
+      </li>
+      <li>
+        <p>
+          Whether an archive may serve only part of its lines (a private
+          archive publishing some of them), and how its discovery document
+          says so (#29).
+        </p>
+      </li>
+    </ul>
     <h3 id="auto-6"><a id="32-the-storage-root"></a>3.2 The storage root<span style="margin-left: 1em"></span></h3>
     <p>
       The <dfn>storage root</dfn> is an OCFL 1.1 storage root at the URL <tt
@@ -3742,8 +3760,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           Which status a member has when the checksum file of its inventory is
-          missing or wrong (#48), and whether a mismatch at the member's
-          archive falls through to mirrors (#37).
+          missing or wrong (#48), and which status it has when one location
+          serves a copy that does not match and another one that matches
+          (#37).
         </p>
       </li>
       <li>
@@ -4297,6 +4316,15 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           to section 4.2 for what a description-only version may change (#24)
           and for the identity of notices (#26); two open questions pointed to
           the issues that hold them (#35, #20).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 21 November 2026:</strong> editorial: open
+          questions added to section 3.1 for paging the discovery document
+          (#19) and for archives serving part of their lines (#29); the open
+          question of #37 in section 14.6 restated, locations being tried in
+          any order (section 12.3).
         </p>
       </li>
     </ul>
