@@ -215,8 +215,8 @@ An owner is itself an object, named by its own genesis record, which lists its
 first keys, and whose versions are its **key log**. Each version lists the
 owner's **current keys**, which sign its documents and collections, with the
 number of them that must sign, and commits, by their digests, to the
-**rotation keys** that alone sign the next version of the key log, as in KERI
-(pre-rotation is provisional, #58); current keys never sign the key log, whose
+**rotation keys** that alone sign the next version of the key log, as in
+KERI; current keys never sign the key log, whose
 first version is computed from the genesis record and signed by no key.
 
 Current keys are in daily use, one on each device; rotation keys are kept

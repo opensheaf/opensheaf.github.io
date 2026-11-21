@@ -321,7 +321,7 @@ A key log checks itself from its owner name: its first version is computed from 
 
 Every copy of an object, in any archive, MUST hold beside it, as owner objects in the same storage root at their paths (section 3.2), the key logs of the owner of its line and, for a branch, of the owner of each parent whose signatures its evidence holds, in `parent/signatures/` and at every level of `parent/parent/` (section 9). Each is copied up to the latest version that whoever makes the copy knows, and at least up to the versions its signatures name, or up to a fork record that carries them (section 6.3). The key logs of third parties whose witnesses a copy holds (section 7) MAY be copied too. Key logs are never copied into an object's content. An archive MUST keep an owner object as long as it keeps an object whose signatures need it, unless the owner object is itself taken down; a tombstone then stands in for it, and a takedown of a line leaves its owner objects in place (section 13). An owner object MAY also be copied on its own, to keep a fresher copy of its key log.
 
-Of two copies of a key log, compared up to their fork records (section 6.3), either one extends the other, and readers use the longer, or they differ from a fork point, as section 6.3 says. A reader that meets copies that differ from a fork point reads them, writing nothing, as an archive holding one of them would once it has appended a fork record carrying the other: the owner is ended at the fork point, and signatures naming versions of either side are judged against them (section 7.3). No one can prove offline that a key log is complete: a copy that stops early may hide that the owner has ended.
+Of two copies of a key log, compared up to their fork records (section 6.3), either one extends the other, and readers use the longer, or they differ from a fork point, as section 6.3 says. A reader that meets copies that differ from a fork point reads them, writing nothing, as an archive holding one of them would once it has appended a fork record carrying the other: the owner is ended at the fork point, and signatures naming versions of either side are judged against them (section 7.3). No one can prove offline that a key log is complete: a copy that stops early may hide that the owner has ended, and a reader holding only one side of a fork sees no fork. Readers judge by the versions they hold, and verifiers report the key-log version they judged against, so that a reader who later meets a longer copy, or the other side, judges again.
 
 **Moving.** An owner moving to another archive copies its owner object there, with the lines it wants to keep there, and continues its lines in the new archive: the same owner and the same lines, not branches. The old copies stay valid where they are, as older copies of the same lines (section 7). In the owner-name layout this is one folder (section 3.2).
 
@@ -335,7 +335,7 @@ When a keeper is named, a verifier MAY check both directions, and reports the li
 
 **Open questions.**
 
-- Pre-rotation, provisional (#58; `drafts/keys-and-forks.md` and `drafts/federated-identity.md` on `main`): weighted thresholds for groups, as KERI's; witnesses that record which version of a key log they saw first, as an extension; and what a reader holding only one side of a fork can know.
+- Weighted thresholds for owners that are groups, as KERI's (#69), and witnesses that record which version of a key log they saw first, as an extension (#70); neither changes a key log made without them (`drafts/keys-and-forks.md` and `drafts/federated-identity.md` on `main`).
 - The form of a keeper's confirmation on ORCID, which depends on an `https` form of `sheaf:<owner>`, and so on the gateway (section 12; #35).
 
 ## 7. Lines and signatures
@@ -432,9 +432,6 @@ An archive adds a version to a line only if, once added, it is signed and not co
 
 Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in the inventory, every inventory by its checksum file, and every member of a collection by a pin (sections 4 and 8). Digests show that files were not changed, signatures which owner's keys signed them; neither shows who wrote them or when (sections 7.2 and 15.1).
 
-**Open questions.**
-
-- Exposed keys and fork records, provisional (sections 6.3 and 6.4; #58).
 
 ## 8. Collections
 
@@ -855,7 +852,6 @@ The verifier then checks, against the objects:
 - The parts of section 4.2 that the files do not decide: whether a version deposited out of order wrote `history` (#51), and when a document version is new (#23).
 - How a verifier tells a licence from a rights statement in `rightsList` (#50), and which licences allow a mirror (#34), which is therefore not checked.
 - What a verifier reports for a pin of an earlier version of a withdrawn line (#25).
-- Fork records and exposed keys, provisional (sections 6.3 and 6.4; #58).
 
 ## 15. Security, privacy and rights
 
@@ -953,6 +949,7 @@ Before 1.0, a minor version MAY be incompatible with the one before it. Version 
 - **0.2 (draft), 20 November 2026:** editorial, from a triage of the issues: the rule that a tombstone does not stop resolution at copies elsewhere (section 12.3) marked provisional, as sections 12.6 and 13.3 list it as open (#66); open questions added to section 4.2 for what a description-only version may change (#24) and for the identity of notices (#26); two open questions pointed to the issues that hold them (#35, #20).
 - **0.2 (draft), 21 November 2026:** editorial: open questions added to section 3.1 for paging the discovery document (#19) and for archives serving part of their lines (#29); the open question of #37 in section 14.6 restated, locations being tried in any order (section 12.3).
 - **0.2 (draft), 21 November 2026:** decided in #55: the field names of `keys.json`, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, `inventorySha512` and `keyLog` (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder `parent/`, with `parent/inventory.json`, `parent/object.json`, `parent/signatures/` and `parent/parent/` for a branch of a branch, `parent` being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
+- **0.2 (draft), 21 November 2026:** decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
 
 ## Appendix A. Profiles (normative for archives declaring them)
 
@@ -1017,7 +1014,6 @@ The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.
 - Registering DOIs with an archive's own DataCite prefix (a `datacite` profile), and documents that already have a DOI elsewhere (#8).
 - Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
 - Whether a takedown reaches the records of external services (#33).
-- Pre-rotation, and with it `next`, `nextThreshold`, `exposed` and the files of fork records, provisional (#58).
 - Which converter is the reference for validating `datacite.json` through XML, since DataCite documents the correspondence but specifies no converter for it (#60).
 
 ## Appendix C. Examples (non-normative)
@@ -1432,7 +1428,7 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
     the second, through a gateway (provisional, #35)
 ```
 
-### C.8 An exposed key and a fork of a key log (provisional, #58)
+### C.8 An exposed key and a fork of a key log
 
 Later, the new laptop is stolen. The owner signs with two tokens of the second version a version 3 of its key log, in `v3/signature-j77iavvdclktxkwm.json` and `v3/signature-nzvwkea25p62akdy.json`, naming version 2. It lists a new current key, made on another laptop, the stolen key in `exposed`, and the digests of three new tokens in `next`:
 

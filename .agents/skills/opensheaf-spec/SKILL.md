@@ -116,7 +116,7 @@ questions are listed at the end of the sections they concern.
   `keys.json` (`keys` as Ed25519 `did:key`, `threshold`, `next`,
   `nextThreshold`, `extensions`, `ended`, `successor`, `exposed`; no
   `keeper`), in every version but a fork record. **Pre-rotation**, as in
-  KERI (provisional, #58): **current keys** (`keys`, `threshold`) sign the
+  KERI (#58): **current keys** (`keys`, `threshold`) sign the
   versions of lines, never the key log; the first version of the key log is
   **computed** from the genesis record, never signed: `genesis.json`,
   `object.json` and `keys.json` (the key fields of the genesis record), and
@@ -146,7 +146,7 @@ questions are listed at the end of the sections they concern.
   the owner's earlier keys: harms trust, never lets a forgery pass), and
   concerns versions of lines, never of key logs; otherwise retiring is
   enough. There is no revocation.
-- **Forks of a key log, fork records** (6.3, provisional, #58): two signed
+- **Forks of a key log, fork records** (6.3, #58): two signed
   versions of one number whose inventories differ are a fork, at its fork
   point. Only rotation keys can make one, never at the computed version 1,
   and a fork **ends the owner** and **freezes** it (7.5). An archive keeps
@@ -286,9 +286,8 @@ the same change in its schema, and the other way round.
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors, #44 aliases,
-  #48, #49, #50, #51 and #23 verification details, #54 custody policies, #55
-  field names of owners and signatures, #57 branch numbering, #58 pre-rotation,
-  exposed keys and fork records (provisional). Read the relevant issue before
+  #48, #49, #50, #51 and #23 verification details, #54 custody policies, #57
+  branch numbering, #69 weighted thresholds, #70 witnesses of key logs. Read the relevant issue before
   touching its topic; do not settle an open question without agreement.
 
 ## Design principles to keep

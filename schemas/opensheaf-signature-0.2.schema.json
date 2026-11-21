@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-signature-0.2.schema.json",
   "title": "OpenSheaf signature file, version 0.2",
-  "$comment": "Section 7.2 of the specification (field names provisional, #55; the signed message is defined there). Dedicated to the public domain under CC0 1.0.",
+  "$comment": "Section 7.2 of the specification (the signed message is defined there). Dedicated to the public domain under CC0 1.0.",
   "type": "object",
   "required": [
     "format",

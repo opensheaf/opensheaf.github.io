@@ -439,7 +439,7 @@
 
   Every copy of an object, in any archive, MUST hold beside it, as owner objects in the same storage root at their paths (section 3.2), the key logs of the owner of its line and, for a branch, of the owner of each parent whose signatures its evidence holds, in <verbatim|parent/signatures/> and at every level of <verbatim|parent/parent/> (section 9). Each is copied up to the latest version that whoever makes the copy knows, and at least up to the versions its signatures name, or up to a fork record that carries them (section 6.3). The key logs of third parties whose witnesses a copy holds (section 7) MAY be copied too. Key logs are never copied into an object's content. An archive MUST keep an owner object as long as it keeps an object whose signatures need it, unless the owner object is itself taken down; a tombstone then stands in for it, and a takedown of a line leaves its owner objects in place (section 13). An owner object MAY also be copied on its own, to keep a fresher copy of its key log.
 
-  Of two copies of a key log, compared up to their fork records (section 6.3), either one extends the other, and readers use the longer, or they differ from a fork point, as section 6.3 says. A reader that meets copies that differ from a fork point reads them, writing nothing, as an archive holding one of them would once it has appended a fork record carrying the other: the owner is ended at the fork point, and signatures naming versions of either side are judged against them (section 7.3). No one can prove offline that a key log is complete: a copy that stops early may hide that the owner has ended.
+  Of two copies of a key log, compared up to their fork records (section 6.3), either one extends the other, and readers use the longer, or they differ from a fork point, as section 6.3 says. A reader that meets copies that differ from a fork point reads them, writing nothing, as an archive holding one of them would once it has appended a fork record carrying the other: the owner is ended at the fork point, and signatures naming versions of either side are judged against them (section 7.3). No one can prove offline that a key log is complete: a copy that stops early may hide that the owner has ended, and a reader holding only one side of a fork sees no fork. Readers judge by the versions they hold, and verifiers report the key-log version they judged against, so that a reader who later meets a longer copy, or the other side, judges again.
 
   <strong|Moving.> An owner moving to another archive copies its owner object there, with the lines it wants to keep there, and continues its lines in the new archive: the same owner and the same lines, not branches. The old copies stay valid where they are, as older copies of the same lines (section 7). In the owner-name layout this is one folder (section 3.2).
 
@@ -454,7 +454,7 @@
   <strong|Open questions.>
 
   <\itemize>
-    <item>Pre-rotation, provisional (#58; <verbatim|drafts/keys-and-forks.md> and <verbatim|drafts/federated-identity.md> on <verbatim|main>): weighted thresholds for groups, as KERI's; witnesses that record which version of a key log they saw first, as an extension; and what a reader holding only one side of a fork can know.
+    <item>Weighted thresholds for owners that are groups, as KERI's (#69), and witnesses that record which version of a key log they saw first, as an extension (#70); neither changes a key log made without them (<verbatim|drafts/keys-and-forks.md> and <verbatim|drafts/federated-identity.md> on <verbatim|main>).
 
     <item>The form of a keeper's confirmation on ORCID, which depends on an <verbatim|https> form of <verbatim|sheaf:\<less\>owner\<gtr\>>, and so on the gateway (section 12; #35).
   </itemize>
@@ -580,12 +580,6 @@
   <subsection*|7.6 Integrity><label|76-integrity>
 
   Integrity rests on OCFL digests: every file is fixed by its SHA-512 digest in the inventory, every inventory by its checksum file, and every member of a collection by a pin (sections 4 and 8). Digests show that files were not changed, signatures which owner's keys signed them; neither shows who wrote them or when (sections 7.2 and 15.1).
-
-  <strong|Open questions.>
-
-  <\itemize>
-    <item>Exposed keys and fork records, provisional (sections 6.3 and 6.4; #58).
-  </itemize>
 
   <section*|8. Collections><label|8-collections>
 
@@ -1133,8 +1127,6 @@
     <item>How a verifier tells a licence from a rights statement in <verbatim|rightsList> (#50), and which licences allow a mirror (#34), which is therefore not checked.
 
     <item>What a verifier reports for a pin of an earlier version of a withdrawn line (#25).
-
-    <item>Fork records and exposed keys, provisional (sections 6.3 and 6.4; #58).
   </itemize>
 
   <section*|15. Security, privacy and rights><label|15-security-privacy-and-rights>
@@ -1271,6 +1263,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> editorial: open questions added to section 3.1 for paging the discovery document (#19) and for archives serving part of their lines (#29); the open question of #37 in section 14.6 restated, locations being tried in any order (section 12.3).
 
     <item><strong|0.2 (draft), 21 November 2026:> decided in #55: the field names of <verbatim|keys.json>, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, <verbatim|inventorySha512> and <verbatim|keyLog> (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder <verbatim|parent/>, with <verbatim|parent/inventory.json>, <verbatim|parent/object.json>, <verbatim|parent/signatures/> and <verbatim|parent/parent/> for a branch of a branch, <verbatim|parent> being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
+
+    <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
   </itemize>
 
   <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>
@@ -1367,8 +1361,6 @@
     <item>Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
 
     <item>Whether a takedown reaches the records of external services (#33).
-
-    <item>Pre-rotation, and with it <verbatim|next>, <verbatim|nextThreshold>, <verbatim|exposed> and the files of fork records, provisional (#58).
 
     <item>Which converter is the reference for validating <verbatim|datacite.json> through XML, since DataCite documents the correspondence but specifies no converter for it (#60).
   </itemize>
@@ -2089,7 +2081,7 @@
     \ \ \ \ the second, through a gateway (provisional, #35)
   </verbatim-code>
 
-  <subsection*|C.8 An exposed key and a fork of a key log (provisional, #58)><label|c8-an-exposed-key-and-a-fork-of-a-key-log-provisional-58>
+  <subsection*|C.8 An exposed key and a fork of a key log><label|c8-an-exposed-key-and-a-fork-of-a-key-log>
 
   Later, the new laptop is stolen. The owner signs with two tokens of the second version a version 3 of its key log, in <verbatim|v3/signature-j77iavvdclktxkwm.json> and <verbatim|v3/signature-nzvwkea25p62akdy.json>, naming version 2. It lists a new current key, made on another laptop, the stolen key in <verbatim|exposed>, and the digests of three new tokens in <verbatim|next>:
 

@@ -9,7 +9,7 @@
 
   <notes-abstract|Extension to the OpenSheaf specification 0.2. Version 0.2 (draft), 21 November 2026. How an owner dates its signatures with RFC 3161 tokens or OpenTimestamps proofs, and declares in its key log that it does so, so that readers can tell which versions existed by a date, for instance before a key was exposed. The extension is named by the URI <verbatim|https://opensheaf.org/opensheaf-timestamps-0.2>. The text is licensed under CC BY-SA 4.0; its JSON Schema is dedicated to the public domain under CC0 1.0.>
 
-  <os-alert|warning|Warning.|<strong|Draft.> This extension rests on the owners, key logs and signatures of the specification (sections 6 and 7), whose field names are open (<hlink|issue #55|https://github.com/opensheaf/opensheaf.github.io/issues/55>), and on its pre-rotation of key logs, exposed keys and fork records, provisional (<hlink|issue #58|https://github.com/opensheaf/opensheaf.github.io/issues/58>).>
+  <os-alert|warning|Warning.|<strong|Draft.> This extension rests on the owners, key logs and signatures of the specification (sections 6 and 7), with their pre-rotation of key logs, exposed keys and fork records (<hlink|issue #55|https://github.com/opensheaf/opensheaf.github.io/issues/55>, <hlink|issue #58|https://github.com/opensheaf/opensheaf.github.io/issues/58>).>
 
   <section*|1. Introduction (non-normative)><label|1-introduction-non-normative>
 
@@ -163,6 +163,8 @@
     <item><strong|0.2 (draft), 19 November 2026:> named version 0.2, with version 0.2 of the specification, which it extends; its URI is <verbatim|https://opensheaf.org/opensheaf-timestamps-0.2>, and its schema <verbatim|opensheaf-timestamps-0.2.schema.json>.
 
     <item><strong|0.2 (draft), 21 November 2026:> the evidence of a branch point is now the folder <verbatim|parent/> of the specification (#55): a branch keeps the timestamp files of its parent's signatures in <verbatim|parent/signatures/>.
+
+    <item><strong|0.2 (draft), 21 November 2026:> the note on the draft follows the specification, whose field names (#55) and pre-rotation, exposed keys and fork records (#58) are no longer open.
   </itemize>
 
 </body>

@@ -1599,7 +1599,10 @@
       carrying the other: the owner is ended at the fork point, and signatures
       naming versions of either side are judged against them (section 7.3). No
       one can prove offline that a key log is complete: a copy that stops
-      early may hide that the owner has ended.
+      early may hide that the owner has ended, and a reader holding only one
+      side of a fork sees no fork. Readers judge by the versions they hold,
+      and verifiers report the key-log version they judged against, so that a
+      reader who later meets a longer copy, or the other side, judges again.
     </p>
     <p>
       <strong>Moving.</strong> An owner moving to another archive copies its
@@ -1654,11 +1657,11 @@
     <ul>
       <li>
         <p>
-          Pre-rotation, provisional (#58; <tt class="verbatim">drafts/keys-and-forks.md</tt>
-          and <tt class="verbatim">drafts/federated-identity.md</tt> on <tt class="verbatim">main</tt>):
-          weighted thresholds for groups, as KERI's; witnesses that record
-          which version of a key log they saw first, as an extension; and what
-          a reader holding only one side of a fork can know.
+          Weighted thresholds for owners that are groups, as KERI's (#69), and
+          witnesses that record which version of a key log they saw first, as
+          an extension (#70); neither changes a key log made without them (<tt
+          class="verbatim">drafts/keys-and-forks.md</tt> and <tt class="verbatim">drafts/federated-identity.md</tt>
+          on <tt class="verbatim">main</tt>).
         </p>
       </li>
       <li>
@@ -2056,17 +2059,6 @@ keyLog &lt;the value of keyLog&gt;</pre>
       files were not changed, signatures which owner's keys signed them;
       neither shows who wrote them or when (sections 7.2 and 15.1).
     </p>
-    <p>
-      <strong>Open questions.</strong>
-    </p>
-    <ul>
-      <li>
-        <p>
-          Exposed keys and fork records, provisional (sections 6.3 and 6.4;
-          #58).
-        </p>
-      </li>
-    </ul>
     <h2 id="auto-31"><a id="8-collections"></a>8. Collections<span style="margin-left: 1em"></span></h2>
     <p>
       A <dfn>collection</dfn> is an object of kind <tt class="verbatim">collection</tt>
@@ -3770,12 +3762,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           withdrawn line (#25).
         </p>
       </li>
-      <li>
-        <p>
-          Fork records and exposed keys, provisional (sections 6.3 and 6.4;
-          #58).
-        </p>
-      </li>
     </ul>
     <h2 id="auto-70"><a id="15-security-privacy-and-rights"></a>15. Security, privacy and rights<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-71"><a id="151-what-the-format-protects"></a>15.1 What the format protects<span style="margin-left: 1em"></span></h3>
@@ -4324,6 +4310,17 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           backdating (section 6.4 and appendix D).
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 21 November 2026:</strong> decided in #58:
+          pre-rotation, exposed keys, fork records and a fork that ends and
+          freezes the owner are no longer provisional (sections 6.1 to 6.4,
+          7.5, 14.6 and C.8); a reader holding one side of a fork sees no
+          fork, and verifiers report the key-log version they judged against
+          (section 6.5); weighted thresholds (#69) and witnesses of the
+          versions of key logs seen first (#70) are left for after 0.2.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -4655,13 +4652,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           Whether a takedown reaches the records of external services (#33).
-        </p>
-      </li>
-      <li>
-        <p>
-          Pre-rotation, and with it <tt class="verbatim">next</tt>, <tt class="verbatim">nextThreshold</tt>,
-          <tt class="verbatim">exposed</tt> and the files of fork records, provisional
-          (#58).
         </p>
       </li>
       <li>
@@ -5293,8 +5283,7 @@ sheaf:zzgdggwl:tqr6lchn/v2
 https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2
     the second, through a gateway (provisional, #35)</pre>
     </div>
-    <h3 id="auto-93"><a id="c8-an-exposed-key-and-a-fork-of-a-key-log-provisional-58"></a>C.8 An exposed key and a fork of a key log
-    (provisional, #58)<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-93"><a id="c8-an-exposed-key-and-a-fork-of-a-key-log"></a>C.8 An exposed key and a fork of a key log<span style="margin-left: 1em"></span></h3>
     <p>
       Later, the new laptop is stolen. The owner signs with two tokens of the
       second version a version 3 of its key log, in <tt class="verbatim">v3/signature-j77iavvdclktxkwm.json</tt>
