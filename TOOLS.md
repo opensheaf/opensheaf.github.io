@@ -355,6 +355,16 @@ passkey, so that it opens the new keys too; `--new-passkey` adds a passkey
 of another provider. `--no-browser` prints the address instead of opening
 it.
 
+**From the browser.** The
+[OpenSheaf Manager](https://manager.opensheaf.org/) does the same for the
+owner of an archive it keeps ("Write directly", then "Set up a key
+wallet"): it puts the current key of your computer's key store in a
+private repository you created, locked with the passphrase, as `osheaf key
+push` does, and adds the lock of a passkey made by the same page of
+`unlock.opensheaf.org`, opened as a popup of the Manager, as `osheaf key
+enroll` does. The files are the same, and `osheaf key pull` and `osheaf
+key unlock` read them.
+
 **Passkeys made on opensheaf.org.** The first version of the page, at
 `opensheaf.org/manager/unlock.html`, made passkeys for `opensheaf.org`,
 which `osheaf` no longer asks the browser for; the keys they locked still
@@ -636,7 +646,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 - To keep an archive from the browser, without the command line: the
   [archive template](https://github.com/opensheaf/archive-template), whose
   README also walks through the key ceremony, and the
-  [OpenSheaf Manager](https://opensheaf.org/manager/), which keeps an archive
+  [OpenSheaf Manager](https://manager.opensheaf.org/), which keeps an archive
   made from the template from a page. Both run `osheaf` for you.
 - To look at an archive and check it: the
   [Explorer](https://opensheaf.org/explorer/), for instance on the

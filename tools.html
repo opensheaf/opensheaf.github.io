@@ -504,6 +504,17 @@ osheaf key unlock   # on another computer: Touch ID, and the current keys are pu
       prints the address instead of opening it.
     </p>
     <p>
+      <strong>From the browser.</strong> The <a href="https://manager.opensheaf.org/">OpenSheaf Manager</a>
+      does the same for the owner of an archive it keeps (&quot;Write
+      directly&quot;, then &quot;Set up a key wallet&quot;): it puts the
+      current key of your computer's key store in a private repository you
+      created, locked with the passphrase, as <tt class="verbatim">osheaf key push</tt>
+      does, and adds the lock of a passkey made by the same page of <tt class="verbatim">unlock.opensheaf.org</tt>,
+      opened as a popup of the Manager, as <tt class="verbatim">osheaf key enroll</tt>
+      does. The files are the same, and <tt class="verbatim">osheaf key pull</tt> and
+      <tt class="verbatim">osheaf key unlock</tt> read them.
+    </p>
+    <p>
       <strong>Passkeys made on opensheaf.org.</strong> The first version of
       the page, at <tt class="verbatim">opensheaf.org/manager/unlock.html</tt>, made
       passkeys for <tt class="verbatim">opensheaf.org</tt>, which <tt class="verbatim">osheaf</tt>
@@ -931,7 +942,7 @@ osheaf zenodo kpz-uniqueness --production</pre>
         <p>
           To keep an archive from the browser, without the command line: the
           <a href="https://github.com/opensheaf/archive-template">archive template</a>, whose README also walks through the
-          key ceremony, and the <a href="https://opensheaf.org/manager/">OpenSheaf Manager</a>, which keeps an
+          key ceremony, and the <a href="https://manager.opensheaf.org/">OpenSheaf Manager</a>, which keeps an
           archive made from the template from a page. Both run <tt class="verbatim">osheaf</tt>
           for you.
         </p>

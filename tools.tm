@@ -287,6 +287,8 @@
 
   The passphrase remains the way back: <verbatim|osheaf> asks for it if the page reports an error, after two minutes without an answer, when you press Ctrl-C while it waits, or when the browser's answer does not open a key. Writing new keys into the wallet still needs the passphrase. Run <verbatim|osheaf key enroll> again after a rotation that did not unlock with the passkey, so that it opens the new keys too; <verbatim|-<no-break>-new-passkey> adds a passkey of another provider. <verbatim|-<no-break>-no-browser> prints the address instead of opening it.
 
+  <strong|From the browser.> The <hlink|OpenSheaf Manager|https://manager.opensheaf.org/> does the same for the owner of an archive it keeps ("Write directly", then "Set up a key wallet"): it puts the current key of your computer's key store in a private repository you created, locked with the passphrase, as <verbatim|osheaf key push> does, and adds the lock of a passkey made by the same page of <verbatim|unlock.opensheaf.org>, opened as a popup of the Manager, as <verbatim|osheaf key enroll> does. The files are the same, and <verbatim|osheaf key pull> and <verbatim|osheaf key unlock> read them.
+
   <strong|Passkeys made on opensheaf.org.> The first version of the page, at <verbatim|opensheaf.org/manager/unlock.html>, made passkeys for <verbatim|opensheaf.org>, which <verbatim|osheaf> no longer asks the browser for; the keys they locked still open with the passphrase. Move once, to a passkey for <verbatim|unlock.opensheaf.org>, then remove the old locks (the passphrase lock stays):
 
   <\html-div-class|language-bash>
@@ -486,7 +488,7 @@
   <section*|Where to go next><label|where-to-go-next>
 
   <\itemize>
-    <item>To keep an archive from the browser, without the command line: the <hlink|archive template|https://github.com/opensheaf/archive-template>, whose README also walks through the key ceremony, and the <hlink|OpenSheaf Manager|https://opensheaf.org/manager/>, which keeps an archive made from the template from a page. Both run <verbatim|osheaf> for you.
+    <item>To keep an archive from the browser, without the command line: the <hlink|archive template|https://github.com/opensheaf/archive-template>, whose README also walks through the key ceremony, and the <hlink|OpenSheaf Manager|https://manager.opensheaf.org/>, which keeps an archive made from the template from a page. Both run <verbatim|osheaf> for you.
 
     <item>To look at an archive and check it: the <hlink|Explorer|https://opensheaf.org/explorer/>, for instance on the <hlink|first archive|https://opensheaf.org/explorer/?url=https://mgubi.org/papers/>, <hlink|mgubi.org/papers|https://mgubi.org/papers/>, which is kept with these tools.
 

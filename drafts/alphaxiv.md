@@ -257,7 +257,7 @@ copy, check and serve.
 - **No discussion.** What alphaXiv started with is what OpenSheaf leaves
   out ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)).
 - **Cost to authors.** Keys, key logs, hosting and the command line are a
-  real barrier, which the [manager](https://opensheaf.org/manager/) and the
+  real barrier, which the [manager](https://manager.opensheaf.org/) and the
   archive template only begin to lower.
 - **No machine interface.** An agent can read an archive's files, but there
   is no resolver it can call, and no gateway yet
