@@ -26,8 +26,8 @@ The [positioning paper](positioning.md) argues that scholarly communication
 bundles several functions, that the function authors cannot do without
 tends to bring the others with it, and that OpenSheaf should be an exchange
 layer under which anyone keeps archives and over which anyone builds
-services. alphaXiv is a test of that argument from the other side: a young,
-well-used service that started with one function over another service's
+services. alphaXiv is a test of that argument from the other side: a young
+service that started with one function over another service's
 record (reading and discussing arXiv papers) and has since taken on others
 (announcing, distributing, recording). Two questions follow. Is it a
 competitor, a possible user, or neither? And what does its success say about
@@ -47,8 +47,8 @@ As its pages describe it on 21 November 2026:
 - **A corpus over arXiv.** Its papers come mostly from arXiv, under arXiv
   identifiers; "Papers not yet in the database are fetched from arXiv". It
   also reads Semantic Scholar pages and direct PDF URLs.
-- **A preprint server.** Since 2025 anyone with an account can publish a
-  paper directly: "Anyone with an alphaXiv account can submit a paper they
+- **A preprint server.** Anyone with an account can publish a paper
+  directly (its list of submissions starts in June 2025): "Anyone with an alphaXiv account can submit a paper they
   authored, or submit on behalf of its authors with their permission". Such
   papers get identifiers of their own (`2611.harness-cg`). There are two
   tracks, human-written ("AI assistance is welcome, including substantial
@@ -63,21 +63,22 @@ As its pages describe it on 21 November 2026:
   five Creative Commons licences (CC BY, CC BY-SA, CC BY-NC-SA, CC BY-NC-ND,
   CC0). "Published papers are kept permanently", and would be transferred to
   "a third-party archive" if alphaXiv shut down.
-- **Researcher profiles**, matched to names and positions by its own tools,
-  which may answer that "nothing matched confidently". How a researcher
+- **Researcher profiles**, at `/@<slug>`, which its tools match to names
+  and positions, and which may answer that "nothing matched confidently". How a researcher
   claims a profile is not documented on the pages read.
 - **AI over the corpus.** An MCP server (`https://api.alphaxiv.org/mcp/v1`,
   OAuth or an API key) with some twenty tools: feeds, search by "an agentic
   retrieval loop", the text of a paper or "a structured AI-generated
   intermediate report" of it, answers to questions with page-level excerpts,
   reading a paper's code on GitHub, researcher profiles and a personal
-  library. Search and analysis count against an assistant quota. Browser
-  clients other than its own are refused. A desktop application,
+  library. Search and analysis count against an assistant quota.
+  Browser-hosted clients (claude.ai, chatgpt.com) are not supported, since
+  its cross-origin access is limited to its own sites. A desktop application,
   Autoresearch, turns coding agents into "research agents that review
   literature, develop hypotheses, and run experiments".
-- **Discussion.** alphaXiv began in 2024 as a place to comment on arXiv
-  papers, line by line, and was linked from arXiv's abstract pages through
-  arXivLabs *(unverified)*. The pages read neither show nor describe
+- **Discussion.** *(Unverified.)* alphaXiv began in 2024 as a place to
+  comment on arXiv papers, line by line, and was linked from arXiv's
+  abstract pages through arXivLabs. The pages read neither show nor describe
   comments today.
 
 Not found on the pages read: a business model or prices, DOIs, a bulk export,
@@ -91,7 +92,7 @@ In the division of [positioning.md](positioning.md), section 1:
 |---|---|---|
 | Record | arXiv's, for most papers; its own for direct submissions: versions kept, URLs kept after withdrawal | the form of the record: object versions fixed by SHA-512 inventories, signed by their owners, named by `sheaf:` URIs |
 | Preserve | a promise: kept permanently, transferred to a third party on closure | none by itself; checkable copies (mirrors, section 11), so that others can preserve |
-| Announce | yes: feeds, trending papers, conference pages, follows | the raw material: an archive's feed (appendix A.3); aggregation is a service |
+| Announce | yes: feeds, trending papers, conference pages, follows | the raw material: an archive's feed (section 3.1, appendix A.3); aggregation is a service |
 | Filter | screening of submissions; ranking by attention; AI search | the form of a filter's statements: selections pinning the revisions vetted (section 8.4) |
 | Distribute | yes, in its interface and to agents through its MCP server | any web server; landing pages for search engines (appendix A.3); the Explorer |
 | Assign merit | attention (views, follows, researcher profiles) | none counted; the evidence made checkable (signatures, selections, relations) |
@@ -151,12 +152,13 @@ itself and relies on custodians (section 11), whose promises are open
 is yet backed by an institution that lasts, as CLOCKSS or Portico back
 journals (see [positioning.md](positioning.md), section 4).
 
-**Authors.** alphaXiv's researchers are profiles it builds and matches, and
+**Authors.** alphaXiv's researchers are profiles that its tools match, and
 submissions are made by accounts, for oneself or with the authors'
 permission. OpenSheaf's owners are keys with key logs (section 6), whose
-signatures say who made a version and checking needs no account anywhere;
-the link between a key and a person is left to keepers (section 6.6), and
-proofs beyond them to ORCID and others
+signatures say which owner's keys signed a version, and checking them needs
+no account anywhere. An owner may name a keeper, an ORCID iD or a domain,
+who answers for it, not for who wrote its documents (section 6.6); proofs
+beyond the keeper are open
 ([#41](https://github.com/opensheaf/opensheaf.github.io/issues/41)).
 
 **Curation.** alphaXiv curates by feeds, trending lists, conference pages
@@ -165,7 +167,8 @@ they stood. OpenSheaf's collections are themselves signed, versioned objects
 that pin their members (section 8), held by anyone, citable at each
 version.
 
-**Discussion.** alphaXiv's original strength; OpenSheaf has no form for it.
+**Discussion.** alphaXiv's original feature *(unverified)*, not described on
+the pages read; OpenSheaf has no form for it.
 Comments, reviews and replies about a version are an open design question
 ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)), and so
 is blind review
@@ -189,8 +192,9 @@ copy, check and serve.
 
 ### What alphaXiv does well
 
-- **It has readers.** It went where the attention is (arXiv papers, AI
-  reading, conference feeds) and built from there. OpenSheaf has no audience
+- **It goes where readers are.** It starts from arXiv papers, AI reading
+  and conference feeds, and builds from there; how many readers it has is
+  not on its pages (its counts are unlabelled). OpenSheaf has no audience
   of its own, and no plan for one beyond the services that might be built on
   it.
 - **It lowers the cost of every step.** Submitting needs an account; reading
@@ -212,9 +216,10 @@ copy, check and serve.
   [positioning.md](positioning.md) (section 2) describes, rebuilt quickly: a
   reader of today's alphaXiv depends on it as a reader of a journal depends
   on its publisher.
-- **The record is not checkable.** A citation of an alphaXiv version, and an
-  AI answer grounded in one, rest on alphaXiv's word about the bytes. For
-  papers that exist only there, there is no second copy to compare.
+- **The record is not checkable.** The pages describe no digests: a
+  citation of an alphaXiv version, and an AI answer grounded in one, rest on
+  alphaXiv's word about the bytes. For papers that exist only there, there
+  is no second copy to compare.
 - **Preservation is a promise.** A transfer to an unnamed third party, by a
   company whose business model is not stated, is weaker than copies already
   held by others.
@@ -222,14 +227,15 @@ copy, check and serve.
   checks that a submission belongs on alphaXiv". With an AI track, the
   volume of papers can grow faster than any attention; what is read will
   depend on filters, and on alphaXiv's ranking above all.
-- **Its own papers are cut off from arXiv's record.** A paper published on
-  alphaXiv cannot be put on arXiv and then on alphaXiv again (a reupload is a
-  duplicate), and alphaXiv's versions do not appear in arXiv's history.
+- **Two records of one work.** A reupload of an arXiv paper is refused as
+  a duplicate, but the policy does not say what happens when a paper
+  published on alphaXiv is later put on arXiv: a work may then have two
+  records, under two identifiers, whose versions nothing links.
 
 ### Where OpenSheaf's position is weak
 
 - **No readers, no discovery.** Feeds and indexes exist in the format
-  (appendix A.3, section 12.5), but no service aggregates them, and the
+  (sections 3.1 and 12.5), but no service aggregates them, and the
   scale of an aggregation is open
   ([#19](https://github.com/opensheaf/opensheaf.github.io/issues/19),
   [#20](https://github.com/opensheaf/opensheaf.github.io/issues/20)).
