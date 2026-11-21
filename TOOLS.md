@@ -376,6 +376,25 @@ wallet, the new ones are put there. The rotation keys then pass through
 the page's memory: the maximum security level keeps them offline, used by
 `osheaf` alone.
 
+**A new archive from the browser.** For a repository made from the
+archive template and not set up yet, the Manager can also make the owner
+itself ("Create the owner and set up the archive here"), as `osheaf init
+--new-owner --key DID` makes it: a current key that signs in the page and
+goes to your key wallet, a current key for the archive's workflows (the
+`DID`, stored as the repository secret `OPENSHEAF_SIGNING_KEY` when your
+sign-in may set secrets, otherwise shown once for you to store), and three
+rotation keys, two of which sign the next version of the key log; the
+first version of the key log is the one `osheaf` makes for the same keys
+and time. The rotation keys are given as the files of `--export` (one zip,
+or one by one) and the sheets of `--print`, locked with the passphrase,
+and nothing is committed until their checks are typed back; or, at the
+level `--keys github:OWNER/REPO`, they are kept in the wallet. The page
+then sets the archive up as the template's "Set up the archive" does, with
+the same files, and opens it with your key unlocked. The rotation keys
+pass through the page's memory: to keep them away from any browser, make
+the owner with `osheaf` (the key ceremony of the template's README), which
+the Manager also guides.
+
 **Passkeys made on opensheaf.org.** The first version of the page, at
 `opensheaf.org/manager/unlock.html`, made passkeys for `opensheaf.org`,
 which `osheaf` no longer asks the browser for; the keys they locked still

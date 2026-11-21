@@ -527,6 +527,28 @@ osheaf key unlock   # on another computer: Touch ID, and the current keys are pu
       security level keeps them offline, used by <tt class="verbatim">osheaf</tt> alone.
     </p>
     <p>
+      <strong>A new archive from the browser.</strong> For a repository made
+      from the archive template and not set up yet, the Manager can also make
+      the owner itself (&quot;Create the owner and set up the archive
+      here&quot;), as <tt class="verbatim">osheaf init --new-owner --key DID</tt> makes
+      it: a current key that signs in the page and goes to your key wallet, a
+      current key for the archive's workflows (the <tt class="verbatim">DID</tt>, stored
+      as the repository secret <tt class="verbatim">OPENSHEAF_SIGNING_KEY</tt> when your
+      sign-in may set secrets, otherwise shown once for you to store), and
+      three rotation keys, two of which sign the next version of the key log;
+      the first version of the key log is the one <tt class="verbatim">osheaf</tt> makes
+      for the same keys and time. The rotation keys are given as the files of
+      <tt class="verbatim">--export</tt> (one zip, or one by one) and the sheets of <tt
+      class="verbatim">--print</tt>, locked with the passphrase, and nothing is
+      committed until their checks are typed back; or, at the level <tt class="verbatim">--keys
+      github:OWNER/REPO</tt>, they are kept in the wallet. The page then sets
+      the archive up as the template's &quot;Set up the archive&quot; does,
+      with the same files, and opens it with your key unlocked. The rotation
+      keys pass through the page's memory: to keep them away from any browser,
+      make the owner with <tt class="verbatim">osheaf</tt> (the key ceremony of the
+      template's README), which the Manager also guides.
+    </p>
+    <p>
       <strong>Passkeys made on opensheaf.org.</strong> The first version of
       the page, at <tt class="verbatim">opensheaf.org/manager/unlock.html</tt>, made
       passkeys for <tt class="verbatim">opensheaf.org</tt>, which <tt class="verbatim">osheaf</tt>
