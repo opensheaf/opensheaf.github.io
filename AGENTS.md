@@ -63,7 +63,10 @@ notes are for anyone, person or agent, changing it.
   [issues](https://github.com/opensheaf/opensheaf.github.io/issues), with the
   existing labels (`design` for open questions, `settled` once written into
   the specification, and topic labels such as `versions`, `collections`,
-  `identifiers`, `decentralisation`, `applications`). Do not settle an open
+  `identifiers`, `decentralisation`, `applications`). Every open issue also
+  has one of `before 0.2 final` (archives or verifiers depend on it),
+  `after 0.2` (an addition or extension that breaks no archive) or `task`
+  (a registration, a test, a tool, the site). Do not settle an open
   question in the text without agreement; state it as open, and point to its
   issue.
 - The use cases and the FAQ are non-normative and must agree with the
