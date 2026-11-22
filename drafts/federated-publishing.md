@@ -954,64 +954,70 @@ federation needs a durable owner, or must be unnecessary.
 
 **What it is.** PubPub is the publishing platform of Knowledge Futures, the
 nonprofit that also makes the Underlay (section 3.3 above): "one platform,
-thousands of communities" (Knowledge Futures 2026k). A **community** is a
-site with its own domain (a journal, a book series, a laboratory); a
-**pub** is one work, written and edited in the browser; a **collection**
-groups pubs, and is of kind `tag`, `issue`, `book` or `conference`
-(`types/collection.ts`). Pubs are linked by typed edges (comment,
-commentary, preprint, rejoinder, reply, review, supplement, translation,
-version), which are sent to Crossref as relations
+thousands of communities" (Knowledge Futures 2026k). A **community** is a site
+with its own address, a subdomain of `pubpub.org` or a domain of its own (a
+journal, a book series, a laboratory); a **pub** is one work, written and
+edited in the browser; a **collection** groups pubs, and is of kind `tag`,
+`issue`, `book` or `conference` (`types/collection.ts`). Pubs are linked by
+typed edges (comment, commentary, preprint, rejoinder, reply, review,
+supplement, translation, version), which are sent to Crossref as relations
 (`utils/pubEdge/relations.ts`). Its code is under GPL-2.0
-(<https://github.com/knowledgefutures/pubpub>, created in 2015; the paths
-in this subsection are in that repository unless another is named).
+(<https://github.com/knowledgefutures/pubpub>, created in 2015; the paths in
+this subsection are in that repository unless another is named).
 
-**Two generations.** The PubPub in use, called **PubPub Legacy** since
+**Two generations.** The PubPub in use, called **PubPub Legacy** since July
 2024, is that repository. **PubPub Platform**, "known officially as PubPub
-Platform, and technically as v7", was released as alpha code in September
-2024 (<https://www.knowledgefutures.org/pubpub>): a set of parts from which
-"Knowledge Applications" are configured, with "specific Pub types",
-"highly customized submission and review workflows", "task automation
-tools" and a "full content and workflow API", and at first without
-editing by several people at once or comments (Knowledge Futures 2025a).
-All communities were to move to it. In June 2025, after a funder
-"unexpectedly withdrew its support", Knowledge Futures announced the end of
-PubPub Legacy on 31 December 2026 and of the hosted Platform at the end of
-2025 (Knowledge Futures 2025b). On 12 January 2026 it reversed this:
-"PubPub and PubPlatform will continue independently", and "the previously
-planned migration to PubPlatform is no longer required"; PubPub stays the
-complete site builder, the Platform becomes infrastructure for building
-toolchains (Knowledge Futures 2026f). The Platform's repository is now
-<https://github.com/knowledgefutures/pubplatform> (`pubpub/platform`
-redirects to it); its README still calls it an alpha, not recommended "for
-production projects". So the generation that continues as a service is the
-older one. Whether Knowledge Futures hosts the Platform for anyone today is
-**unverified**.
+Platform, and technically as v7" (Knowledge Futures 2024a), was released as
+alpha code on 23 September 2024 (Knowledge Futures 2024b): a set of parts from
+which "Knowledge Applications" are configured, with "specific Pub types",
+"highly customized submission and review workflows", "task automation tools"
+and a "full content and workflow API", and at first without editing by several
+people at once or commenting (Knowledge Futures 2025a). All communities were
+to move to it. In June 2025, after a funder "unexpectedly withdrew its
+support", Knowledge Futures announced the end of PubPub Legacy on 31 December
+2026 and of the hosted Platform at the end of 2025 (Knowledge Futures 2025b).
+On 12 January 2026 it reversed this: "PubPub and PubPlatform will continue
+independently", and "the previously planned migration to PubPlatform is no
+longer required"; PubPub stays the complete site builder, the Platform becomes
+infrastructure for building toolchains (Knowledge Futures 2026f). The
+Platform's repository is now <https://github.com/knowledgefutures/pubplatform>
+(`pubpub/platform` redirects to it); its README still calls it an alpha, not
+recommended "for production projects". So the generation that continues as the
+service for everyone is the older one. Knowledge Futures still runs one
+instance of the Platform, at `app.pubstar.org`, to which `app.pubpub.org`
+redirects (`infra/Caddyfile` of the Platform), deployed from its tagged
+releases, the latest `v0.0.1-alpha.4` of 4 November 2026
+(`.github/workflows/on_tag.yml`); it opens on a login page, and who uses it is
+not published.
 
 **Status: active.** The PubPub repository has 216 commits in 2026, the
-last on 20 November 2026; the Platform 25, mostly dependencies and
+last on 20 November 2026; the Platform 25, features until April
+(automations, a site builder, COAR Notify) and then dependencies and
 deployment, the last on 5 November 2026 (GitHub API). At the end of
 February 2026 PubPub moved to a Docker stack on generic servers, at "less
 than 1% the cost of our previous setup" (Knowledge Futures 2026g, 2026h);
 on 8 October 2026 Knowledge Futures said that "PubPub's server costs are
 covered, for good", by a fund whose return pays them (Knowledge Futures
-2026l). Since 27 May 2026 users sign in with central Knowledge Futures
-accounts, also through ORCID or GitHub (Knowledge Futures 2026i).
+2026l). Since a change announced on 27 May 2026, users sign in with
+central Knowledge Futures accounts, also through ORCID or GitHub
+(Knowledge Futures 2026i).
 
 **How it works.** From the code, read through the GitHub API on 22
 November 2026. The user documentation, `help.pubpub.org`, now redirects to
 the Platform's discussion forum, and `www.pubpub.org`, its API
 documentation included, refused automated access.
 
-- **Drafts and releases.** A pub has one **draft**, edited by several
-  people at once; each change is a step numbered by a history key, kept
-  in Firebase and, since 2026, older steps in PostgreSQL
-  (`server/draftCheckpoint`; Knowledge Futures 2026h). A **release** is
-  made by a member who administers the pub (directly, or through its
-  collection or community; `server/release/permissions.ts`): the draft at
-  a history key is copied into a new document, with an optional note, and
-  readers see releases numbered from 1 at `/pub/<slug>/release/<n>`
+- **Drafts and releases.** A pub has one **draft**, edited by several people
+  at once; each change is a step numbered by a history key, kept in Firebase.
+  Since 2026 an idle draft is moved to PostgreSQL as a checkpoint, the
+  document at its latest key, and the step-by-step history is no longer kept
+  for every pub (`server/draftCheckpoint/model.ts`; Knowledge Futures 2026f,
+  2026h). A **release** is made by a member who administers the pub (directly,
+  or through its collection or community; `server/release/permissions.ts`):
+  the draft at a history key is copied into a new document, with an optional
+  note, and readers see releases numbered from 1 at `/pub/<slug>/release/<n>`
   (`server/release/queries.ts`, `server/routes/pubDocument.tsx`). Earlier
-  states of the draft are shown to members at
+  states of the draft, as far as they are kept, are shown to members at
   `/pub/<slug>/draft/<historyKey>`.
 - **Fixity.** The API creates releases and has no call to change or
   delete one (`utils/api/contracts/release.ts`); the code changes them only
@@ -1021,17 +1027,23 @@ documentation included, refused automated access.
   published, and no reader can check that release 2 is today what it was.
 - **Names.** A pub is named by a URL on its community's domain and by its
   DOI, a release by its number in the URL.
-- **DOIs.** DOIs go to pubs and to collections, never to releases, and a
-  pub needs a release first (`server/doi/api.ts`). Knowledge Futures
-  registers them with Crossref under its prefix `10.21428`: "PubPub is
-  responsible for generating DOIs, not Crossref"
-  (`utils/crossref/README.md`). A community may set its own deposit
-  target, Crossref or DataCite, with its own prefix and credentials
-  (`server/depositTarget/model.ts`). The DOI resolves to the pub's URL,
-  which shows the latest release (`utils/crossref/transform/pub.js`): it
-  names the work, and a reader following a DOI cited for release 1 sees
-  release 3. Crossref is investing $258k in exploring "high-volume DOI
-  management" with Knowledge Futures (Knowledge Futures 2026j).
+- **DOIs.** DOIs are requested for pubs and for collections, never for
+  releases, and a pub needs a release first (`server/doi/api.ts`); a
+  journal's community has a title DOI as well
+  (`utils/crossref/transform/community.js`). Knowledge Futures registers
+  them with Crossref under its prefix `10.21428`: "PubPub is responsible
+  for generating DOIs, not Crossref" (`utils/crossref/README.md`). Of the
+  13,881 DOIs under that prefix that Crossref lists on 22 November 2026,
+  13,158 resolve to a pub, 361 (journals) to a community's home page and
+  362 to collections (issues, books, proceedings); none resolves to a
+  release (Crossref REST API, `/prefixes/10.21428/works`). A community may
+  set its own deposit target, Crossref or DataCite, with its own prefix
+  and credentials (`server/depositTarget/model.ts`). The DOI resolves to
+  the pub's URL, which shows the latest release
+  (`utils/crossref/transform/pub.js`): it names the work, and a reader
+  following a DOI cited for release 1 sees release 3. Crossref is backing
+  work with Knowledge Futures on "high-volume, high-granularity DOI
+  management" with "a $258k investment" (Knowledge Futures 2026j).
 - **Who can write.** Members of a community, collection or pub, with the
   permissions `view`, `edit`, `manage` or `admin` (`server/member/model.ts`).
   Nothing is signed; authors are attributions entered by editors, with an
@@ -1066,19 +1078,23 @@ documentation included, refused automated access.
 - **Copies, and the Underlay.** Since 21 July 2026 a community can push
   its content to an Underlay collection (`server/underlay`; pull requests
   #3669, and #3690 for protocol v2, 6 October 2026): records for the
-  community, its collections, pages, pubs, attributions, edges and
-  releases, each release with its rendered HTML, assets and exports (by
-  default PDF and EPUB) as files named by SHA-256, and no volatile fields,
-  so that an unchanged pub gives the same records
-  (`server/underlay/mapping.ts`). Discussions are not pushed. Two such
-  collections are public on 22 November 2026, both of the Center of Trial
-  and Error: `centeroftrialanderror/jote`, "Export of the Journal of Trial
-  and Error PubPub Community", whose version v2.2.0 of 30 October 2026
-  holds 122 pubs and 223 releases in 724 records and 1,633 files
+  community, its collections, pages, pubs, attributions and the users
+  they credit, edges and releases, each release with its rendered HTML,
+  assets and exports (by default PDF and EPUB) as files named by SHA-256,
+  and no volatile fields, so that an unchanged pub gives the same records
+  (`server/underlay/mapping.ts`, `server/underlayIntegration/model.ts`).
+  Discussions are not pushed. Two such collections are public on 22
+  November 2026, both of the Center of Trial and Error:
+  `centeroftrialanderror/jote`, "Export of the Journal of Trial and Error
+  PubPub Community", whose version v2.2.0 of 30 October 2026 holds 122
+  pubs and 223 releases in 724 records and 1,633 files
   (<https://www.underlay.org/api/collections/centeroftrialanderror/jote>),
-  and `centeroftrialanderror/jrn`. Knowledge Futures has
-  "begun moving other PubPub communities" to collections in the Underlay
-  (Knowledge Futures 2026k).
+  and `centeroftrialanderror/jrn` (18 pubs, 18 releases). The Open
+  Encyclopedia of Cognitive Science, a PubPub community of the MIT Press,
+  moved to the Underlay in July 2026, with a new site built on its
+  collection (Knowledge Futures 2026m), and Knowledge Futures has "begun
+  moving other PubPub communities to the same system" (Knowledge Futures
+  2026k).
 - **Self-hosting.** For PubPub, "standing up local or managed instances is
   now feasible using standard Docker workflows", though it is "not yet
   fully independent of external services (such as AWS or Firebase)"
@@ -1088,21 +1104,35 @@ documentation included, refused automated access.
   (`infra/docker-compose.prod.yml`), Pandoc for conversions (`README.md`),
   and an OpenID Connect provider for sign-in
   (`server/kf/oidc.server.ts`). Knowledge Futures runs its own, KF Auth,
-  whose repository (`kf-auth-v3`) is not public on GitHub. The Platform
-  ships a Docker Compose file with the application, a jobs service,
-  Valkey, PostgreSQL 17, Caddy and MinIO or any S3-compatible storage
-  (<https://github.com/knowledgefutures/pubplatform>, `self-host/`).
-- **Preservation.** No arrangement with Portico, CLOCKSS or the Internet
-  Archive is announced in Knowledge Futures' updates. The SFTP export
-  offers "e.g. CLOCKSS SFTP" as an example name for a target
-  (`client/containers/SuperAdminDashboard/FtpTargets/FtpTargets.tsx`);
-  whether any community deposits with CLOCKSS or Portico is
-  **unverified**. The "long-term static archive of existing content"
-  announced in June 2025 (Knowledge Futures 2025b) is not mentioned in
+  which the README asks to start first; its repository,
+  <https://github.com/knowledgefutures/kf-auth-v3>, is not public (the
+  link and the GitHub API give "Not Found" on 22 November 2026). The
+  Platform ships a Docker Compose file with the application, a jobs
+  service, Valkey, PostgreSQL 17, Caddy and MinIO or any S3-compatible
+  storage (<https://github.com/knowledgefutures/pubplatform>,
+  `self-host/`).
+- **Preservation.** No arrangement of Knowledge Futures with Portico, CLOCKSS
+  or the Internet Archive is announced in its updates, and neither Knowledge
+  Futures nor the MIT Press is among CLOCKSS's participating publishers. Some
+  communities are preserved through their publishers: the Harvard Data Science
+  Review, a PubPub community of the MIT Press with DOIs under the MIT Press's
+  prefix, is "Preserved" in Portico from volume 1 (2019) to volume 7, issue 2
+  (2025) (Portico's holdings in KBART,
+  <https://api.portico.org/kbart/Portico_Holding_KBart.txt>, read on 22
+  November 2026); no ISSN found in the deposits under `10.21428` is in them.
+  The SFTP export offers "e.g. CLOCKSS SFTP" as an example name for a target
+  (`client/containers/SuperAdminDashboard/FtpTargets/FtpTargets.tsx`). Of what
+  was announced in June 2025 (Knowledge Futures 2025b), the "self-service
+  export tooling" was built: an administrator of a community can download a
+  ZIP of it, with its data in JSON and the HTML of its pubs, drafts and
+  releases (pull request #3260 of June 2025,
+  `workers/tasks/communityExport.tsx`, `server/community/permissions.ts`). The
+  "long-term static archive of existing content" was to follow the end of
+  PubPub Legacy, which was cancelled in January 2026; it is not mentioned in
   the updates of 2026, and whether it was built is **unverified**. The
-  consortium that would "potentially host mirrors" (Knowledge Futures
-  2026f) has had no later announcement; whether it has been formed is
-  **unverified**.
+  consortium that would "potentially host mirrors" (Knowledge Futures 2026f)
+  has had no later announcement in the updates read; whether it has been
+  formed is **unverified**.
 
 **What OpenSheaf does differently.** A PubPub release and an OpenSheaf
 document version are the same idea: a state of a work fixed by a
@@ -1117,16 +1147,16 @@ Zenodo profile gives each document version a DOI and the line a concept
 DOI (appendix A.1). PubPub's authority is its accounts and permissions;
 OpenSheaf's is the owner's keys. A PubPub licence belongs to the pub and
 may change under every release; OpenSheaf's `rightsList` is in each object
-version, and changes only by a new, description-only version, so that
-earlier versions keep the licence they were deposited under (sections 4.2
-and 4.4). PubPub carries a discussion forward from release to release;
-OpenSheaf has no discussions, and how statements about versions are
-written is open
+version, and changes only by a new object version (a description-only
+version, if the files stay the same), so that earlier object versions keep
+the licence they were deposited under (sections 4.2 and 4.4). PubPub
+carries a discussion forward from release to release; OpenSheaf has no
+discussions, and how statements about versions are written is open
 ([#21](https://github.com/opensheaf/opensheaf.github.io/issues/21)). The
 Underlay export comes closest: releases become content-addressed files,
-but by SHA-256 of rendered HTML, fixed by the log of the Underlay's server
-rather than signed by the community, and each version of the collection
-is a snapshot of the whole community, not of one release.
+but by SHA-256 of their rendered HTML and exports, fixed by the log of the
+Underlay's server rather than signed by the community, and each version of
+the collection is a snapshot of the whole community, not of one release.
 
 **What OpenSheaf could take or offer.**
 
@@ -1177,8 +1207,9 @@ is a snapshot of the whole community, not of one release.
 - **An export path.** Three routes, in order of effort. A tool can read
   pubs, releases and exports through the API and write an archive. It can
   read a community's Underlay collection, whose release records list
-  their files by SHA-256: OCFL's `fixity` block can carry these beside the
-  SHA-512 digests, as the Zenodo profile carries MD5 (appendix A.1). Or
+  their files by SHA-256: an inventory may record SHA-256 digests in
+  `fixity` beside its SHA-512 digests (section 4.1), as the Zenodo profile
+  records MD5 there (appendix A.1), so these can be kept and checked. Or
   PubPub could gain an OpenSheaf target beside its Crossref, DataCite,
   SFTP and Underlay targets, reusing the mapping that already leaves out
   volatile fields. In each, the community needs an owner and keys
@@ -1322,7 +1353,7 @@ withdrawal.
 | eLife, Docmaps, PCI, Episciences | review of a preprint version | none (DOI, version number, URL) | DOI | journal, group | none | accounts, ORCID | active (Docmaps spec dormant) |
 | Europe PMC, Crossref, openRxiv | preprint metadata | none | DOI, PPRID | servers | none | servers | active |
 | ORC, Coko, ASAPbio central service | portal, software, aggregator | none | DOI | platform | none | accounts | dead (Coko reportedly) |
-| PubPub | pub and its releases, in a community | none (releases fixed by the application; SHA-256 in Underlay exports) | DOI per pub or collection (Crossref, or the community's own), URL, release number | community members with permissions | Docker self-hosting; exports to the Underlay and by SFTP; mirrors considered | accounts, ORCID sign-in | active (Platform alpha) |
+| PubPub | pub and its releases, in a community | none (releases fixed by the application; SHA-256 in Underlay exports) | DOI per pub, collection or journal, never per release (Crossref, or the community's own), URL, release number | community members with permissions | Docker self-hosting; exports to the Underlay and by SFTP; mirrors considered | accounts, ORCID sign-in | active (Platform alpha) |
 | OJS, PKP Preservation Network | journal | none | DOI, URL | each journal | LOCKSS dark archive, opt-in | accounts | active |
 | Shadow libraries | file | digests (torrents, IPFS) | digest | uploaders | anyone seeds | none | active, illegal |
 | OpenSheaf | object version of a document or collection | SHA-512 inventories, pins | genesis digest, owner name | the owner of the line | any archive, checked by pin and signature | owner key log, Ed25519, pre-rotation | draft 0.2 |
@@ -1350,9 +1381,9 @@ withdrawal.
   safety net (section 4.2 above).
 - **Funding and stewards.** Coko sought a new steward and, reportedly,
   closed; PubPub nearly closed when one funder left, and was kept by
-  cutting its server costs by 99% and raising a fund to pay them (section
-  7.3 above); ResearchEquals says it
-  needs EUR 100k a year to sustain it beyond 2027; why Open Research
+  cutting its server costs by more than 99% and raising a fund whose
+  return pays them (section 7.3 above); ResearchEquals says it needs EUR
+  100k a year to sustain it beyond 2027; why Open Research
   Central disappeared was not found. Shared infrastructure for scholarly
   communication is funded by a few foundations, and ends when they leave.
   Other services ended for other reasons: the PKP Index because others did
@@ -1746,7 +1777,12 @@ conversation, and each has something OpenSheaf lacks.
   <https://sciety.org/about>; Peer Community In,
   <https://peercommunityin.org/faq/>; Episciences,
   <https://www.episciences.org/publishing-model/>.
-- Knowledge Futures, *PubPub Platform Update: Migration and Launch
+- Knowledge Futures, *PubPub Platform Technical Overview*, 17 July 2024,
+  <https://www.knowledgefutures.org/updates/2024-07-platform-tech-overview>
+  (2024a); *Knowledge Futures launches alpha code release of PubPub
+  Platform*, 23 September 2024,
+  <https://www.knowledgefutures.org/updates/2024-09-platform-update>
+  (2024b); *PubPub Platform Update: Migration and Launch
   Timeline, Public, Sandbox, and Documentation*, 14 April 2025,
   <https://www.knowledgefutures.org/updates/2025-04-platform-update>
   (2025a); *Not Enough: Open Infrastructure Funding and the Future of
@@ -1767,13 +1803,22 @@ conversation, and each has something OpenSheaf lacks.
   <https://www.knowledgefutures.org/updates/2026-09-29-knowledge-systems-built-for-purpose>
   (2026k); *Launching the Infrastructure Longevity Fund*, 8 October 2026,
   <https://www.knowledgefutures.org/updates/2026-10-08-infrastructure-longevity-fund>
-  (2026l); PubPub updates, <https://www.knowledgefutures.org/pubpub>.
+  (2026l); *Open Encyclopedia of Cognitive Science moves to Underlay*, 22
+  July 2026,
+  <https://www.knowledgefutures.org/updates/2026-09-oecs-moves-to-underlay>
+  (2026m).
 - PubPub code: <https://github.com/knowledgefutures/pubpub> (pull requests
-  3654, 3669 and 3690), <https://github.com/knowledgefutures/pubplatform>
-  (`self-host/`), <https://github.com/pubpub/sdk>; the Underlay
-  collections of the Journal of Trial and Error,
+  3260, 3654, 3669 and 3690),
+  <https://github.com/knowledgefutures/pubplatform> (`self-host/`,
+  `infra/Caddyfile`, `.github/workflows/on_tag.yml`),
+  <https://github.com/pubpub/sdk>; the Underlay collections of the Journal
+  of Trial and Error,
   <https://www.underlay.org/api/collections/centeroftrialanderror/jote>
-  and `centeroftrialanderror/jrn`.
+  and `centeroftrialanderror/jrn`; Crossref's works under the prefix
+  10.21428, <https://api.crossref.org/prefixes/10.21428/works>; Portico's
+  holdings, <https://api.portico.org/kbart/Portico_Holding_KBart.txt>;
+  CLOCKSS's participating publishers,
+  <https://clockss.org/digital-archive-community/participating-publishers/>.
 - PKP Preservation Network, <https://pkp.sfu.ca/pkp-preservation/>.
 - Crossref, posted content,
   <https://www.crossref.org/documentation/schema-library/markup-guide-record-types/posted-content-includes-preprints/>;
