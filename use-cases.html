@@ -408,28 +408,31 @@ members:
           the paper, owned by the journal (an owner with keys of its own), a
           new object holding every file of that version except its <tt class="verbatim">datacite.json</tt>,
           its <tt class="verbatim">object.json</tt> and the version's own evidence if it
-          is itself a branch (<tt class="verbatim">parent.*</tt>), byte for byte, with
+          is itself a branch (<tt class="verbatim">parent/</tt>), byte for byte, with
           the evidence of the authors' version (their inventory, <tt class="verbatim">object.json</tt>
           and signatures, and, if the authors' version is itself a branch, the
           evidence of its own parents; section 9.2), and the key logs of the
           authors and of those parents' owners beside it, as owner objects. It
-          keeps the document version of the revision it copies (the authors'
-          version 3, say). Only the copied revision needs a licence allowing
-          redistribution; a paper whose first preprint was under a restrictive
-          licence can be accepted in a later, openly licensed version. Later
-          versions of the accepted copy (corrections, notices, a withdrawal)
-          are the editors' acts, signed by the journal; the authors cannot
-          change them. A journal will usually adopt the <a href="opensheaf-timestamps-0.2.html">timestamps
-          extension</a> in its key log, from its first version, so that every
-          version it signs is dated, by an RFC 3161 authority it trusts or by
-          OpenTimestamps, so that if it ever loses a key to others, readers
-          can tell which versions came before. A correction the journal makes
-          itself is its own version 4 (provisionally: the numbering on
-          branches is an open question of section 9, #57); when the editors
-          later vet the authors' corrected version, the copy moves its branch
-          point to it, with new evidence, as the journal's next version (the
-          journal's own files are then dropped; how a move keeps them is an
-          open question of section 9, #57).
+          is the journal's version 1, recording the document version of the
+          revision it copies (the authors' version 3, say) in <tt class="verbatim">parent.documentVersion</tt>.
+          Only the copied revision needs a licence allowing redistribution; a
+          paper whose first preprint was under a restrictive licence can be
+          accepted in a later, openly licensed version. Later versions of the
+          accepted copy (corrections, notices, a withdrawal) are the editors'
+          acts, signed by the journal; the authors cannot change them. A
+          journal will usually adopt the <a href="opensheaf-timestamps-0.2.html">timestamps extension</a> in
+          its key log, from its first version, so that every version it signs
+          is dated, by an RFC 3161 authority it trusts or by OpenTimestamps,
+          so that if it ever loses a key to others, readers can tell which
+          versions came before. A correction the journal makes itself, its
+          version of record, is the journal's version 2, since every line
+          numbers its own versions; when the editors later vet the authors'
+          corrected version, the copy takes it as a new branch point, with new
+          evidence, as the journal's version 3, which keeps the journal's
+          notices, while its version of record stays in its earlier versions
+          (section 9.4). If the authors take in the journal's corrections,
+          they deposit them as a version of their own, linked to the journal's
+          version (section 9.5).
         </p>
       </li>
     </ul>

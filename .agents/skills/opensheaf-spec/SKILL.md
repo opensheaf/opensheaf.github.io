@@ -43,7 +43,7 @@ signature files, 7.3 statuses, 7.4 one writer per line, 7.5 adding versions,
 `members.json`, 8.3 catalogue members, 8.4 selection members, 8.5 pins and
 statuses of members, 8.6 description and rights); 9 branches and accepted
 copies (9.1 `parent`, 9.2 first version and evidence, 9.3 checking, 9.4
-moving the branch point, 9.5 continuing another owner's work, 9.6 accepted
+new branch points, 9.5 continuing another owner's work, 9.6 accepted
 copies, 9.7 description and rights); 10 drafts and sealing; 11 copies and
 mirrors; 12 `sheaf:` URIs, resolution, indexes (12.1 URIs, 12.2 short forms,
 12.3 resolution, 12.4 searching for a work, 12.5 indexes, 12.6 gateways); 13
@@ -224,7 +224,11 @@ questions are listed at the end of the sections they concern.
   declared in `parent`; evidence in the folder `parent/`
   (`parent/inventory.json`, `parent/object.json`, `parent/signatures/`,
   `parent/parent/`); verdicts
-  inconsistent, confirmed, unchecked; the branch point only moves forward.
+  inconsistent, confirmed, unchecked; a branch numbers its own document
+  versions from 1 (`parent.documentVersion` keeps the parent's); a later
+  branch point is taken by a new version of the same branch, never back,
+  keeping the branch's note files; work of another line is taken in by a
+  deposit with a relation (#57 settled).
   **Accepted copy** (9.6): a branch kept by a selection's owner, never a
   mirror.
 - **Drafts and sealing** (10): drafts belong to the reserved owner `draft`,
@@ -311,7 +315,7 @@ the same change in its schema, and the other way round.
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors, #44 aliases,
-  #48 and #50 verification details, #54 custody policies, #57
+  #48 and #50 verification details, #54 custody policies,
   branch numbering, #69 weighted thresholds, #70 witnesses of key logs. Read the relevant issue before
   touching its topic; do not settle an open question without agreement.
 

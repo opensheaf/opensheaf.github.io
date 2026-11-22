@@ -676,7 +676,7 @@
       Notices are added to <tt class="verbatim">notices</tt> by description-only
       versions, at its end, and stay, unchanged and in the same order, at the
       start of <tt class="verbatim">notices</tt> in every later object version (for a
-      branch whose branch point moves, see section 9). A notice is thus
+      branch taking a new branch point, see section 9.4). A notice is thus
       identified by its position: <strong>notice <em>k</em></strong> of a line
       is the <em>k</em>-th entry of <tt class="verbatim">notices</tt>, counted from 1,
       in every version that holds it. A notice is corrected or withdrawn only
@@ -1130,8 +1130,8 @@
       from the genesis record (section 6.1). Every other line of the genesis
       record is a branch and MUST declare its parent (section 9); a line of
       another owner that declares none is not a valid line of the name. A tool
-      refuses a branch owned by the originator (how the originator takes in
-      another line's work is open, #57).
+      refuses a branch owned by the originator, which takes in another line's
+      work by depositing it (section 9.5).
     </p>
     <p>
       <strong>Clashes.</strong> An owner has one line of each name, and no two
@@ -1159,8 +1159,8 @@
           <tt class="verbatim">parent.name</tt> that gives a line free for its owner,
           and <tt class="verbatim">parent</tt> keeps the parent's name; if none up to 15
           is free, the branch is refused. When the line taken is the owner's
-          own branch of the same parent line, section 9 says when the owner
-          moves that branch's branch point instead.
+          own branch of the same parent line, section 9.4 says when the owner
+          gives that branch a new branch point instead.
         </p>
       </li>
       <li>
@@ -2591,7 +2591,9 @@ keyLog &lt;the value of keyLog&gt;</pre>
           included, except <tt class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt>
           and the parent's evidence, is present at the same logical path with
           the same digest; no other file is present besides the branch's <tt
-          class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt> and evidence;
+          class="verbatim">datacite.json</tt>, <tt class="verbatim">object.json</tt> and evidence,
+          and, at a new branch point, the files of the branch's own notices
+          that its <tt class="verbatim">object.json</tt> names (section 9.4);
         </p>
       </li>
       <li>
@@ -2667,46 +2669,57 @@ keyLog &lt;the value of keyLog&gt;</pre>
       stay good; readers weigh it as they weigh that owner's history (section
       6.4).
     </p>
-    <h3 id="auto-42"><a id="94-later-versions-and-moving-the-branch-point"></a>9.4 Later versions and moving the branch point<span
-    style="margin-left: 1em"></span></h3>
+    <h3 id="auto-42"><a id="94-later-versions-and-new-branch-points"></a>9.4 Later versions and new branch points<span style="margin-left: 1em"></span></h3>
     <p>
       The later versions of a branch are its owner's, signed like those of any
       line (section 7). They MUST keep the identity files unchanged, byte for
-      byte, until a version that moves the branch point.
+      byte, until a version that takes a new branch point.
     </p>
     <p>
-      <strong>Moving the branch point.</strong> A branch MAY take as a new
-      branch point a later version of the same parent line (a journal vetting
-      the authors' corrected version): with the same <tt class="verbatim">owner</tt> and
-      <tt class="verbatim">name</tt>, a higher object version, and a document version
-      later than the previous branch point's in the history of the new parent
-      version (section 4.2). A parent version holding the same document
-      version (a DOI added) is not a new branch point; a branch point never
-      moves back and is never dropped. The version whose <tt class="verbatim">parent</tt>
-      differs from the one before holds exactly the files of the new parent
-      version with new evidence, and is checked as a first version is (section
-      9.3), and also for continuity: the two parent inventories have the same
-      <tt class="verbatim">id</tt>, every entry of <tt class="verbatim">versions</tt> of the
-      previous one is equal, as a JSON value, to the entry of the same version
-      in the new one, and every digest in those entries is in the manifest of
-      the new one. The branch's own notes and notices then lose their files
-      (#57).
+      <strong>A new branch point.</strong> A branch MAY take as a new branch
+      point, by a new object version of the same branch, a later version of
+      the same parent line (a journal vetting the authors' corrected version):
+      with the same <tt class="verbatim">owner</tt> and <tt class="verbatim">name</tt>, a higher
+      object version, and a document version later than the previous branch
+      point's in the history of the new parent version (section 4.2). A parent
+      version holding the same document version (a DOI added) is not a new
+      branch point; a branch point never moves back and is never dropped.
+      Nothing is changed in place: the earlier object versions keep their
+      branch point. The version whose <tt class="verbatim">parent</tt> differs from the
+      one before is a new document version of the branch (and so reinstates a
+      withdrawn branch, section 13.1); it holds the files of the new parent
+      version with new evidence, and the files of the branch's own notices
+      (section 4.2), which its <tt class="verbatim">object.json</tt> names and which
+      MUST NOT have the logical path of a file of the new parent version; it
+      is checked as a first version is (section 9.3), and also for continuity:
+      the two parent inventories have the same <tt class="verbatim">id</tt>, every entry
+      of <tt class="verbatim">versions</tt> of the previous one is equal, as a JSON
+      value, to the entry of the same version in the new one, and every digest
+      in those entries is in the manifest of the new one. The branch's earlier
+      document versions, such as its version of record, stay in its earlier
+      object versions.
     </p>
     <p>
-      <strong>Numbering.</strong> The first version of a branch holds the
-      document version of its branch point. Provisionally, later versions
-      continue from it without gaps (section 4.2), a version that moves the
-      branch point taking the next number, while <tt class="verbatim">parent.documentVersion</tt>
-      keeps the parent's (#57).
+      <strong>Numbering.</strong> A branch numbers its own document versions,
+      from 1 without gaps, as every line does (section 4.2): its first version
+      is its document version 1, whatever the number of the parent version,
+      which <tt class="verbatim">parent.documentVersion</tt> keeps, and a version that
+      takes a new branch point has the next number of the branch.
+      Presentations SHOULD show both numbers (&quot;version 1, the authors'
+      version 3&quot;). The notices of a branch are its own, about its
+      document versions; those of the parent stay in <tt class="verbatim">parent/object.json</tt>
+      and in the parent's line, and the branch's <tt class="verbatim">object.json</tt>
+      does not repeat them, although their files are among the files of the
+      parent version it holds.
     </p>
     <p>
       <strong>Naming.</strong> A branch is named as section 5.3 says. When the
       line it would take is its owner's branch of the same parent line, the
-      owner moves that branch's branch point instead if the new branch point
-      is later in that line's history than that branch's current one, and
-      otherwise the new branch is refused, since a branch point never moves
-      back and an owner keeps one branch of a parent line; when it is another
-      line of its owner, the new branch is renamed.
+      owner gives that branch a new branch point instead if the new branch
+      point is later in that line's history than that branch's current one,
+      and otherwise the new branch is refused, since a branch point never
+      moves back and an owner keeps one branch of a parent line; when it is
+      another line of its owner, the new branch is renamed.
     </p>
     <h3 id="auto-43"><a id="95-continuing-another-owners-work"></a>9.5 Continuing another owner's work<span style="margin-left: 1em"></span></h3>
     <p>
@@ -2716,6 +2729,19 @@ keyLog &lt;the value of keyLog&gt;</pre>
       owner MAY add a notice to its line pointing to it. An owner moving its
       lines to another archive hands nothing over: they stay its lines
       (section 6.5).
+    </p>
+    <p>
+      <strong>Taking in another line's work.</strong> Any line, the
+      originator's included, takes in work from another line (a co-author's
+      changes, a journal's corrections) by depositing it as a new document
+      version of its own: its change note says where the work comes from, and
+      its <tt class="verbatim">datacite.json</tt> SHOULD link the version taken in with
+      <tt class="verbatim">IsDerivedFrom</tt> or <tt class="verbatim">IsNewVersionOf</tt>, by its
+      DOI, or else by the gateway URL of a <tt class="verbatim">sheaf:</tt> URI with its
+      <tt class="verbatim">sha512</tt> (section 12.6), which fixes the version taken in.
+      The originator never branches its own work (section 5.3); a branch takes
+      in later work of its parent line by a new branch point instead, or by
+      such a deposit.
     </p>
     <p>
       A branch holds none of the parent's earlier versions. An owner who wants
@@ -2732,8 +2758,8 @@ keyLog &lt;the value of keyLog&gt;</pre>
       renamed against each other; the selections of one owner (the issues of a
       journal) share its accepted copy of a document, which each of them MAY
       list. The later versions of an accepted copy are acts of the selection's
-      curator (a corrected version accepted, by moving the branch point; a
-      notice; a withdrawal); the authors' later versions change nothing in it.
+      curator (a corrected version accepted, by a new branch point; a notice;
+      a withdrawal); the authors' later versions change nothing in it.
     </p>
     <p>
       The selection lists the accepted copy as a member; it MAY also list the
@@ -2755,8 +2781,8 @@ keyLog &lt;the value of keyLog&gt;</pre>
       <strong>Description.</strong> A branch's <tt class="verbatim">datacite.json</tt>
       has as <tt class="verbatim">publisher</tt> its owner, or for a selection the body
       behind it, and keeps the relations of the parent version. Its first
-      version, and every version that moves its branch point, SHOULD link the
-      parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if it has
+      version, and every version that takes a new branch point, SHOULD link
+      the parent version with <tt class="verbatim">IsIdenticalTo</tt>: its DOI if it has
       one, otherwise <tt class="verbatim">parent.url</tt> as a <tt class="verbatim">URL</tt>.
     </p>
     <p>
@@ -2765,27 +2791,6 @@ keyLog &lt;the value of keyLog&gt;</pre>
       it follows section 11.2. The evidence is metadata, under CC0 (section
       15.6).
     </p>
-    <p>
-      <strong>Open questions.</strong>
-    </p>
-    <ul>
-      <li>
-        <p>
-          The numbering of document versions on a branch: continued from the
-          branch point (provisional), or numbered from it (3.1, 3.2), which
-          makes <tt class="verbatim">documentVersion</tt> more than an integer; <tt
-          class="verbatim">/v&lt;n&gt;</tt> of a <tt class="verbatim">sheaf:</tt> URI follows it
-          (#57).
-        </p>
-      </li>
-      <li>
-        <p>
-          Moving a branch point when the branch has files of its own (of its
-          notes, a withdrawal, a version of record): probably a merge keeping
-          both, with evidence that tells them apart (#57).
-        </p>
-      </li>
-    </ul>
     <h2 id="auto-46"><a id="10-drafts-and-sealing"></a>10. Drafts and sealing<span style="margin-left: 1em"></span></h2>
     <p>
       A <dfn>draft</dfn> is a sandbox for a work not yet sealed, on which
@@ -3013,11 +3018,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       version of the line (section 4.2, also on a branch), or for a key log an
       object version. It names only signed versions (section 7.3) whose <tt
       class="verbatim">object.json</tt> has the URI's name and the line's owner: a
-      branch names only its own versions, from its branch point, and drafts
-      are never named (section 10.1). Without a digest, it names the object
-      version holding n that the history of the line's latest signed version
-      lists (section 4.2), or without <tt class="verbatim">history</tt> the last signed
-      one holding n; what it names may change as the line grows.
+      branch names only its own versions, numbered from 1 (section 9.4), and
+      drafts are never named (section 10.1). Without a digest, it names the
+      object version holding n that the history of the line's latest signed
+      version lists (section 4.2), or without <tt class="verbatim">history</tt> the last
+      signed one holding n; what it names may change as the line grows.
     </p>
     <p>
       <strong>The pin.</strong> With a digest, the URI names exactly the
@@ -3305,12 +3310,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <p>
           Whether a tombstone in one archive should stop resolution at copies
           elsewhere (section 13; #66).
-        </p>
-      </li>
-      <li>
-        <p>
-          The numbering of document versions on a branch, which <tt class="verbatim">/v&lt;n&gt;</tt>
-          follows (section 9; #57).
         </p>
       </li>
     </ul>
@@ -3710,15 +3709,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           <strong>a branch:</strong> the verdict of each branch point (section
-          9.3), at its first version and at every version that moves it, with
-          the continuity of section 9.4, and that the identity files are
-          unchanged between them. An inconsistent branch point is an error, an
-          unchecked one a warning; the branch's verdict, and whether its
-          parent's line is found, unavailable, removed or withdrawn, are
-          results. A rename whose algorithm number is not greater than that of
-          <tt class="verbatim">parent.name</tt> is an error (section 9.3); one that
-          neither the objects nor the tombstones of the archive justify, or
-          not by the smallest number free there, is a warning (section 5.3);
+          9.3), at its first version and at every version that takes a new
+          branch point, with the continuity of section 9.4, and that the
+          identity files are unchanged between them. An inconsistent branch
+          point is an error, an unchecked one a warning; the branch's verdict,
+          and whether its parent's line is found, unavailable, removed or
+          withdrawn, are results. A rename whose algorithm number is not
+          greater than that of <tt class="verbatim">parent.name</tt> is an error
+          (section 9.3); one that neither the objects nor the tombstones of
+          the archive justify, or not by the smallest number free there, is a
+          warning (section 5.3);
         </p>
       </li>
       <li>
@@ -4391,6 +4391,20 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           by owner, in the order of <tt class="verbatim">owners</tt>, or together,
           naming the owner of each when the archive hosts several (appendix
           A.3).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #57: a
+          branch numbers its own document versions from 1, <tt class="verbatim">parent.documentVersion</tt>
+          keeping the parent's number (sections 9.4 and 12.1); &quot;moving
+          the branch point&quot; renamed taking a new branch point, by a new
+          object version of the same branch, which is a new document version
+          and keeps the branch's own notices with their files, the parent's
+          notices staying in its evidence (sections 9.3 and 9.4); a line takes
+          in another line's work by depositing it with a relation to the
+          version taken in (sections 5.3 and 9.5); the open questions of
+          sections 9.7 and 12.6 on branches removed.
         </p>
       </li>
       <li>
@@ -6097,6 +6111,26 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           genesis record every copy carries names the originator, so the URI
           is fixed by the work; &quot;the latest&quot; line would depend on
           what a resolver knows.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a branch numbers from 1.</strong> The owner of a line
+          numbers its own document versions (section 4.2); continuing the
+          parent's numbers made the journal's version 4 look like the authors'
+          version 4 while holding other content, and dotted numbers would make
+          <tt class="verbatim">documentVersion</tt> more than an integer. <tt class="verbatim">parent.documentVersion</tt>
+          keeps the parent's number, so nothing is lost (#57).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a new branch point is a new version, not a
+          merge.</strong> A branch point is recorded in each object version,
+          so a later one is a new version of the same branch, which keeps the
+          branch's own notices as every version does; work taken in from
+          another line is a deposit with a relation, since the files are what
+          a version holds, and a relation says where they came from (#57).
         </p>
       </li>
       <li>

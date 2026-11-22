@@ -447,7 +447,7 @@
 
   <subsection*|Branches and accepted copies><label|branches-and-accepted-copies>
 
-  A <strong|branch> continues a signed version of someone else's paper as a paper of your own, keeping the evidence of where it started (section <hlink|9|opensheaf-specification-0.2.tm#9-branches-and-accepted-copies>). A journal <strong|accepts> a paper as an accepted copy, a branch listed by one of its selections (section <hlink|9.6|opensheaf-specification-0.2.tm#96-accepted-copies>); its own typeset version is then deposited as a later version of that copy, with <verbatim|-<no-break>-stage VoR> and <verbatim|-<no-break>-agreement>.
+  A <strong|branch> continues a signed version of someone else's paper as a paper of your own, keeping the evidence of where it started (section <hlink|9|opensheaf-specification-0.2.tm#9-branches-and-accepted-copies>). A journal <strong|accepts> a paper as an accepted copy, a branch listed by one of its selections (section <hlink|9.6|opensheaf-specification-0.2.tm#96-accepted-copies>); its own typeset version is then deposited as a later version of that copy, with <verbatim|-<no-break>-stage VoR> and <verbatim|-<no-break>-agreement>. A branch numbers its own versions from 1: its first version is its version 1, whatever the parent's number, which it records. Branching or accepting a later version of the same paper again gives the existing branch a new branch point, its next version, which keeps the branch's own notices (section <hlink|9.4|opensheaf-specification-0.2.tm#94-later-versions-and-new-branch-points>).
 
   <\html-div-class|language-bash>
   <\verbatim-code>
