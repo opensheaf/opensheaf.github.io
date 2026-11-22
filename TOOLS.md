@@ -597,7 +597,9 @@ written elsewhere: a byte-for-byte copy, checked, with its owner's key log
 archive answers for having the right to redistribute it, by its licence or the
 authors' agreement (section 11.2): a version not under a licence the tool
 knows to be open is copied with a warning, which `--licence-checked` silences.
-`osheaf mirror --all` brings every mirror up to date.
+`osheaf mirror --all` brings every mirror up to date, and reports a line taken
+down where it was copied from: the takedown does not reach your mirror, which
+you keep or take down yourself (section 13.3).
 
 ```sh
 osheaf mirror "sheaf:<name>:<owner>" --at https://mgubi.org/papers/ --label kpz-copy

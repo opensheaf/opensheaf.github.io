@@ -841,8 +841,6 @@
     <item>Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what it has the right to redistribute (#39).
 
     <item>What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
-
-    <item>Whether a custodian follows a takedown of a line it mirrors (section 13).
   </itemize>
 
   <section*|12. Identifiers: sheaf: URIs, resolution, indexes><label|12-identifiers-sheaf-uris-resolution-indexes>
@@ -897,7 +895,7 @@
 
   <strong|Copies, forks and ended owners.> Since a copy that stops early looks complete, a resolver uses the latest signed version among the copies it found that agree (section 7.4), and says where it found them. A fork of the line (section 7.4) is reported with the status of each side; the resolver uses only signed versions and does not choose between signed sides. A fork of a key log is not one of a line: it ends and freezes the owner (sections 6.3 and 7.5), and signatures naming versions of either side are checked against them, wherever held, the versions they sign being contested from the fork point on (section 7.3). A resolver reports an owner that has ended, by an ending version or a fork, or has exposed keys (section 6.3), with any successor, its own or named by its keeper (section 6.6), and never follows a successor by itself.
 
-  <strong|Tombstones.> Provisionally (#66): a tombstone (section 13) is not signed, and a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
+  <strong|Tombstones.> A tombstone (section 13) is not signed and speaks for its archive only (section 13.3): a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
 
   <strong|External records.> A deposit with an external service (<verbatim|external>, section 4.3; appendix A) or a software archive snapshot is a witness (section 7.2), not a copy: it holds no inventory, so it is never checked against a pin and resolves nothing; a resolver MAY report it as a place where the files may be found. A snapshot holding an archive's storage root (an archive kept in git) is read as that archive.
 
@@ -947,8 +945,6 @@
     <item>Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#20).
 
     <item>Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's <verbatim|swhid>) (#22).
-
-    <item>Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13; #66).
   </itemize>
 
   <section*|13. Withdrawal, takedown and tombstones><label|13-withdrawal-takedown-and-tombstones>
@@ -991,15 +987,13 @@
 
   A tombstone is never removed, except when its line returns: it keeps the line taken (section 5.3), and <verbatim|objects> never lists its <verbatim|id>. It is not signed (section 12.3). A line, or a version of it no later than <verbatim|lastVersion>, of which no copy is found but a tombstone is, is reported as removed (sections 8.5 and 9.3).
 
+  <strong|Elsewhere.> A tombstone speaks for its archive only: it says that this archive no longer serves the line, not that nobody may. It binds no other archive, and does not stop resolution at copies elsewhere (section 12.3). Mirrors, branches holding the files, indexes kept by others, gateways and the records of external services (appendix A) do not follow a takedown by themselves: each answers for what it serves, as for what it copies (section 11.2), and content that must not be served anywhere is taken down at each archive that serves it, at a request made to each. Requests are outside this specification. Tools that meet a tombstone of a line they copy, index or serve from elsewhere (a mirror brought up to date, a resolver, a gateway) report it, with the copy they found. An owner who wants every copy to show that a work is no longer valid withdraws it (section 13.1), which copies follow, since it is a signed version.
+
+  <strong|Earlier versions.> A tombstone pins the last version taken down. A pin of an earlier version of the line, of which no copy is found, is reported as removed (section 8.5); the archive's <verbatim|sha512/> index, if kept, holds the digest of every version (section 12.5).
+
   <strong|Open questions.>
 
   <\itemize>
-    <item>Whether a tombstone in one archive stops resolution at copies elsewhere (#66), and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
-
-    <item>The form of an owner's signed request for a takedown, and of a keeper's (#33).
-
-    <item>Whether a tombstone lists the inventory digests of every version taken down, so that a pin of a removed version is told from a pin that never named one; meanwhile the archive's <verbatim|sha512/> index keeps them (section 12.5; #33).
-
     <item>A retraction by a collection (a journal) of one of its members, distinct from a withdrawal by the member's owner (#40).
 
     <item>Takedowns of single files or versions, should a later OCFL provide them (#32).
@@ -1172,8 +1166,6 @@
   <strong|Open questions.>
 
   <\itemize>
-    <item>Whether a takedown reaches mirrors, branches holding the files, indexes kept by others and gateways (#33).
-
     <item>How a referee's commitment is written as a creator in DataCite, and exactly what is hashed (#63).
 
     <item>Tying owners to ORCID iDs and domains beyond the keeper (#41).
@@ -1249,6 +1241,8 @@
     <item><strong|0.2 (draft), 22 November 2026:> decided in #50 and #34: an entry of <verbatim|rightsList> with <verbatim|rightsIdentifier> or <verbatim|rightsUri> is a licence, one with neither a rights statement (section 4.4); an archive keeping a mirror or a branch is responsible for having the right to redistribute what it copies, by licence, agreement or law, which the specification does not judge and verifiers do not check (sections 9.7, 11.2 and 15.6, appendix D); the open questions of sections 11.2, 14.6 and 15.6 on licences removed.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #48 and #37: whether a copy matches a pin is decided by the bytes of its inventory file, a checksum file missing or wrong being reported with its location without making the copy fail; a pin is a mismatch only if no copy found matches, every copy that does not match being reported with its location, and a resolver MAY stop at the first copy that matches (sections 8.5, 12.3 and 14.5, appendix D); the open questions of sections 8.5 and 14.6 removed.
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #66 and #33: a tombstone speaks for its archive only and does not stop resolution at copies elsewhere, no longer provisionally (sections 12.3 and 13.3); mirrors, branches, indexes kept by others, gateways and external records do not follow a takedown by themselves, each answering for what it serves, content to be removed everywhere being taken down at each archive at a request to each, and tools report the tombstones they meet; no signed takedown requests in the format, an owner withdrawing instead; tombstones keep one pin, earlier versions being reported as removed (section 13.3, appendix D); the open questions of sections 11.2, 12.6, 13.3, 15.6 and appendix A on takedowns removed.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #26: a notice is numbered by its position in <verbatim|notices>, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in <verbatim|replaces>, each notice being replaced at most once; the current notices are those not replaced; the <verbatim|date> of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 
@@ -1351,8 +1345,6 @@
     <item>Registering DOIs with an archive's own DataCite prefix (a <verbatim|datacite> profile), and documents that already have a DOI elsewhere (#8).
 
     <item>Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
-
-    <item>Whether a takedown reaches the records of external services (#33).
 
     <item>Which converter is the reference for validating <verbatim|datacite.json> through XML, since DataCite documents the correspondence but specifies no converter for it (#60).
   </itemize>
@@ -2365,6 +2357,10 @@
     <item><strong|Why a takedown deletes the whole object.> OCFL 1.1 cannot remove a file without changing the inventories, and so every pin and signature; deleting the object leaves all else valid, which is also why erasure is a takedown. Every removal is one, so nothing leaves an archive silently.
 
     <item><strong|Why a tombstone is not signed.> Takedowns are often made against the owner's will, and a host can add a tombstone falsely; it speaks for one archive only.
+
+    <item><strong|Why a takedown binds only its archive.> A tombstone that stopped resolution elsewhere would let any host suppress lines kept by others, falsely or under pressure; and what an archive must not serve depends on the law that applies to it. Each archive answers for what it serves, as for what it copies, and an owner who wants every copy to say that a work is not valid withdraws it, by a signed version (#66, #33).
+
+    <item><strong|Why no signed takedown requests.> Requests come from people with many standings (a court, a rights holder, a person whose data is held), which no key in the format can show; the owner's keys are not enough, since a thief may hold them (section 13.2), and the owner's own means is a withdrawal (#33).
 
     <item><strong|Why a tombstone keeps the genesis name.> A work taken down cannot then return there under a reused record (section 5.4).
 

@@ -1035,12 +1035,14 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           data, section 15.5)</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the object is deleted and a tombstone stays; verifiers
           report the member as removed, and resolvers keep looking past the
-          tombstone and report copies found elsewhere, which the takedown does
-          not reach (open, #33); the owners' key logs stay, since other
-          objects need them (section 13.2)</td>
+          tombstone and report copies found elsewhere with it: the takedown
+          does not reach them, each archive answering for what it serves
+          (section 13.3); the owners' key logs stay, since other objects need
+          them (section 13.2)</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the same for the pinned revisions; an accepted copy is a
           line of the selection's owner, to which the takedown is applied
-          separately; copies kept elsewhere are not reached (open, #33)</td>
+          separately; copies kept elsewhere are not reached (section
+          13.3)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a document kept privately is made public</td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">it can be a member once a copy of its line is public: the

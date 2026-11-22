@@ -441,12 +441,16 @@
       because the archive stops keeping it): the object is deleted and a
       tombstone is left in the discovery document, so that collections pinning
       it report it as removed rather than corrupt. Every removal is a
-      takedown, so nothing leaves an archive silently. The owners' key logs
-      stay, since other objects need them to be checked; an owner's key log is
-      taken down only for itself. Drafts are neither withdrawn nor taken down:
-      they are simply deleted. OCFL version 2 is expected to add a native
-      mechanism for deleting single files; whether OpenSheaf uses it is open
-      (#32).
+      takedown, so nothing leaves an archive silently. A takedown speaks for
+      its archive only: copies kept elsewhere stay, each archive answering for
+      what it serves, and are reported with the tombstone; content that must
+      go everywhere is taken down at each archive, and an owner who wants
+      every copy to show that a work is not valid withdraws it. The owners'
+      key logs stay, since other objects need them to be checked; an owner's
+      key log is taken down only for itself. Drafts are neither withdrawn nor
+      taken down: they are simply deleted. OCFL version 2 is expected to add a
+      native mechanism for deleting single files; whether OpenSheaf uses it is
+      open (#32).
     </p>
     <h2 id="auto-28"><a id="can-i-use-all-rights-reserved"></a>Can I use &quot;All rights reserved&quot;?<span style="margin-left: 1em"></span></h2>
     <p>

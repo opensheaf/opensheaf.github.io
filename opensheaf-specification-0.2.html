@@ -2955,12 +2955,6 @@ keyLog &lt;the value of keyLog&gt;</pre>
           it says so (#54).
         </p>
       </li>
-      <li>
-        <p>
-          Whether a custodian follows a takedown of a line it mirrors (section
-          13).
-        </p>
-      </li>
     </ul>
     <h2 id="auto-52"><a id="12-identifiers-sheaf-uris-resolution-indexes"></a>12. Identifiers: sheaf: URIs, resolution, indexes<span
     style="margin-left: 1em"></span></h2>
@@ -3135,10 +3129,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       itself.
     </p>
     <p>
-      <strong>Tombstones.</strong> Provisionally (#66): a tombstone (section
-      13) is not signed, and a resolver that meets one keeps looking, and when
-      it finds a copy that passes the checks, reports the copy and the
-      tombstone.
+      <strong>Tombstones.</strong> A tombstone (section 13) is not signed and
+      speaks for its archive only (section 13.3): a resolver that meets one
+      keeps looking, and when it finds a copy that passes the checks, reports
+      the copy and the tombstone.
     </p>
     <p>
       <strong>External records.</strong> A deposit with an external service
@@ -3316,12 +3310,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           (#22).
         </p>
       </li>
-      <li>
-        <p>
-          Whether a tombstone in one archive should stop resolution at copies
-          elsewhere (section 13; #66).
-        </p>
-      </li>
     </ul>
     <h2 id="auto-59"><a id="13-withdrawal-takedown-and-tombstones"></a>13. Withdrawal, takedown and tombstones<span style="margin-left: 1em"></span></h2>
     <p>
@@ -3456,31 +3444,31 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       and 9.3).
     </p>
     <p>
+      <strong>Elsewhere.</strong> A tombstone speaks for its archive only: it
+      says that this archive no longer serves the line, not that nobody may.
+      It binds no other archive, and does not stop resolution at copies
+      elsewhere (section 12.3). Mirrors, branches holding the files, indexes
+      kept by others, gateways and the records of external services (appendix
+      A) do not follow a takedown by themselves: each answers for what it
+      serves, as for what it copies (section 11.2), and content that must not
+      be served anywhere is taken down at each archive that serves it, at a
+      request made to each. Requests are outside this specification. Tools
+      that meet a tombstone of a line they copy, index or serve from elsewhere
+      (a mirror brought up to date, a resolver, a gateway) report it, with the
+      copy they found. An owner who wants every copy to show that a work is no
+      longer valid withdraws it (section 13.1), which copies follow, since it
+      is a signed version.
+    </p>
+    <p>
+      <strong>Earlier versions.</strong> A tombstone pins the last version
+      taken down. A pin of an earlier version of the line, of which no copy is
+      found, is reported as removed (section 8.5); the archive's <tt class="verbatim">sha512/</tt>
+      index, if kept, holds the digest of every version (section 12.5).
+    </p>
+    <p>
       <strong>Open questions.</strong>
     </p>
     <ul>
-      <li>
-        <p>
-          Whether a tombstone in one archive stops resolution at copies
-          elsewhere (#66), and whether mirrors, branches holding the version
-          taken down, indexes kept by others and gateways follow a takedown
-          (#33, #39).
-        </p>
-      </li>
-      <li>
-        <p>
-          The form of an owner's signed request for a takedown, and of a
-          keeper's (#33).
-        </p>
-      </li>
-      <li>
-        <p>
-          Whether a tombstone lists the inventory digests of every version
-          taken down, so that a pin of a removed version is told from a pin
-          that never named one; meanwhile the archive's <tt class="verbatim">sha512/</tt>
-          index keeps them (section 12.5; #33).
-        </p>
-      </li>
       <li>
         <p>
           A retraction by a collection (a journal) of one of its members,
@@ -4064,12 +4052,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <ul>
       <li>
         <p>
-          Whether a takedown reaches mirrors, branches holding the files,
-          indexes kept by others and gateways (#33).
-        </p>
-      </li>
-      <li>
-        <p>
           How a referee's commitment is written as a creator in DataCite, and
           exactly what is hashed (#63).
         </p>
@@ -4486,6 +4468,22 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #66 and
+          #33: a tombstone speaks for its archive only and does not stop
+          resolution at copies elsewhere, no longer provisionally (sections
+          12.3 and 13.3); mirrors, branches, indexes kept by others, gateways
+          and external records do not follow a takedown by themselves, each
+          answering for what it serves, content to be removed everywhere being
+          taken down at each archive at a request to each, and tools report
+          the tombstones they meet; no signed takedown requests in the format,
+          an owner withdrawing instead; tombstones keep one pin, earlier
+          versions being reported as removed (section 13.3, appendix D); the
+          open questions of sections 11.2, 12.6, 13.3, 15.6 and appendix A on
+          takedowns removed.
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>0.2 (draft), 22 November 2026:</strong> decided in #26: a
           notice is numbered by its position in <tt class="verbatim">notices</tt>, kept
           in order in every later version; a later notice about the same
@@ -4876,11 +4874,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           Whether a Zenodo record version also uploads the version's inventory
           file, its checksum file and its signature files, so that it can be
           checked against a pin (#22; section 12.6).
-        </p>
-      </li>
-      <li>
-        <p>
-          Whether a takedown reaches the records of external services (#33).
         </p>
       </li>
       <li>
@@ -6287,6 +6280,26 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           <strong>Why a tombstone is not signed.</strong> Takedowns are often
           made against the owner's will, and a host can add a tombstone
           falsely; it speaks for one archive only.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a takedown binds only its archive.</strong> A tombstone
+          that stopped resolution elsewhere would let any host suppress lines
+          kept by others, falsely or under pressure; and what an archive must
+          not serve depends on the law that applies to it. Each archive
+          answers for what it serves, as for what it copies, and an owner who
+          wants every copy to say that a work is not valid withdraws it, by a
+          signed version (#66, #33).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why no signed takedown requests.</strong> Requests come from
+          people with many standings (a court, a rights holder, a person whose
+          data is held), which no key in the format can show; the owner's keys
+          are not enough, since a thief may hold them (section 13.2), and the
+          owner's own means is a withdrawal (#33).
         </p>
       </li>
       <li>

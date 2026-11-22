@@ -359,14 +359,17 @@ regenerated from the sources whenever the presentation changes.
 To withdraw a document (for instance a retraction), its owner makes a new
 object version that only marks it withdrawn, with a date and a reason: the
 content and its history stay, and presentations show the withdrawal. The
-withdrawal covers the versions deposited so far; a corrected version
-deposited later reinstates the document, and the withdrawn versions stay
-withdrawn, as on arXiv. Content
-is removed only by a **takedown** (by law, for a breach of rights, or
-because the archive stops keeping it): the object is deleted and a tombstone
-is left in the discovery document, so that collections pinning it report it
-as removed rather than corrupt. Every removal is a takedown, so nothing leaves
-an archive silently. The owners' key logs stay, since other objects need them
+withdrawal covers the versions deposited so far; a corrected version deposited
+later reinstates the document, and the withdrawn versions stay withdrawn, as
+on arXiv. Content is removed only by a **takedown** (by law, for a breach of
+rights, or because the archive stops keeping it): the object is deleted and a
+tombstone is left in the discovery document, so that collections pinning it
+report it as removed rather than corrupt. Every removal is a takedown, so
+nothing leaves an archive silently. A takedown speaks for its archive only:
+copies kept elsewhere stay, each archive answering for what it serves, and are
+reported with the tombstone; content that must go everywhere is taken down at
+each archive, and an owner who wants every copy to show that a work is not
+valid withdraws it. The owners' key logs stay, since other objects need them
 to be checked; an owner's key log is taken down only for itself. Drafts are
 neither withdrawn nor taken down: they are simply deleted. OCFL version 2 is
 expected to add a native mechanism for deleting single files; whether

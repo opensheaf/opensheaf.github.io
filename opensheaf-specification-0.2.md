@@ -647,7 +647,6 @@ An archive that keeps a mirror redistributes the files it copies, and is respons
 
 - Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what it has the right to redistribute (#39).
 - What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
-- Whether a custodian follows a takedown of a line it mirrors (section 13).
 
 ## 12. Identifiers: sheaf: URIs, resolution, indexes
 
@@ -695,7 +694,7 @@ Expansions may differ between resolvers and over time, so every file defined by 
 
 **Copies, forks and ended owners.** Since a copy that stops early looks complete, a resolver uses the latest signed version among the copies it found that agree (section 7.4), and says where it found them. A fork of the line (section 7.4) is reported with the status of each side; the resolver uses only signed versions and does not choose between signed sides. A fork of a key log is not one of a line: it ends and freezes the owner (sections 6.3 and 7.5), and signatures naming versions of either side are checked against them, wherever held, the versions they sign being contested from the fork point on (section 7.3). A resolver reports an owner that has ended, by an ending version or a fork, or has exposed keys (section 6.3), with any successor, its own or named by its keeper (section 6.6), and never follows a successor by itself.
 
-**Tombstones.** Provisionally (#66): a tombstone (section 13) is not signed, and a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
+**Tombstones.** A tombstone (section 13) is not signed and speaks for its archive only (section 13.3): a resolver that meets one keeps looking, and when it finds a copy that passes the checks, reports the copy and the tombstone.
 
 **External records.** A deposit with an external service (`external`, section 4.3; appendix A) or a software archive snapshot is a witness (section 7.2), not a copy: it holds no inventory, so it is never checked against a pin and resolves nothing; a resolver MAY report it as a place where the files may be found. A snapshot holding an archive's storage root (an archive kept in git) is read as that archive.
 
@@ -732,7 +731,6 @@ A gateway serves a URI at its base URL followed by the URI unchanged (`https://o
 - Whether the project runs a gateway, on which domain, and whether a domain used only for resolution drops `sheaf:` from the path, as `https://doi.org/` drops `doi:` (#35).
 - Who keeps indexes of many archives, so that a line can be found once its archives have gone, and how resolvers find them (#20).
 - Whether an external record can resolve a pin if it also holds the version's inventory file, its checksum file and its signature files (a Zenodo record version uploading them, a member's `swhid`) (#22).
-- Whether a tombstone in one archive should stop resolution at copies elsewhere (section 13; #66).
 
 ## 13. Withdrawal, takedown and tombstones
 
@@ -768,11 +766,12 @@ A <dfn>tombstone</dfn> is an entry of `tombstones` in the discovery document (se
 
 A tombstone is never removed, except when its line returns: it keeps the line taken (section 5.3), and `objects` never lists its `id`. It is not signed (section 12.3). A line, or a version of it no later than `lastVersion`, of which no copy is found but a tombstone is, is reported as removed (sections 8.5 and 9.3).
 
+**Elsewhere.** A tombstone speaks for its archive only: it says that this archive no longer serves the line, not that nobody may. It binds no other archive, and does not stop resolution at copies elsewhere (section 12.3). Mirrors, branches holding the files, indexes kept by others, gateways and the records of external services (appendix A) do not follow a takedown by themselves: each answers for what it serves, as for what it copies (section 11.2), and content that must not be served anywhere is taken down at each archive that serves it, at a request made to each. Requests are outside this specification. Tools that meet a tombstone of a line they copy, index or serve from elsewhere (a mirror brought up to date, a resolver, a gateway) report it, with the copy they found. An owner who wants every copy to show that a work is no longer valid withdraws it (section 13.1), which copies follow, since it is a signed version.
+
+**Earlier versions.** A tombstone pins the last version taken down. A pin of an earlier version of the line, of which no copy is found, is reported as removed (section 8.5); the archive's `sha512/` index, if kept, holds the digest of every version (section 12.5).
+
 **Open questions.**
 
-- Whether a tombstone in one archive stops resolution at copies elsewhere (#66), and whether mirrors, branches holding the version taken down, indexes kept by others and gateways follow a takedown (#33, #39).
-- The form of an owner's signed request for a takedown, and of a keeper's (#33).
-- Whether a tombstone lists the inventory digests of every version taken down, so that a pin of a removed version is told from a pin that never named one; meanwhile the archive's `sha512/` index keeps them (section 12.5; #33).
 - A retraction by a collection (a journal) of one of its members, distinct from a withdrawal by the member's owner (#40).
 - Takedowns of single files or versions, should a later OCFL provide them (#32).
 
@@ -897,7 +896,6 @@ What an archive serves is public, its drafts included (section 10.1); a sealed v
 
 **Open questions.**
 
-- Whether a takedown reaches mirrors, branches holding the files, indexes kept by others and gateways (#33).
 - How a referee's commitment is written as a creator in DataCite, and exactly what is hashed (#63).
 - Tying owners to ORCID iDs and domains beyond the keeper (#41).
 - How an archive on a host that sets no response headers (GitHub Pages) keeps the files of its objects from running scripts in the origin of its presentation files, while search engines want its PDFs on the host of its landing pages (section 15.3, appendix A.3) (#64).
@@ -944,6 +942,7 @@ Before 1.0, a minor version MAY be incompatible with the one before it. Version 
 - **0.2 (draft), 22 November 2026:** decided in #29: an archive need not be public, and serves all its lines or none; an owner publishes lines kept privately by copying them into a public archive, the same lines (section 3.1); the `at` of a member in a private archive is the base URL at which it is kept (section 8.2); `Available` is the deposit, whether the archive is public or not, unless the version appeared elsewhere first, and `Created` dates a version deposited later (section 4.4); drafts are not shared as objects, and whatever a recipient relies on is sealed (section 10.2); what an archive holds may be made public (section 15.4); the open questions of sections 3.1 and 10.2 removed, and that of section 15 on referees pointed to #63 (appendix D).
 - **0.2 (draft), 22 November 2026:** decided in #50 and #34: an entry of `rightsList` with `rightsIdentifier` or `rightsUri` is a licence, one with neither a rights statement (section 4.4); an archive keeping a mirror or a branch is responsible for having the right to redistribute what it copies, by licence, agreement or law, which the specification does not judge and verifiers do not check (sections 9.7, 11.2 and 15.6, appendix D); the open questions of sections 11.2, 14.6 and 15.6 on licences removed.
 - **0.2 (draft), 22 November 2026:** decided in #48 and #37: whether a copy matches a pin is decided by the bytes of its inventory file, a checksum file missing or wrong being reported with its location without making the copy fail; a pin is a mismatch only if no copy found matches, every copy that does not match being reported with its location, and a resolver MAY stop at the first copy that matches (sections 8.5, 12.3 and 14.5, appendix D); the open questions of sections 8.5 and 14.6 removed.
+- **0.2 (draft), 22 November 2026:** decided in #66 and #33: a tombstone speaks for its archive only and does not stop resolution at copies elsewhere, no longer provisionally (sections 12.3 and 13.3); mirrors, branches, indexes kept by others, gateways and external records do not follow a takedown by themselves, each answering for what it serves, content to be removed everywhere being taken down at each archive at a request to each, and tools report the tombstones they meet; no signed takedown requests in the format, an owner withdrawing instead; tombstones keep one pin, earlier versions being reported as removed (section 13.3, appendix D); the open questions of sections 11.2, 12.6, 13.3, 15.6 and appendix A on takedowns removed.
 - **0.2 (draft), 22 November 2026:** decided in #26: a notice is numbered by its position in `notices`, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in `replaces`, each notice being replaced at most once; the current notices are those not replaced; the `date` of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 - **0.2 (draft), 22 November 2026:** decided in #24, #45 and #27 (its first point): a collection is a document whose source is `members.json`, with renditions and the fields of a document but `mainSource`, `sourceFormat`, `sourcesMissing` and `licence`, so any change of `members.json` is a new document version and a description-only version of a collection may hold an earlier member list (sections 4.2, 4.3 and 8.2); a description-only version changes the description of the object and adds to `external`, while `mainSource`, `sourceFormat`, `sourcesMissing`, `renditions` and `toolchain` belong to the document version, except as a completion adds to them (section 4.2); a followed member moves with new document versions of its catalogue only (section 8.3); verifiers resolve the members of the current version (sections 14.4 and 14.5, appendix D).
 - **0.2 (draft), 21 November 2026:** decided in #23: a new document version is made when the own files differ from those of the current version, compared by logical path and digest, so that a rename is a change; an object version holding an existing document version holds exactly its files; files of an earlier version deposited again are a revert, a new document version (section 4.2, appendix D).
@@ -1011,7 +1010,6 @@ The schemas are written in JSON Schema 2020-12, published at `https://opensheaf.
 
 - Registering DOIs with an archive's own DataCite prefix (a `datacite` profile), and documents that already have a DOI elsewhere (#8).
 - Whether a Zenodo record version also uploads the version's inventory file, its checksum file and its signature files, so that it can be checked against a pin (#22; section 12.6).
-- Whether a takedown reaches the records of external services (#33).
 - Which converter is the reference for validating `datacite.json` through XML, since DataCite documents the correspondence but specifies no converter for it (#60).
 
 ## Appendix C. Examples (non-normative)
@@ -1594,6 +1592,8 @@ The reasons for the main choices, in the order of the sections.
 - **Why a withdrawal keeps the content.** A retracted paper stays part of the record, cited and collected; deleting it would break every pin and signature that includes it.
 - **Why a takedown deletes the whole object.** OCFL 1.1 cannot remove a file without changing the inventories, and so every pin and signature; deleting the object leaves all else valid, which is also why erasure is a takedown. Every removal is one, so nothing leaves an archive silently.
 - **Why a tombstone is not signed.** Takedowns are often made against the owner's will, and a host can add a tombstone falsely; it speaks for one archive only.
+- **Why a takedown binds only its archive.** A tombstone that stopped resolution elsewhere would let any host suppress lines kept by others, falsely or under pressure; and what an archive must not serve depends on the law that applies to it. Each archive answers for what it serves, as for what it copies, and an owner who wants every copy to say that a work is not valid withdraws it, by a signed version (#66, #33).
+- **Why no signed takedown requests.** Requests come from people with many standings (a court, a rights holder, a person whose data is held), which no key in the format can show; the owner's keys are not enough, since a thief may hold them (section 13.2), and the owner's own means is a withdrawal (#33).
 - **Why a tombstone keeps the genesis name.** A work taken down cannot then return there under a reused record (section 5.4).
 - **Why owner objects outlive takedowns of lines.** Every other line, branch and copy the owner signed needs the key log; and since a thief may hold current keys, or rotation keys, a takedown of an owner object needs the law or the keeper, never the owner's keys.
 
