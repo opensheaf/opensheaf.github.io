@@ -55,7 +55,7 @@ decoupled journal [@priem2012], the repository community's Pubfair
 [@pubfair2019]. Unbundled actors exist. Overlay journals, Peer Community In
 and SciPost vet documents that stay where their authors put them. But they
 rest on archives they do not control: a selection of arXiv papers can name
-the version it vetted (`arXiv:...v2`), yet only arXiv vouches for the bytes
+the version it vetted (`arXiv:NNNN.NNNNNv2`), yet only arXiv vouches for the bytes
 behind that name, and none of the overlays surveyed publishes a digest of the
 version it vetted [@fedpub].
 
@@ -134,8 +134,9 @@ copied (specification, sections 11.2 and 15.6).
 
 This section summarises version 0.2 [@spec02], which is authoritative. Its
 appendix C follows one paper of the first archive through an illustrative
-history; the names, keys, digests and signatures it shows are computed, with
-a few stated exceptions. The listings below are taken from it, with long
+history: the owner, the dates, the journal, the DOIs, the Zenodo record and
+the ORCID iD are invented or placeholders, and the names, keys, digests and
+signatures are computed from them. The listings below are taken from it, with long
 digests and keys shortened in the middle.
 
 ### Archives and the discovery document {#sec:archives}
@@ -192,13 +193,14 @@ Listing: An excerpt of the discovery document of appendix C.6: `contact` and `ex
 }
 ```
 
-The <dfn>storage root</dfn> is an OCFL 1.1 storage root. Its default layout
-puts the line `sheaf:<name>:<owner>` at `<owner>/<name>/` and an owner's key
-log at `<owner>/<owner>/`, so that an owner moves to another archive by
+The <dfn>storage root</dfn> is an OCFL 1.1 storage root. In its default
+layout, an owner's key log is at `<owner>/<owner>/` and each of its lines,
+`sheaf:<name>:<owner>`, at `<owner>/<name>/`, so that an owner moves to another archive by
 copying one folder; large archives use OCFL's hashed layout (specification,
 section 3.2). An archive need not be public. It serves all its lines or
 none, and a line kept privately is published by copying it into a public
-archive, where it is the same line and every pin made before stays valid.
+archive, where it is the same line and every pin made before stays valid
+(specification, section 3.1).
 
 ### Objects, versions and pins {#sec:objects}
 
@@ -217,7 +219,7 @@ its inventory file. An inventory records the digests of the files of its
 version and of every earlier one, and every sealed version after the first
 records in `previous` the digest of the inventory file before it. A pin
 therefore fixes the object up to that version, the bytes of every earlier
-inventory included, in any copy (specification, section 4.3). Collections,
+inventory included, in any copy (specification, sections 4 and 4.3). Collections,
 branches and `sheaf:` URIs refer to object versions by pins. Table @tab:files
 lists the files of an object.
 
@@ -237,7 +239,8 @@ Table: The files of an object and of its versions (specification, sections 4 to 
 
 A new document version is made exactly when the own files (sources,
 renditions, change note) differ from those of the current version, compared
-by logical path and digest (specification, section 4.2). A
+by logical path and digest, except when a version deposited without sources
+is completed (specification, section 4.2). A
 <dfn>description-only version</dfn> keeps the files and changes only the
 description: a DOI, a licence, a notice, a withdrawal. A version deposited
 without sources says why, and may be completed later. A <dfn>notice</dfn>, a
@@ -304,17 +307,16 @@ Listing: The genesis record of the example paper (appendix C.2). {#lst:genesis}
 }
 ```
 
-Algorithm k, for k from 0 to 15, takes the SHA-256 digest of the seed
-`opensheaf-name-<k>`, a line feed and the bytes of `genesis.json`, and
-writes it in lowercase base32 without padding: 52 characters, the last of
-which holds the last bit of the digest and four zero bits, set to k
+Algorithm *k*, for *k* from 0 to 15, hashes with SHA-256 a seed,
+`opensheaf-name-<k>`, then a line feed and the bytes of `genesis.json`, and
+writes the digest in lowercase base32 without padding: 52 characters, the last of
+which holds the last bit of the digest and four zero bits, set to *k*
 (specification, section 5.2). Names of different algorithms never coincide,
 and are compared as strings, never decoded. Listing @lst:name computes them.
 We ran it on the bytes of the genesis record of appendix C.2, with its final
-line feed: it prints `zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q`
-and, by algorithm 1, `aajozkubvmxu37pbu2lumdl37llv4ntkazd6j2es54zn23fkiknb`,
-the names given there. On the owner's record of appendix C.1 it prints the
-owner name given there, `56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa`.
+line feed: it prints `zzgdggwl...oz4q` and, by algorithm 1,
+`aajozkub...iknb`, the names given there in full. On the owner's record of
+appendix C.1 it prints the owner name given there, `56wo6cdp...z3pa`.
 
 Listing: Computing the names of a genesis record; checked against appendix C. {#lst:name}
 
@@ -345,7 +347,7 @@ line is made, and are resolved there: the originator's tool draws a new nonce,
 and a branch whose line is taken takes the smallest free algorithm number
 above its parent's. A genesis record reused for another work gives no valid
 line, and there are no aliases: a work refused for a reused record is sealed
-anew (specification, section 5.4).
+anew (specification, section 5.4 and appendix D.2).
 
 ### Owners and key logs {#sec:owners}
 
@@ -362,7 +364,8 @@ version of the key log; each version commits to them in advance by their
 SHA-256 digests in `next`, with a `nextThreshold`. A rotation key is used
 once, committed in one version only, and never becomes a current key;
 current keys never sign the key log. The first version is computed from the
-owner's genesis record, byte for byte in the JSON Canonicalization Scheme,
+owner's genesis record, its `object.json`, `keys.json` and inventory written
+in the JSON Canonicalization Scheme so that every copy has the same bytes,
 and is never signed, so the owner name commits to the first current keys and
 to the digests of the first rotation keys (Listing @lst:owner). The
 specification advises one current key per device and three rotation keys
@@ -397,39 +400,37 @@ Listing: The genesis record of the authors' owner (appendix C.1); the data of th
 #### Exposure, ending and forks
 An owner whose current keys may have been exposed, and could reach the
 `threshold`, signs at once, with rotation keys, a version listing them in
-`exposed`, or ends. Whoever holds
-the current keys can neither prevent nor contest it. There is no
-revocation: signatures carry no time, so nothing tells what a key signed
-before it leaked from what a thief signs after; signatures stay good, and
-what needs an exposed key becomes contested (Section @sec:lines). An owner
-ends by signing a last version with `ended` and, optionally, a successor.
-Two signed versions of a key log with one number and different inventories
-are a <dfn>fork of the key log</dfn>; only rotation keys can make one,
-stolen before use or kept after it. The format cannot tell which side is the
-owner's, so a fork ends the owner and freezes it: archives add no more
-versions of its lines unless trusted evidence dates them before the fork
-(specification, sections 6.3 and 7.5). An archive keeps the side it saw
-first and appends a <dfn>fork record</dfn>, an unsigned version carrying the
-other side, so that every copy shows the fork.
+`exposed`, or ends. Whoever holds the current keys can neither prevent nor
+contest it. There is no revocation: signatures carry no time, so nothing
+tells what a key signed before it leaked from what a thief signs after;
+signatures stay good, and what needs an exposed key becomes contested
+(Section @sec:lines). An owner ends by signing a last version with `ended`
+and, optionally, a successor. Two signed versions of a key log with one
+number and different inventories are a <dfn>fork of the key log</dfn>; only
+rotation keys can make one, stolen before use or kept after it. The format
+cannot tell which side is the owner's, so a fork ends the owner and freezes
+it: archives add no more versions of its lines unless trusted evidence dates
+them before the fork (specification, sections 6.3 and 7.5). An archive keeps
+the side it saw first and appends a <dfn>fork record</dfn>, an unsigned
+version carrying the other side, so that every copy shows the fork.
 
 #### Travel and keepers
 A key log checks itself from its owner name, so a copy from any source is as
 good as the original. Every copy of an object holds beside it the key logs
 its signatures need, and the longer of two copies is used; no one can prove
 offline that a key log is complete (specification, section 6.5). An owner may
-name one <dfn>keeper</dfn> in its genesis record, an ORCID iD or a domain,
-who may confirm the link, names the accepted successor when no ending
-version before a fork point names one, and, besides the law, alone can have
-an owner object that other objects need taken down (specification,
-sections 6.6 and 13.2). The
-keeper says who answers for an owner, not who owns its lines, which only its
+name one <dfn>keeper</dfn> in its genesis record, an ORCID iD or a domain.
+The keeper may confirm the link; names the accepted successor when no ending
+version before a fork point names one; and is, besides the law, the only
+party at whose request an archive takes down an owner object that other
+objects need (specification, sections 6.6 and 13.2). The keeper says who answers for an owner, not who owns its lines, which only its
 keys decide.
 
 ### Lines, signatures and statuses {#sec:lines}
 
 A <dfn>line</dfn> is the history of a work as decided by one owner,
 `sheaf:<name>:<owner>`, and is its signed versions, wherever stored
-(specification, section 7). Every sealed version is signed by at least
+(specification, section 7). Every sealed version of a line other than a key log is signed by at least
 `threshold` current keys of one version of the owner's key log, each in a
 signature file kept in the object's witness folder, outside every version
 (Listing @lst:signature). The file's name is derived from its key, so a
@@ -452,7 +453,7 @@ Listing: A signature file of the paper's second version (appendix C.3). {#lst:si
   "signer": "56wo6cdp...z3pa",
   "key": "did:key:z6MkugKq...DDvThn",
   "keyLog":
-    "sheaf:56wo...z3pa/v2?sha512=7673...3f84",
+    "sheaf:56wo6cdp...z3pa/v2?sha512=7673...3f84",
   "signature": "Gf9KOxH/...qipyBA=="
 }
 ```
@@ -479,8 +480,9 @@ list of lines of documents or collections, in any archive, each pinned
 (specification, section 8). Its source is the member list, so any change of
 it is a new document version. Keeping and vetting are different acts. A
 <dfn>catalogue</dfn> keeps objects whole and is impartial about their
-versions; with `follow` set to `latest`, its tool writes a new version when a
-member has a new signed version. A <dfn>selection</dfn> vets particular
+versions; a member may have `follow` set to `latest`, and the catalogue's
+tool then writes a new document version of the catalogue when that member's
+line has a new signed version, never a contested one. A <dfn>selection</dfn> vets particular
 versions: each member pins a revision set, the document versions vetted
 (Listing @lst:selection), and later versions by the authors enter only by a
 new version of the selection.
@@ -657,7 +659,8 @@ resolve(uri):
     check the version holds n
     if digest: check the inventory bytes,
       whatever the checksum file says
-    keep the copy, with its location
+    keep the copy and its signed versions;
+      a contested one only for a digest
   report copies that do not match, forks,
     ended owners, exposed keys, tombstones
   if digest: return a copy that matches,
@@ -697,7 +700,7 @@ before an end or a fork record, and it can delete what it serves, never a
 copy held elsewhere (specification, section 15.1). A good signature shows
 that a key of the owner's key log signed one version; not who wrote the
 document, who the owner is, when it was signed, or that no later version
-exists. Among the residual risks it lists are a host that withholds an exposure,
+exists. Among the residual risks the specification lists (section 15.1) are a host that withholds an exposure,
 archives that see different sides of a fork, a retired key never exposed,
 and a thief who forks a key log and exposes the owner's earlier keys, which
 harms trust in the owner's past but lets no forgery pass.
@@ -786,7 +789,7 @@ only the exposed key signed are then signed again with a new key.
 The Explorer shows an archive or a collection in the browser, with its
 objects, versions, files and members across archives, and verifies it as
 section 14 of the specification asks, from a static page [@explorer]. The
-Manager keeps from a page an archive made from the archive template, a GitHub
+Manager is a web page that keeps an archive made from the archive template, a GitHub
 repository with its workflows and Pages already set up [@manager; @template].
 It can make the owner and add keys to its key log; rotation keys then pass
 through the page's memory, so the highest security level keeps them offline,
@@ -801,8 +804,9 @@ programs, states the rules as definitions and the promises as theorems
 [@lean]. It is non-normative; a difference between it and the specification
 is a bug of one or the other. Digests, names and signature verification are
 left to an abstract environment, about which almost nothing is assumed, and
-every change of a world is one of four steps: a new archive, object, version
-or set of signature files. The theorems include:
+every addition to a world is one of four steps: a new archive, object,
+version or set of signature files; takedowns, which remove, are modelled
+apart. The theorems include:
 
 - `Step.resolveAt_ok`, immutability: once a pin resolves at an archive, no
   step changes what it resolves to there, for any digest function, since
@@ -830,7 +834,7 @@ not glue, a fork of the line is the reason.
 
 ### The first archive {#sec:papers}
 
-The first archive is the author's, at `https://mgubi.org/papers/`, kept in
+The first archive is the author's, at `mgubi.org/papers`, kept in
 the git repository mgubi/papers with these tools [@papers]. It follows
 version 0.2 since its rebuild on 20 November 2026, and keeps TeXmacs sources,
 HTML versions and PDFs. It holds 83 documents, 81 of which have versions
@@ -889,7 +893,7 @@ marked unverified there are marked so here. Table @tab:compare sets
 OpenSheaf against ten systems of the survey, among them the three it finds
 closest.
 
-Table*: OpenSheaf and ten systems of the survey [@fedpub]. {#tab:compare}
+Table*: OpenSheaf and ten systems of the survey, in eight rows [@fedpub]. {#tab:compare}
 
 | System | Fixity | Names | Who writes | Copies | Identity | Requires |
 |---|---|---|---|---|---|---|
@@ -931,7 +935,7 @@ immutable, sequential versions, append-only logs signed by the server after
 Certificate Transparency, and mirrors checked against hashes
 [@kf2026a; @kf2026c]. Each collection has one authoritative server; in its
 draft third protocol authors may sign changes, but one authority still
-accepts versions. Its salted commitments to private records bear on blind
+accepts versions [@fedpub]. Its salted commitments to private records bear on blind
 review (#63). **SWHIDs** name source code by intrinsic digests
 [@dicosmo2018] and are now an ISO standard [@fedpub], with no identity,
 signature or notion of a work; OpenSheaf records them as relations and
@@ -1013,10 +1017,10 @@ source, but its identity is the key itself [@nostr]. **IPFS** fetches content
 by hash [@ipfs]; an OpenSheaf pin also fixes all earlier versions, and, unlike
 a pin in IPFS, keeps nothing available. **Distributed hash tables**
 [@kademlia2002] answer where a copy is, which pins do not, and could serve as
-optional resolvers (#20). **Git** links commits by mostly SHA-1 hashes;
+optional resolvers (#20). **Git** links commits by hashes, SHA-1 in most repositories;
 OpenSheaf uses it as a store, its integrity staying in OCFL inventories
 [@git02]. **Radicle** names repositories by a digest and peers by keys, each
-peer writing only its own branch, with delegates changed by a threshold of the
+peer writing only its own namespace, with delegates changed by a threshold of the
 previous ones [@radicle]; OpenSheaf took from it, as from The Update Framework
 [@tuf], a key log signed by keys of the version before, and added pre-rotation
 and plain files [@radiclewp; @fedidentity].
@@ -1060,7 +1064,7 @@ Table: What is new and what is not [@fedpub]. {#tab:new}
 | new signed records, nothing deleted | nanopublications |
 | copies checked by digest | nanopub registries, Underlay, LOCKSS |
 | append-only signed logs | Underlay, after CT |
-| dated digests | bloxberg, Ledger, OpenTimestamps |
+| dated digests | bloxberg, OpenTimestamps, Ledger (unverified) |
 | overlays over versions held elsewhere | PCI, Episciences, eLife |
 | packaging with digests | BagIt, OCFL, RO-Crate |
 | static files or a git host only | DSGL, BagIt, OCFL, ResearchEquals' static archive |
@@ -1072,10 +1076,11 @@ Table: What is new and what is not [@fedpub]. {#tab:new}
 
 ## Evaluation and limitations {#sec:eval}
 
-Earlier designs ended for lack of funding or of a steward, for lack of
-adoption, or by depending on a token, a chain or a service run by someone
-else; others were overtaken by other services [@fedpub]. OpenSheaf avoids
-the third cause and shares the others; we weigh it against them.
+Earlier designs ended for lack of funding or of a steward, or by depending
+on a token, a chain, peers online or a service run by someone else; others
+were overtaken by other services, and the most successful remains small
+[@fedpub]. OpenSheaf avoids the dependencies and shares the rest; we weigh
+it against them.
 
 #### Adoption
 An exchange layer is worth something only when several parties use it, and
@@ -1126,25 +1131,25 @@ bundles of a collection with its members (#74).
 
 ## Conclusion {#sec:conclusion}
 
-We have argued that the functions of scholarly communication stay bundled
-in part because nothing lets separate parties rely on one another's work.
-OpenSheaf proposes a common form for that: documents fixed by digests and named apart from their hosts and
-keys, owners who sign their lines and can answer a theft, and catalogues and
-selections that are themselves fixed and checkable. On it, recording can stay
-with authors, preservation can be shared by institutions, and announcing,
-filtering and evaluation can be built by anyone, without asking the
-archives. Most of the parts exist elsewhere; their combination was not
-found. Version 0.2 is a draft, with tools, a formal model and a first archive; whether it
+We have argued that the functions of scholarly communication stay bundled in
+part because nothing lets separate parties rely on one another's work.
+OpenSheaf proposes a common form for that: documents fixed by digests and
+named apart from their hosts and keys, owners who sign their lines and can
+answer the theft of a signing key, and catalogues and selections that are
+themselves fixed and checkable. On it, recording can stay with authors,
+preservation can be shared by institutions, and announcing, filtering and
+assigning merit can be built by anyone, without asking the archives. Version
+0.2 is a draft, with tools, a formal model and a first archive; whether it
 is adopted depends on the services built on it.
 
 ## References
 
-- [roosendaal1997] H. E. Roosendaal and P. A. Th. M. Geurts. Forces and functions in scientific communication: an analysis of their interplay. 1997.
+- [roosendaal1997] H. E. Roosendaal and P. A. Th. M. Geurts. Forces and functions in scientific communication: an analysis of their interplay. CRISP 97, Cooperative Research Information Systems in Physics, Oldenburg, 1997.
 - [vandesompel2004] H. Van de Sompel, S. Payette, J. Erickson, C. Lagoze and S. Warner. Rethinking scholarly communication: building the system that scholars deserve. D-Lib Magazine 10 (9), 2004. https://dlib.org/dlib/september04/vandesompel/09vandesompel.html
 - [smith1999] J. W. T. Smith. The deconstructed journal: a new model for academic publishing. Learned Publishing 12 (2), 1999.
 - [priem2012] J. Priem and B. M. Hemminger. Decoupling the scholarly journal. Frontiers in Computational Neuroscience 6, 2012.
 - [pubfair2019] T. Ross-Hellauer, B. Fecher, K. Shearer and E. Rodrigues. Pubfair: a distributed framework for open publishing services, version 2. COAR, 2019.
-- [spec02] M. Gubinelli (editor). OpenSheaf: an open format for document archives and collections, version 0.2 (draft), 22 November 2026. OpenSheaf, 2026. https://opensheaf.org/opensheaf-specification-0.2
+- [spec02] OpenSheaf project. OpenSheaf: an open format for document archives and collections, version 0.2 (draft), 22 November 2026. OpenSheaf, 2026. https://opensheaf.org/opensheaf-specification-0.2
 - [git02] OpenSheaf project. OpenSheaf archives in git, version 0.2 (draft), 22 November 2026. Companion to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-git-0.2
 - [timestamps02] OpenSheaf project. OpenSheaf timestamps, version 0.2 (draft), 21 November 2026. Extension to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-timestamps-0.2
 - [tools] OpenSheaf project. opensheaf-py, a literate program, and The command-line tools, its guide. 2026. https://github.com/opensheaf/opensheaf-py and https://opensheaf.org/tools
@@ -1168,7 +1173,7 @@ is adopted depends on the services built on it.
 - [kuhn2014] T. Kuhn and M. Dumontier. Trusty URIs: verifiable, immutable, and permanent digital artifacts for linked data. ESWC 2014, LNCS 8465, 395-410, 2014. doi:10.1007/978-3-319-07443-6_27
 - [kuhn2016] T. Kuhn and others. Decentralized provenance-aware publishing with nanopublications. PeerJ Computer Science 2, e78, 2016. doi:10.7717/peerj-cs.78
 - [kuhn2026] T. Kuhn, V. Balseiro, A. Caselli, Z. Plutschow, P. Sowinski and A. Danilenka. A robust decentralized infrastructure for trust-aware open knowledge sharing. ISWC 2026, LNCS, 152-170, 2026. doi:10.1007/978-3-032-42015-2_8
-- [ellerman2024b] E. C. Ellerman. Document Succession Git Layout, edition 1.1. 2024. https://castedo.github.io/dsgl-spec/
+- [ellerman2024b] E. C. Ellerman. Document Succession Git Layout, edition 1.1. 2024. https://pilot.perm.pub/VGajCjaNP1Ugz58Khn1JWOEdMZ8/
 - [kf2026a] Knowledge Futures. Underlay, revived. 2026. https://www.knowledgefutures.org/updates/2026-04-27-underlay-revived
 - [kf2026c] Knowledge Futures. Underlay moves to protocol v2. 2026. https://www.knowledgefutures.org/updates/2026-10-06-underlay-protocol-v2
 - [kf2025b] Knowledge Futures. Not enough: open infrastructure funding and the future of Knowledge Futures. 2025. https://www.knowledgefutures.org/updates/2025-06-update/

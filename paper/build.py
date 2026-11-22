@@ -70,9 +70,12 @@ def breakable(t, every=14):
             out.append(tok)
             run += 1
             continue
-        for c in tok:
+        for k, c in enumerate(tok):
             out.append(c)
             run += 1
+            nxt = tok[k + 1:k + 2]
+            if c in ':/' and nxt == '/':
+                continue  # keep "https://" whole
             if c in '/:.?&=-,_' or run >= every:
                 out.append('<line-break>')
                 run = 0
@@ -82,7 +85,8 @@ def breakable(t, every=14):
 def with_breaks(markup):
     markup = re.sub(r'<verbatim\|((?:[^<>]|<[^<>]*>)*)>',
                     lambda m: '<verbatim|' + (breakable(m.group(1))
-                                              if len(m.group(1)) > 20 else m.group(1)) + '>',
+                                              if len(m.group(1)) > (16 if re.search(r'[:/]', m.group(1)) else 30)
+                                              else m.group(1)) + '>',
                     markup)
     return re.sub(r'(?<![|\w])(https?://[^\s<>|]+)', lambda m: breakable(m.group(1)), markup)
 
@@ -94,7 +98,7 @@ def heading(text):
 
 
 def table(rows):
-    body = '|'.join('<row|' + '|'.join(f'<cell|{inline(c)}>' for c in r) + '>'
+    body = '|'.join('<row|' + '|'.join(f'<cell|<with|par-mode|left|{inline(c)}>>' for c in r) + '>'
                     for r in rows)
     n = len(rows[0])
     return ('<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|'
@@ -188,7 +192,7 @@ def convert(md):
             wide = False
             if caption and caption[0] == 'table':
                 wide = caption[1]
-                size = '0.84' if not wide else '0.9'
+                size = '0.84'
                 markup = (f'<big-table|<with|font-size|{size}|{markup}>|'
                           f'{caption[2]}{caption[3]}>')
                 caption = None
