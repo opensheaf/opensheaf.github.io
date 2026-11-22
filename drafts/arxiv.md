@@ -76,7 +76,7 @@ nonprofit, nonstock Delaware Corporation", granted tax-exempt status, with
 governed by a Board of Directors; a Chief Executive Officer leads its
 operations (Penelope Lewis from 17 August 2026), with "numerous volunteer
 subject moderators" and three advisory councils (editorial, institutions,
-science). Its headquarters remain at Cornell Tech. It is funded by Simons
+science). For the near term its headquarters remain at Cornell Tech. It is funded by Simons
 Foundation International, member institutions and donors, and remains
 "committed to being free to use". It "now hosts more than three million
 scholarly articles in eight subject areas" (about page).
@@ -90,7 +90,7 @@ come with prior authorship in the domain, or a personal endorsement is
 needed; the stated reason is "the flood of low-quality, non-scientific
 submissions" (blog, 21 January 2026).
 
-**Moderation.** "The arXiv moderation process is not a peer-review process."
+**Moderation.** "[T]he arXiv moderation process is not a peer-review process."
 Moderators expect submissions "to be of scholarly archival interest", may
 decline one that "lacks originality, novelty, significance", reclassify, and
 "arXiv, in its sole discretion, may decline to post works". Research
@@ -175,8 +175,9 @@ giving an MD5 sum of each tar file. "The full, machine-readable arXiv dataset
 is available on Kaggle." The terms of use of the APIs forbid to "Store and
 serve arXiv e-prints (PDFs, source files, or other content) from your
 servers" without the copyright holder's permission or a licence that allows
-it, and ask tools built on the full text to "link back to arXiv for
-downloads".
+it, and ask to "Direct users to arXiv.org to retrieve e-print content"; the
+bulk data pages ask that tools built on the full text "link back to arXiv
+for downloads".
 
 **arXivLabs.** Features built with outside collaborators, shown in tabs on
 the abstract page: on that of `1706.03762`, bibliographic tools, citation
@@ -232,16 +233,15 @@ version; for older versions the two are separated by years.
 **Who stands behind a version.** On arXiv, the account of the submitter,
 endorsed for the category, who certifies "the right to grant this license";
 the abstract page names the submitter, and a withdrawal says by whom. No
-version is signed. In OpenSheaf an owner's keys sign every version (section
-7.1); a keeper may answer for the owner (section 6.6), and authorship stays
+version is signed. In OpenSheaf an owner's keys sign each version it publishes (section 7.1;
+drafts are not signed, section 10); a keeper may answer for the owner (section 6.6), and authorship stays
 in `creators` (section 4.4). An imported arXiv version is signed by the
 owner that imported it: the signature says that this owner decided the
 version and received these bytes, not that arXiv or every author agreed.
 
 **Names and DOIs.** `arXiv:YYMM.NNNNNvN` names a version in one service, and
 without `vN` the latest. arXiv's DOI is an article's, resolved to the latest
-version, its DataCite metadata updated at each replacement: a citation by DOI
-does not say which version was read. A `sheaf:` URI names a document
+version: a citation by DOI does not say which version was read. A `sheaf:` URI names a document
 version, and with `?sha512=` exactly one object version (section 12.1),
 resolved from any copy that passes the checks (section 12.3). OpenSheaf
 records arXiv's names beside its own: in the reference archive, an imported
@@ -301,9 +301,11 @@ reserved" for a draft never on arXiv), the case of #34 in which the open head
 reuses files of a restricted version, and 2 change between restrictive
 licences. So 3 of 81 lines could be mirrored as they stand. The author, who
 holds the rights, may keep and serve the archive; a custodian, a mirror or a
-journal keeping an accepted copy needs the authors' agreement, recorded
-minimally in `agreement` (section 4.3), and copying by agreement is itself
-open ([#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)). A
+journal keeping an accepted copy needs the authors' permission besides the
+licence. `agreement` (section 4.3) records only that the authors agreed to a
+deposit and its licence; copying by the agreement of the rights holders is
+open (section 11.2,
+[#39](https://github.com/opensheaf/opensheaf.github.io/issues/39)). A
 reference needs no permission (section 8.5), but a selection can only pin
 lines, so a paper that is only on arXiv is first imported into an archive
 ([use cases](../USE-CASES.md)). How a verifier tells a licence from a rights
@@ -399,7 +401,7 @@ issues.
 ### Where OpenSheaf's position is weak
 
 - **It depends on arXiv for content.** 81 of the 83 documents of the
-  reference archive came from arXiv; OpenSheaf there adds to arXiv's record,
+  reference archive have versions imported from arXiv; OpenSheaf there adds to arXiv's record,
   it does not replace it.
 - **It cannot copy most of what it imports.** By its own rule (section 11.2),
   arXiv's licences confine most imported papers to the author's archive.
