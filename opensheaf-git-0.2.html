@@ -501,8 +501,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       rebuilt, on any branch, since a new version with other bytes would be a
       fork of its line (section 7.4 of the specification). Drafts, under the
       reserved owner <tt class="verbatim">draft</tt>, may change freely; sealing makes a
-      new, fixed object from a draft; private states of archives are discussed
-      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.
+      new, fixed object from a draft; an archive kept in a private repository
+      is a private archive (section 3.1 of the specification), whose lines are
+      published by copying them into a public one.
     </p>
     <h3 id="auto-17"><a id="63-merging"></a>6.3 Merging<span style="margin-left: 1em"></span></h3>
     <p>
@@ -555,9 +556,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       copies of other owners' lines up to their latest signed versions, and
       continues another owner's line only by a branch under its own owner
       (section 9 of the specification). The object version is created (its <tt
-      class="verbatim">created</tt> date in the inventory) before it is published. (When
-      a version becomes public, and how this is recorded, is discussed in <a
-      href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.)
+      class="verbatim">created</tt> date in the inventory) before it is published. Its
+      <tt class="verbatim">Available</tt> date is that of its deposit, not of the merge
+      (section 4.4 of the specification).
     </p>
     <h2 id="auto-18"><a id="7-publishing"></a>7. Publishing<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-19"><a id="71-what-is-served"></a>7.1 What is served<span style="margin-left: 1em"></span></h3>
@@ -890,9 +891,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           <strong>What is pushed is public.</strong> Everything committed to a
           public repository, on any branch, including working files and
           commits later reverted, is published and copied, and is hard to
-          withdraw (section 9). Private drafts and private reviews (issue <a
-          href="https://github.com/opensheaf/opensheaf.github.io/issues/29">#29</a>) MUST NOT be pushed to a public repository, even on a
-          branch.
+          withdraw (section 9). Private drafts and the lines of a private
+          archive (section 3.1 of the specification), private reviews among
+          them, MUST NOT be pushed to a public repository, even on a branch: a
+          line is published by copying it into the public archive.
         </p>
       </li>
       <li>
@@ -955,13 +957,6 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           <strong>Portable content paths</strong> (section 4.3): a
           recommendation here, or a rule of the specification itself, since it
           matters for any copy made on another system?
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>Drafts and publication dates</strong> (sections 6.2 and
-          6.3): the draft state and the date a version becomes public, in <a
-          href="https://github.com/opensheaf/opensheaf.github.io/issues/29">issue #29</a>.
         </p>
       </li>
       <li>
@@ -1107,6 +1102,16 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           the specification (#72): a commit updates an owner catalogue, and
           merges conflict on the catalogue of an owner both branches changed
           (sections 6.1 and 6.3).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> following the
+          specification (#29): an archive in a private repository is a private
+          archive, whose lines are published by copying them, never by pushing
+          them to a public repository (sections 6.2 and 12); a deposit merged
+          from a pull request is <tt class="verbatim">Available</tt> from its deposit
+          (section 6.3); open question 4 removed.
         </p>
       </li>
     </ul>

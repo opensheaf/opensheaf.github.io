@@ -68,10 +68,9 @@ The discovery document is rewritten whenever an object is added or changed. It i
 
 **Labels.** A <dfn>label</dfn> is a short readable name an archive MAY give a line it holds, for readable URLs on its website: it matches `^[a-z0-9]+(-[a-z0-9]+)*$`, has at most 64 characters, and is unique in the discovery document. It is the archive's choice, may change, and is not an identifier; permanent links use `sheaf:` URIs (section 12). Labels SHOULD be chosen by the depositor, not derived from the title.
 
-**Open questions.**
+**Private archives.** An archive need not be public. Kept in a private repository or on its owner's machine, or served only to some readers (a journal behind a paywall), it follows this specification all the same, and whoever has its files deposits, pins and verifies in it as in any other. An archive serves all its lines or none: its discovery document lists every object of its storage root, and no archive serves only part of its lines. An owner who wants to publish some of the lines it keeps privately copies them into a public archive (section 11): a copy of a line is the same line, with the same inventories, signatures and witnesses, so that pins made before stay valid. A version that no reader can reach is reported unavailable (section 8.5).
 
-- Archives with millions of objects: whether `objects` and the feed are paged, and how (#19).
-- Whether an archive may serve only part of its lines (a private archive publishing some of them), and how its discovery document says so (#29).
+**Open question.** Archives with millions of objects: whether `objects` and the feed are paged, and how (#19).
 
 ### 3.2 The storage root
 
@@ -181,9 +180,9 @@ Every object version except in an owner object MUST contain `datacite.json`, the
 **Dates.** Each date type has one meaning:
 
 - `Issued`: the first public appearance of the work, anywhere, the same in every version; RECOMMENDED, and tools importing works published elsewhere SHOULD set it;
-- `Available`, SHOULD be present: when this document version first became public, anywhere (its date on the service it was imported from, or its deposit, section 4.1, if it was first made public by its deposit);
+- `Available`, SHOULD be present: when this document version was first made available, anywhere: its date on the service it was imported from, if it appeared there first, or else its deposit (section 4.1); a version is available from its deposit whether the archive is public or not (section 3.1), and the date does not change when the version is later made public;
 - `Updated`: the date of the latest description-only version holding this document version, if any;
-- `Created` (when a version not public at the time was written), `Submitted` and `Accepted`, OPTIONAL;
+- `Created` (when a version deposited later, a manuscript found years after, was written), `Submitted` and `Accepted`, OPTIONAL;
 - `Withdrawn`: equal to `withdrawal.date` in `object.json`.
 
 Dates MAY be approximate, as DataCite allows (`2019-03`, `2018/2019`), with `dateInformation` saying why; unknown dates are omitted.
@@ -459,7 +458,7 @@ Each member MUST have:
 
 - `kind`: `document` or `collection`;
 - `name` and `owner`: its line (sections 5 and 6), by which copies are found (section 12) and checked against its owner's signatures; never a label (section 3.1) or a location;
-- `at`: a non-empty list of base URLs where copies of the line may be found, also of one URL: equal hints, which need no signature (section 3), read as the `at` parameter of a `sheaf:` URI (section 12). They locate copies of the member's own line, mirrors included (section 11), never a branch of it (section 9).
+- `at`: a non-empty list of base URLs where copies of the line may be found, also of one URL: equal hints, which need no signature (section 3), read as the `at` parameter of a `sheaf:` URI (section 12). They locate copies of the member's own line, mirrors included (section 11), never a branch of it (section 9). The base URL of a private archive (section 3.1) is the one at which it is kept, whether or not readers can reach it; readers who have its files map it to where they are (section 12.3).
 
 Each member MAY have `doi`, the version DOI, and `conceptDoi`, the concept DOI, of the member; and `cite`, a cached citation, not authoritative, so that the collection can be read and ordered without resolving its members, also when they become unavailable: `title`, `creators` (a list of names), `year`, `issued`, the member's `Issued` date, and `available`, its `Available` date, so that `order` can be followed from `members.json` alone. Since `members.json` is the source of the collection, any change of it, `cite` included, is a new document version (section 4.2); tools SHOULD refresh `cite` only when the member list changes otherwise.
 
@@ -625,7 +624,7 @@ A <dfn>draft</dfn> is a sandbox for a work not yet sealed, on which nothing may 
 
 **Drafts stay outside the line.** A work may be sealed from a draft or from files outside any archive. The versions of a draft are never part of the line sealed from it, and nothing in the line refers to them. Sealed from a draft, the first version holds the files of the draft's latest version as document version 1: its `object.json` drops `history` and `notices`, with the files of the notices, which concern the draft's document versions; its `datacite.json` keeps the description, with `version` `"1"`, and drops the `Updated` date (section 4.4).
 
-**Open question.** Whether and how drafts are shared before sealing (among co-authors, with a journal under review), and how an archive serves them, which bears on when a work must be sealed (#29).
+**Sharing before sealing.** A draft is not shared as an object (section 10.1). Co-authors working on a draft share its files by any means outside this specification: a git repository, e-mail, a shared folder. Whatever a recipient must be able to rely on, cite or pin, a submission to a journal above all, is sealed first and shared as a line, privately if need be (section 3.1).
 
 ## 11. Copies and mirrors
 
@@ -885,7 +884,7 @@ An archive does not vouch for the files of its objects (section 3). Its presenta
 
 ### 15.4 Keys and secrets
 
-Private keys, and other secrets (tokens of external services, the secrets of a review), MUST NOT be stored in an archive: in an object, a witness folder, a draft, presentation files, or the repository of an archive kept in git. Whatever an archive holds is public and copied.
+Private keys, and other secrets (tokens of external services, the secrets of a review), MUST NOT be stored in an archive: in an object, a witness folder, a draft, presentation files, or the repository of an archive kept in git. Whatever an archive holds, a private archive included (section 3.1), may be made public and copied.
 
 ### 15.5 Privacy
 
@@ -905,7 +904,7 @@ What an archive serves is public, its drafts included (section 10.1); a sealed v
 
 - Which licences allow a mirror, and how a verifier tells a licence from a rights statement (#34, #50); copying by the agreement of the rights holders (#39).
 - Whether a takedown reaches mirrors, branches holding the files, indexes kept by others and gateways (#33).
-- Private archives and drafts, anonymous referees and the secrets of a review (#29).
+- How a referee's commitment is written as a creator in DataCite, and exactly what is hashed (#63).
 - Tying owners to ORCID iDs and domains beyond the keeper (#41).
 - How an archive on a host that sets no response headers (GitHub Pages) keeps the files of its objects from running scripts in the origin of its presentation files, while search engines want its PDFs on the host of its landing pages (section 15.3, appendix A.3) (#64).
 
@@ -948,6 +947,7 @@ Before 1.0, a minor version MAY be incompatible with the one before it. Version 
 - **0.2 (draft), 22 November 2026:** decided in #25: a withdrawal withdraws every document version deposited before it, and later description-only versions keep it; a new document version reinstates the line, the versions withdrawn staying withdrawn, and a later withdrawal is possible; a new document version is never a withdrawal; an ended owner withdraws nothing; verifiers report members pinning a withdrawn document version (sections 13.1, 14.4 and 14.5, appendix D); the open questions of sections 13.3 and 14.6 on withdrawal removed.
 - **0.2 (draft), 22 November 2026:** decided in #49: digests in inventories and checksum files MUST be in lower case (section 4.1, appendix D); the item is removed from the open questions of section 14.6.
 - **0.2 (draft), 22 November 2026:** decided in #51: a deposit out of order is recorded by writing `history`, which defines the history, in place of a requirement verifiers cannot check; a version deposited without it is the current version (section 4.2, appendix D); the item is removed from the open questions of section 14.6.
+- **0.2 (draft), 22 November 2026:** decided in #29: an archive need not be public, and serves all its lines or none; an owner publishes lines kept privately by copying them into a public archive, the same lines (section 3.1); the `at` of a member in a private archive is the base URL at which it is kept (section 8.2); `Available` is the deposit, whether the archive is public or not, unless the version appeared elsewhere first, and `Created` dates a version deposited later (section 4.4); drafts are not shared as objects, and whatever a recipient relies on is sealed (section 10.2); what an archive holds may be made public (section 15.4); the open questions of sections 3.1 and 10.2 removed, and that of section 15 on referees pointed to #63 (appendix D).
 - **0.2 (draft), 22 November 2026:** decided in #26: a notice is numbered by its position in `notices`, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in `replaces`, each notice being replaced at most once; the current notices are those not replaced; the `date` of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 - **0.2 (draft), 22 November 2026:** decided in #24, #45 and #27 (its first point): a collection is a document whose source is `members.json`, with renditions and the fields of a document but `mainSource`, `sourceFormat`, `sourcesMissing` and `licence`, so any change of `members.json` is a new document version and a description-only version of a collection may hold an earlier member list (sections 4.2, 4.3 and 8.2); a description-only version changes the description of the object and adds to `external`, while `mainSource`, `sourceFormat`, `sourcesMissing`, `renditions` and `toolchain` belong to the document version, except as a completion adds to them (section 4.2); a followed member moves with new document versions of its catalogue only (section 8.3); verifiers resolve the members of the current version (sections 14.4 and 14.5, appendix D).
 - **0.2 (draft), 21 November 2026:** decided in #23: a new document version is made when the own files differ from those of the current version, compared by logical path and digest, so that a rename is a change; an object version holding an existing document version holds exactly its files; files of an earlier version deposited again are a revert, a new document version (section 4.2, appendix D).
@@ -1519,6 +1519,8 @@ The reasons for the main choices, in the order of the sections.
 - **Why a deposit out of order is recorded by `history`.** Only the author knows that a version belongs earlier in the work; the files cannot show it, so no rule could require `history` of such a version and be checked. The history is therefore defined by what is written: the order of the numbers, unless `history` says otherwise (#51).
 - **Why an explicit history.** Dates may be approximate or unknown, and fixed versions cannot correct pointers to their predecessors when a version is found later. A list of object versions, read from the latest signed version, can be corrected; it cannot list digests, since a version cannot contain the digest of its own inventory.
 - **Why the deposit is read from the inventory.** OCFL already records it; repeating it in `object.json` would let the two disagree.
+- **Why an archive serves all its lines or none.** A discovery document listing only some objects of its storage root could no longer be checked against it, and readers could not tell a line kept back from one lost. Since a copy of a line is the same line, publishing some lines of a private archive is copying them, and pins made privately stay valid (#29).
+- **Why `Available` is the deposit, in a private archive too.** Whether a version is public is not in the files, and changes with the archive's access (a paywall, a repository made public); the deposit is fixed, recorded in the inventory, and the same for every archive, and a later date would need a new version only to state it (#29).
 
 ### D.2 Names
 
@@ -1572,6 +1574,7 @@ The reasons for the main choices, in the order of the sections.
 - **Why drafts.** A version that has left its owner's hands may be cited, pinned or copied, and must stay fixed and signed; a draft keeps unfinished work in the usual format, marked, outside its content, as something on which nothing may rely.
 - **Why sealing makes a new object.** Continuing the draft would start the line with unsigned history that may have changed; a new object starts it at its first signed version.
 - **Why only at the owner's request.** Sealing fixes a name and signs for ever; a tool sealing as a side effect would make the owner answer for a version it did not choose to share.
+- **Why drafts are not shared as objects.** A draft may change, so a recipient could rely on nothing in it; files shared to work together need no format, and whatever must be relied on is sealed (#29).
 
 ### D.8 Copies and mirrors
 

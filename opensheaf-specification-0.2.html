@@ -334,23 +334,23 @@
       depositor, not derived from the title.
     </p>
     <p>
-      <strong>Open questions.</strong>
+      <strong>Private archives.</strong> An archive need not be public. Kept
+      in a private repository or on its owner's machine, or served only to
+      some readers (a journal behind a paywall), it follows this specification
+      all the same, and whoever has its files deposits, pins and verifies in
+      it as in any other. An archive serves all its lines or none: its
+      discovery document lists every object of its storage root, and no
+      archive serves only part of its lines. An owner who wants to publish
+      some of the lines it keeps privately copies them into a public archive
+      (section 11): a copy of a line is the same line, with the same
+      inventories, signatures and witnesses, so that pins made before stay
+      valid. A version that no reader can reach is reported unavailable
+      (section 8.5).
     </p>
-    <ul>
-      <li>
-        <p>
-          Archives with millions of objects: whether <tt class="verbatim">objects</tt>
-          and the feed are paged, and how (#19).
-        </p>
-      </li>
-      <li>
-        <p>
-          Whether an archive may serve only part of its lines (a private
-          archive publishing some of them), and how its discovery document
-          says so (#29).
-        </p>
-      </li>
-    </ul>
+    <p>
+      <strong>Open question.</strong> Archives with millions of objects:
+      whether <tt class="verbatim">objects</tt> and the feed are paged, and how (#19).
+    </p>
     <h3 id="auto-6"><a id="32-the-storage-root"></a>3.2 The storage root<span style="margin-left: 1em"></span></h3>
     <p>
       The <dfn>storage root</dfn> is an OCFL 1.1 storage root at the URL <tt
@@ -954,9 +954,11 @@
       <li>
         <p>
           <tt class="verbatim">Available</tt>, SHOULD be present: when this document
-          version first became public, anywhere (its date on the service it
-          was imported from, or its deposit, section 4.1, if it was first made
-          public by its deposit);
+          version was first made available, anywhere: its date on the service
+          it was imported from, if it appeared there first, or else its
+          deposit (section 4.1); a version is available from its deposit
+          whether the archive is public or not (section 3.1), and the date
+          does not change when the version is later made public;
         </p>
       </li>
       <li>
@@ -967,9 +969,9 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">Created</tt> (when a version not public at the time was
-          written), <tt class="verbatim">Submitted</tt> and <tt class="verbatim">Accepted</tt>,
-          OPTIONAL;
+          <tt class="verbatim">Created</tt> (when a version deposited later, a
+          manuscript found years after, was written), <tt class="verbatim">Submitted</tt>
+          and <tt class="verbatim">Accepted</tt>, OPTIONAL;
         </p>
       </li>
       <li>
@@ -2219,7 +2221,9 @@ keyLog &lt;the value of keyLog&gt;</pre>
           signature (section 3), read as the <tt class="verbatim">at</tt> parameter of a
           <tt class="verbatim">sheaf:</tt> URI (section 12). They locate copies of the
           member's own line, mirrors included (section 11), never a branch of
-          it (section 9).
+          it (section 9). The base URL of a private archive (section 3.1) is
+          the one at which it is kept, whether or not readers can reach it;
+          readers who have its files map it to where they are (section 12.3).
         </p>
       </li>
     </ul>
@@ -2869,9 +2873,12 @@ keyLog &lt;the value of keyLog&gt;</pre>
       date (section 4.4).
     </p>
     <p>
-      <strong>Open question.</strong> Whether and how drafts are shared before
-      sealing (among co-authors, with a journal under review), and how an
-      archive serves them, which bears on when a work must be sealed (#29).
+      <strong>Sharing before sealing.</strong> A draft is not shared as an
+      object (section 10.1). Co-authors working on a draft share its files by
+      any means outside this specification: a git repository, e-mail, a shared
+      folder. Whatever a recipient must be able to rely on, cite or pin, a
+      submission to a journal above all, is sealed first and shared as a line,
+      privately if need be (section 3.1).
     </p>
     <h2 id="auto-49"><a id="11-copies-and-mirrors"></a>11. Copies and mirrors<span style="margin-left: 1em"></span></h2>
     <p>
@@ -4004,7 +4011,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       Private keys, and other secrets (tokens of external services, the
       secrets of a review), MUST NOT be stored in an archive: in an object, a
       witness folder, a draft, presentation files, or the repository of an
-      archive kept in git. Whatever an archive holds is public and copied.
+      archive kept in git. Whatever an archive holds, a private archive
+      included (section 3.1), may be made public and copied.
     </p>
     <h3 id="auto-75"><a id="155-privacy"></a>15.5 Privacy<span style="margin-left: 1em"></span></h3>
     <p>
@@ -4081,8 +4089,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
-          Private archives and drafts, anonymous referees and the secrets of a
-          review (#29).
+          How a referee's commitment is written as a creator in DataCite, and
+          exactly what is hashed (#63).
         </p>
       </li>
       <li>
@@ -4451,6 +4459,23 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           cannot check; a version deposited without it is the current version
           (section 4.2, appendix D); the item is removed from the open
           questions of section 14.6.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #29: an
+          archive need not be public, and serves all its lines or none; an
+          owner publishes lines kept privately by copying them into a public
+          archive, the same lines (section 3.1); the <tt class="verbatim">at</tt> of a
+          member in a private archive is the base URL at which it is kept
+          (section 8.2); <tt class="verbatim">Available</tt> is the deposit, whether the
+          archive is public or not, unless the version appeared elsewhere
+          first, and <tt class="verbatim">Created</tt> dates a version deposited later
+          (section 4.4); drafts are not shared as objects, and whatever a
+          recipient relies on is sealed (section 10.2); what an archive holds
+          may be made public (section 15.4); the open questions of sections
+          3.1 and 10.2 removed, and that of section 15 on referees pointed to
+          #63 (appendix D).
         </p>
       </li>
       <li>
@@ -5735,6 +5760,26 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           would let the two disagree.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>Why an archive serves all its lines or none.</strong> A
+          discovery document listing only some objects of its storage root
+          could no longer be checked against it, and readers could not tell a
+          line kept back from one lost. Since a copy of a line is the same
+          line, publishing some lines of a private archive is copying them,
+          and pins made privately stay valid (#29).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why <tt class="verbatim">Available</tt> is the deposit, in a private
+          archive too.</strong> Whether a version is public is not in the
+          files, and changes with the archive's access (a paywall, a
+          repository made public); the deposit is fixed, recorded in the
+          inventory, and the same for every archive, and a later date would
+          need a new version only to state it (#29).
+        </p>
+      </li>
     </ul>
     <h3 id="auto-96"><a id="d2-names"></a>D.2 Names<span style="margin-left: 1em"></span></h3>
     <ul>
@@ -6100,6 +6145,14 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           <strong>Why only at the owner's request.</strong> Sealing fixes a
           name and signs for ever; a tool sealing as a side effect would make
           the owner answer for a version it did not choose to share.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why drafts are not shared as objects.</strong> A draft may
+          change, so a recipient could rely on nothing in it; files shared to
+          work together need no format, and whatever must be relied on is
+          sealed (#29).
         </p>
       </li>
     </ul>

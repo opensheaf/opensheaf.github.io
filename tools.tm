@@ -177,7 +177,7 @@
   </verbatim-code>
   </html-div-class>
 
-  Dates follow the specification: <verbatim|-<no-break>-available> (when this version became public; by default today), <verbatim|-<no-break>-created> for a version that was not public at the time, <verbatim|-<no-break>-issued> for the first appearance of the work. A version found later, which belongs earlier in the history, is placed with <verbatim|-<no-break>-after N>. The publication stage is <verbatim|-<no-break>-stage> (<verbatim|AM> for an accepted manuscript, <verbatim|VoR> for the version of record, ...).
+  Dates follow the specification: <verbatim|-<no-break>-available> (when this version was first made available, public or not; by default today, the deposit), <verbatim|-<no-break>-created> for when a version deposited long after was written, <verbatim|-<no-break>-issued> for the first appearance of the work. A version found later, which belongs earlier in the history, is placed with <verbatim|-<no-break>-after N>. The publication stage is <verbatim|-<no-break>-stage> (<verbatim|AM> for an accepted manuscript, <verbatim|VoR> for the version of record, ...).
 
   <subsection*|Notices, corrections and withdrawals><label|notices-corrections-and-withdrawals>
 

@@ -216,9 +216,10 @@ osheaf deposit kpz-uniqueness paper.tex --pdf paper.pdf --changes "Typos correct
   --title "Energy solutions of KPZ are unique" --author "Doe, Jane|Example University"
 ```
 
-Dates follow the specification: `--available` (when this version became
-public; by default today), `--created` for a version that was not public at
-the time, `--issued` for the first appearance of the work. A version found
+Dates follow the specification: `--available` (when this version was
+first made available, public or not; by default today, the deposit),
+`--created` for when a version deposited long after was written, `--issued`
+for the first appearance of the work. A version found
 later, which belongs earlier in the history, is placed with `--after N`.
 The publication stage is `--stage` (`AM` for an accepted manuscript, `VoR`
 for the version of record, ...).

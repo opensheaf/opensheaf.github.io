@@ -179,7 +179,7 @@
 
   <subsection*|6.2 Working branches><label|62-working-branches>
 
-  Git branches other than the published branch are <dfn|working branches>: working space, not branches of an object (section 9 of the specification). They MAY be rewritten, but only drafts may be rebuilt on them: a sealed version is signed by its owner, and is never rebuilt, on any branch, since a new version with other bytes would be a fork of its line (section 7.4 of the specification). Drafts, under the reserved owner <verbatim|draft>, may change freely; sealing makes a new, fixed object from a draft; private states of archives are discussed in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>.
+  Git branches other than the published branch are <dfn|working branches>: working space, not branches of an object (section 9 of the specification). They MAY be rewritten, but only drafts may be rebuilt on them: a sealed version is signed by its owner, and is never rebuilt, on any branch, since a new version with other bytes would be a fork of its line (section 7.4 of the specification). Drafts, under the reserved owner <verbatim|draft>, may change freely; sealing makes a new, fixed object from a draft; an archive kept in a private repository is a private archive (section 3.1 of the specification), whose lines are published by copying them into a public one.
 
   <subsection*|6.3 Merging><label|63-merging>
 
@@ -193,7 +193,7 @@
     <item><strong|The discovery document and the owner catalogues.> Branches that add versions to different objects both change <verbatim|opensheaf.json>, and, when the objects have the same owner, usually that owner's catalogue (section 8.1 of the specification). A merge of these files as text can produce a discovery document that parses but no longer matches the storage root, or a collection version holding the members of only one branch. The <verbatim|-merge> attribute (section 4.1) makes every such change a conflict; the tool resolves it by writing the discovery document again from the storage root, and by making a new version of the collection, never by combining texts.
   </itemize>
 
-  A deposit MAY be proposed by a pull request (or merge request) and published by the maintainer of the archive when it is merged, after the checks of section 10 have passed on it. The version MUST already be signed by its line's owner, with the owner's own keys, before the pull request is merged: a contributor proposes versions of its own lines, or copies of other owners' lines up to their latest signed versions, and continues another owner's line only by a branch under its own owner (section 9 of the specification). The object version is created (its <verbatim|created> date in the inventory) before it is published. (When a version becomes public, and how this is recorded, is discussed in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>.)
+  A deposit MAY be proposed by a pull request (or merge request) and published by the maintainer of the archive when it is merged, after the checks of section 10 have passed on it. The version MUST already be signed by its line's owner, with the owner's own keys, before the pull request is merged: a contributor proposes versions of its own lines, or copies of other owners' lines up to their latest signed versions, and continues another owner's line only by a branch under its own owner (section 9 of the specification). The object version is created (its <verbatim|created> date in the inventory) before it is published. Its <verbatim|Available> date is that of its deposit, not of the merge (section 4.4 of the specification).
 
   <section*|7. Publishing><label|7-publishing>
 
@@ -296,7 +296,7 @@
   <section*|12. Security and privacy><label|12-security-and-privacy>
 
   <\itemize>
-    <item><strong|What is pushed is public.> Everything committed to a public repository, on any branch, including working files and commits later reverted, is published and copied, and is hard to withdraw (section 9). Private drafts and private reviews (issue <hlink|#29|https://github.com/opensheaf/opensheaf.github.io/issues/29>) MUST NOT be pushed to a public repository, even on a branch.
+    <item><strong|What is pushed is public.> Everything committed to a public repository, on any branch, including working files and commits later reverted, is published and copied, and is hard to withdraw (section 9). Private drafts and the lines of a private archive (section 3.1 of the specification), private reviews among them, MUST NOT be pushed to a public repository, even on a branch: a line is published by copying it into the public archive.
 
     <item><strong|Commit metadata> publishes the names and e-mail addresses of authors and committers, and their time zones. Maintainers SHOULD commit with an address meant to be public (on GitHub, a <verbatim|noreply> address). Commits that concern anonymous referees are made in the name of the journal, not of the referee.
 
@@ -315,8 +315,6 @@
     <item><strong|Takedown without rewriting history.> Section 9 makes takedown a rewrite of history. Alternatives: content files outside git, one repository per object, or the deletion mechanism expected in OCFL 2 (section 13.3 of the specification, #32). Archives that hold documents of others (a journal, an institution) need it most.
 
     <item><strong|Portable content paths> (section 4.3): a recommendation here, or a rule of the specification itself, since it matters for any copy made on another system?
-
-    <item><strong|Drafts and publication dates> (sections 6.2 and 6.3): the draft state and the date a version becomes public, in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>.
 
     <item><strong|Scale> (section 8): indexes and the size of git trees for very large archives, in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19> and <hlink|issue #32|https://github.com/opensheaf/opensheaf.github.io/issues/32>.
 
@@ -345,6 +343,8 @@
     <item><strong|0.2 (draft), 20 November 2026:> open question 6 pointed to issue #39 (custodians' copies), issue #13 being closed.
 
     <item><strong|0.2 (draft), 22 November 2026:> the archive's main catalogue replaced by one owner catalogue per owner hosted, as in the specification (#72): a commit updates an owner catalogue, and merges conflict on the catalogue of an owner both branches changed (sections 6.1 and 6.3).
+
+    <item><strong|0.2 (draft), 22 November 2026:> following the specification (#29): an archive in a private repository is a private archive, whose lines are published by copying them, never by pushing them to a public repository (sections 6.2 and 12); a deposit merged from a pull request is <verbatim|Available> from its deposit (section 6.3); open question 4 removed.
   </itemize>
 
 </body>

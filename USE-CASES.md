@@ -462,16 +462,14 @@ it privately, and in the end publishes the accepted version together with as
 much of the review as the participants agree to make public (ideally the
 reports themselves, even if this is not customary today).
 
-- **A private archive.** The specification describes archives that are served
-  (section 3), but the same files, kept in a private repository, can be
-  deposited, pinned and verified in the same way by whoever has them. Whether
-  such an archive conforms, what `at` it gives and how its members are
-  resolved are open questions (issue #29). So is its `Available` date: the
-  specification asks for the date of deposit (section 4.4), as for the early
-  versions found later in [A researcher's own
-  archive](#a-researchers-own-archive), while a version deposited privately
-  becomes public only later; #29 proposes to leave it out and add it, by a
-  description-only version, when the version is made public.
+- **A private archive.** An archive need not be public (section 3.1): the
+  same files, kept in a private repository, are deposited, pinned and
+  verified in the same way by whoever has them. Its members give as `at` the
+  base URL at which it is kept, which readers who have its files map to where
+  they are (sections 8.2 and 12.3). A version is `Available` from its
+  deposit, private or not (section 4.4), and keeps that date when it is made
+  public. Before sealing, the authors share the files of a draft by any means
+  they like; what they send the journal is sealed first (section 10.2).
 - **Priority without disclosure.** The authors can timestamp the signature of
   each object version: they adopt the timestamps extension in their key log,
   listing an RFC 3161 time-stamping authority they trust, or use
@@ -544,26 +542,22 @@ reports themselves, even if this is not customary today).
 - **The record.** When the paper is accepted, the journal keeps the accepted
   version, with the reports, the replies and the decisions, in its archive:
   the complete record of the process, fixed by pins. It publishes only the
-  public part: an accepted copy of the paper (section 9.6) and, with the
-  agreement of those concerned, the reports and replies, listed with the paper
-  in the issue (a selection) or in a public selection of the review. Each
-  report keeps its `Reviews` relation to the submitted version it reviewed,
-  and the accepted copy links its reports with `IsReviewedBy`. Everything else
-  stays private, still verifiable by those who have it.
+  public part, by copying those lines into a public archive, since an archive
+  serves all its lines or none (section 3.1): an accepted copy of the paper
+  (section 9.6) and, with the agreement of those concerned, the reports and
+  replies, listed with the paper in the issue (a selection) or in a public
+  selection of the review. Each report keeps its `Reviews` relation to the
+  submitted version it reviewed, and the accepted copy links its reports with
+  `IsReviewedBy`. Everything else stays private, still verifiable by those who
+  have it.
 
-Open questions for the specification, discussed in issues #29, #39 and #54:
+Open questions for the specification, discussed in issues #39, #54 and #63:
 
-- how a line kept privately becomes public: a copy of it in a public archive
-  is the same line, with the same inventories, so published reports keep
-  pinning versions readers can resolve; what remains open is whether an
-  archive may serve only part of its lines, and how it says so;
-- what `at` a private archive gives, and how verifiers resolve its members;
-- `Available` for versions deposited privately;
 - mirrors made with the owner's agreement, for objects whose licence does not
   allow redistribution (#39, #54);
 - how a commitment is written as a creator in DataCite (for instance a
   `nameIdentifier` with a scheme of its own), with the exact encoding of what
-  is hashed, so that every tool computes the same digest.
+  is hashed, so that every tool computes the same digest (#63).
 
 ### A learning record: a thesis, a project, an essay, an experiment
 
@@ -586,7 +580,7 @@ was done, not only of what was handed in.
   which they keep after leaving, or deposits it directly in an archive of the
   institution; either way the student is its owner, with keys of their own,
   signs every version, and takes the line along on leaving (section 6.5).
-  Until the work is examined the archive is usually private (issue #29). Work
+  Until the work is examined the archive is usually private (section 3.1). Work
   in progress is a draft (section 10), which may be rewritten; handing it in
   seals it: sealing makes a new, fixed object, the line, from the draft.
 - **Dates.** A timestamp of the signature of each version (section 7.2) shows
@@ -675,7 +669,7 @@ journal is a selection of the journal's own documents, or of accepted copies.
 | the authors withdraw the document | it is followed: the withdrawn document stays, with its withdrawal | the vetted revisions stay, and presentations show the authors' withdrawal with the document (section 13.1); the curator decides what else (a notice of its own, a withdrawal of its accepted copy) |
 | the editors correct a vetted version | not applicable | a new revision in the set, or a new version of the accepted copy: the editors' act, in the selection's history |
 | a document is taken down (by law, or to erase personal data, section 15.5) | the object is deleted and a tombstone stays; verifiers report the member as removed, and resolvers keep looking past the tombstone and report copies found elsewhere, which the takedown does not reach (open, #33); the owners' key logs stay, since other objects need them (section 13.2) | the same for the pinned revisions; an accepted copy is a line of the selection's owner, to which the takedown is applied separately; copies kept elsewhere are not reached (open, #33) |
-| a document kept privately is made public | it can be a member once a copy of its line is public: the same line, so earlier pins stay valid (issue #29) | the same; published reports keep pointing to the versions they reviewed |
+| a document kept privately is made public | it can be a member once a copy of its line is public: the same line, so earlier pins stay valid (section 3.1) | the same; published reports keep pointing to the versions they reviewed |
 | a referee agrees to be named | the report's owner (the journal) adds the referee to its creators by a description-only version, which is followed | the vetted revision keeps its pin; the version naming the referee is not vetted, unless a new document version is |
 | the member's archive moves | the pin stays valid; readers follow redirects, the other locations listed in member entries (`at`), or indexes | the same |
 | the member's owner moves to another archive | the line continues there, as the same line; the collection finds it through `at`, once updated, or through indexes | the same; vetted revisions are unchanged |
