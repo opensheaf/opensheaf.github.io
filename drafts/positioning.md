@@ -1,28 +1,29 @@
 # OpenSheaf as an exchange layer for scholarly communication
 
 *Working paper, draft of 15 November 2026, revised for version 0.2 of the
-specification on 22 November 2026. Non-normative: ideas and
-positions, not decisions. Scholarly communication bundles several
-functions: recording, preserving, announcing, filtering, distributing and
-assigning merit. Preprint servers and publishers each hold a bundle of
-them, and the function that authors cannot do without tends to bring the
-others with it. The case for separating them is not new. This paper
-argues that what has been missing is a common form in which the separated
-parties exchange what they handle: documents fixed by digests, named
-independently of where they are kept, and statements about them
-(collections) that are themselves fixed and verifiable. OpenSheaf is meant
-to be that form, an exchange layer: archives kept by anyone below it,
-announcement, filtering, evaluation and preservation built by anyone above
-it, and federations of archives and services joined through it. The paper
-compares it with the infrastructure of scholarly communication and with
-federated and distributed systems, weighs what separating the functions
-costs, and makes proposals.*
+specification on 22 November 2026. Non-normative: ideas and positions, not
+decisions. Scholarly communication bundles several functions: recording,
+preserving, announcing, filtering, distributing and assigning merit.
+Preprint servers and publishers each hold a bundle of them, and the function
+that authors cannot do without tends to bring the others with it. The case
+for separating them is not new. This paper argues that what has been missing
+is a common form in which the separated parties exchange what they handle:
+documents fixed by digests, named independently of where they are kept, and
+statements about them (collections) that are themselves fixed and
+verifiable. OpenSheaf is meant to be that form, an exchange layer: archives
+kept by anyone below it, announcement, filtering, evaluation and
+preservation built by anyone above it, and federations of archives and
+services joined through it. The paper compares it with the infrastructure of
+scholarly communication and with federated and distributed systems, weighs
+what separating the functions costs, and makes proposals.*
 
 > [!NOTE]
 > Revised for [version 0.2](../opensheaf-specification-0.2.md) of the
 > specification, as of 22 November 2026: section numbers of the specification
 > are those of 0.2. Where this paper and the specification differ, the
-> specification holds.
+> specification holds. A section number with a decimal point (6.6), or
+> marked as the specification's, is a section of the specification; a whole
+> number alone is a section of this paper.
 
 ## 1. The functions
 
@@ -74,8 +75,8 @@ The actors of scholarly communication each carry a bundle of functions:
 
 | Actor | Record and preserve | Announce | Filter | Distribute | Merit |
 |---|---|---|---|---|---|
-| arXiv | yes, with dated submissions | yes, the daily listings | moderation only | yes | little |
-| Hexagon | yes, with the provenance of each version | yes, monthly listings and feeds by subject | screening only | yes | none, on purpose |
+| arXiv | yes, with dated submissions | yes, the daily listings | endorsement and moderation, not review | yes | little |
+| Hexagon | yes, with the provenance of each version | yes, listings by month and feeds by subject | screening only | yes | none, on purpose |
 | alphaXiv | arXiv's for most papers, its own for direct submissions | yes, feeds and trending papers | screening, ranking by attention | yes, also to AI agents | attention (views, follows) |
 | A journal and its publisher | the version of record | weak (tables of contents, alerts) | yes, refereeing | yes, often behind a paywall | yes, the main signal |
 | An overlay journal (Discrete Analysis, the journals of Episciences) | relies on arXiv, HAL or Zenodo | weak | yes | relies on the same | yes |
@@ -114,19 +115,19 @@ Three working papers compare OpenSheaf with some of these actors in
 detail: [arxiv.md](arxiv.md), [hexagon.md](hexagon.md) and
 [alphaxiv.md](alphaxiv.md).
 
-**SciPost** (<https://scipost.org>) deserves a word, as the most complete
-of the unbundled filters. It is a not-for-profit foundation in Amsterdam
+**SciPost** (<https://scipost.org>) deserves a word, as the most complete of
+the unbundled filters. It is a not-for-profit foundation in Amsterdam
 (Stichting SciPost), founded by J.-S. Caux and run largely by working
 scientists, with eighteen journals in physics, astronomy, chemistry and a
-few other fields. Its referees' reports are published, anonymous by
-default; submissions come preferably through a preprint server; the
-accepted paper is typeset by SciPost and published with its own DOI under
-CC BY 4.0, and preserved through CLOCKSS. Neither authors nor readers pay:
-SciPost estimates its cost at about 500 euros a paper on average, and asks
-the organisations that benefit for sponsorship, weighing each paper among
-its authors' institutions and funders (its "PubFracs"). Its software is
-open source and its finances public. Section 3 takes it as
-the worked example of a filter.
+few other fields. Its referees' reports are published, anonymous by default;
+submissions come preferably through a preprint server; the accepted paper is
+typeset by SciPost and published with its own DOI under CC BY 4.0, and
+preserved through CLOCKSS. Neither authors nor readers pay: SciPost's
+business model estimates its cost at about 500 euros a paper on average (its
+accounts give more in recent years), and asks the organisations that benefit
+for sponsorship, weighing each paper among its authors' institutions (its
+"PubFracs"). Its software is open source and its finances public. Section 3
+takes it as the worked example of a filter.
 
 ## 3. OpenSheaf as an exchange layer
 
@@ -160,7 +161,7 @@ The layer defines:
   where the files are served (sections 5 to 7 of the specification);
 - how it is **found**: the discovery document of an archive, its indexes
   and its feed of new object versions, and `sheaf:` URIs with their hints
-  (section 12);
+  (specification, section 12);
 - how copies are **checked**: any copy, from anywhere, is valid when its
   bytes match the pin and its versions carry the owner's signatures, so
   that copies can be kept by others;
@@ -202,15 +203,14 @@ from its keeper (an ORCID iD or a domain, section 6.6).
 
 ### Preserve
 
-The layer does not keep anything: it makes copies checkable, so that
-others can keep them. Mirrors keep byte-for-byte copies of whole lines,
-with the key logs their signatures need, so that a copy can be checked
-without the archive it came from (section 6.5); a pin says which copy is
-right. External deposits (Zenodo) and software archives (Software
-Heritage) keep further copies, but a Zenodo record holds the content files
-without the inventory, so it is a witness, not a copy, and resolves no pin
-(section 12.3); whether it could, by uploading the inventory, is open
-(issue #22).
+The layer does not keep anything: it makes copies checkable, so that others
+can keep them. Mirrors keep byte-for-byte copies of whole lines, with the
+key logs their signatures need, so that a copy can be checked without the
+archive it came from (sections 6.5 and 11.1); a pin says which copy is
+right. External deposits (Zenodo) and software archives (Software Heritage)
+keep further copies, but a Zenodo record holds the content files without the
+inventory, so it is a witness, not a copy, and resolves no pin (section
+12.3); whether it could, by uploading the inventory, is open (issue #22).
 
 Preservation is then a service built on the layer, like the others:
 <dfn>federated archiving</dfn>. Institutions (libraries, universities,
@@ -226,46 +226,45 @@ every collection still say which copies are right. Custody is shared
 between the owner, who alone signs the versions of its lines, and the
 federation, which keeps them alive.
 
-The format already has most of the parts. A mirror is a byte-for-byte
-copy of a line, grown only by adding the owner's signed versions (section
-11.1); an archive's list of the lines it holds as copies is a catalogue.
-Since an object's path is `<owner>/<name>/` (section 3.2), lines of
-different owners never clash, and one node can hold the lines of any
-number of leaves in one storage root. Resolution (section 12.3) tries the
-`at` of a `sheaf:` URI or of a collection member, a branch's parent URL,
+The format already has most of the parts. A mirror is a byte-for-byte copy
+of a line, grown only by adding the owner's signed versions (section 11.1);
+an archive's list of the lines it holds as copies is a catalogue. Since, in
+the default layout, an object's path is `<owner>/<name>/` (section 3.2),
+lines of different owners never clash, and one node can hold the lines of
+any number of leaves in one storage root. Resolution (section 12.3) tries
+the `at` of a `sheaf:` URI or of a collection member, a branch's parent URL,
 the indexes it knows and its user's configuration; a custodian may keep
-indexes of many archives at an address of its own (section 12.5). What
-remains open:
+indexes of many archives at an address of its own (section 12.5).
+
+Two questions are settled. An archive that keeps a mirror is responsible
+for having the right to redistribute it, by the licences of the versions,
+by the agreement of the rights holders, or by law; the format does not
+judge it, and tools may warn when they know no licence that allows it
+(section 11.2, issue #34). A rule that would have allowed mirrors only of
+lines under one standard licence was considered and not adopted. And a
+tombstone speaks for its archive only: copies elsewhere do not follow a
+takedown by themselves, each archive answering for what it serves, and
+resolution goes on to them (section 13.3, issues #33 and #66). A
+federation that must remove content removes it at each node; an owner who
+wants every copy to show that a work is no longer valid withdraws it, a
+signed version that copies follow. What remains open:
 
 - **Finding the network when the leaf is gone.** The leaf's discovery
-  document and indexes disappear with it, and a member gives locations
-  only if its curator recorded them. A federation needs its own way to be
-  asked: indexes kept for many archives, found by a registry, a
-  well-known address per network, or a distributed hash table (section
-  5). Who keeps such indexes, and how resolvers find them, is open (issue
-  #20).
-- **What may be copied.** An archive that keeps a mirror is responsible
-  for having the right to redistribute it, by the licences of the
-  versions, by the agreement of the rights holders, or by law; the format
-  does not judge it, and tools may warn when they know no licence that
-  allows it (section 11.2, issue #34). A rule that would have allowed
-  mirrors only of lines under one standard licence was considered and not
-  adopted.
+  document and indexes disappear with it, and a member's `at` gives only the
+  locations its curator recorded, often the leaf alone. A federation needs
+  its own way to be asked: indexes kept for many archives, found by a
+  registry, a well-known address per network, or a distributed hash table
+  (section 5). Who keeps such indexes, and how resolvers find them, is open
+  (issue #20).
 - **Copies short of the whole line.** Licences belong to versions, but a
-  mirror copies a line up to its latest signed version. Whether a
-  custodian may stop at a pinned version, keeping exactly what it pins or
-  what it has the right to redistribute, and how copying by agreement is
-  recorded, is open (issue #39); so is what a custodian promises to keep
-  (issue #54). What may not be served can still be kept as a dark copy,
-  under an agreement with the owner, released only after a trigger such
-  as the leaf being gone for good, as CLOCKSS does for journals: an
-  agreement of the federation, not a state of the format.
-- **Takedowns.** A tombstone speaks for its archive only: copies elsewhere
-  do not follow a takedown by themselves, each archive answering for what
-  it serves, and resolution goes on to them (section 13.3, issues #33 and
-  #66). A federation that must remove content removes it at each node; an
-  owner who wants every copy to show that a work is no longer valid
-  withdraws it, a signed version that copies follow.
+  mirror copies a line up to its latest signed version. Whether a custodian
+  may stop at a pinned version, keeping exactly what it pins or what it has
+  the right to redistribute, and how copying by agreement is recorded, is
+  open (issue #39); so is what a custodian promises to keep (issue #54).
+  What may not be served can still be kept as a dark copy, under an
+  agreement with the owner, released only after a trigger such as the leaf
+  being gone for good, as CLOCKSS does for journals: an agreement of the
+  federation, not a state of the format.
 
 Federated archiving keeps the rest of the design as it is: the leaves stay
 static files, owners stay the single writers of their lines, and any copy,
@@ -319,7 +318,7 @@ overlay journals of a field a catalogue. Several filters can work on the
 same documents without copying them, and without the authors' archives
 knowing about them: a document never states the collections that include
 it. Who includes or reviews a document is learnt the other way, by
-notices sent to its archive (section 4).
+notifications sent to its archive (section 4).
 
 **SciPost as a worked example.** SciPost (section 2) is already close to
 what a selection describes, and shows what the layer would add:
@@ -341,51 +340,51 @@ what a selection describes, and shows what the layer would add:
   such papers can be kept by any federation.
 
 The words collide here: SciPost Selections is the name of one of its
-journals, a multidisciplinary one for outstanding papers; in OpenSheaf
-terms it too would be a selection, but the name is SciPost's own.
+journals, still in development, which publishes extended abstracts of
+papers that its editorial colleges single out from its flagship journals;
+in OpenSheaf terms it is a selection over SciPost's own journals, but the
+name is SciPost's own.
 
 ### Distribute
 
 Archives are static websites: any web server distributes them, and any
-mirror can stand in. The website profile gives every document a landing page
-that search engines read (Google Scholar); the Zenodo profile gives it a
-DOI; `sheaf:` URIs name lines and pinned versions wherever they are kept,
-and a gateway can turn them into web links (section 12, issue #35); the
-OpenSheaf Explorer reads and verifies any archive in the browser.
-Distribution is the function that needs least from the layer, which only
-asks that files be served byte for byte and readable from other sites.
-Search across archives is not part of the format; like announcement, it is a
-service that needs aggregation.
+mirror can stand in. The website profile gives every line of an owner
+catalogue a landing page that search engines read (Google Scholar); the
+Zenodo profile gives it a DOI; `sheaf:` URIs name lines and pinned versions
+wherever they are kept, and a gateway can turn them into web links
+(specification, section 12, issue #35); the OpenSheaf Explorer reads and
+verifies any archive in the browser. Distribution is the function that needs
+least from the layer, which only asks that files be served byte for byte and
+readable from other sites. Search across archives is not part of the format;
+like announcement, it is a service that needs aggregation.
 
 ### Assign merit
 
-The layer does not count anything. It makes the evidence on which merit
-is assigned explicit and checkable: which selections vetted which
-revision, and when (the versions of each selection); what the referees
-said, when reviews are published as documents of their own; how documents
-relate, through DataCite relations; which owner signed what, and when,
-as the signatures show and timestamps can prove (Record, above). A record of
-this kind is checked from the files, instead of being taken on the word of
-a platform.
+The layer does not count anything. It makes the evidence on which merit is
+assigned explicit and checkable: which selections vetted which revision, and
+when (the versions of each selection); what the referees said, when reviews
+are published as documents of their own; how documents relate, through
+DataCite relations; which owner signed what, as the signatures show, and
+when, as timestamps can prove (Record, above). A record of this kind is
+checked from the files, instead of being taken on the word of a platform.
 
-Two cautions. First, the reverse question (which selections include a
-given document?) cannot be answered from the document: it needs notices
-sent to its archive (section 4) or an index over many archives, which is
-again a service. Crossref's Event Data, which recorded where DOIs were
-mentioned, was such an index for DOIs; its public API was sunset on 23
-April 2026, its historical data kept.
-Second, making evidence easy to collect makes it easy to count; a format
-should not invent metrics, and this one does not.
+Two cautions. First, the reverse question (which selections include a given
+document?) cannot be answered from the document: it needs notifications sent
+to its archive (section 4) or an index over many archives, which is again a
+service. Crossref's Event Data, which recorded where DOIs were mentioned,
+was such an index for DOIs; its public API was sunset on 23 April 2026, its
+historical data kept. Second, making evidence easy to collect makes it easy
+to count; a format should not invent metrics, and this one does not.
 
 ### What the layer leaves out
 
 On purpose:
 
 - search and ranking;
-- the identity of persons: an owner is a keyed identity that names no
-  one, tied to a person only by its keeper (an ORCID iD or a domain) and
-  by what its versions say; authors are named in `creators`, with their
-  ORCID iDs (sections 6.6 and 15.5);
+- the identity of persons: an owner is a keyed identity that names no one,
+  tied to a person only by its keeper (an ORCID iD or a domain), by keys it
+  shares with another owner, and by what its versions say; authors are named
+  in `creators`, with their ORCID iDs (sections 6.6 and 15.5);
 - moderation of announcement channels;
 - payment;
 - the hosting itself.
@@ -482,32 +481,33 @@ static archive can be read, but cannot receive anything.
 
 - **Announcing.** WebSub (W3C, 2018) lets a hub push the updates of a feed
   to its subscribers, so that aggregators learn of new versions without
-  polling. The archive names a hub in its Atom feed, and whatever builds
-  the archive tells the hub at each update; the archive itself stays
-  static. ActivityPub lets an archive or an announcement service be
-  followed (section 5).
-- **Notices between parties.** Linked Data Notifications (W3C, 2017)
-  define an inbox, declared by a resource, to which others post notices
-  about it; Webmention does the same, more simply, for links between web
-  pages. They answer the reverse question that a document cannot answer
-  about itself (which selections include it, who reviewed it) without
+  polling. An archive could name a hub in its Atom feed, and whatever builds
+  the archive would tell the hub at each update; the archive itself stays
+  static. A bridge to ActivityPub would let an archive or an announcement
+  service be followed (section 5).
+- **Notifications between parties.** Linked Data Notifications (W3C, 2017)
+  define an inbox, declared by a resource, to which others post
+  notifications about it; Webmention does the same, more simply, for links
+  between web pages. They answer the reverse question that a document cannot
+  answer about itself (which selections include it, who reviewed it) without
   breaking the rule that a document never states the collections that
-  include it: the selection sends a notice to the document's archive, and
-  the notices are kept outside the objects.
+  include it: the selection sends a notification to the document's archive,
+  and the notifications are kept outside the objects. (They are not the
+  notices of the specification, which an owner adds to its own versions,
+  section 4.2.)
 - **COAR Notify.** The Confederation of Open Access Repositories' protocol,
   COAR Notify (version 1.0.1), builds on Linked Data Notifications and the
   ActivityStreams 2.0 vocabulary to connect repositories with the services
   that review and endorse what they hold.
   - Its patterns include requests (*Request Review*, *Request Endorsement*),
-    acknowledgements (accept, reject), and announcements (*Announce
-    Review*, *Announce Endorsement*, *Announce Relationship*). A
-    repository offers a preprint to a review service, and the service
-    announces the review back, naming the reviewed resource in the
-    notice's `context`.
+    acknowledgements (accept, reject), and announcements (*Announce Review*,
+    *Announce Endorsement*, *Announce Relationship*). A repository offers a
+    preprint to a review service, and the service announces the review back,
+    naming the reviewed resource in the notice's `context`.
   - Repository platforms (DSpace, EPrints, Dataverse), repositories (HAL),
-    preprint servers (bioRxiv, Preprints.org, SciELO Preprints), and
-    review and overlay services (Peer Community In, Episciences,
-    PREreview, Sciety) implement it, as listed on the protocol's site.
+    preprint servers (bioRxiv, Preprints.org, SciELO Preprints), and review
+    and overlay services (Peer Community In, Episciences, PREreview, Sciety)
+    implement it, as listed on the protocol's site.
 
   It is the separation of section 2, already at work between filters and
   archives, and the protocol to follow rather than to reinvent.
@@ -529,15 +529,14 @@ The repository community has made the same argument for separating the
 functions. COAR's Next Generation Repositories (2017) set out a vision of
 repositories as a distributed network with services built on top, and the
 white paper *Pubfair* (Ross-Hellauer, Fecher, Shearer and Rodrigues, 2019)
-made it a framework for open publishing: a modular, open-source
-publishing layer over a distributed network of repositories, which hold
-the research outputs while separate services review, curate and
-disseminate them. Pubfair itself is a conceptual model, not software;
-COAR Notify, launched in 2021 and developed since with dedicated funding,
+made it a framework for open publishing: a modular, open-source publishing
+layer over a distributed network of repositories, which hold the research
+outputs while separate services review, curate and disseminate them. Pubfair
+itself is a conceptual model, not software; COAR Notify, launched in 2021,
 implements part of it, with working cases such as the review of HAL's
-preprints by Episciences journals. A related model, from the
-preprint-review movement and adopted by eLife and Sciety, is now often
-called "publish, review, curate".
+preprints by Episciences journals. A related model, from the preprint-review
+movement and adopted by eLife and Sciety, is now often called "publish,
+review, curate".
 
 OpenSheaf agrees with this model and differs in what it assumes about the
 archives:
@@ -619,23 +618,23 @@ application views and custom feeds build what readers see from that
 stream. Identity is a decentralised identifier (DID), portable across
 hosts.
 
-- **Similar.** Of all these systems, this is the closest in architecture.
-  A user's repository is an archive; a relay is an aggregator of feeds; a
+- **Similar.** Of all these systems, this is the closest in architecture. A
+  user's repository is an archive; a relay is an aggregator of feeds; a
   custom feed is a filter, built by anyone over the same data. The
   separation of keeping, relaying and presenting is the separation of
   record, announce and filter of section 1.
-- **Different.** An AT repository is a mutable set of small records,
-  signed as a whole at each change; an OpenSheaf archive holds large
-  documents in append-only versions, each fixed by its own inventory.
-  Portable identity is designed in from both. Its main method there,
-  `did:plc`, depends on a directory developed by Bluesky, for which an
-  independent steward, the PLC Organization, a Swiss association, was
-  founded in 2026; an OpenSheaf owner is instead a key log that checks
-  itself from its name, with rotation keys committed in advance, and needs
-  no directory (section 6). The price is that a fork of a key log ends the
-  owner, since nothing can tell which side is the owner's; the working
-  papers [federated-identity.md](federated-identity.md) and
-  [keys-and-forks.md](keys-and-forks.md) compare the two designs.
+- **Different.** An AT repository is a mutable set of small records, signed
+  as a whole at each change; an OpenSheaf archive holds large documents in
+  append-only versions, each fixed by its own inventory. Both design in
+  portable identity. Its main method there, `did:plc`, depends on a
+  directory developed by Bluesky, for which an independent steward, the PLC
+  Organization, a Swiss association, was founded in 2026; an OpenSheaf owner
+  is instead a key log that checks itself from its name, with rotation keys
+  committed in advance, and needs no directory (specification, section 6).
+  The price is that a fork of a key log ends the owner, since nothing can
+  tell which side is the owner's; the working paper
+  [federated-identity.md](federated-identity.md) compares the two designs,
+  and [keys-and-forks.md](keys-and-forks.md) the problems of forks.
 - **To reuse.** The role of the relay, and the idea that feeds are built by
   third parties over a shared stream, describe the announcement and index
   services that the layer needs.
@@ -696,13 +695,12 @@ hashes are SHA-1 in most repositories and its layout is internal to git;
 OpenSheaf uses git as a convenient store and transport, and keeps its
 integrity in OCFL inventories. How to keep an archive in git without git
 changing a byte is set out in [OpenSheaf archives in
-git](../opensheaf-git-0.2.md); whether git's own structures could carry
-the format is the subject of a sibling working paper,
+git](../opensheaf-git-0.2.md); whether git's own structures could carry the
+format is the subject of a sibling working paper,
 [git-as-implementation.md](git-as-implementation.md). A Software Heritage
-snapshot of an archive is a further witness. Radicle, a peer-to-peer
-network for git repositories, is compared in
-[radicle.md](radicle.md), and Matrix, as a channel beside archives, in
-[matrix.md](matrix.md).
+snapshot of an archive is a further witness. Radicle, a peer-to-peer network
+for git repositories, is compared in [radicle.md](radicle.md), and Matrix,
+as a channel beside archives, in [matrix.md](matrix.md).
 
 ### Summary
 
@@ -757,48 +755,48 @@ for mirrors.
 A central service can refuse a submission; an open network cannot stop
 anyone from publishing an archive. Spam, plagiarism, generated papers and
 fake archives created to inflate one another's records will appear as soon
-as there is something to gain. The layer offers some defences: every
-version is fixed and signed, and with timestamps dated, so that copying
-can be shown and priority argued; selections and moderated catalogues are
-acts of owners who sign them, and answer for what they admit through
-their keepers. Works written with or by language models raise the same
-question at a larger scale; how Hexagon records their provenance, and how
-a version could, is discussed in [hexagon.md](hexagon.md). But
-filtering abuse is a function of its own, and falls to announcement
-services and selections, which must moderate, as arXiv's moderators and
-journals' editors do now. Evidence for merit drawn from an open network is
-only as good as the curators it counts.
+as there is something to gain. The layer offers some defences: every version
+is fixed and signed, and with timestamps dated, so that copying can be shown
+and priority argued; selections and moderated catalogues are acts of owners
+who sign them and, when they name a keeper, are tied to someone who answers
+for them. Works written with or by language models raise the same question
+at a larger scale; how Hexagon records their provenance, and how a version
+could, is discussed in [hexagon.md](hexagon.md). But filtering abuse is a
+function of its own, and falls to announcement services and selections,
+which must moderate, as arXiv's moderators and journals' editors do now.
+Evidence for merit drawn from an open network is only as good as the
+curators it counts.
 
 ### Rights, licences and takedowns
 
-Distribution depends on rights. A reference (a pin) needs no permission,
-but an archive that keeps a mirror or an accepted copy redistributes its
-files, and answers for having the right to, by a licence, the agreement
-of the rights holders, or law; the format does not judge it (sections
-9.7 and 11.2). The `agreement` of a version records only that the
-authors agreed to a deposit and its licence; how copying by agreement is
-recorded is open (issue #39). Documents under restrictive licences, such
-as arXiv's default licence, can be recorded and pinned by anyone, but
-copied only where that right exists ([arxiv.md](arxiv.md)). Takedowns are
-harder in a network than in one place: when a document must be removed
-for legal reasons, its archive deletes it and leaves a tombstone, which
-speaks for that archive only; mirrors and external copies answer for
-what they serve, and content that must not be served anywhere is taken
-down at each archive that serves it (section 13.3).
+Distribution depends on rights. A reference (a pin) needs no permission, but
+an archive that keeps a mirror or an accepted copy redistributes its files,
+and answers for having the right to, by a licence, the agreement of the
+rights holders, or law; the format does not judge it (sections 9.7 and
+11.2). The `agreement` of a version records only that the authors agreed to
+a deposit and its licence; how copying by agreement is recorded is open
+(issue #39). Documents under restrictive licences, such as arXiv's default
+licence, can be pinned by anyone and recorded in their authors' own
+archives, but copied only where that right exists ([arxiv.md](arxiv.md)).
+Takedowns are harder in a network than in one place: when a document must be
+removed for legal reasons, its archive deletes it and leaves a tombstone,
+which speaks for that archive only; mirrors and external copies answer for
+what they serve, and content that must not be served anywhere is taken down
+at each archive that serves it (section 13.3).
 
 ### Anonymity and review
 
 Merit rests in part on peer review, and peer review usually rests on
-anonymity: referees are not named to authors, and submissions are not
-public before acceptance. A network of public archives fits public
-records better than confidential ones. The specification now allows
-private archives: an archive need not be public, serves all its lines or
-none, and publishes a line by copying it into a public archive, with the
-same inventories and signatures, so that pins made in private stay valid
-(section 3.1); drafts are never shared as objects (section 10). Anonymous
-referees, anonymous authors, and opening the record later are still open
-(issue #63); until they are settled, a journal can keep its review
-process where it is today and publish its decisions as selections.
+anonymity: referees are not named to authors, and submissions are not public
+before acceptance. A network of public archives fits public records better
+than confidential ones. The specification allows private archives: an
+archive need not be public, serves all its lines or none, and publishes a
+line by copying it into a public archive, with the same inventories and
+signatures, so that pins made in private stay valid (section 3.1); drafts
+are never shared as objects (specification, section 10). Anonymous referees,
+anonymous authors, and opening the record later are still open (issue #63);
+until they are settled, a journal can keep its review process where it is
+today and publish its decisions as selections.
 
 ## 7. Proposals and open questions
 
@@ -815,9 +813,8 @@ reader, or a verifier, can then ask any node for an object whose archive
 is unreachable, and the network answers with copies that the pins check.
 
 Integrity is not the difficulty: a pin checks every byte, whichever node
-supplied it. The difficulty is everything a pin does not fix: where
-things are, what is current, what was removed, and whether a key log is
-complete.
+supplied it. The difficulty is everything a pin does not fix: where things
+are, what is current, what was removed, and whether a key log is complete.
 Content is self-certifying; state is not. Among trusted peers, false nodes
 are not a concern, but these remain:
 
@@ -867,7 +864,7 @@ reach: indexes of many archives and a way to find them (issue #20).
 This paper first proposed that authors publish their keys on their ORCID
 records. Version 0.2 took a related path: keys belong to owners, whose key
 logs check themselves, and an owner MAY name a keeper, an ORCID iD or a
-domain, fixed with its owner name, which confirms the link by naming the
+domain, fixed with its owner name, which MAY confirm the link by naming the
 owner in its ORCID record or in a file on its domain (section 6.6). The
 link says who answers for an owner, not who owns its lines, which only its
 keys decide, nor who wrote its documents.
@@ -902,14 +899,14 @@ keys decide, nor who wrote its documents.
   keep the version it published, and review records as documents;
   statements by a journal about its members (volume, acceptance, its DOI,
   retraction) are open (issue #40).
-- **Notices with pins** (section 4). Selections and reviewers notify the
+- **Notifications with pins** (section 4). Selections and reviewers notify the
   archives of the documents they include or review, with COAR Notify,
   giving the pin of what they vetted; archives name an inbox, run
   elsewhere if they are static, through an extension. This builds the
   reverse index from the edge; references and applications in general are
   discussed in issue #21.
 - **Resolvers and gateways.** `sheaf:` URIs and names checked from the
-  content are now in the specification (sections 5 and 12). Still open: a
+  content are in the specification (its sections 5 and 12). Still open: a
   gateway run by the project, and on which domain (issue #35); the
   registration of the scheme with IANA (issue #36); indexes of many
   archives and how resolvers find them, for which a DHT could serve as an
@@ -969,8 +966,10 @@ community.
 - Priem, J. and Hemminger, B. M., *Decoupling the scholarly journal*,
   Frontiers in Computational Neuroscience 6, 2012.
 - Ross-Hellauer, T., Fecher, B., Shearer, K. and Rodrigues, E.,
+  *Pubfair: a distributed framework for open publishing services*,
+  version 2, COAR, 27 November 2019 (first version, September 2019:
   *Pubfair: a framework for sustainable, distributed, open science
-  publishing services*, COAR, 2019 (second version, November 2019).
+  publishing services*).
 - COAR, *Next Generation Repositories*, 2017.
 - arXiv: <https://arxiv.org>.
 - Discrete Analysis, an arXiv overlay journal:
