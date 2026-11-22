@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf archives in git, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 20 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a..."></meta>
+    <meta name="description" content="Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 22 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -32,7 +32,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 20
+      Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 22
       November 2026. How to keep an OpenSheaf archive in a git repository,
       publish it from there and copy it, without git changing a byte of what
       the archive holds. It adds nothing to the format: readers of an archive
@@ -475,8 +475,8 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     <h3 id="auto-15"><a id="61-commits"></a>6.1 Commits<span style="margin-left: 1em"></span></h3>
     <p>
       A commit MAY add any number of object versions. A commit SHOULD hold one
-      act of the archive (a deposit, an import, an update of the main
-      collection, the addition of witnesses), and its message SHOULD name the
+      act of the archive (a deposit, an import, an update of an owner
+      catalogue, the addition of witnesses), and its message SHOULD name the
       object versions it adds (for instance <tt class="verbatim">kpz-details v3:
       document version 2, the published version</tt>).
     </p>
@@ -532,16 +532,17 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       </li>
       <li>
         <p>
-          <strong>The discovery document and the main collection.</strong>
+          <strong>The discovery document and the owner catalogues.</strong>
           Branches that add versions to different objects both change <tt
-          class="verbatim">opensheaf.json</tt>, and usually the main collection. A merge
-          of these files as text can produce a discovery document that parses
-          but no longer matches the storage root, or a collection version
-          holding the members of only one branch. The <tt class="verbatim">-merge</tt>
-          attribute (section 4.1) makes every such change a conflict; the tool
-          resolves it by writing the discovery document again from the storage
-          root, and by making a new version of the collection, never by
-          combining texts.
+          class="verbatim">opensheaf.json</tt>, and, when the objects have the same
+          owner, usually that owner's catalogue (section 8.1 of the
+          specification). A merge of these files as text can produce a
+          discovery document that parses but no longer matches the storage
+          root, or a collection version holding the members of only one
+          branch. The <tt class="verbatim">-merge</tt> attribute (section 4.1) makes
+          every such change a conflict; the tool resolves it by writing the
+          discovery document again from the storage root, and by making a new
+          version of the collection, never by combining texts.
         </p>
       </li>
     </ul>
@@ -1097,6 +1098,15 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
         <p>
           <strong>0.2 (draft), 20 November 2026:</strong> open question 6
           pointed to issue #39 (custodians' copies), issue #13 being closed.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> the archive's main
+          catalogue replaced by one owner catalogue per owner hosted, as in
+          the specification (#72): a commit updates an owner catalogue, and
+          merges conflict on the catalogue of an owner both branches changed
+          (sections 6.1 and 6.3).
         </p>
       </li>
     </ul>

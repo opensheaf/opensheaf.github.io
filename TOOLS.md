@@ -152,8 +152,9 @@ archive.
 
 With `--index texmacs`, the home page is instead a TeXmacs document made
 from a template (`--index-template FILE`), with HTML versions of TeXmacs
-papers in `site/`; the landing pages are the same. `--curated` makes a main
-catalogue that you choose by hand rather than one that lists every paper.
+papers in `site/`; the landing pages are the same. `--curated` makes an
+owner catalogue that you choose by hand rather than one that lists every
+paper.
 
 ## Daily work
 
@@ -259,8 +260,7 @@ osheaf label kpz-copy --unset                       # no label: the page is at p
 ```
 
 The discovery document, the indexes and the website are written again;
-the main catalogue and the featured collection are renamed in
-`osheaf.json` too. The page moves to `paper/<new>/`, and the HTML version
+the featured collection is renamed in `osheaf.json` too. The page moves to `paper/<new>/`, and the HTML version
 of a TeXmacs paper to `site/<new>/<new>.html`, with its images. The
 versions already deposited give the old address in their descriptions,
 and links to it are out in the world, so the old address leads to the
@@ -271,10 +271,20 @@ them with the paper.
 ### Updating the archive and checking it
 
 ```sh
-osheaf collect   # a new version of the main catalogue, listing the latest versions
+osheaf collect   # new versions of the owner catalogues, listing the latest versions
 osheaf index     # rewrite opensheaf.json, the indexes and the website
 osheaf verify    # check everything, as section 14 of the specification asks
 ```
+
+Each owner the archive hosts has an owner catalogue of its own, made when
+the owner is set up (by `osheaf init`, or by `osheaf owner init` for
+another owner in the same archive), which lists its papers in the archive,
+branches included
+(section [8.1](opensheaf-specification-0.2.md#81-catalogues-and-selections)).
+`osheaf collect` gives a new version only to the catalogues whose papers
+changed, each signed by its own owner; `--owner OWNER` takes one owner's
+catalogue alone. The home page presents the catalogues in the order of
+`owners` in `opensheaf.json`.
 
 The website is written again after every command that changes the archive,
 so `osheaf index` is only needed to rewrite everything. `osheaf verify`
@@ -676,7 +686,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 
 | Command | What it does |
 |---|---|
-| `init` | create an archive: `osheaf.json`, storage, owner, main catalogue |
+| `init` | create an archive: `osheaf.json`, storage, owner, its owner catalogue |
 | `deposit LABEL [SOURCE]` | deposit a paper (`--new`) or a new version of it |
 | `notice LABEL` | a notice about a version (`--about N --text TEXT`) |
 | `describe LABEL` | correct the title, abstract, keywords or authors |
@@ -684,7 +694,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `relate LABEL` | link the same work elsewhere (arXiv, DOI) |
 | `withdraw LABEL` | withdraw a paper (`--reason TEXT`); the content stays |
 | `complete LABEL` | add the sources of a version deposited without them |
-| `collect` | a new version of the main catalogue, when needed |
+| `collect` | new versions of the owner catalogues, when needed (`--owner`: one) |
 | `index` | rewrite `opensheaf.json`, the indexes and the website |
 | `verify` | check the archive (`--remote`, `--json`) |
 | `collection new LABEL` | make a collection (`--type`, `--title`) |
@@ -699,7 +709,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `seal DRAFT` | seal a draft as a new paper (`--label LABEL`) |
 | `label LINE LABEL` | give a paper or collection a new label (`--unset`; `--owner OWNER`: the owner object) |
 | `takedown LABEL` | delete an object, leaving a tombstone |
-| `owner init` | make an owner (done by `init --new-owner`) |
+| `owner init` | make an owner (done by `init --new-owner`); in an archive, with its owner catalogue |
 | `owner show` | show the key log |
 | `owner rotate` | add or retire current keys, new rotation keys |
 | `owner expose DID` | declare stolen or leaked keys |

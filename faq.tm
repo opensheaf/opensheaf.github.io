@@ -39,7 +39,7 @@
 
   <section*|Why is there a discovery document (opensheaf.json)?><label|why-is-there-a-discovery-document-opensheafjson>
 
-  Static web servers cannot list folders, so a program visiting an archive could not find its objects. <verbatim|opensheaf.json>, at the archive's address, lists them with their head versions and digests, names the storage root and the main collection, and says which version of the specification the archive follows. It is only a map: everything it says is checked against the storage root.
+  Static web servers cannot list folders, so a program visiting an archive could not find its objects. <verbatim|opensheaf.json>, at the archive's address, lists them with their head versions and digests, names the storage root and the owners it hosts, each with its owner catalogue, and says which version of the specification the archive follows. It is only a map: everything it says is checked against the storage root.
 
   <section*|How are objects identified?><label|how-are-objects-identified>
 
@@ -67,7 +67,7 @@
 
   A <strong|collection> is a statement: a versioned list of pins, made by a curator, over objects kept anywhere. It says which objects, in which versions, go together: an author's papers, an issue of a journal, a reading list. Collections are objects themselves, so they can be pinned, nested and included in other collections, across archives.
 
-  The two are kept apart because an archive changes at every deposit and holds facts that are nobody's claim (which objects it holds, their heads, its tombstones), while a collection changes by the rules its curator set (adding members, following them as they grow, vetting their versions), and each of its versions can be cited and verified as it stood. When an archive's documents should be cited as they stood, that is what its main collection is for: a catalogue of them, pinned like any other. Archives hold copies, each line possibly in several; collections overlay them, any number of views over any copies.
+  The two are kept apart because an archive changes at every deposit and holds facts that are nobody's claim (which objects it holds, their heads, its tombstones), while a collection changes by the rules its curator set (adding members, following them as they grow, vetting their versions), and each of its versions can be cited and verified as it stood. When an owner's documents in an archive should be cited as they stood, that is what its owner catalogue is for: each owner an archive hosts has one there, a catalogue of its own lines, pinned like any other and signed by that owner alone. Archives hold copies, each line possibly in several; collections overlay them, any number of views over any copies.
 
   <section*|What is the difference between a catalogue and a selection?><label|what-is-the-difference-between-a-catalogue-and-a-selection>
 

@@ -82,8 +82,9 @@ archive, [mgubi.org/papers](https://mgubi.org/papers/), is one).
   is the date of their deposit.
 - An erratum is a notice about a version; a retraction is a withdrawal. Both
   are description-only versions: nothing deposited changes.
-- The archive's main collection is a **catalogue** of her own documents,
-  following them: the index shows the current version of each.
+- Her owner catalogue in the archive, made when the archive set her up, is a
+  **catalogue** of her own documents, following them: the index shows the
+  current version of each.
 - DOIs come from the Zenodo profile (appendix A.1): a concept DOI for each
   document and a DOI for each document version. A version deposited out of
   order may be deposited as a separate Zenodo record, and notices are not
@@ -123,7 +124,7 @@ osheaf notice kpz-uniqueness \
 osheaf arxiv fetch downloads --refresh
 osheaf arxiv import downloads --update
 
-# update the main collection and the website, then check everything
+# update her owner catalogue and the website, then check everything
 osheaf collect
 osheaf index
 osheaf verify
@@ -167,11 +168,13 @@ what it publishes is then signed by that many of them.
 A university keeps an archive of its members' work.
 
 - Members may deposit their lines in the institution's archive, as owners with
-  keys of their own: the archive hosts them, and lists them in a catalogue,
-  perhaps with one catalogue per department. The lines stay the members': a
+  keys of their own: the archive hosts them, and each has there an owner
+  catalogue of its own lines, which it alone signs (section 8.1); a catalogue
+  per department is a further collection. The lines stay the members': a
   member who leaves copies her key log and her lines to another archive and
   continues them there (section 6.5). The institution decides which owners it
-  hosts, and lists them in `owners` of its discovery document.
+  hosts, and lists them, each with its catalogue, in `owners` of its
+  discovery document.
 - Or members keep their own archives, and the institution **mirrors** their
   lines: each mirror is a whole copy, every version, with the member's key
   log, kept up to date by copying new versions, and checked by the member's
@@ -302,8 +305,8 @@ osheaf accept https://authors.example.org/ network-discrimination \
 
 # list the issue (issue-7.yaml below): a selection, whose member pins the
 # revisions vetted; update never changes them, it only reports versions
-# not vetted. Name the collection: without a name, sync replaces the main
-# collection.
+# not vetted. The journal's owner catalogue, kept by osheaf collect,
+# lists its accepted copies as lines of its own.
 osheaf collection sync issue-7 --from issue-7.yaml
 ```
 

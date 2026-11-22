@@ -42,7 +42,7 @@
 
     <item>An erratum is a notice about a version; a retraction is a withdrawal. Both are description-only versions: nothing deposited changes.
 
-    <item>The archive's main collection is a <strong|catalogue> of her own documents, following them: the index shows the current version of each.
+    <item>Her owner catalogue in the archive, made when the archive set her up, is a <strong|catalogue> of her own documents, following them: the index shows the current version of each.
 
     <item>DOIs come from the Zenodo profile (appendix A.1): a concept DOI for each document and a DOI for each document version. A version deposited out of order may be deposited as a separate Zenodo record, and notices are not uploaded, since the files of a published Zenodo record are fixed.
   </itemize>
@@ -115,7 +115,7 @@
 
 
 
-    # update the main collection and the website, then check everything
+    # update her owner catalogue and the website, then check everything
 
     osheaf collect
 
@@ -140,7 +140,7 @@
   A university keeps an archive of its members' work.
 
   <\itemize>
-    <item>Members may deposit their lines in the institution's archive, as owners with keys of their own: the archive hosts them, and lists them in a catalogue, perhaps with one catalogue per department. The lines stay the members': a member who leaves copies her key log and her lines to another archive and continues them there (section 6.5). The institution decides which owners it hosts, and lists them in <verbatim|owners> of its discovery document.
+    <item>Members may deposit their lines in the institution's archive, as owners with keys of their own: the archive hosts them, and each has there an owner catalogue of its own lines, which it alone signs (section 8.1); a catalogue per department is a further collection. The lines stay the members': a member who leaves copies her key log and her lines to another archive and continues them there (section 6.5). The institution decides which owners it hosts, and lists them, each with its catalogue, in <verbatim|owners> of its discovery document.
 
     <item>Or members keep their own archives, and the institution <strong|mirrors> their lines: each mirror is a whole copy, every version, with the member's key log, kept up to date by copying new versions, and checked by the member's signatures. Mirroring is allowed only when the licences of all the versions copied allow redistribution (section 11.2). Many papers imported from arXiv carry arXiv's default licence, which does not; the institution then only references them, or asks the authors to deposit openly licensed versions.
 
@@ -251,9 +251,9 @@
 
     # revisions vetted; update never changes them, it only reports versions
 
-    # not vetted. Name the collection: without a name, sync replaces the main
+    # not vetted. The journal's owner catalogue, kept by osheaf collect,
 
-    # collection.
+    # lists its accepted copies as lines of its own.
 
     osheaf collection sync issue-7 -<no-break>-from issue-7.yaml
   </verbatim-code>

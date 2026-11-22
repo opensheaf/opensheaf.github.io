@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf archives in git>
 
-  <notes-abstract|Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 20 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
+  <notes-abstract|Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 22 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.>
 
   <os-alert|warning|Warning.|<strong|Draft for discussion.> This document is a first draft. Its open questions are listed in section 13; none of them is settled.>
 
@@ -171,7 +171,7 @@
 
   <subsection*|6.1 Commits><label|61-commits>
 
-  A commit MAY add any number of object versions. A commit SHOULD hold one act of the archive (a deposit, an import, an update of the main collection, the addition of witnesses), and its message SHOULD name the object versions it adds (for instance <verbatim|kpz-details v3: document version 2, the published version>).
+  A commit MAY add any number of object versions. A commit SHOULD hold one act of the archive (a deposit, an import, an update of an owner catalogue, the addition of witnesses), and its message SHOULD name the object versions it adds (for instance <verbatim|kpz-details v3: document version 2, the published version>).
 
   The author and committer of a commit record who made the commit; the inventory records who deposited each object version (its <verbatim|user>) and when (its <verbatim|created>), and the inventory is authoritative. They may differ: an assistant commits a version deposited by an author.
 
@@ -190,7 +190,7 @@
   <\itemize>
     <item><strong|Versions of the same object.> If both add version <verbatim|v\<less\>N\<gtr\>> of the same draft, the second to be merged MUST be redone by the tool as <verbatim|v\<less\>N+1\<gtr\>>, with a new inventory; it MUST NOT be resolved by editing files. A sealed version is signed when it is made (section 7.1 of the specification), and never rebuilt (section 6.2): two versions <verbatim|v\<less\>N\<gtr\>> of one line with different inventories are a fork of the line, never redone by a merge: only one is published, and the other is reported, or, for a key log, carried by a fork record added after the version published (section 6.3 of the specification); the first version of a key log, computed, is the same on both branches.
 
-    <item><strong|The discovery document and the main collection.> Branches that add versions to different objects both change <verbatim|opensheaf.json>, and usually the main collection. A merge of these files as text can produce a discovery document that parses but no longer matches the storage root, or a collection version holding the members of only one branch. The <verbatim|-merge> attribute (section 4.1) makes every such change a conflict; the tool resolves it by writing the discovery document again from the storage root, and by making a new version of the collection, never by combining texts.
+    <item><strong|The discovery document and the owner catalogues.> Branches that add versions to different objects both change <verbatim|opensheaf.json>, and, when the objects have the same owner, usually that owner's catalogue (section 8.1 of the specification). A merge of these files as text can produce a discovery document that parses but no longer matches the storage root, or a collection version holding the members of only one branch. The <verbatim|-merge> attribute (section 4.1) makes every such change a conflict; the tool resolves it by writing the discovery document again from the storage root, and by making a new version of the collection, never by combining texts.
   </itemize>
 
   A deposit MAY be proposed by a pull request (or merge request) and published by the maintainer of the archive when it is merged, after the checks of section 10 have passed on it. The version MUST already be signed by its line's owner, with the owner's own keys, before the pull request is merged: a contributor proposes versions of its own lines, or copies of other owners' lines up to their latest signed versions, and continues another owner's line only by a branch under its own owner (section 9 of the specification). The object version is created (its <verbatim|created> date in the inventory) before it is published. (When a version becomes public, and how this is recorded, is discussed in <hlink|issue #29|https://github.com/opensheaf/opensheaf.github.io/issues/29>.)
@@ -343,6 +343,8 @@
     <item><strong|0.2 (draft), 20 November 2026:> GitHub Pages sets no <verbatim|Content-Security-Policy>, so it cannot sandbox the files of objects as section 15.3 of the specification recommends (section 7.2).
 
     <item><strong|0.2 (draft), 20 November 2026:> open question 6 pointed to issue #39 (custodians' copies), issue #13 being closed.
+
+    <item><strong|0.2 (draft), 22 November 2026:> the archive's main catalogue replaced by one owner catalogue per owner hosted, as in the specification (#72): a commit updates an owner catalogue, and merges conflict on the catalogue of an owner both branches changed (sections 6.1 and 6.3).
   </itemize>
 
 </body>

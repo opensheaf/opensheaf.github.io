@@ -39,11 +39,6 @@
         "0003-hash-and-id-n-tuple-storage-layout"
       ]
     },
-    "mainCollection": {
-      "type": "string",
-      "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
-      "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
-    },
     "profiles": {
       "type": "array",
       "items": {
@@ -231,11 +226,26 @@
     "owners": {
       "type": "array",
       "items": {
-        "type": "string",
-        "pattern": "^[a-z2-7]{51}[aq]$"
+        "type": "object",
+        "required": [
+          "owner",
+          "catalogue"
+        ],
+        "properties": {
+          "owner": {
+            "type": "string",
+            "pattern": "^[a-z2-7]{51}[aq]$",
+            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
+          },
+          "catalogue": {
+            "type": "string",
+            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
+            "$comment": "the owner catalogue (section 8.1), sheaf:<name>:<owner>"
+          }
+        }
       },
       "uniqueItems": true,
-      "$comment": "the owner names (section 6) of the owners the archive hosts"
+      "$comment": "the owners the archive hosts (sections 3.1, 6), each with its owner catalogue (section 8.1), in the order in which the archive presents them (appendix A.3)"
     },
     "drafts": {
       "type": "array",

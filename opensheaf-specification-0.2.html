@@ -298,12 +298,13 @@
       </li>
     </ul>
     <p>
-      It SHOULD contain <tt class="verbatim">mainCollection</tt>, the identifier of the
-      catalogue of the archive's documents (section 8); <tt class="verbatim">contact</tt>,
+      It SHOULD contain <tt class="verbatim">owners</tt>, the owners it hosts (section
+      6), in the order in which the archive presents them (appendix A.3), each
+      with <tt class="verbatim">owner</tt>, its owner name, and <tt class="verbatim">catalogue</tt>,
+      the identifier of its owner catalogue (section 8.1); <tt class="verbatim">contact</tt>,
       a URI; and <tt class="verbatim">extensions</tt>, the names of the extensions its
-      objects use (section 2). It MAY contain <tt class="verbatim">owners</tt>, the
-      owner names of the owners it hosts (section 6); <tt class="verbatim">drafts</tt>,
-      the drafts it chooses to show, with <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt>
+      objects use (section 2). It MAY contain <tt class="verbatim">drafts</tt>, the
+      drafts it chooses to show, with <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt>
       and <tt class="verbatim">head</tt>, as unfinished work on which nothing may rely
       (section 10); <tt class="verbatim">indexes</tt>, which maps each index kept to the
       length of the prefixes of its files (section 12.5); and <tt class="verbatim">feed</tt>,
@@ -2118,19 +2119,24 @@ keyLog &lt;the value of keyLog&gt;</pre>
       selection of issues).
     </p>
     <p>
-      <strong>An archive's collections.</strong> An archive that makes
-      collections does so as an owner, with a key log like any other (section
-      6). Its <dfn>main catalogue</dfn>, named by <tt class="verbatim">mainCollection</tt>
-      in its discovery document (section 3.1), is a catalogue of the documents
-      of the lines its owners write in the archive, not of the copies it
-      holds; its owners are those that <tt class="verbatim">owners</tt> of the discovery
-      document lists, and when it lists none, which lines are the archive's
-      own is not checked (section 14.6). It lists only such lines, of any of
-      these owners, and need not list all of them: its curator MAY choose. It
-      MAY also keep a catalogue of the lines it holds as copies (section 11).
-      A selection is kept by the owner of the body that vets (a journal, a
-      review journal), which also owns the accepted copies the selection keeps
-      (section 9).
+      <strong>Owner catalogues.</strong> Each owner an archive hosts has there
+      an <dfn>owner catalogue</dfn>: a catalogue of that owner, created when
+      the owner is set up in the archive, and named with the owner in <tt
+      class="verbatim">owners</tt> of the discovery document (section 3.1). It lists the
+      documents of the owner's own lines in the archive, branches of its own
+      included (section 9), never copies of lines (section 11); it need not
+      list all of them: its curator MAY choose. It is a line of its owner like
+      any other, so a change by one owner (a deposit, a new version, a branch)
+      touches that owner's catalogue only, and no owner signs for another.
+      When <tt class="verbatim">owners</tt> is absent, which lines are an owner's own in
+      the archive is not checked (section 14.6). An owner catalogue is not
+      mirrored: a mirror of a line never brings its owner's catalogue (section
+      11). An archive MAY also keep, as one of the owners it hosts, a
+      catalogue of the lines it holds as copies (section 11). An archive that
+      makes other collections does so as an owner too, with a key log like any
+      other (section 6). A selection is kept by the owner of the body that
+      vets (a journal, a review journal), which also owns the accepted copies
+      the selection keeps (section 9).
     </p>
     <h3 id="auto-33"><a id="82-the-member-list-membersjson"></a>8.2 The member list: members.json<span style="margin-left: 1em"></span></h3>
     <p>
@@ -2418,6 +2424,13 @@ keyLog &lt;the value of keyLog&gt;</pre>
           the journal's own DOI, a retraction by the journal) (#40).
         </p>
       </li>
+      <li>
+        <p>
+          Binding an owner catalogue to its archive, keys that an archive
+          requires to create lines there, and a curated selection over the
+          owner catalogues of an archive (#72).
+        </p>
+      </li>
     </ul>
     <h2 id="auto-38"><a id="9-branches-and-accepted-copies"></a>9. Branches and accepted copies<span style="margin-left: 1em"></span></h2>
     <p>
@@ -2430,7 +2443,9 @@ keyLog &lt;the value of keyLog&gt;</pre>
       with its own identifier <tt class="verbatim">sheaf:&lt;name&gt;:&lt;owner&gt;</tt>
       (section 4), holding the branch point and its own versions, never the
       parent's other versions. An originator never owns a branch of its own
-      work (section 5.3).
+      work (section 5.3). A branch is a line of its owner: an archive hosting
+      that owner lists it in that owner's catalogue, never in the catalogue of
+      the parent's owner (section 8.1).
     </p>
     <h3 id="auto-39"><a id="91-the-parent-parent-in-objectjson"></a>9.1 The parent: parent in object.json<span style="margin-left: 1em"></span></h3>
     <p>
@@ -2867,11 +2882,13 @@ keyLog &lt;the value of keyLog&gt;</pre>
     </p>
     <p>
       <strong>Elsewhere.</strong> A mirror may be listed in a catalogue of
-      copies, never in the main catalogue (section 8.1), and located by the
+      copies, never in an owner catalogue (section 8.1), and located by the
       <tt class="verbatim">at</tt> of collection members (section 8.2). A copy of a
       parent's line kept beside a branch is a mirror (section 9.5); an
       accepted copy is a branch, not a mirror (section 9.6). Drafts are never
-      mirrored (section 10.1).
+      mirrored (section 10.1), nor are owner catalogues: a mirror of a line
+      never brings the catalogue of its owner, which lists the owner's lines
+      in the archive that hosts it (section 8.1).
     </p>
     <h3 id="auto-51"><a id="112-rights"></a>11.2 Rights<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3313,9 +3330,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       erase personal data, section 15.5), or a line the archive stops keeping.
       It removes one object: others holding the same files, such as a branch
       holding its parent version (section 9), are taken down on their own. A
-      takedown of a line of the main catalogue SHOULD be followed by a version
-      of the catalogue without it (section 8.1); earlier versions keep their
-      pins, and the member is read there as removed (section 8.5).
+      takedown of a line listed by an owner catalogue SHOULD be followed by a
+      version of that catalogue without it (section 8.1); earlier versions
+      keep their pins, and the member is read there as removed (section 8.5).
     </p>
     <p>
       <strong>Owner objects.</strong> A takedown of a line leaves in place the
@@ -3694,14 +3711,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           <strong>the discovery document</strong> (section 3.1): that <tt
           class="verbatim">objects</tt> lists every object of the storage root except
           drafts, each entry with the values its object gives (<tt class="verbatim">status</tt>
-          as section 13.1 says), with distinct labels; that <tt class="verbatim">mainCollection</tt>
-          names a catalogue it lists and, a breach being a warning, when <tt
-          class="verbatim">owners</tt> is present, that its members are lines of those
-          owners (section 8.1); that <tt class="verbatim">drafts</tt> lists only drafts
-          of the storage root, with their heads; and, a breach being a
-          warning, that <tt class="verbatim">owners</tt> lists only owner objects it
-          holds and <tt class="verbatim">extensions</tt> every extension its objects
-          use;
+          as section 13.1 says), with distinct labels; that no two entries of
+          <tt class="verbatim">owners</tt> have the same <tt class="verbatim">owner</tt> or the
+          same <tt class="verbatim">catalogue</tt>, and that each <tt class="verbatim">catalogue</tt>
+          names a catalogue it lists, of the entry's owner (section 8.1); a
+          breach being a warning, that <tt class="verbatim">owners</tt> names only owner
+          objects it holds, and that the members of each owner catalogue are
+          documents of lines of its owner that the storage root holds (section
+          8.1); that <tt class="verbatim">drafts</tt> lists only drafts of the storage
+          root, with their heads; and, a breach being a warning, that <tt
+          class="verbatim">extensions</tt> lists every extension its objects use;
         </p>
       </li>
       <li>
@@ -4365,6 +4384,26 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           appendix D).
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #72: each
+          owner an archive hosts has an owner catalogue there, a catalogue of
+          that owner created when the owner is set up, listing the documents
+          of its own lines in the archive, branches included, and changed by
+          that owner only; it replaces the archive's main catalogue, and is
+          never mirrored (sections 8.1, 9 and 11.1); <tt class="verbatim">owners</tt> of
+          the discovery document becomes recommended and names each owner with
+          its catalogue, in the order of presentation, and <tt class="verbatim">mainCollection</tt>
+          is dropped (section 3.1, appendix B); the index page presents the
+          owner catalogues in that order (appendix A.3); verifiers check <tt
+          class="verbatim">owners</tt> and the owner catalogues (section 14.6); a
+          takedown is followed by a version of the owner catalogue that listed
+          the line (section 13.2); appendix C and the rationale (appendix D)
+          updated. Binding a catalogue to its archive, keys an archive
+          requires to create lines, and an archive-wide selection over the
+          owner catalogues are left open (#72).
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -4539,29 +4578,30 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <ul>
       <li>
         <p>
-          <strong>Index.</strong> An index page presents the latest signed
-          version (section 7.3) of the main catalogue (section 8.1), in its
-          order, possibly over several pages; other collections MAY have pages
-          of their own. When the main catalogue has no signed version (its
-          versions contested after an exposure, or unchecked), the index page
-          presents no members and says why, until its owner, if not ended,
-          signs a version again (section 7.1). A flattened list, not
-          authoritative, for programs that do not read OCFL MAY be published
-          as <tt class="verbatim">catalog.json</tt>.
+          <strong>Index.</strong> An index page presents the owner catalogues
+          (section 8.1) of the owners the archive hosts, in the order of <tt
+          class="verbatim">owners</tt> (section 3.1): of each, the latest signed version
+          (section 7.3), in its order, possibly over several pages; other
+          collections MAY have pages of their own. When an owner catalogue has
+          no signed version (its versions contested after an exposure, or
+          unchecked), the index page presents none of its members and says
+          why, until its owner, if not ended, signs a version again (section
+          7.1). A flattened list, not authoritative, for programs that do not
+          read OCFL MAY be published as <tt class="verbatim">catalog.json</tt>.
         </p>
       </li>
       <li>
         <p>
-          <strong>Landing pages.</strong> Each line of the main catalogue has
-          one landing page, at an address of the archive's choice, distinct
-          for each line and not an identifier (from its label, section 3.1, or
-          for a line without one from its name, and its owner name when the
-          archive holds several lines of that name), for its current version
-          (section 4.2), giving the full <tt class="verbatim">sheaf:</tt> URI of the
-          line in canonical form (sections 12.1 and 12.2) and every signed
-          document version in the order of the history, each with its external
-          labels, stage, change note, notices, renditions, sources and DOI,
-          and the withdrawal if any (sections 4.2, 4.3 and 13.1).
+          <strong>Landing pages.</strong> Each line listed by an owner
+          catalogue has one landing page, at an address of the archive's
+          choice, distinct for each line and not an identifier (from its
+          label, section 3.1, or for a line without one from its name, and its
+          owner name when the archive holds several lines of that name), for
+          its current version (section 4.2), giving the full <tt class="verbatim">sheaf:</tt>
+          URI of the line in canonical form (sections 12.1 and 12.2) and every
+          signed document version in the order of the history, each with its
+          external labels, stage, change note, notices, renditions, sources
+          and DOI, and the withdrawal if any (sections 4.2, 4.3 and 13.1).
         </p>
       </li>
       <li>
@@ -4710,7 +4750,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <p>
       The examples follow one paper of the first archive (section 1) through
       an illustrative history: its owner is created, the paper is sealed and
-      revised, kept in the archive's main catalogue, and accepted by a
+      revised, kept in its owner's catalogue in the archive, and accepted by a
       journal, which keeps an accepted copy and lists it in an issue. The
       title and the authors are those of the archive; the dates, the journal
       and its domain are invented, and the DOIs (with Zenodo's prefix) and the
@@ -4773,13 +4813,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           <strong>Follow it in a catalogue</strong> (sections 8.1 to 8.3). The
-          archive's main catalogue, a collection of the same owner, pins each
-          paper by its object version and inventory digest; with <tt class="verbatim">follow</tt>
-          <tt class="verbatim">latest</tt>, its tool writes a new document version of
-          the catalogue pinning <tt class="verbatim">v2</tt> once <tt class="verbatim">v2</tt> is
-          signed (section C.4). A journal that accepts the paper keeps an
-          accepted copy, a branch of its own, and lists it in a selection
-          (sections C.4 and C.5).
+          owner catalogue, a collection of the same owner made when the
+          archive set the owner up, pins each paper by its object version and
+          inventory digest; with <tt class="verbatim">follow</tt> <tt class="verbatim">latest</tt>,
+          its tool writes a new document version of the catalogue pinning <tt
+          class="verbatim">v2</tt> once <tt class="verbatim">v2</tt> is signed (section C.4). A
+          journal that accepts the paper keeps an accepted copy, a branch of
+          its own, and lists it in a selection (sections C.4 and C.5).
         </p>
       </li>
     </ol>
@@ -5112,10 +5152,11 @@ keyLog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673
     </p>
     <h3 id="auto-89"><a id="c4-collections"></a>C.4 Collections<span style="margin-left: 1em"></span></h3>
     <p>
-      The <tt class="verbatim">members.json</tt> of the second version of the archive's
-      main catalogue (section 8.3), owned by the authors' owner. The member is
-      followed, so that when version 2 of the paper was signed, the
-      catalogue's tool wrote this version, pinning it in place of version 1:
+      The <tt class="verbatim">members.json</tt> of the second version of the owner
+      catalogue of the authors' owner in their archive (sections 8.1 and 8.3).
+      The member is followed, so that when version 2 of the paper was signed,
+      the catalogue's tool wrote this version, pinning it in place of version
+      1:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -5246,7 +5287,7 @@ ocfl/
         v1/signature-w7htq42yt7tllefi.json.3mpvi64zr26ezfvh.tsr
         v2/signature-4hz7zgsiazl6hx7i.json
         v2/signature-4hz7zgsiazl6hx7i.json.5xjh5tk24wrufjrz.tsr
-    kdye5s4igsyn6i6c46lqhercobkiv5avkepkdy6hcs6wr2pakxeq/      the main catalogue</pre>
+    kdye5s4igsyn6i6c46lqhercobkiv5avkepkdy6hcs6wr2pakxeq/      the owner catalogue</pre>
     </div>
     <p>
       In the hashed layout, the paper would be at <tt class="verbatim">946/75e/b2e/sheaf%3azzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q%3a56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjua-94675eb2e27de7146a912666db928784432a4c206a6b390da5a0ed7d15975580/</tt>:
@@ -5255,9 +5296,10 @@ ocfl/
     </p>
     <p>
       The discovery document (section 3.1). The archive hosts one owner, whose
-      key log, paper and catalogue it lists, with labels for the website; a
-      second paper of the owner was taken down, and its tombstone (section
-      13.3) keeps its line taken:
+      key log, paper and catalogue it lists, with labels for the website, and
+      which <tt class="verbatim">owners</tt> names with its catalogue; a second paper of
+      the owner was taken down, and its tombstone (section 13.3) keeps its
+      line taken:
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -5269,10 +5311,12 @@ ocfl/
   &quot;contact&quot;: &quot;https://orcid.org/0000-0002-1234-5677&quot;,
   &quot;storageRoot&quot;: &quot;ocfl/&quot;,
   &quot;storageLayout&quot;: &quot;opensheaf-owner-name-storage-layout&quot;,
-  &quot;mainCollection&quot;: &quot;sheaf:kdye5s4igsyn6i6c46lqhercobkiv5avkepkdy6hcs6wr2pakxeq:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot;,
   &quot;profiles&quot;: [ &quot;zenodo&quot;, &quot;texmacs&quot;, &quot;website&quot; ],
   &quot;extensions&quot;: [ &quot;https://opensheaf.org/opensheaf-timestamps-0.2&quot; ],
-  &quot;owners&quot;: [ &quot;56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot; ],
+  &quot;owners&quot;: [
+    { &quot;owner&quot;: &quot;56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot;,
+      &quot;catalogue&quot;: &quot;sheaf:kdye5s4igsyn6i6c46lqhercobkiv5avkepkdy6hcs6wr2pakxeq:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot; }
+  ],
   &quot;indexes&quot;: { &quot;names&quot;: 2, &quot;owners&quot;: 2, &quot;sha512&quot;: 2 },
   &quot;objects&quot;: [
     { &quot;id&quot;: &quot;sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa&quot;,
@@ -5825,6 +5869,17 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           <strong>Why <tt class="verbatim">follow</tt> is a setting.</strong> A
           collection version states exactly what it contains; a floating
           &quot;latest&quot; would change its meaning over time.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why one catalogue per owner.</strong> A catalogue is a line,
+          signed by its owner. One catalogue for an archive hosting several
+          owners would need one owner's keys for every other owner's deposit,
+          or an archive that signs for its owners; with one catalogue each,
+          every owner signs only its own lines, a branch is listed by the
+          owner who made it, and an archive adding an owner changes nothing of
+          the others (#72).
         </p>
       </li>
       <li>

@@ -66,9 +66,11 @@ questions are listed at the end of the sections they concern.
 - **Discovery document** (3.1): a map, never a witness: `format`,
   `specification`, `name`, `storageRoot`, `storageLayout`, `profiles`,
   `objects` (`id`, `kind`, `name`, `owner`, `head`, `inventorySha512`,
-  `status`, optional `label`; no drafts); SHOULD `mainCollection`,
-  `contact`, `extensions`; MAY `owners`, `drafts`, `indexes`, `feed`; MUST
-  `tombstones` once an object is taken down. **Labels**: readable, local,
+  `status`, optional `label`; no drafts); SHOULD `owners` (each hosted
+  owner with `owner` and `catalogue`, its owner catalogue, in the order of
+  presentation), `contact`, `extensions`; MAY `drafts`, `indexes`, `feed`;
+  MUST `tombstones` once an object is taken down; no `mainCollection`
+  (#72). **Labels**: readable, local,
   not identifiers.
 - **Storage root and layouts** (3.2): the owner-name layout
   (`<owner>/<name>/`, drafts at `draft/<id>/`, the key log at
@@ -206,6 +208,12 @@ questions are listed at the end of the sections they concern.
   `documentVersion`, `version`, `inventorySha512`); members name `kind`,
   `name`, `owner`, `at` (equal hints); member statuses verified, mismatch,
   contested, unchecked, not a version, unavailable, removed (8.5).
+  **Owner catalogues** (8.1, #72 settled): each owner an archive hosts has
+  there a catalogue of its own, created when the owner is set up, listing
+  the documents of its own lines in the archive (branches included, never
+  copies), possibly curated, signed by that owner only; never mirrored; the
+  index page presents them in the order of `owners` (A.3). No main
+  catalogue of the archive.
 - **Branches** (9): a line of another owner from a signed parent version,
   declared in `parent`; evidence in the folder `parent/`
   (`parent/inventory.json`, `parent/object.json`, `parent/signatures/`,

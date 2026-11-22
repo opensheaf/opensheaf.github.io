@@ -254,7 +254,7 @@ osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://j
       With <tt class="verbatim">--index texmacs</tt>, the home page is instead a TeXmacs
       document made from a template (<tt class="verbatim">--index-template FILE</tt>),
       with HTML versions of TeXmacs papers in <tt class="verbatim">site/</tt>; the
-      landing pages are the same. <tt class="verbatim">--curated</tt> makes a main
+      landing pages are the same. <tt class="verbatim">--curated</tt> makes an owner
       catalogue that you choose by hand rather than one that lists every
       paper.
     </p>
@@ -385,8 +385,8 @@ osheaf label kpz-copy --unset                       # no label: the page is at p
     </div>
     <p>
       The discovery document, the indexes and the website are written again;
-      the main catalogue and the featured collection are renamed in <tt class="verbatim">osheaf.json</tt>
-      too. The page moves to <tt class="verbatim">paper/&lt;new&gt;/</tt>, and the HTML
+      the featured collection is renamed in <tt class="verbatim">osheaf.json</tt> too.
+      The page moves to <tt class="verbatim">paper/&lt;new&gt;/</tt>, and the HTML
       version of a TeXmacs paper to <tt class="verbatim">site/&lt;new&gt;/&lt;new&gt;.html</tt>,
       with its images. The versions already deposited give the old address in
       their descriptions, and links to it are out in the world, so the old
@@ -398,11 +398,22 @@ osheaf label kpz-copy --unset                       # no label: the page is at p
     <div class="language-bash">
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
-osheaf collect   # a new version of the main catalogue, listing the latest versions
+osheaf collect   # new versions of the owner catalogues, listing the latest versions
 osheaf index     # rewrite opensheaf.json, the indexes and the website
 osheaf verify    # check everything, as section 14 of the specification asks</pre>
       </div>
     </div>
+    <p>
+      Each owner the archive hosts has an owner catalogue of its own, made
+      when the owner is set up (by <tt class="verbatim">osheaf init</tt>, or by <tt
+      class="verbatim">osheaf owner init</tt> for another owner in the same archive),
+      which lists its papers in the archive, branches included (section <a
+      href="opensheaf-specification-0.2.html#81-catalogues-and-selections">8.1</a>). <tt class="verbatim">osheaf collect</tt> gives a new version only
+      to the catalogues whose papers changed, each signed by its own owner;
+      <tt class="verbatim">--owner OWNER</tt> takes one owner's catalogue alone. The
+      home page presents the catalogues in the order of <tt class="verbatim">owners</tt>
+      in <tt class="verbatim">opensheaf.json</tt>.
+    </p>
     <p>
       The website is written again after every command that changes the
       archive, so <tt class="verbatim">osheaf index</tt> is only needed to rewrite
@@ -902,7 +913,7 @@ osheaf zenodo kpz-uniqueness --production</pre>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">init</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">create an archive: <tt class="verbatim">osheaf.json</tt>, storage,
-          owner, main catalogue</td>
+          owner, its owner catalogue</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">deposit LABEL [SOURCE]</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">deposit a paper (<tt class="verbatim">--new</tt>) or a new version
@@ -929,7 +940,8 @@ osheaf zenodo kpz-uniqueness --production</pre>
           <td style="border-right: 1px solid; border-bottom: 1px solid">add the sources of a version deposited without them</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">collect</tt></td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">a new version of the main catalogue, when needed</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">new versions of the owner catalogues, when needed (<tt
+          class="verbatim">--owner</tt>: one)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">index</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">rewrite <tt class="verbatim">opensheaf.json</tt>, the indexes and
@@ -980,8 +992,8 @@ osheaf zenodo kpz-uniqueness --production</pre>
           <td style="border-right: 1px solid; border-bottom: 1px solid">delete an object, leaving a tombstone</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner init</tt></td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">make an owner (done by <tt class="verbatim">init
-          --new-owner</tt>)</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">make an owner (done by <tt class="verbatim">init --new-owner</tt>);
+          in an archive, with its owner catalogue</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner show</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">show the key log</td>
