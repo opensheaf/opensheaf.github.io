@@ -241,10 +241,11 @@ its `--text` is required, and `--file` adds a full statement, such as an
 erratum. `describe` corrects the title, the abstract, the keywords or the
 authors. `relicense` records a new licence with the authors' agreement;
 its `--rights` takes the same values as that of `deposit`. `relate` links the same work elsewhere (on
-arXiv, or by a DOI). `withdraw` withdraws the paper: the content stays, no
-new versions are added, and every page that shows it shows the withdrawal
-(section [13](opensheaf-specification-0.2.md#13-withdrawal-takedown-and-tombstones));
-its `--reason` is required.
+arXiv, or by a DOI). `withdraw` withdraws the versions of the paper
+deposited so far: the content stays, and every page that shows them shows
+the withdrawal; its `--reason` is required. A later `deposit` of a new
+version reinstates the paper, while the versions withdrawn stay withdrawn
+(section [13](opensheaf-specification-0.2.md#13-withdrawal-takedown-and-tombstones)).
 
 ### Changing a label
 

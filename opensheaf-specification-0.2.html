@@ -3320,22 +3320,49 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <h3 id="auto-60"><a id="131-withdrawal"></a>13.1 Withdrawal<span style="margin-left: 1em"></span></h3>
     <p>
       A document or a collection is <dfn>withdrawn</dfn> by a description-only
-      version (section 4.2) whose <tt class="verbatim">object.json</tt> has <tt class="verbatim">status</tt>
-      <tt class="verbatim">withdrawn</tt> and <tt class="verbatim">withdrawal</tt> (section 4.3),
-      and whose <tt class="verbatim">datacite.json</tt> has <tt class="verbatim">withdrawal.date</tt>
-      as <tt class="verbatim">Withdrawn</tt> (section 4.4). The status is the line's,
-      read, as its history is, from its latest signed version (section 7.3),
-      whatever document version that holds; a copy without a signed version
-      has no status as a line, and its discovery document gives that of its
-      head (section 3.1); a single document version is retracted by a notice
-      (section 4.2). A branch or an accepted copy is withdrawn only by its own
-      owner (section 9).
+      version (section 4.2), the <dfn>withdrawal</dfn>, whose <tt class="verbatim">object.json</tt>
+      has <tt class="verbatim">status</tt> <tt class="verbatim">withdrawn</tt> and <tt class="verbatim">withdrawal</tt>
+      (section 4.3), and whose <tt class="verbatim">datacite.json</tt> has <tt class="verbatim">withdrawal.date</tt>
+      as <tt class="verbatim">Withdrawn</tt> (section 4.4). A withdrawal holds the files
+      of an existing document version, unchanged (tools hold the current one),
+      and adds no document version: it changes the meaning of the versions
+      before it, which stay inspectable. It withdraws every document version
+      deposited before it, in the order of deposit (section 4.1): a version
+      found later and placed earlier by <tt class="verbatim">history</tt> is withdrawn
+      if it was deposited before the withdrawal. A single document version is
+      retracted by a notice instead (section 4.2).
     </p>
     <p>
-      A withdrawn line keeps every version, signed, pinned and copied as
-      before. Presentations showing a version of a line they know to be
-      withdrawn MUST show the withdrawal, also when the version shown is
-      earlier.
+      <strong>Until a new document version.</strong> Every later
+      description-only version (a notice, a DOI) keeps <tt class="verbatim">status</tt>
+      <tt class="verbatim">withdrawn</tt> and the same <tt class="verbatim">withdrawal</tt>. A new
+      document version <dfn>reinstates</dfn> the line: it has <tt class="verbatim">status</tt>
+      <tt class="verbatim">active</tt> and no <tt class="verbatim">withdrawal</tt>, and its change
+      note SHOULD say why the work is back. The document versions withdrawn
+      stay withdrawn; those deposited after the reinstatement are not, until a
+      later withdrawal, which withdraws them in turn. A new document version
+      is never itself a withdrawal. These rules are read from the object
+      versions of the line, every one of which stays: a document version is
+      withdrawn when an object version after the one that first held it is a
+      withdrawal, which gives its date and reason.
+    </p>
+    <p>
+      <strong>Status.</strong> The status of the line is that of its latest
+      signed version (section 7.3), whatever document version that holds: <tt
+      class="verbatim">withdrawn</tt> from a withdrawal until a reinstatement. A copy
+      without a signed version has no status as a line, and its discovery
+      document gives that of its head (section 3.1). A branch or an accepted
+      copy is withdrawn only by its own owner (section 9). An ended owner
+      signs nothing, and so withdraws nothing (section 6.3), nor does an owner
+      that has lost its keys: an owner withdraws its lines before it ends.
+    </p>
+    <p>
+      A withdrawn document version keeps every object version, signed, pinned
+      and copied as before. Presentations showing a document version they know
+      to be withdrawn MUST show it as withdrawn, with the date and reason of
+      the withdrawal, also when the line has been reinstated since;
+      presentations showing a version of a line they know to be withdrawn MUST
+      show the withdrawal, also when the version shown is earlier.
     </p>
     <h3 id="auto-61"><a id="132-takedown"></a>13.2 Takedown<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3440,15 +3467,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           taken down, so that a pin of a removed version is told from a pin
           that never named one; meanwhile the archive's <tt class="verbatim">sha512/</tt>
           index keeps them (section 12.5; #33).
-        </p>
-      </li>
-      <li>
-        <p>
-          Whether a withdrawn line takes new document versions; whether and
-          how it is reinstated; whether <tt class="verbatim">withdrawal</tt> stays in
-          later versions; what a verifier reports for a pin of an earlier
-          version of a withdrawn line; and how the line of an ended owner,
-          which signs nothing, is withdrawn (#25).
         </p>
       </li>
       <li>
@@ -3660,9 +3678,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           every version and between versions (numbering, new versions, the
           fields that belong to a document version and <tt class="verbatim">external</tt>,
           completion, <tt class="verbatim">history</tt>, notices kept in order and the
-          notices they replace), and, as a warning, a notice dated after its
-          deposit, for collections as for documents, as far as the files
-          decide them;
+          notices they replace, a withdrawal kept until a new document version
+          reinstates the line and never made by one, section 13.1), and, as a
+          warning, a notice dated after its deposit, for collections as for
+          documents, as far as the files decide them;
         </p>
       </li>
       <li>
@@ -3719,7 +3738,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       9.6); several selections of one owner listing the same accepted copy are
       no breach. A member that is not a version is an error, and so is a
       mismatch of a copy held in the archive; any other status but verified,
-      contested included, is a warning.
+      contested included, is a warning. A member whose document version pinned
+      (in a selection, a revision) is withdrawn, as the verifier reads the
+      member's line, is reported so, as a result, also when the line has been
+      reinstated since (section 13.1).
     </p>
     <h3 id="auto-69"><a id="146-the-archive-as-a-whole"></a>14.6 The archive as a whole<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3795,12 +3817,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           How a verifier tells a licence from a rights statement in <tt class="verbatim">rightsList</tt>
           (#50), and which licences allow a mirror (#34), which is therefore
           not checked.
-        </p>
-      </li>
-      <li>
-        <p>
-          What a verifier reports for a pin of an earlier version of a
-          withdrawn line (#25).
         </p>
       </li>
     </ul>
@@ -4360,6 +4376,19 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           fork, and verifiers report the key-log version they judged against
           (section 6.5); weighted thresholds (#69) and witnesses of the
           versions of key logs seen first (#70) are left for after 0.2.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #25: a
+          withdrawal withdraws every document version deposited before it, and
+          later description-only versions keep it; a new document version
+          reinstates the line, the versions withdrawn staying withdrawn, and a
+          later withdrawal is possible; a new document version is never a
+          withdrawal; an ended owner withdraws nothing; verifiers report
+          members pinning a withdrawn document version (sections 13.1, 14.4
+          and 14.5, appendix D); the open questions of sections 13.3 and 14.6
+          on withdrawal removed.
         </p>
       </li>
       <li>
@@ -6088,6 +6117,18 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
     </ul>
     <h3 id="auto-104"><a id="d10-withdrawal-takedown-and-tombstones"></a>D.10 Withdrawal, takedown and tombstones<span style="margin-left: 1em"></span></h3>
     <ul>
+      <li>
+        <p>
+          <strong>Why a withdrawal can be followed by a new version.</strong>
+          A retraction is a statement about the versions made so far; work
+          corrected later is a new version of the same work, as on arXiv,
+          whose withdrawal is itself a version after which a replacement may
+          come. The withdrawn versions stay withdrawn, so a reinstatement
+          never rewrites what readers were told. No list of withdrawals is
+          kept: every object version stays, and the withdrawals are read from
+          them (#25).
+        </p>
+      </li>
       <li>
         <p>
           <strong>Why a withdrawal keeps the content.</strong> A retracted

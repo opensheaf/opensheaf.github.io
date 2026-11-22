@@ -357,7 +357,10 @@ regenerated from the sources whenever the presentation changes.
 
 To withdraw a document (for instance a retraction), its owner makes a new
 object version that only marks it withdrawn, with a date and a reason: the
-content and its history stay, and presentations show the withdrawal. Content
+content and its history stay, and presentations show the withdrawal. The
+withdrawal covers the versions deposited so far; a corrected version
+deposited later reinstates the document, and the withdrawn versions stay
+withdrawn, as on arXiv. Content
 is removed only by a **takedown** (by law, for a breach of rights, or
 because the archive stops keeping it): the object is deleted and a tombstone
 is left in the discovery document, so that collections pinning it report it

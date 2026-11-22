@@ -238,7 +238,10 @@ questions are listed at the end of the sections they concern.
   nothing; indexes `names/`, `owners/`, `sha512/`; gateways redirect only
   temporarily to checked copies.
 - **Withdrawal, takedown, tombstones** (13): a withdrawal is a
-  description-only version with `status` `withdrawn`; drafts are never
+  description-only version with `status` `withdrawn`, which withdraws every
+  document version deposited before it and is kept by later
+  description-only versions; a new document version reinstates the line,
+  the versions withdrawn staying withdrawn (#25 settled); drafts are never
   withdrawn. Every removal of a sealed object is a **takedown**, which
   leaves a **tombstone** (`id`, `kind`, `name`, `owner`, `genesisName`,
   `lastVersion`, `inventorySha512`, `date`, `reason`); owner objects others
@@ -302,7 +305,7 @@ the same change in its schema, and the other way round.
 - Open questions go to issues on `opensheaf/opensheaf.github.io`, among
   them: #13 decentralised holding (split into #39 custodians' copies, #40
   statements by collections, #41 owner proofs), #19 scale, #22 external
-  records and pins, #25 withdrawal details, #27 ordering collections, #28
+  records and pins, #27 ordering collections, #28
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors, #44 aliases,

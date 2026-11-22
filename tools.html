@@ -364,10 +364,11 @@ osheaf withdraw kpz-uniqueness --reason &quot;Superseded by a joint paper.&quot;
       class="verbatim">relicense</tt> records a new licence with the authors' agreement;
       its <tt class="verbatim">--rights</tt> takes the same values as that of <tt class="verbatim">deposit</tt>.
       <tt class="verbatim">relate</tt> links the same work elsewhere (on arXiv, or by a
-      DOI). <tt class="verbatim">withdraw</tt> withdraws the paper: the content stays,
-      no new versions are added, and every page that shows it shows the
-      withdrawal (section <a href="opensheaf-specification-0.2.html#13-withdrawal-takedown-and-tombstones">13</a>); its <tt class="verbatim">--reason</tt> is
-      required.
+      DOI). <tt class="verbatim">withdraw</tt> withdraws the versions of the paper
+      deposited so far: the content stays, and every page that shows them
+      shows the withdrawal; its <tt class="verbatim">--reason</tt> is required. A later
+      <tt class="verbatim">deposit</tt> of a new version reinstates the paper, while the
+      versions withdrawn stay withdrawn (section <a href="opensheaf-specification-0.2.html#13-withdrawal-takedown-and-tombstones">13</a>).
     </p>
     <h3 id="auto-10"><a id="changing-a-label"></a>Changing a label<span style="margin-left: 1em"></span></h3>
     <p>

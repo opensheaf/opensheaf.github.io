@@ -971,9 +971,13 @@
 
   <subsection*|13.1 Withdrawal><label|131-withdrawal>
 
-  A document or a collection is <dfn|withdrawn> by a description-only version (section 4.2) whose <verbatim|object.json> has <verbatim|status> <verbatim|withdrawn> and <verbatim|withdrawal> (section 4.3), and whose <verbatim|datacite.json> has <verbatim|withdrawal.date> as <verbatim|Withdrawn> (section 4.4). The status is the line's, read, as its history is, from its latest signed version (section 7.3), whatever document version that holds; a copy without a signed version has no status as a line, and its discovery document gives that of its head (section 3.1); a single document version is retracted by a notice (section 4.2). A branch or an accepted copy is withdrawn only by its own owner (section 9).
+  A document or a collection is <dfn|withdrawn> by a description-only version (section 4.2), the <dfn|withdrawal>, whose <verbatim|object.json> has <verbatim|status> <verbatim|withdrawn> and <verbatim|withdrawal> (section 4.3), and whose <verbatim|datacite.json> has <verbatim|withdrawal.date> as <verbatim|Withdrawn> (section 4.4). A withdrawal holds the files of an existing document version, unchanged (tools hold the current one), and adds no document version: it changes the meaning of the versions before it, which stay inspectable. It withdraws every document version deposited before it, in the order of deposit (section 4.1): a version found later and placed earlier by <verbatim|history> is withdrawn if it was deposited before the withdrawal. A single document version is retracted by a notice instead (section 4.2).
 
-  A withdrawn line keeps every version, signed, pinned and copied as before. Presentations showing a version of a line they know to be withdrawn MUST show the withdrawal, also when the version shown is earlier.
+  <strong|Until a new document version.> Every later description-only version (a notice, a DOI) keeps <verbatim|status> <verbatim|withdrawn> and the same <verbatim|withdrawal>. A new document version <dfn|reinstates> the line: it has <verbatim|status> <verbatim|active> and no <verbatim|withdrawal>, and its change note SHOULD say why the work is back. The document versions withdrawn stay withdrawn; those deposited after the reinstatement are not, until a later withdrawal, which withdraws them in turn. A new document version is never itself a withdrawal. These rules are read from the object versions of the line, every one of which stays: a document version is withdrawn when an object version after the one that first held it is a withdrawal, which gives its date and reason.
+
+  <strong|Status.> The status of the line is that of its latest signed version (section 7.3), whatever document version that holds: <verbatim|withdrawn> from a withdrawal until a reinstatement. A copy without a signed version has no status as a line, and its discovery document gives that of its head (section 3.1). A branch or an accepted copy is withdrawn only by its own owner (section 9). An ended owner signs nothing, and so withdraws nothing (section 6.3), nor does an owner that has lost its keys: an owner withdraws its lines before it ends.
+
+  A withdrawn document version keeps every object version, signed, pinned and copied as before. Presentations showing a document version they know to be withdrawn MUST show it as withdrawn, with the date and reason of the withdrawal, also when the line has been reinstated since; presentations showing a version of a line they know to be withdrawn MUST show the withdrawal, also when the version shown is earlier.
 
   <subsection*|13.2 Takedown><label|132-takedown>
 
@@ -1009,8 +1013,6 @@
     <item>The form of an owner's signed request for a takedown, and of a keeper's (#33).
 
     <item>Whether a tombstone lists the inventory digests of every version taken down, so that a pin of a removed version is told from a pin that never named one; meanwhile the archive's <verbatim|sha512/> index keeps them (section 12.5; #33).
-
-    <item>Whether a withdrawn line takes new document versions; whether and how it is reinstated; whether <verbatim|withdrawal> stays in later versions; what a verifier reports for a pin of an earlier version of a withdrawn line; and how the line of an ended owner, which signs nothing, is withdrawn (#25).
 
     <item>A retraction by a collection (a journal) of one of its members, distinct from a withdrawal by the member's owner (#40).
 
@@ -1078,7 +1080,7 @@
   For every other object, the verifier checks:
 
   <\itemize>
-    <item><strong|its records:> the rules of sections 4.2 to 4.4 in every version and between versions (numbering, new versions, the fields that belong to a document version and <verbatim|external>, completion, <verbatim|history>, notices kept in order and the notices they replace), and, as a warning, a notice dated after its deposit, for collections as for documents, as far as the files decide them;
+    <item><strong|its records:> the rules of sections 4.2 to 4.4 in every version and between versions (numbering, new versions, the fields that belong to a document version and <verbatim|external>, completion, <verbatim|history>, notices kept in order and the notices they replace, a withdrawal kept until a new document version reinstates the line and never made by one, section 13.1), and, as a warning, a notice dated after its deposit, for collections as for documents, as far as the files decide them;
 
     <item><strong|its identity:> the genesis record, the name and the identifier in every version (sections 4 and 5), and that the objects and tombstones of the archive with the same genesis name are its originator's line and branches of it (section 5.4);
 
@@ -1091,7 +1093,7 @@
 
   <subsection*|14.5 Collections><label|145-collections>
 
-  For each collection version, the verifier checks the rules of section 8 on <verbatim|members.json> and its members. It resolves every member of the current version (section 4.2; every revision, in a selection) as a resolver does (section 12.3), and the members held in the archive in every earlier version; resolving the other members of earlier versions is OPTIONAL. The status of each member is a result (section 8.5). It also checks that no owner of selections of the archive keeps two accepted copies, two lines, of the same document (section 9.6); several selections of one owner listing the same accepted copy are no breach. A member that is not a version is an error, and so is a mismatch of a copy held in the archive; any other status but verified, contested included, is a warning.
+  For each collection version, the verifier checks the rules of section 8 on <verbatim|members.json> and its members. It resolves every member of the current version (section 4.2; every revision, in a selection) as a resolver does (section 12.3), and the members held in the archive in every earlier version; resolving the other members of earlier versions is OPTIONAL. The status of each member is a result (section 8.5). It also checks that no owner of selections of the archive keeps two accepted copies, two lines, of the same document (section 9.6); several selections of one owner listing the same accepted copy are no breach. A member that is not a version is an error, and so is a mismatch of a copy held in the archive; any other status but verified, contested included, is a warning. A member whose document version pinned (in a selection, a revision) is withdrawn, as the verifier reads the member's line, is reported so, as a result, also when the line has been reinstated since (section 13.1).
 
   <subsection*|14.6 The archive as a whole><label|146-the-archive-as-a-whole>
 
@@ -1113,8 +1115,6 @@
     <item>Which status a member has when the checksum file of its inventory is missing or wrong (#48), and which status it has when one location serves a copy that does not match and another one that matches (#37).
 
     <item>How a verifier tells a licence from a rights statement in <verbatim|rightsList> (#50), and which licences allow a mirror (#34), which is therefore not checked.
-
-    <item>What a verifier reports for a pin of an earlier version of a withdrawn line (#25).
   </itemize>
 
   <section*|15. Security, privacy and rights><label|15-security-privacy-and-rights>
@@ -1253,6 +1253,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> decided in #55: the field names of <verbatim|keys.json>, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, <verbatim|inventorySha512> and <verbatim|keyLog> (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder <verbatim|parent/>, with <verbatim|parent/inventory.json>, <verbatim|parent/object.json>, <verbatim|parent/signatures/> and <verbatim|parent/parent/> for a branch of a branch, <verbatim|parent> being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
 
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #25: a withdrawal withdraws every document version deposited before it, and later description-only versions keep it; a new document version reinstates the line, the versions withdrawn staying withdrawn, and a later withdrawal is possible; a new document version is never a withdrawal; an ended owner withdraws nothing; verifiers report members pinning a withdrawn document version (sections 13.1, 14.4 and 14.5, appendix D); the open questions of sections 13.3 and 14.6 on withdrawal removed.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #49: digests in inventories and checksum files MUST be in lower case (section 4.1, appendix D); the item is removed from the open questions of section 14.6.
 
@@ -2354,6 +2356,8 @@
   <subsection*|D.10 Withdrawal, takedown and tombstones><label|d10-withdrawal-takedown-and-tombstones>
 
   <\itemize>
+    <item><strong|Why a withdrawal can be followed by a new version.> A retraction is a statement about the versions made so far; work corrected later is a new version of the same work, as on arXiv, whose withdrawal is itself a version after which a replacement may come. The withdrawn versions stay withdrawn, so a reinstatement never rewrites what readers were told. No list of withdrawals is kept: every object version stays, and the withdrawals are read from them (#25).
+
     <item><strong|Why a withdrawal keeps the content.> A retracted paper stays part of the record, cited and collected; deleting it would break every pin and signature that includes it.
 
     <item><strong|Why a takedown deletes the whole object.> OCFL 1.1 cannot remove a file without changing the inventories, and so every pin and signature; deleting the object leaves all else valid, which is also why erasure is a takedown. Every removal is one, so nothing leaves an archive silently.
