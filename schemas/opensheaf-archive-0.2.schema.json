@@ -10,6 +10,7 @@
     "name",
     "storageRoot",
     "storageLayout",
+    "owners",
     "objects",
     "profiles"
   ],
@@ -245,7 +246,7 @@
         }
       },
       "uniqueItems": true,
-      "$comment": "the owners the archive hosts (sections 3.1, 6), each with its owner catalogue (section 8.1), in the order in which the archive presents them (appendix A.3)"
+      "$comment": "the owners the archive hosts (sections 3.1, 6), each with its owner catalogue (section 8.1), in the order in which the archive presents them (appendix A.3); empty for an archive that hosts no owner"
     },
     "drafts": {
       "type": "array",

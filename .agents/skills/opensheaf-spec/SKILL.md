@@ -66,9 +66,10 @@ questions are listed at the end of the sections they concern.
 - **Discovery document** (3.1): a map, never a witness: `format`,
   `specification`, `name`, `storageRoot`, `storageLayout`, `profiles`,
   `objects` (`id`, `kind`, `name`, `owner`, `head`, `inventorySha512`,
-  `status`, optional `label`; no drafts); SHOULD `owners` (each hosted
+  `status`, optional `label`; no drafts) and `owners` (each hosted
   owner with `owner` and `catalogue`, its owner catalogue, in the order of
-  presentation), `contact`, `extensions`; MAY `drafts`, `indexes`, `feed`;
+  presentation; empty when the archive hosts no owner); SHOULD `contact`,
+  `extensions`; MAY `drafts`, `indexes`, `feed`;
   MUST `tombstones` once an object is taken down; no `mainCollection`
   (#72). **Labels**: readable, local,
   not identifiers.
@@ -216,7 +217,8 @@ questions are listed at the end of the sections they concern.
   there a catalogue of its own, created when the owner is set up, listing
   the documents of its own lines in the archive (branches included, never
   copies), possibly curated, signed by that owner only; never mirrored; the
-  index page presents them in the order of `owners` (A.3). No main
+  index page presents their members grouped by owner, in the order of
+  `owners`, or together, naming each member's owner (A.3). No main
   catalogue of the archive.
 - **Branches** (9): a line of another owner from a signed parent version,
   declared in `parent`; evidence in the folder `parent/`

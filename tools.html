@@ -412,8 +412,18 @@ osheaf verify    # check everything, as section 14 of the specification asks</pr
       href="opensheaf-specification-0.2.html#81-catalogues-and-selections">8.1</a>). <tt class="verbatim">osheaf collect</tt> gives a new version only
       to the catalogues whose papers changed, each signed by its own owner;
       <tt class="verbatim">--owner OWNER</tt> takes one owner's catalogue alone. The
-      home page presents the catalogues in the order of <tt class="verbatim">owners</tt>
-      in <tt class="verbatim">opensheaf.json</tt>.
+      catalogue of the archive's first owner is labelled <tt class="verbatim">main</tt>;
+      that of another owner <tt class="verbatim">&lt;label&gt;-catalogue</tt>, when the
+      owner has a label, which <tt class="verbatim">osheaf label --owner</tt> gives or
+      changes with the owner's.
+    </p>
+    <p>
+      With several owners, the home page lists the papers of all the
+      catalogues together, newest first, each with its owner; with <tt class="verbatim">&quot;index&quot;:
+      {&quot;owners&quot;: &quot;by-owner&quot;}</tt> in <tt class="verbatim">osheaf.json</tt>
+      (the default is <tt class="verbatim">&quot;together&quot;</tt>), it lists them
+      under a heading for each owner, in the order of <tt class="verbatim">owners</tt>
+      in <tt class="verbatim">opensheaf.json</tt>. With one owner both are the same.
     </p>
     <p>
       The website is written again after every command that changes the
@@ -494,10 +504,8 @@ osheaf key list     # what the key wallet holds (never a secret)</pre>
       wallets hinted for it, then in yours, in order, and use the first that
       holds them; <tt class="verbatim">OPENSHEAF_WALLET</tt> wins over both, and <tt
       class="verbatim">--wallet github:OWNER/REPO</tt> (or <tt class="verbatim">--wallet
-      command</tt>) names another. The earlier forms are still read: a single
-      <tt class="verbatim">&quot;keys&quot;: {&quot;wallet&quot;: ...}</tt> in <tt
-      class="verbatim">osheaf.json</tt> is a hint for every owner, and in your file
-      comes after your <tt class="verbatim">wallets</tt>.
+      command</tt>) names another. A wallet configured under <tt class="verbatim">keys</tt>
+      in your file (a command wallet) comes after your <tt class="verbatim">wallets</tt>.
     </p>
     <div class="language-bash">
       <div class="tmweb-code">

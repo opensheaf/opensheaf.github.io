@@ -285,6 +285,15 @@
       </li>
       <li>
         <p>
+          <tt class="verbatim">owners</tt>: the owners it hosts (section 6), in the
+          order in which the archive presents them (appendix A.3), each with
+          <tt class="verbatim">owner</tt>, its owner name, and <tt class="verbatim">catalogue</tt>,
+          the identifier of its owner catalogue (section 8.1); empty for an
+          archive that hosts no owner and holds only copies (section 11);
+        </p>
+      </li>
+      <li>
+        <p>
           <tt class="verbatim">objects</tt>: every object of the storage root except
           drafts, each with <tt class="verbatim">id</tt> (section 4), <tt class="verbatim">kind</tt>,
           <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> (sections 5 and 6),
@@ -298,19 +307,15 @@
       </li>
     </ul>
     <p>
-      It SHOULD contain <tt class="verbatim">owners</tt>, the owners it hosts (section
-      6), in the order in which the archive presents them (appendix A.3), each
-      with <tt class="verbatim">owner</tt>, its owner name, and <tt class="verbatim">catalogue</tt>,
-      the identifier of its owner catalogue (section 8.1); <tt class="verbatim">contact</tt>,
-      a URI; and <tt class="verbatim">extensions</tt>, the names of the extensions its
-      objects use (section 2). It MAY contain <tt class="verbatim">drafts</tt>, the
-      drafts it chooses to show, with <tt class="verbatim">id</tt>, <tt class="verbatim">kind</tt>
-      and <tt class="verbatim">head</tt>, as unfinished work on which nothing may rely
-      (section 10); <tt class="verbatim">indexes</tt>, which maps each index kept to the
-      length of the prefixes of its files (section 12.5); and <tt class="verbatim">feed</tt>,
-      the URL of an Atom feed of new object versions. It MUST contain <tt
-      class="verbatim">tombstones</tt> once an object has been taken down (section
-      13.3).
+      It SHOULD contain <tt class="verbatim">contact</tt>, a URI, and <tt class="verbatim">extensions</tt>,
+      the names of the extensions its objects use (section 2). It MAY contain
+      <tt class="verbatim">drafts</tt>, the drafts it chooses to show, with <tt class="verbatim">id</tt>,
+      <tt class="verbatim">kind</tt> and <tt class="verbatim">head</tt>, as unfinished work on
+      which nothing may rely (section 10); <tt class="verbatim">indexes</tt>, which maps
+      each index kept to the length of the prefixes of its files (section
+      12.5); and <tt class="verbatim">feed</tt>, the URL of an Atom feed of new object
+      versions. It MUST contain <tt class="verbatim">tombstones</tt> once an object has
+      been taken down (section 13.3).
     </p>
     <p>
       The discovery document is rewritten whenever an object is added or
@@ -2145,16 +2150,14 @@ keyLog &lt;the value of keyLog&gt;</pre>
       included (section 9), never copies of lines (section 11); it need not
       list all of them: its curator MAY choose. It is a line of its owner like
       any other, so a change by one owner (a deposit, a new version, a branch)
-      touches that owner's catalogue only, and no owner signs for another.
-      When <tt class="verbatim">owners</tt> is absent, which lines are an owner's own in
-      the archive is not checked (section 14.6). An owner catalogue is not
-      mirrored: a mirror of a line never brings its owner's catalogue (section
-      11). An archive MAY also keep, as one of the owners it hosts, a
-      catalogue of the lines it holds as copies (section 11). An archive that
-      makes other collections does so as an owner too, with a key log like any
-      other (section 6). A selection is kept by the owner of the body that
-      vets (a journal, a review journal), which also owns the accepted copies
-      the selection keeps (section 9).
+      touches that owner's catalogue only, and no owner signs for another. An
+      owner catalogue is not mirrored: a mirror of a line never brings its
+      owner's catalogue (section 11). An archive MAY also keep, as one of the
+      owners it hosts, a catalogue of the lines it holds as copies (section
+      11). An archive that makes other collections does so as an owner too,
+      with a key log like any other (section 6). A selection is kept by the
+      owner of the body that vets (a journal, a review journal), which also
+      owns the accepted copies the selection keeps (section 9).
     </p>
     <h3 id="auto-33"><a id="82-the-member-list-membersjson"></a>8.2 The member list: members.json<span style="margin-left: 1em"></span></h3>
     <p>
@@ -4380,6 +4383,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #72
+          (follow-up): <tt class="verbatim">owners</tt> of the discovery document is
+          required, empty for an archive that hosts no owner, and the rule for
+          an archive without it is removed (sections 3.1 and 8.1, appendix B);
+          the index page presents the members of the owner catalogues grouped
+          by owner, in the order of <tt class="verbatim">owners</tt>, or together,
+          naming the owner of each when the archive hosts several (appendix
+          A.3).
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>0.2 (draft), 22 November 2026:</strong> decided in #25: a
           withdrawal withdraws every document version deposited before it, and
           later description-only versions keep it; a new document version
@@ -4646,16 +4661,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <ul>
       <li>
         <p>
-          <strong>Index.</strong> An index page presents the owner catalogues
-          (section 8.1) of the owners the archive hosts, in the order of <tt
-          class="verbatim">owners</tt> (section 3.1): of each, the latest signed version
-          (section 7.3), in its order, possibly over several pages; other
-          collections MAY have pages of their own. When an owner catalogue has
-          no signed version (its versions contested after an exposure, or
-          unchecked), the index page presents none of its members and says
-          why, until its owner, if not ended, signs a version again (section
-          7.1). A flattened list, not authoritative, for programs that do not
-          read OCFL MAY be published as <tt class="verbatim">catalog.json</tt>.
+          <strong>Index.</strong> An index page presents the members of the
+          owner catalogues (section 8.1) of the owners the archive hosts, of
+          each the latest signed version (section 7.3), either grouped by
+          owner, in the order of <tt class="verbatim">owners</tt> (section 3.1) and each
+          catalogue in its order, or together in one list that names the owner
+          of each member when the archive hosts several, possibly over several
+          pages; other collections MAY have pages of their own. When an owner
+          catalogue has no signed version (its versions contested after an
+          exposure, or unchecked), the index page presents none of its members
+          and says why, until its owner, if not ended, signs a version again
+          (section 7.1). A flattened list, not authoritative, for programs
+          that do not read OCFL MAY be published as <tt class="verbatim">catalog.json</tt>.
         </p>
       </li>
       <li>

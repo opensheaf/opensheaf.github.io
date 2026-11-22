@@ -284,8 +284,15 @@ branches included
 (section [8.1](opensheaf-specification-0.2.md#81-catalogues-and-selections)).
 `osheaf collect` gives a new version only to the catalogues whose papers
 changed, each signed by its own owner; `--owner OWNER` takes one owner's
-catalogue alone. The home page presents the catalogues in the order of
-`owners` in `opensheaf.json`.
+catalogue alone. The catalogue of the archive's first owner is labelled
+`main`; that of another owner `<label>-catalogue`, when the owner has a
+label, which `osheaf label --owner` gives or changes with the owner's.
+
+With several owners, the home page lists the papers of all the catalogues
+together, newest first, each with its owner; with
+`"index": {"owners": "by-owner"}` in `osheaf.json` (the default is
+`"together"`), it lists them under a heading for each owner, in the order
+of `owners` in `opensheaf.json`. With one owner both are the same.
 
 The website is written again after every command that changes the archive,
 so `osheaf index` is only needed to rewrite everything. `osheaf verify`
@@ -340,9 +347,8 @@ owner may be in several wallets. Two lists say where keys are looked for:
 The `key` commands look for the keys of an owner in the wallets hinted
 for it, then in yours, in order, and use the first that holds them;
 `OPENSHEAF_WALLET` wins over both, and `--wallet github:OWNER/REPO` (or
-`--wallet command`) names another. The earlier forms are still read: a
-single `"keys": {"wallet": ...}` in `osheaf.json` is a hint for every
-owner, and in your file comes after your `wallets`.
+`--wallet command`) names another. A wallet configured under `keys` in
+your file (a command wallet) comes after your `wallets`.
 
 ```sh
 osheaf key wallet                    # where the keys of the owner are looked for, in order

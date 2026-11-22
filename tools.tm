@@ -229,7 +229,9 @@
   </verbatim-code>
   </html-div-class>
 
-  Each owner the archive hosts has an owner catalogue of its own, made when the owner is set up (by <verbatim|osheaf init>, or by <verbatim|osheaf owner init> for another owner in the same archive), which lists its papers in the archive, branches included (section <hlink|8.1|opensheaf-specification-0.2.tm#81-catalogues-and-selections>). <verbatim|osheaf collect> gives a new version only to the catalogues whose papers changed, each signed by its own owner; <verbatim|-<no-break>-owner OWNER> takes one owner's catalogue alone. The home page presents the catalogues in the order of <verbatim|owners> in <verbatim|opensheaf.json>.
+  Each owner the archive hosts has an owner catalogue of its own, made when the owner is set up (by <verbatim|osheaf init>, or by <verbatim|osheaf owner init> for another owner in the same archive), which lists its papers in the archive, branches included (section <hlink|8.1|opensheaf-specification-0.2.tm#81-catalogues-and-selections>). <verbatim|osheaf collect> gives a new version only to the catalogues whose papers changed, each signed by its own owner; <verbatim|-<no-break>-owner OWNER> takes one owner's catalogue alone. The catalogue of the archive's first owner is labelled <verbatim|main>; that of another owner <verbatim|\<less\>label\<gtr\>-catalogue>, when the owner has a label, which <verbatim|osheaf label -<no-break>-owner> gives or changes with the owner's.
+
+  With several owners, the home page lists the papers of all the catalogues together, newest first, each with its owner; with <verbatim|"index": {"owners": "by-owner"}> in <verbatim|osheaf.json> (the default is <verbatim|"together">), it lists them under a heading for each owner, in the order of <verbatim|owners> in <verbatim|opensheaf.json>. With one owner both are the same.
 
   The website is written again after every command that changes the archive, so <verbatim|osheaf index> is only needed to rewrite everything. <verbatim|osheaf verify> reports errors, warnings and the status of every signature and member; <verbatim|-<no-break>-remote> also checks the members of your collections held in other archives, and <verbatim|-<no-break>-json> prints the findings for a program. The same checks can be run on a published archive from the browser, with the <hlink|Explorer|https://opensheaf.org/explorer/>.
 
@@ -267,7 +269,7 @@
     <item>for each owner of an archive, the wallets that hold its keys, as hints in its <verbatim|osheaf.json>, <verbatim|"keys": {"\<less\>owner\<gtr\>": {"wallets": [.<no-break>.<no-break>.]}}> (GitHub wallets only), written by <verbatim|init>, <verbatim|owner init> and <verbatim|owner rotate> with <verbatim|-<no-break>-keys github:.<no-break>.<no-break>.>, and by <verbatim|key push -<no-break>-wallet github:.<no-break>.<no-break>.>.
   </itemize>
 
-  The <verbatim|key> commands look for the keys of an owner in the wallets hinted for it, then in yours, in order, and use the first that holds them; <verbatim|OPENSHEAF_WALLET> wins over both, and <verbatim|-<no-break>-wallet github:OWNER/REPO> (or <verbatim|-<no-break>-wallet command>) names another. The earlier forms are still read: a single <verbatim|"keys": {"wallet": .<no-break>.<no-break>.}> in <verbatim|osheaf.json> is a hint for every owner, and in your file comes after your <verbatim|wallets>.
+  The <verbatim|key> commands look for the keys of an owner in the wallets hinted for it, then in yours, in order, and use the first that holds them; <verbatim|OPENSHEAF_WALLET> wins over both, and <verbatim|-<no-break>-wallet github:OWNER/REPO> (or <verbatim|-<no-break>-wallet command>) names another. A wallet configured under <verbatim|keys> in your file (a command wallet) comes after your <verbatim|wallets>.
 
   <\html-div-class|language-bash>
   <\verbatim-code>
