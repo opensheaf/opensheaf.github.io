@@ -688,7 +688,7 @@
   <\itemize>
     <item>What a collection may state about its members (volume, acceptance, the journal's own DOI, a retraction by the journal) (#40).
 
-    <item>Binding an owner catalogue to its archive, keys that an archive requires to create lines there, and a curated selection over the owner catalogues of an archive (#72).
+    <item>Binding an owner catalogue to its archive, keys that an archive requires to create lines there, and a curated selection over the owner catalogues of an archive (#76).
   </itemize>
 
   <section*|9. Branches and accepted copies><label|9-branches-and-accepted-copies>
@@ -1245,6 +1245,8 @@
     <item><strong|0.2 (draft), 22 November 2026:> decided in #66 and #33: a tombstone speaks for its archive only and does not stop resolution at copies elsewhere, no longer provisionally (sections 12.3 and 13.3); mirrors, branches, indexes kept by others, gateways and external records do not follow a takedown by themselves, each answering for what it serves, content to be removed everywhere being taken down at each archive at a request to each, and tools report the tombstones they meet; no signed takedown requests in the format, an owner withdrawing instead; tombstones keep one pin, earlier versions being reported as removed (section 13.3, appendix D); the open questions of sections 11.2, 12.6, 13.3, 15.6 and appendix A on takedowns removed.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #19: <verbatim|objects> may be paged, by <verbatim|objectPages> and page files of format <verbatim|opensheaf-objects/0.2>, which tools SHOULD use beyond about a thousand objects (section 3.1, appendix B, with a new schema); the feed SHOULD hold the recent versions and MAY link archived feeds (RFC 5005, appendix A.3); a verifier MAY check part of an archive (section 14.1); the open question of section 3.1 removed (appendix D).
+
+    <item><strong|0.2 (draft), 22 November 2026:> editorial: the open question of section 8 on owner catalogues (binding to the archive, creation keys, a curated selection) pointed to #76, #72 being settled.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #26: a notice is numbered by its position in <verbatim|notices>, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in <verbatim|replaces>, each notice being replaced at most once; the current notices are those not replaced; the <verbatim|date> of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 
