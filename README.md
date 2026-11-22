@@ -55,18 +55,18 @@ OpenSheaf proposes a lean common format instead:
   digest, also across archives, and compose without copying, as local pieces glue into a
   sheaf. The [use cases](USE-CASES.md) show how authors, archives and
   selections use them.
-- **Federative archiving.** A document is named by a `sheaf:` URI, which
-  says what it is, not where it is kept, and every copy is checked against
-  the signatures of its owner, wherever it is found. Anyone can therefore
-  set up a mirror: an archive that keeps exact copies of a set of documents
-  from other archives (when their licences allow it), and preserves them
+- **Federative archiving.** A document is named by a `sheaf:` URI, which says
+  what it is, not where it is kept, and every copy is checked against the
+  signatures of its owner, wherever it is found. Anyone can therefore set up a
+  mirror: an archive that keeps exact copies of a set of documents from other
+  archives (when it has the right to redistribute them), and preserves them
   when the original archive goes away. A branch carries a work on under
   another owner (a co-author, a successor, a journal keeping the version it
   accepted) and keeps its link to the original. Discovery, how archives and
   readers learn of new documents and versions, is not part of the
-  specification: it can be built on top of it with common federated
-  protocols such as ActivityPub or Matrix, or left to Google Scholar and
-  other search engines, which index an archive's pages.
+  specification: it can be built on top of it with common federated protocols
+  such as ActivityPub or Matrix, or left to Google Scholar and other search
+  engines, which index an archive's pages.
 - **Compatible with existing infrastructure.** Documents can also be on
   arXiv, get DOIs and be archived on Zenodo, and be found by Google Scholar;
   none of these is required.

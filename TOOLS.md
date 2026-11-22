@@ -593,10 +593,11 @@ osheaf resolve "sheaf:<name>:<owner>/v2" --at https://mgubi.org/papers/
 
 A library, or a colleague keeping a preservation copy, **mirrors** a paper
 written elsewhere: a byte-for-byte copy, checked, with its owner's key log
-(section [11](opensheaf-specification-0.2.md#11-copies-and-mirrors)). It
-is refused unless every version is under an open licence, or you confirm
-with `--licence-checked` that copying is allowed. `osheaf mirror --all`
-brings every mirror up to date.
+(section [11](opensheaf-specification-0.2.md#11-copies-and-mirrors)). Your
+archive answers for having the right to redistribute it, by its licence or the
+authors' agreement (section 11.2): a version not under a licence the tool
+knows to be open is copied with a warning, which `--licence-checked` silences.
+`osheaf mirror --all` brings every mirror up to date.
 
 ```sh
 osheaf mirror "sheaf:<name>:<owner>" --at https://mgubi.org/papers/ --label kpz-copy

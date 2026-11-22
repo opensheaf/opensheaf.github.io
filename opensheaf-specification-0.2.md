@@ -168,7 +168,7 @@ Every object version except in an owner object MUST contain `datacite.json`, the
 
 - `descriptions`, with an `Abstract`, and `subjects`, with a `subjectScheme` (MSC2020 is common in mathematics);
 - `dates` (below);
-- `rightsList`: for a licence with an SPDX identifier, that identifier in lower case and the licence URL; for one without, its name in `rights` and, REQUIRED then, the URL identifying it in `rightsUri` (for arXiv's default licence, `http://arxiv.org/licenses/nonexclusive-distrib/1.0/`); or a statement such as "All rights reserved", without URL;
+- `rightsList`: licences and rights statements. An entry with `rightsIdentifier` or `rightsUri` is a <dfn>licence</dfn>: one with an SPDX identifier has it in `rightsIdentifier`, in lower case, with `rightsIdentifierScheme` `SPDX`, and SHOULD have the licence URL; one without has its name in `rights` and the URL identifying it in `rightsUri` (for arXiv's default licence, `http://arxiv.org/licenses/nonexclusive-distrib/1.0/`). An entry with neither is a <dfn>rights statement</dfn>, such as "All rights reserved";
 - `language`, `formats` (the media types of sources and renditions) and `sizes`;
 - identifiers of creators (ORCID) and affiliations (ROR), where they exist;
 - `relatedIdentifiers` (below).
@@ -598,7 +598,7 @@ A version the selection makes itself, such as a typeset version of record, is a 
 
 **Description.** A branch's `datacite.json` has as `publisher` its owner, or for a selection the body behind it, and keeps the relations of the parent version. Its first version, and every version that takes a new branch point, SHOULD link the parent version with `IsIdenticalTo`: its DOI if it has one, otherwise `parent.url` as a `URL`.
 
-**Rights.** A branch needs only the right to redistribute its parent versions (section 15.6); a copy of the parent's line beside it follows section 11.2. The evidence is metadata, under CC0 (section 15.6).
+**Rights.** A branch redistributes the files of its parent versions, and its archive is responsible for having the right to (section 11.2); a copy of the parent's line beside it is a mirror. The evidence is metadata, under CC0 (section 15.6).
 
 ## 10. Drafts and sealing
 
@@ -640,12 +640,11 @@ A <dfn>copy</dfn> of a line is its object as held in one storage root; a <dfn>mi
 
 ### 11.2 Rights
 
-An archive MUST NOT keep a mirror unless the licences of every object version it copies (`rightsList`, section 4.4, which a description-only version may change) allow redistribution. Key logs, inventories, signature files and the other metadata are under CC0 (section 15.6), and are copied freely; a reference needs no permission (section 8.5).
+An archive that keeps a mirror redistributes the files it copies, and is responsible for having the right to: by their licences (`rightsList`, section 4.4, which a description-only version may change), by the agreement of the rights holders, or by law. This specification does not judge it, and verifiers do not check it; tools MAY warn when no licence of the versions copied is one they know to allow redistribution. Key logs, inventories, signature files and the other metadata are under CC0 (section 15.6), and are copied freely; a reference needs no permission (section 8.5).
 
 **Open questions.**
 
-- Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what the licences allow (#39).
-- Copying by the agreement of the rights holders, besides the licences, recorded minimally (#39), and which licences allow redistribution (#34).
+- Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what it has the right to redistribute (#39).
 - What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
 - Whether a custodian follows a takedown of a line it mirrors (section 13).
 
@@ -841,7 +840,6 @@ The verifier then checks, against the objects:
 **Open questions.**
 
 - Which status a member has when the checksum file of its inventory is missing or wrong (#48), and which status it has when one location serves a copy that does not match and another one that matches (#37).
-- How a verifier tells a licence from a rights statement in `rightsList` (#50), and which licences allow a mirror (#34), which is therefore not checked.
 
 ## 15. Security, privacy and rights
 
@@ -898,11 +896,10 @@ What an archive serves is public, its drafts included (section 10.1); a sealed v
 
 **Metadata.** The JSON files this specification defines, inventories with their checksum files, fork records and the evidence of branches are metadata, texts of notes and abstracts included. Whoever writes them dedicates them to the public domain under CC0 1.0, so that they can be harvested and copied freely; an archive admits only owners that accept this. Files of notes (section 4.3) are content.
 
-**Content.** The files of a document version are under the licence its owner states (sections 4.3 and 4.4); "All rights reserved" is allowed, since depositing grants readers access, not reuse. Copies and branches keep the licences of what they copy, and need the right to redistribute it (sections 9.7 and 11.2).
+**Content.** The files of a document version are under the licence its owner states (sections 4.3 and 4.4); "All rights reserved" is allowed, since depositing grants readers access, not reuse. Copies and branches keep the licences of what they copy; whoever keeps them is responsible for having the right to redistribute it (sections 9.7 and 11.2).
 
 **Open questions.**
 
-- Which licences allow a mirror, and how a verifier tells a licence from a rights statement (#34, #50); copying by the agreement of the rights holders (#39).
 - Whether a takedown reaches mirrors, branches holding the files, indexes kept by others and gateways (#33).
 - How a referee's commitment is written as a creator in DataCite, and exactly what is hashed (#63).
 - Tying owners to ORCID iDs and domains beyond the keeper (#41).
@@ -948,6 +945,7 @@ Before 1.0, a minor version MAY be incompatible with the one before it. Version 
 - **0.2 (draft), 22 November 2026:** decided in #49: digests in inventories and checksum files MUST be in lower case (section 4.1, appendix D); the item is removed from the open questions of section 14.6.
 - **0.2 (draft), 22 November 2026:** decided in #51: a deposit out of order is recorded by writing `history`, which defines the history, in place of a requirement verifiers cannot check; a version deposited without it is the current version (section 4.2, appendix D); the item is removed from the open questions of section 14.6.
 - **0.2 (draft), 22 November 2026:** decided in #29: an archive need not be public, and serves all its lines or none; an owner publishes lines kept privately by copying them into a public archive, the same lines (section 3.1); the `at` of a member in a private archive is the base URL at which it is kept (section 8.2); `Available` is the deposit, whether the archive is public or not, unless the version appeared elsewhere first, and `Created` dates a version deposited later (section 4.4); drafts are not shared as objects, and whatever a recipient relies on is sealed (section 10.2); what an archive holds may be made public (section 15.4); the open questions of sections 3.1 and 10.2 removed, and that of section 15 on referees pointed to #63 (appendix D).
+- **0.2 (draft), 22 November 2026:** decided in #50 and #34: an entry of `rightsList` with `rightsIdentifier` or `rightsUri` is a licence, one with neither a rights statement (section 4.4); an archive keeping a mirror or a branch is responsible for having the right to redistribute what it copies, by licence, agreement or law, which the specification does not judge and verifiers do not check (sections 9.7, 11.2 and 15.6, appendix D); the open questions of sections 11.2, 14.6 and 15.6 on licences removed.
 - **0.2 (draft), 22 November 2026:** decided in #26: a notice is numbered by its position in `notices`, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in `replaces`, each notice being replaced at most once; the current notices are those not replaced; the `date` of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 - **0.2 (draft), 22 November 2026:** decided in #24, #45 and #27 (its first point): a collection is a document whose source is `members.json`, with renditions and the fields of a document but `mainSource`, `sourceFormat`, `sourcesMissing` and `licence`, so any change of `members.json` is a new document version and a description-only version of a collection may hold an earlier member list (sections 4.2, 4.3 and 8.2); a description-only version changes the description of the object and adds to `external`, while `mainSource`, `sourceFormat`, `sourcesMissing`, `renditions` and `toolchain` belong to the document version, except as a completion adds to them (section 4.2); a followed member moves with new document versions of its catalogue only (section 8.3); verifiers resolve the members of the current version (sections 14.4 and 14.5, appendix D).
 - **0.2 (draft), 21 November 2026:** decided in #23: a new document version is made when the own files differ from those of the current version, compared by logical path and digest, so that a rename is a change; an object version holding an existing document version holds exactly its files; files of an earlier version deposited again are a revert, a new document version (section 4.2, appendix D).
@@ -1611,6 +1609,8 @@ The reasons for the main choices, in the order of the sections.
 - **Why object files never run in an archive's origin.** A script served from an origin acts as that site: it reads what its pages store, and presents forged pages under a trusted address.
 - **Why owners are pseudonymous.** Owner names, key logs and signatures travel with every copy and can never be removed; if they named persons, no takedown could erase them.
 - **Why metadata is under CC0.** Pins, signatures and key logs are checked only where they can be copied; a licence would make every copy, index and reference a question of rights.
+- **Why the format does not judge the right to copy.** Whether a copy is lawful depends on the licence, on agreements with the rights holders, on the law where the archive is and on who keeps it, none of which is in the files; a list of licences checked by verifiers would refuse lawful copies and could not make others lawful. The archive that serves a copy answers for it, as any publisher does (#34).
+- **Why an entry with an identifier or a URL is a licence.** The kind of a `rightsList` entry must be read from the file, not guessed from its name; a licence is identified, a statement is not (#50).
 
 ### D.13 Versioning
 

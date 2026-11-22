@@ -891,12 +891,15 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">rightsList</tt>: for a licence with an SPDX identifier,
-          that identifier in lower case and the licence URL; for one without,
-          its name in <tt class="verbatim">rights</tt> and, REQUIRED then, the URL
-          identifying it in <tt class="verbatim">rightsUri</tt> (for arXiv's default
-          licence, <tt class="verbatim">http://arxiv.org/licenses/nonexclusive-distrib/1.0/</tt>);
-          or a statement such as &quot;All rights reserved&quot;, without URL;
+          <tt class="verbatim">rightsList</tt>: licences and rights statements. An entry
+          with <tt class="verbatim">rightsIdentifier</tt> or <tt class="verbatim">rightsUri</tt>
+          is a <dfn>licence</dfn>: one with an SPDX identifier has it in <tt
+          class="verbatim">rightsIdentifier</tt>, in lower case, with <tt class="verbatim">rightsIdentifierScheme</tt>
+          <tt class="verbatim">SPDX</tt>, and SHOULD have the licence URL; one without
+          has its name in <tt class="verbatim">rights</tt> and the URL identifying it in
+          <tt class="verbatim">rightsUri</tt> (for arXiv's default licence, <tt class="verbatim">http://arxiv.org/licenses/nonexclusive-distrib/1.0/</tt>).
+          An entry with neither is a <dfn>rights statement</dfn>, such as
+          &quot;All rights reserved&quot;;
         </p>
       </li>
       <li>
@@ -2788,10 +2791,10 @@ keyLog &lt;the value of keyLog&gt;</pre>
       one, otherwise <tt class="verbatim">parent.url</tt> as a <tt class="verbatim">URL</tt>.
     </p>
     <p>
-      <strong>Rights.</strong> A branch needs only the right to redistribute
-      its parent versions (section 15.6); a copy of the parent's line beside
-      it follows section 11.2. The evidence is metadata, under CC0 (section
-      15.6).
+      <strong>Rights.</strong> A branch redistributes the files of its parent
+      versions, and its archive is responsible for having the right to
+      (section 11.2); a copy of the parent's line beside it is a mirror. The
+      evidence is metadata, under CC0 (section 15.6).
     </p>
     <h2 id="auto-46"><a id="10-drafts-and-sealing"></a>10. Drafts and sealing<span style="margin-left: 1em"></span></h2>
     <p>
@@ -2923,10 +2926,13 @@ keyLog &lt;the value of keyLog&gt;</pre>
     </p>
     <h3 id="auto-51"><a id="112-rights"></a>11.2 Rights<span style="margin-left: 1em"></span></h3>
     <p>
-      An archive MUST NOT keep a mirror unless the licences of every object
-      version it copies (<tt class="verbatim">rightsList</tt>, section 4.4, which a
-      description-only version may change) allow redistribution. Key logs,
-      inventories, signature files and the other metadata are under CC0
+      An archive that keeps a mirror redistributes the files it copies, and is
+      responsible for having the right to: by their licences (<tt class="verbatim">rightsList</tt>,
+      section 4.4, which a description-only version may change), by the
+      agreement of the rights holders, or by law. This specification does not
+      judge it, and verifiers do not check it; tools MAY warn when no licence
+      of the versions copied is one they know to allow redistribution. Key
+      logs, inventories, signature files and the other metadata are under CC0
       (section 15.6), and are copied freely; a reference needs no permission
       (section 8.5).
     </p>
@@ -2938,14 +2944,7 @@ keyLog &lt;the value of keyLog&gt;</pre>
         <p>
           Whether a copy MAY stop before the latest signed version of the copy
           it copies, at a pinned version, so that a custodian keeps exactly
-          what it pins or what the licences allow (#39).
-        </p>
-      </li>
-      <li>
-        <p>
-          Copying by the agreement of the rights holders, besides the
-          licences, recorded minimally (#39), and which licences allow
-          redistribution (#34).
+          what it pins or what it has the right to redistribute (#39).
         </p>
       </li>
       <li>
@@ -3820,13 +3819,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           (#37).
         </p>
       </li>
-      <li>
-        <p>
-          How a verifier tells a licence from a rights statement in <tt class="verbatim">rightsList</tt>
-          (#50), and which licences allow a mirror (#34), which is therefore
-          not checked.
-        </p>
-      </li>
     </ul>
     <h2 id="auto-70"><a id="15-security-privacy-and-rights"></a>15. Security, privacy and rights<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-71"><a id="151-what-the-format-protects"></a>15.1 What the format protects<span style="margin-left: 1em"></span></h3>
@@ -4067,20 +4059,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <strong>Content.</strong> The files of a document version are under the
       licence its owner states (sections 4.3 and 4.4); &quot;All rights
       reserved&quot; is allowed, since depositing grants readers access, not
-      reuse. Copies and branches keep the licences of what they copy, and need
-      the right to redistribute it (sections 9.7 and 11.2).
+      reuse. Copies and branches keep the licences of what they copy; whoever
+      keeps them is responsible for having the right to redistribute it
+      (sections 9.7 and 11.2).
     </p>
     <p>
       <strong>Open questions.</strong>
     </p>
     <ul>
-      <li>
-        <p>
-          Which licences allow a mirror, and how a verifier tells a licence
-          from a rights statement (#34, #50); copying by the agreement of the
-          rights holders (#39).
-        </p>
-      </li>
       <li>
         <p>
           Whether a takedown reaches mirrors, branches holding the files,
@@ -4476,6 +4462,19 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           may be made public (section 15.4); the open questions of sections
           3.1 and 10.2 removed, and that of section 15 on referees pointed to
           #63 (appendix D).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #50 and
+          #34: an entry of <tt class="verbatim">rightsList</tt> with <tt class="verbatim">rightsIdentifier</tt>
+          or <tt class="verbatim">rightsUri</tt> is a licence, one with neither a rights
+          statement (section 4.4); an archive keeping a mirror or a branch is
+          responsible for having the right to redistribute what it copies, by
+          licence, agreement or law, which the specification does not judge
+          and verifiers do not check (sections 9.7, 11.2 and 15.6, appendix
+          D); the open questions of sections 11.2, 14.6 and 15.6 on licences
+          removed.
         </p>
       </li>
       <li>
@@ -6338,6 +6337,25 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           <strong>Why metadata is under CC0.</strong> Pins, signatures and key
           logs are checked only where they can be copied; a licence would make
           every copy, index and reference a question of rights.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why the format does not judge the right to copy.</strong>
+          Whether a copy is lawful depends on the licence, on agreements with
+          the rights holders, on the law where the archive is and on who keeps
+          it, none of which is in the files; a list of licences checked by
+          verifiers would refuse lawful copies and could not make others
+          lawful. The archive that serves a copy answers for it, as any
+          publisher does (#34).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why an entry with an identifier or a URL is a
+          licence.</strong> The kind of a <tt class="verbatim">rightsList</tt> entry
+          must be read from the file, not guessed from its name; a licence is
+          identified, a statement is not (#50).
         </p>
       </li>
     </ul>

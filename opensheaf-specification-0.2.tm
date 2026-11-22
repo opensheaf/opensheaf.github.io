@@ -228,7 +228,7 @@
 
     <item><verbatim|dates> (below);
 
-    <item><verbatim|rightsList>: for a licence with an SPDX identifier, that identifier in lower case and the licence URL; for one without, its name in <verbatim|rights> and, REQUIRED then, the URL identifying it in <verbatim|rightsUri> (for arXiv's default licence, <verbatim|http://arxiv.org/licenses/nonexclusive-distrib/1.0/>); or a statement such as "All rights reserved", without URL;
+    <item><verbatim|rightsList>: licences and rights statements. An entry with <verbatim|rightsIdentifier> or <verbatim|rightsUri> is a <dfn|licence>: one with an SPDX identifier has it in <verbatim|rightsIdentifier>, in lower case, with <verbatim|rightsIdentifierScheme> <verbatim|SPDX>, and SHOULD have the licence URL; one without has its name in <verbatim|rights> and the URL identifying it in <verbatim|rightsUri> (for arXiv's default licence, <verbatim|http://arxiv.org/licenses/nonexclusive-distrib/1.0/>). An entry with neither is a <dfn|rights statement>, such as "All rights reserved";
 
     <item><verbatim|language>, <verbatim|formats> (the media types of sources and renditions) and <verbatim|sizes>;
 
@@ -791,7 +791,7 @@
 
   <strong|Description.> A branch's <verbatim|datacite.json> has as <verbatim|publisher> its owner, or for a selection the body behind it, and keeps the relations of the parent version. Its first version, and every version that takes a new branch point, SHOULD link the parent version with <verbatim|IsIdenticalTo>: its DOI if it has one, otherwise <verbatim|parent.url> as a <verbatim|URL>.
 
-  <strong|Rights.> A branch needs only the right to redistribute its parent versions (section 15.6); a copy of the parent's line beside it follows section 11.2. The evidence is metadata, under CC0 (section 15.6).
+  <strong|Rights.> A branch redistributes the files of its parent versions, and its archive is responsible for having the right to (section 11.2); a copy of the parent's line beside it is a mirror. The evidence is metadata, under CC0 (section 15.6).
 
   <section*|10. Drafts and sealing><label|10-drafts-and-sealing>
 
@@ -833,14 +833,12 @@
 
   <subsection*|11.2 Rights><label|112-rights>
 
-  An archive MUST NOT keep a mirror unless the licences of every object version it copies (<verbatim|rightsList>, section 4.4, which a description-only version may change) allow redistribution. Key logs, inventories, signature files and the other metadata are under CC0 (section 15.6), and are copied freely; a reference needs no permission (section 8.5).
+  An archive that keeps a mirror redistributes the files it copies, and is responsible for having the right to: by their licences (<verbatim|rightsList>, section 4.4, which a description-only version may change), by the agreement of the rights holders, or by law. This specification does not judge it, and verifiers do not check it; tools MAY warn when no licence of the versions copied is one they know to allow redistribution. Key logs, inventories, signature files and the other metadata are under CC0 (section 15.6), and are copied freely; a reference needs no permission (section 8.5).
 
   <strong|Open questions.>
 
   <\itemize>
-    <item>Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what the licences allow (#39).
-
-    <item>Copying by the agreement of the rights holders, besides the licences, recorded minimally (#39), and which licences allow redistribution (#34).
+    <item>Whether a copy MAY stop before the latest signed version of the copy it copies, at a pinned version, so that a custodian keeps exactly what it pins or what it has the right to redistribute (#39).
 
     <item>What a custodian promises to keep (all the lines of an owner, the members of a collection, the revisions a selection vets), and where it says so (#54).
 
@@ -1101,8 +1099,6 @@
 
   <\itemize>
     <item>Which status a member has when the checksum file of its inventory is missing or wrong (#48), and which status it has when one location serves a copy that does not match and another one that matches (#37).
-
-    <item>How a verifier tells a licence from a rights statement in <verbatim|rightsList> (#50), and which licences allow a mirror (#34), which is therefore not checked.
   </itemize>
 
   <section*|15. Security, privacy and rights><label|15-security-privacy-and-rights>
@@ -1177,13 +1173,11 @@
 
   <strong|Metadata.> The JSON files this specification defines, inventories with their checksum files, fork records and the evidence of branches are metadata, texts of notes and abstracts included. Whoever writes them dedicates them to the public domain under CC0 1.0, so that they can be harvested and copied freely; an archive admits only owners that accept this. Files of notes (section 4.3) are content.
 
-  <strong|Content.> The files of a document version are under the licence its owner states (sections 4.3 and 4.4); "All rights reserved" is allowed, since depositing grants readers access, not reuse. Copies and branches keep the licences of what they copy, and need the right to redistribute it (sections 9.7 and 11.2).
+  <strong|Content.> The files of a document version are under the licence its owner states (sections 4.3 and 4.4); "All rights reserved" is allowed, since depositing grants readers access, not reuse. Copies and branches keep the licences of what they copy; whoever keeps them is responsible for having the right to redistribute it (sections 9.7 and 11.2).
 
   <strong|Open questions.>
 
   <\itemize>
-    <item>Which licences allow a mirror, and how a verifier tells a licence from a rights statement (#34, #50); copying by the agreement of the rights holders (#39).
-
     <item>Whether a takedown reaches mirrors, branches holding the files, indexes kept by others and gateways (#33).
 
     <item>How a referee's commitment is written as a creator in DataCite, and exactly what is hashed (#63).
@@ -1257,6 +1251,8 @@
     <item><strong|0.2 (draft), 22 November 2026:> decided in #51: a deposit out of order is recorded by writing <verbatim|history>, which defines the history, in place of a requirement verifiers cannot check; a version deposited without it is the current version (section 4.2, appendix D); the item is removed from the open questions of section 14.6.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #29: an archive need not be public, and serves all its lines or none; an owner publishes lines kept privately by copying them into a public archive, the same lines (section 3.1); the <verbatim|at> of a member in a private archive is the base URL at which it is kept (section 8.2); <verbatim|Available> is the deposit, whether the archive is public or not, unless the version appeared elsewhere first, and <verbatim|Created> dates a version deposited later (section 4.4); drafts are not shared as objects, and whatever a recipient relies on is sealed (section 10.2); what an archive holds may be made public (section 15.4); the open questions of sections 3.1 and 10.2 removed, and that of section 15 on referees pointed to #63 (appendix D).
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #50 and #34: an entry of <verbatim|rightsList> with <verbatim|rightsIdentifier> or <verbatim|rightsUri> is a licence, one with neither a rights statement (section 4.4); an archive keeping a mirror or a branch is responsible for having the right to redistribute what it copies, by licence, agreement or law, which the specification does not judge and verifiers do not check (sections 9.7, 11.2 and 15.6, appendix D); the open questions of sections 11.2, 14.6 and 15.6 on licences removed.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #26: a notice is numbered by its position in <verbatim|notices>, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in <verbatim|replaces>, each notice being replaced at most once; the current notices are those not replaced; the <verbatim|date> of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 
@@ -2395,6 +2391,10 @@
     <item><strong|Why owners are pseudonymous.> Owner names, key logs and signatures travel with every copy and can never be removed; if they named persons, no takedown could erase them.
 
     <item><strong|Why metadata is under CC0.> Pins, signatures and key logs are checked only where they can be copied; a licence would make every copy, index and reference a question of rights.
+
+    <item><strong|Why the format does not judge the right to copy.> Whether a copy is lawful depends on the licence, on agreements with the rights holders, on the law where the archive is and on who keeps it, none of which is in the files; a list of licences checked by verifiers would refuse lawful copies and could not make others lawful. The archive that serves a copy answers for it, as any publisher does (#34).
+
+    <item><strong|Why an entry with an identifier or a URL is a licence.> The kind of a <verbatim|rightsList> entry must be read from the file, not guessed from its name; a licence is identified, a statement is not (#50).
   </itemize>
 
   <subsection*|D.13 Versioning><label|d13-versioning>

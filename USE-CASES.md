@@ -135,19 +135,19 @@ osheaf verify
 Two co-authors each keep an archive; their joint paper is deposited once, in
 one of them. The other lists it in a collection of her own archive (for
 instance "papers with my students") as a member of another archive. In a
-**catalogue** with `follow`, each time she updates the collection
-(`osheaf collect`) it pins the latest signed version of her co-author's line;
-nothing is copied, and no permission is needed. Her member entry
-lists in `at` the archives where the paper may be found, all equal locations
-(section 8.2), so that readers still reach it when her co-author's archive is
-down. If she wants the paper in her archive too, and the licences of all its
-versions allow redistribution, she can **mirror** it: a byte-for-byte copy of
-her co-author's line, every version, kept in her storage root beside her own
-lines, with her co-author's key log. Its versions stay her co-author's,
-checked by her co-author's signatures; her archive can add nothing to them. If
-she carries the work on herself, she makes a **branch**: a new line of hers,
-starting from a version of her co-author's, and keeps the mirror beside it if
-she wants the earlier versions at hand (section 9.5).
+**catalogue** with `follow`, each time she updates the collection (`osheaf
+collect`) it pins the latest signed version of her co-author's line; nothing
+is copied, and no permission is needed. Her member entry lists in `at` the
+archives where the paper may be found, all equal locations (section 8.2), so
+that readers still reach it when her co-author's archive is down. If she wants
+the paper in her archive too, and has the right to redistribute it (by its
+licences, or her co-author's agreement), she can **mirror** it: a
+byte-for-byte copy of her co-author's line, every version, kept in her storage
+root beside her own lines, with her co-author's key log. Its versions stay her
+co-author's, checked by her co-author's signatures; her archive can add
+nothing to them. If she carries the work on herself, she makes a **branch**: a
+new line of hers, starting from a version of her co-author's, and keeps the
+mirror beside it if she wants the earlier versions at hand (section 9.5).
 
 ### A research group, a seminar, lecture notes
 
@@ -178,9 +178,11 @@ A university keeps an archive of its members' work.
 - Or members keep their own archives, and the institution **mirrors** their
   lines: each mirror is a whole copy, every version, with the member's key
   log, kept up to date by copying new versions, and checked by the member's
-  signatures. Mirroring is allowed only when the licences of all the versions
-  copied allow redistribution (section 11.2). Many papers imported from arXiv
-  carry arXiv's default licence, which does not; the institution then only
+  signatures. The institution answers for what it serves, and mirrors only
+  what it has the right to redistribute (section 11.2): by the licences, or by
+  its members' agreement, which it may ask for when they join. Many papers
+  imported from arXiv carry arXiv's default licence, which allows only arXiv
+  to distribute them; without the authors' agreement the institution only
   references them, or asks the authors to deposit openly licensed versions.
 - The institution is impartial: it keeps what its members deposit. It does not
   vet versions; that is what selections do.
@@ -278,24 +280,23 @@ particular version of each paper.
   its own parents; section 9.2), and the key logs of the authors and of those
   parents' owners beside it, as owner objects. It is the journal's version 1,
   recording the document version of the revision it copies (the authors'
-  version 3, say) in `parent.documentVersion`. Only the copied
-  revision needs a licence allowing redistribution; a paper whose first
-  preprint was under a restrictive licence can be accepted in a later, openly
-  licensed version. Later versions of the accepted copy (corrections, notices,
-  a withdrawal) are the editors' acts, signed by the journal; the authors
-  cannot change them. A journal will usually adopt the [timestamps
-  extension](opensheaf-timestamps-0.2.md) in its key log, from its first
-  version, so that every version it signs is dated, by an RFC 3161 authority
-  it trusts or by OpenTimestamps, so that if it ever loses a key to others,
-  readers can tell which versions came before. A correction the
-  journal makes itself, its version of record, is the journal's version 2,
-  since every line numbers its own versions; when the editors later vet the
-  authors' corrected version, the copy takes it as a new branch point, with
-  new evidence, as the journal's version 3, which keeps the journal's
-  notices, while its version of record stays in its earlier versions
-  (section 9.4). If the authors take in the journal's corrections, they
-  deposit them as a version of their own, linked to the journal's version
-  (section 9.5).
+  version 3, say) in `parent.documentVersion`. The journal needs the right to
+  redistribute only the copied revision (section 11.2), by its licence or the
+  authors' agreement; a paper whose first preprint was under a restrictive
+  licence can be accepted in a later, openly licensed version. Later versions
+  of the accepted copy (corrections, notices, a withdrawal) are the editors'
+  acts, signed by the journal; the authors cannot change them. A journal will
+  usually adopt the [timestamps extension](opensheaf-timestamps-0.2.md) in its
+  key log, from its first version, so that every version it signs is dated, by
+  an RFC 3161 authority it trusts or by OpenTimestamps, so that if it ever
+  loses a key to others, readers can tell which versions came before. A
+  correction the journal makes itself, its version of record, is the journal's
+  version 2, since every line numbers its own versions; when the editors later
+  vet the authors' corrected version, the copy takes it as a new branch point,
+  with new evidence, as the journal's version 3, which keeps the journal's
+  notices, while its version of record stays in its earlier versions (section
+  9.4). If the authors take in the journal's corrections, they deposit them as
+  a version of their own, linked to the journal's version (section 9.5).
 
 ```sh
 # keep an accepted copy of the version the editors vetted; --version names
@@ -379,12 +380,13 @@ and to analysis by people and machines.
   the detailed arguments it reviewed.
 - **The detailed argument stays available.** Her archive keeps it, with all
   its versions. To make sure the version reviewed survives her server, the
-  journal, or a storage site, **mirrors** the detailed argument, if its
-  licences allow: a mirror is a copy of her line, with her key log, impartial,
-  every version, which is what the journal wants for a document it vetted but
-  does not publish (an accepted copy would make it a line of the journal). The
-  selection `issue-7-details` lists the mirror in its member's `at`; a
-  Software Heritage snapshot of her archive is a further witness.
+  journal, or a storage site, **mirrors** the detailed argument, if it has the
+  right to (by its licences or her agreement): a mirror is a copy of her line,
+  with her key log, impartial, every version, which is what the journal wants
+  for a document it vetted but does not publish (an accepted copy would make
+  it a line of the journal). The selection `issue-7-details` lists the mirror
+  in its member's `at`; a Software Heritage snapshot of her archive is a
+  further witness.
 - **Later versions.** When she improves the detailed argument after
   publication, her catalogue follows it; the account published by the journal
   keeps pointing to the version reviewed, and presentations may say that
@@ -432,17 +434,17 @@ published yet, and its design is discussed in issue #28):
 
 Tools that know the extension follow it. Verifying the account resolves and
 checks the companions' pins like the pins of members. Mirroring the account
-mirrors its companions too, or reports that their licences forbid it. Keeping
-an accepted copy of the account does the same, and records the relation again
-in the copy's own `object.json`, since an accepted copy is a line of its own,
-which keeps the original's `object.json` only as evidence, in
-`parent/object.json` (section 9.2). Presentations show "the full argument,
-version 3, as reviewed" beside the account. A selection could also treat the
-companions, in their pinned versions, as vetted with the account; whether an
-extension may do so is one of the questions of #28, and in the core the
-journal pins them itself, in a selection such as `issue-7-details`. Tools that
-do not know the extension still read, copy and verify both documents by the
-core rules alone.
+mirrors its companions too, or warns when their licences do not show that they
+may be redistributed. Keeping an accepted copy of the account does the same,
+and records the relation again in the copy's own `object.json`, since an
+accepted copy is a line of its own, which keeps the original's `object.json`
+only as evidence, in `parent/object.json` (section 9.2). Presentations show
+"the full argument, version 3, as reviewed" beside the account. A selection
+could also treat the companions, in their pinned versions, as vetted with the
+account; whether an extension may do so is one of the questions of #28, and in
+the core the journal pins them itself, in a selection such as
+`issue-7-details`. Tools that do not know the extension still read, copy and
+verify both documents by the core rules alone.
 
 The same pattern serves other relations in which one document focuses on
 another: slides and the paper they present, a survey and the papers it
@@ -484,11 +486,10 @@ reports themselves, even if this is not customary today).
   authors' line, checked by their signatures), or a small collection pinning
   the objects that go together (the paper, a detailed argument, data). The
   journal checks what it received against the pins the authors give it. A
-  manuscript under review is usually not licensed for redistribution, while
-  the specification allows mirrors only when the licences allow it (section
-  11.2): here the mirror is made with the authors' agreement, which the
-  specification does not yet provide for (copying by agreement, #39; what
-  custodians promise, #54).
+  manuscript under review is usually not licensed for redistribution: here the
+  mirror is made with the authors' agreement, which is enough, since the
+  journal answers for what it keeps (section 11.2), and it keeps the mirror
+  privately anyway (what custodians promise is open, #54).
 - **The review as a selection.** The journal keeps, in its own private
   archive, a selection for each submission. Its members are the documents of
   the process, each pinned in the version that played its part: the submitted
@@ -551,10 +552,9 @@ reports themselves, even if this is not customary today).
   `IsReviewedBy`. Everything else stays private, still verifiable by those who
   have it.
 
-Open questions for the specification, discussed in issues #39, #54 and #63:
+Open questions for the specification, discussed in issues #54 and #63:
 
-- mirrors made with the owner's agreement, for objects whose licence does not
-  allow redistribution (#39, #54);
+- what a journal keeping authors' lines by agreement promises to keep (#54);
 - how a commitment is written as a creator in DataCite (for instance a
   `nameIdentifier` with a scheme of its own), with the exact encoding of what
   is hashed, so that every tool computes the same digest (#63).
@@ -589,8 +589,8 @@ was done, not only of what was handed in.
   extension; an institution may adopt it, and ask its students to adopt it in
   their key logs from the first version, so that every version is dated; a
   single researcher may not need it. When the institution keeps a mirror of
-  the work at each submission (if the licence allows; copying by agreement is
-  open, #39), the mirror is also its receipt.
+  the work at each submission (by the licence, or the student's agreement),
+  the mirror is also its receipt.
 - **Comments.** The supervisors' comments are documents (`Text`, with a
   `resourceType` such as "Supervisor's comments"), each with `Reviews`
   pointing to the exact object version commented on: a short text, an
@@ -675,4 +675,4 @@ journal is a selection of the journal's own documents, or of accepted copies.
 | the member's owner moves to another archive | the line continues there, as the same line; the collection finds it through `at`, once updated, or through indexes | the same; vetted revisions are unchanged |
 | another archive adds a version to a member's line | it is not the owner's: it is not signed, so verifiers report it as not a version, and the collection does not follow it | the same |
 | the member's archive disappears | members are fetched from mirrors, or any copy matching the pin; Zenodo records are witnesses, which keep the files but cannot be checked against the pin | the accepted copy keeps the vetted revision; references keep their cached citations |
-| a version's licence forbids redistribution | the line cannot be mirrored, only referenced (copying by agreement is open, #39) | the revision cannot be copied, only referenced (copying by agreement is open, #39) |
+| a version's licence forbids redistribution | the line is only referenced, unless its owner agrees to a mirror, for which the archive answers (section 11.2) | the revision is only referenced, unless its owner agrees to a copy (section 11.2) |

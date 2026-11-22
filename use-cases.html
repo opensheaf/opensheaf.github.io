@@ -227,15 +227,15 @@ osheaf verify</pre>
       class="verbatim">at</tt> the archives where the paper may be found, all equal
       locations (section 8.2), so that readers still reach it when her
       co-author's archive is down. If she wants the paper in her archive too,
-      and the licences of all its versions allow redistribution, she can
-      <strong>mirror</strong> it: a byte-for-byte copy of her co-author's
-      line, every version, kept in her storage root beside her own lines, with
-      her co-author's key log. Its versions stay her co-author's, checked by
-      her co-author's signatures; her archive can add nothing to them. If she
-      carries the work on herself, she makes a <strong>branch</strong>: a new
-      line of hers, starting from a version of her co-author's, and keeps the
-      mirror beside it if she wants the earlier versions at hand (section
-      9.5).
+      and has the right to redistribute it (by its licences, or her
+      co-author's agreement), she can <strong>mirror</strong> it: a
+      byte-for-byte copy of her co-author's line, every version, kept in her
+      storage root beside her own lines, with her co-author's key log. Its
+      versions stay her co-author's, checked by her co-author's signatures;
+      her archive can add nothing to them. If she carries the work on herself,
+      she makes a <strong>branch</strong>: a new line of hers, starting from a
+      version of her co-author's, and keeps the mirror beside it if she wants
+      the earlier versions at hand (section 9.5).
     </p>
     <h3 id="auto-5"><a id="a-research-group-a-seminar-lecture-notes"></a>A research group, a seminar, lecture notes<span style="margin-left: 1em"></span></h3>
     <p>
@@ -275,12 +275,14 @@ osheaf verify</pre>
           Or members keep their own archives, and the institution
           <strong>mirrors</strong> their lines: each mirror is a whole copy,
           every version, with the member's key log, kept up to date by copying
-          new versions, and checked by the member's signatures. Mirroring is
-          allowed only when the licences of all the versions copied allow
-          redistribution (section 11.2). Many papers imported from arXiv carry
-          arXiv's default licence, which does not; the institution then only
-          references them, or asks the authors to deposit openly licensed
-          versions.
+          new versions, and checked by the member's signatures. The
+          institution answers for what it serves, and mirrors only what it has
+          the right to redistribute (section 11.2): by the licences, or by its
+          members' agreement, which it may ask for when they join. Many papers
+          imported from arXiv carry arXiv's default licence, which allows only
+          arXiv to distribute them; without the authors' agreement the
+          institution only references them, or asks the authors to deposit
+          openly licensed versions.
         </p>
       </li>
       <li>
@@ -415,15 +417,16 @@ members:
           authors and of those parents' owners beside it, as owner objects. It
           is the journal's version 1, recording the document version of the
           revision it copies (the authors' version 3, say) in <tt class="verbatim">parent.documentVersion</tt>.
-          Only the copied revision needs a licence allowing redistribution; a
-          paper whose first preprint was under a restrictive licence can be
-          accepted in a later, openly licensed version. Later versions of the
-          accepted copy (corrections, notices, a withdrawal) are the editors'
-          acts, signed by the journal; the authors cannot change them. A
-          journal will usually adopt the <a href="opensheaf-timestamps-0.2.html">timestamps extension</a> in
-          its key log, from its first version, so that every version it signs
-          is dated, by an RFC 3161 authority it trusts or by OpenTimestamps,
-          so that if it ever loses a key to others, readers can tell which
+          The journal needs the right to redistribute only the copied revision
+          (section 11.2), by its licence or the authors' agreement; a paper
+          whose first preprint was under a restrictive licence can be accepted
+          in a later, openly licensed version. Later versions of the accepted
+          copy (corrections, notices, a withdrawal) are the editors' acts,
+          signed by the journal; the authors cannot change them. A journal
+          will usually adopt the <a href="opensheaf-timestamps-0.2.html">timestamps extension</a> in its key
+          log, from its first version, so that every version it signs is
+          dated, by an RFC 3161 authority it trusts or by OpenTimestamps, so
+          that if it ever loses a key to others, readers can tell which
           versions came before. A correction the journal makes itself, its
           version of record, is the journal's version 2, since every line
           numbers its own versions; when the editors later vet the authors'
@@ -560,13 +563,14 @@ members:
           <strong>The detailed argument stays available.</strong> Her archive
           keeps it, with all its versions. To make sure the version reviewed
           survives her server, the journal, or a storage site,
-          <strong>mirrors</strong> the detailed argument, if its licences
-          allow: a mirror is a copy of her line, with her key log, impartial,
-          every version, which is what the journal wants for a document it
-          vetted but does not publish (an accepted copy would make it a line
-          of the journal). The selection <tt class="verbatim">issue-7-details</tt> lists
-          the mirror in its member's <tt class="verbatim">at</tt>; a Software Heritage
-          snapshot of her archive is a further witness.
+          <strong>mirrors</strong> the detailed argument, if it has the right
+          to (by its licences or her agreement): a mirror is a copy of her
+          line, with her key log, impartial, every version, which is what the
+          journal wants for a document it vetted but does not publish (an
+          accepted copy would make it a line of the journal). The selection
+          <tt class="verbatim">issue-7-details</tt> lists the mirror in its member's <tt
+          class="verbatim">at</tt>; a Software Heritage snapshot of her archive is a
+          further witness.
         </p>
       </li>
       <li>
@@ -627,16 +631,17 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
     <p>
       Tools that know the extension follow it. Verifying the account resolves
       and checks the companions' pins like the pins of members. Mirroring the
-      account mirrors its companions too, or reports that their licences
-      forbid it. Keeping an accepted copy of the account does the same, and
-      records the relation again in the copy's own <tt class="verbatim">object.json</tt>,
-      since an accepted copy is a line of its own, which keeps the original's
-      <tt class="verbatim">object.json</tt> only as evidence, in <tt class="verbatim">parent/object.json</tt>
-      (section 9.2). Presentations show &quot;the full argument, version 3, as
-      reviewed&quot; beside the account. A selection could also treat the
-      companions, in their pinned versions, as vetted with the account;
-      whether an extension may do so is one of the questions of #28, and in
-      the core the journal pins them itself, in a selection such as <tt class="verbatim">issue-7-details</tt>.
+      account mirrors its companions too, or warns when their licences do not
+      show that they may be redistributed. Keeping an accepted copy of the
+      account does the same, and records the relation again in the copy's own
+      <tt class="verbatim">object.json</tt>, since an accepted copy is a line of its
+      own, which keeps the original's <tt class="verbatim">object.json</tt> only as
+      evidence, in <tt class="verbatim">parent/object.json</tt> (section 9.2).
+      Presentations show &quot;the full argument, version 3, as reviewed&quot;
+      beside the account. A selection could also treat the companions, in
+      their pinned versions, as vetted with the account; whether an extension
+      may do so is one of the questions of #28, and in the core the journal
+      pins them itself, in a selection such as <tt class="verbatim">issue-7-details</tt>.
       Tools that do not know the extension still read, copy and verify both
       documents by the core rules alone.
     </p>
@@ -698,11 +703,10 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           signatures), or a small collection pinning the objects that go
           together (the paper, a detailed argument, data). The journal checks
           what it received against the pins the authors give it. A manuscript
-          under review is usually not licensed for redistribution, while the
-          specification allows mirrors only when the licences allow it
-          (section 11.2): here the mirror is made with the authors' agreement,
-          which the specification does not yet provide for (copying by
-          agreement, #39; what custodians promise, #54).
+          under review is usually not licensed for redistribution: here the
+          mirror is made with the authors' agreement, which is enough, since
+          the journal answers for what it keeps (section 11.2), and it keeps
+          the mirror privately anyway (what custodians promise is open, #54).
         </p>
       </li>
       <li>
@@ -800,14 +804,13 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
       </li>
     </ul>
     <p>
-      Open questions for the specification, discussed in issues #39, #54 and
-      #63:
+      Open questions for the specification, discussed in issues #54 and #63:
     </p>
     <ul>
       <li>
         <p>
-          mirrors made with the owner's agreement, for objects whose licence
-          does not allow redistribution (#39, #54);
+          what a journal keeping authors' lines by agreement promises to keep
+          (#54);
         </p>
       </li>
       <li>
@@ -868,8 +871,8 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           adopt it, and ask its students to adopt it in their key logs from
           the first version, so that every version is dated; a single
           researcher may not need it. When the institution keeps a mirror of
-          the work at each submission (if the licence allows; copying by
-          agreement is open, #39), the mirror is also its receipt.
+          the work at each submission (by the licence, or the student's
+          agreement), the mirror is also its receipt.
         </p>
       </li>
       <li>
@@ -1077,10 +1080,10 @@ osheaf collection sync issue-7-details --from issue-7-details.yaml</pre>
           keep their cached citations</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid">a version's licence forbids redistribution</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the line cannot be mirrored, only referenced (copying by
-          agreement is open, #39)</td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the revision cannot be copied, only referenced (copying
-          by agreement is open, #39)</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the line is only referenced, unless its owner agrees to a
+          mirror, for which the archive answers (section 11.2)</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the revision is only referenced, unless its owner agrees
+          to a copy (section 11.2)</td>
         </tr></tbody>
       </table>
     </p>

@@ -75,7 +75,7 @@
 
   <section*|Can I put someone else's paper in my collection?><label|can-i-put-someone-elses-paper-in-my-collection>
 
-  Yes. A reference (a pin) copies nothing and needs no permission. There are two ways to keep a copy, both allowed only if the licence of what is copied permits redistribution (copying by the authors' agreement is still open, #39): a <strong|mirror> copies the whole line, every version, and stays its owner's line (for an institution or a storage site); an <strong|accepted copy> takes the one revision a selection vetted into a line of the selection's owner, where later changes are the curator's acts (for a journal). The licence of a collection (CC0 for the list) never extends to its members.
+  Yes. A reference (a pin) copies nothing and needs no permission. There are two ways to keep a copy, for which you need the right to redistribute what you copy, by its licence or by the authors' agreement; the archive that serves a copy answers for it, and the format does not judge it (section 11.2): a <strong|mirror> copies the whole line, every version, and stays its owner's line (for an institution or a storage site); an <strong|accepted copy> takes the one revision a selection vetted into a line of the selection's owner, where later changes are the curator's acts (for a journal). The licence of a collection (CC0 for the list) never extends to its members.
 
   <section*|Who owns an object?><label|who-owns-an-object>
 
