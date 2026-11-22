@@ -73,6 +73,9 @@
               },
               "issued": {
                 "type": "string"
+              },
+              "available": {
+                "type": "string"
               }
             }
           },

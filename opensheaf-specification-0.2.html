@@ -2229,11 +2229,13 @@ keyLog &lt;the value of keyLog&gt;</pre>
       a cached citation, not authoritative, so that the collection can be read
       and ordered without resolving its members, also when they become
       unavailable: <tt class="verbatim">title</tt>, <tt class="verbatim">creators</tt> (a list of
-      names), <tt class="verbatim">year</tt>, and <tt class="verbatim">issued</tt>, the member's
-      <tt class="verbatim">Issued</tt> date. Since <tt class="verbatim">members.json</tt> is the
-      source of the collection, any change of it, <tt class="verbatim">cite</tt>
-      included, is a new document version (section 4.2); tools SHOULD refresh
-      <tt class="verbatim">cite</tt> only when the member list changes otherwise.
+      names), <tt class="verbatim">year</tt>, <tt class="verbatim">issued</tt>, the member's <tt
+      class="verbatim">Issued</tt> date, and <tt class="verbatim">available</tt>, its <tt class="verbatim">Available</tt>
+      date, so that <tt class="verbatim">order</tt> can be followed from <tt class="verbatim">members.json</tt>
+      alone. Since <tt class="verbatim">members.json</tt> is the source of the
+      collection, any change of it, <tt class="verbatim">cite</tt> included, is a new
+      document version (section 4.2); tools SHOULD refresh <tt class="verbatim">cite</tt>
+      only when the member list changes otherwise.
     </p>
     <h3 id="auto-34"><a id="83-members-of-a-catalogue"></a>8.3 Members of a catalogue<span style="margin-left: 1em"></span></h3>
     <p>
@@ -2429,12 +2431,6 @@ keyLog &lt;the value of keyLog&gt;</pre>
       <strong>Open questions.</strong>
     </p>
     <ul>
-      <li>
-        <p>
-          Ordering by <tt class="verbatim">Available</tt> without resolving members,
-          which <tt class="verbatim">cite</tt> does not cache (#27).
-        </p>
-      </li>
       <li>
         <p>
           Which status a member has when the checksum file of its inventory is
@@ -4393,6 +4389,15 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           by owner, in the order of <tt class="verbatim">owners</tt>, or together,
           naming the owner of each when the archive hosts several (appendix
           A.3).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #27: <tt
+          class="verbatim">cite</tt> caches the member's <tt class="verbatim">Available</tt> date
+          in <tt class="verbatim">available</tt>, beside <tt class="verbatim">issued</tt>, so that
+          an <tt class="verbatim">order</tt> by date is followed from <tt class="verbatim">members.json</tt>
+          alone (section 8.2); the open question of section 8.6 removed.
         </p>
       </li>
       <li>

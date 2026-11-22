@@ -312,7 +312,7 @@ the same change in its schema, and the other way round.
 - Open questions go to issues on `opensheaf/opensheaf.github.io`, among
   them: #13 decentralised holding (split into #39 custodians' copies, #40
   statements by collections, #41 owner proofs), #19 scale, #22 external
-  records and pins, #27 ordering collections, #28
+  records and pins, #28
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors,

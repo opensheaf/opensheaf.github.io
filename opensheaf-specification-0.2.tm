@@ -619,7 +619,7 @@
     <item><verbatim|at>: a non-empty list of base URLs where copies of the line may be found, also of one URL: equal hints, which need no signature (section 3), read as the <verbatim|at> parameter of a <verbatim|sheaf:> URI (section 12). They locate copies of the member's own line, mirrors included (section 11), never a branch of it (section 9).
   </itemize>
 
-  Each member MAY have <verbatim|doi>, the version DOI, and <verbatim|conceptDoi>, the concept DOI, of the member; and <verbatim|cite>, a cached citation, not authoritative, so that the collection can be read and ordered without resolving its members, also when they become unavailable: <verbatim|title>, <verbatim|creators> (a list of names), <verbatim|year>, and <verbatim|issued>, the member's <verbatim|Issued> date. Since <verbatim|members.json> is the source of the collection, any change of it, <verbatim|cite> included, is a new document version (section 4.2); tools SHOULD refresh <verbatim|cite> only when the member list changes otherwise.
+  Each member MAY have <verbatim|doi>, the version DOI, and <verbatim|conceptDoi>, the concept DOI, of the member; and <verbatim|cite>, a cached citation, not authoritative, so that the collection can be read and ordered without resolving its members, also when they become unavailable: <verbatim|title>, <verbatim|creators> (a list of names), <verbatim|year>, <verbatim|issued>, the member's <verbatim|Issued> date, and <verbatim|available>, its <verbatim|Available> date, so that <verbatim|order> can be followed from <verbatim|members.json> alone. Since <verbatim|members.json> is the source of the collection, any change of it, <verbatim|cite> included, is a new document version (section 4.2); tools SHOULD refresh <verbatim|cite> only when the member list changes otherwise.
 
   <subsection*|8.3 Members of a catalogue><label|83-members-of-a-catalogue>
 
@@ -688,8 +688,6 @@
   <strong|Open questions.>
 
   <\itemize>
-    <item>Ordering by <verbatim|Available> without resolving members, which <verbatim|cite> does not cache (#27).
-
     <item>Which status a member has when the checksum file of its inventory is missing or wrong (#48).
 
     <item>What a collection may state about its members (volume, acceptance, the journal's own DOI, a retraction by the journal) (#40).
@@ -1249,6 +1247,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #72 (follow-up): <verbatim|owners> of the discovery document is required, empty for an archive that hosts no owner, and the rule for an archive without it is removed (sections 3.1 and 8.1, appendix B); the index page presents the members of the owner catalogues grouped by owner, in the order of <verbatim|owners>, or together, naming the owner of each when the archive hosts several (appendix A.3).
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #27: <verbatim|cite> caches the member's <verbatim|Available> date in <verbatim|available>, beside <verbatim|issued>, so that an <verbatim|order> by date is followed from <verbatim|members.json> alone (section 8.2); the open question of section 8.6 removed.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #44: no aliases; a work refused for a reused genesis record is sealed anew and MAY relate to the version it was refused as (section 5.4, appendix D); the open question of section 5.4 removed.
 
