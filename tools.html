@@ -236,13 +236,10 @@ osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://j
       <li>
         <p>
           <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>:
-          indexes for looking things up;
-        </p>
-      </li>
-      <li>
-        <p>
-          the website: <tt class="verbatim">index.html</tt>, a page per paper at <tt
-          class="verbatim">paper/&lt;label&gt;/</tt>, a page per owner at <tt class="verbatim">owner/&lt;owner&gt;/</tt>,
+          indexes for looking things up; - the website: <tt class="verbatim">index.html</tt>,
+          a page per paper at <tt class="verbatim">paper/&lt;name&gt;/</tt> (the
+          permanent address the descriptions record) and at <tt class="verbatim">paper/&lt;label&gt;/</tt>
+          (the readable one the pages link to), a page per owner at <tt class="verbatim">owner/&lt;owner&gt;/</tt>,
           <tt class="verbatim">sitemap.xml</tt>, and the templates they are made from in
           <tt class="verbatim">templates/</tt>, which you can edit.
         </p>
@@ -260,10 +257,12 @@ osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://j
     <h3 id="auto-7"><a id="depositing-a-paper"></a>Depositing a paper<span style="margin-left: 1em"></span></h3>
     <p>
       A new paper gets a <strong>label</strong> of your choice, which names it
-      in your archive and gives the address of its page, <tt class="verbatim">paper/&lt;label&gt;/</tt>.
-      <tt class="verbatim">--new</tt> makes the new work; the deposit prints its
-      permanent name, a <tt class="verbatim">sheaf:</tt> URI. A label may change later
-      (<tt class="verbatim">osheaf label</tt>, below); the permanent name does not.
+      in your archive and gives a readable address of its page, <tt class="verbatim">paper/&lt;label&gt;/</tt>;
+      the descriptions deposited record the permanent one, <tt class="verbatim">paper/&lt;name&gt;/</tt>,
+      built from its name. <tt class="verbatim">--new</tt> makes the new work; the
+      deposit prints its permanent name, a <tt class="verbatim">sheaf:</tt> URI. A label
+      may change later (<tt class="verbatim">osheaf label</tt>, below); the permanent
+      name does not.
     </p>
     <div class="language-bash">
       <div class="tmweb-code">
@@ -385,13 +384,14 @@ osheaf label kpz-copy --unset                       # no label: the page is at p
     <p>
       The discovery document, the indexes and the website are written again;
       the featured collection is renamed in <tt class="verbatim">osheaf.json</tt> too.
-      The page moves to <tt class="verbatim">paper/&lt;new&gt;/</tt>, and the HTML
-      version of a TeXmacs paper to <tt class="verbatim">site/&lt;new&gt;/&lt;new&gt;.html</tt>,
-      with its images. The versions already deposited give the old address in
-      their descriptions, and links to it are out in the world, so the old
-      address leads to the new one: <tt class="verbatim">osheaf.json</tt> records it in
-      <tt class="verbatim">formerAddresses</tt>, and the website keeps a small page
-      there that sends the reader on. A takedown removes them with the paper.
+      The readable address moves to <tt class="verbatim">paper/&lt;new&gt;/</tt>, and
+      the HTML version of a TeXmacs paper to <tt class="verbatim">site/&lt;new&gt;/&lt;new&gt;.html</tt>,
+      with its images; the permanent address <tt class="verbatim">paper/&lt;name&gt;/</tt>,
+      which the descriptions record, does not change. As a courtesy to links
+      shared with the old readable address, <tt class="verbatim">osheaf.json</tt>
+      records it in <tt class="verbatim">formerAddresses</tt>, and the website keeps a
+      small page there that sends the reader on, until another paper takes the
+      label. A takedown removes them with the paper.
     </p>
     <h3 id="auto-11"><a id="updating-the-archive-and-checking-it"></a>Updating the archive and checking it<span style="margin-left: 1em"></span></h3>
     <div class="language-bash">

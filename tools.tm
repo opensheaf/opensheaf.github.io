@@ -98,9 +98,7 @@
 
     <item><verbatim|ocfl/>: the storage itself, one folder per work, with the key log of the owner at <verbatim|ocfl/\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/>; - <verbatim|opensheaf.json>: the discovery document, which readers and tools start from, with the labels of your papers; beyond a thousand objects, the list of objects moves into pages under <verbatim|objects/>, so that a deposit rewrites one small file;
 
-    <item><verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>: indexes for looking things up;
-
-    <item>the website: <verbatim|index.html>, a page per paper at <verbatim|paper/\<less\>label\<gtr\>/>, a page per owner at <verbatim|owner/\<less\>owner\<gtr\>/>, <verbatim|sitemap.xml>, and the templates they are made from in <verbatim|templates/>, which you can edit.
+    <item><verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>: indexes for looking things up; - the website: <verbatim|index.html>, a page per paper at <verbatim|paper/\<less\>name\<gtr\>/> (the permanent address the descriptions record) and at <verbatim|paper/\<less\>label\<gtr\>/> (the readable one the pages link to), a page per owner at <verbatim|owner/\<less\>owner\<gtr\>/>, <verbatim|sitemap.xml>, and the templates they are made from in <verbatim|templates/>, which you can edit.
   </itemize>
 
   With <verbatim|-<no-break>-index texmacs>, the home page is instead a TeXmacs document made from a template (<verbatim|-<no-break>-index-template FILE>), with HTML versions of TeXmacs papers in <verbatim|site/>; the landing pages are the same. <verbatim|-<no-break>-curated> makes an owner catalogue that you choose by hand rather than one that lists every paper.
@@ -109,7 +107,7 @@
 
   <subsection*|Depositing a paper><label|depositing-a-paper>
 
-  A new paper gets a <strong|label> of your choice, which names it in your archive and gives the address of its page, <verbatim|paper/\<less\>label\<gtr\>/>. <verbatim|-<no-break>-new> makes the new work; the deposit prints its permanent name, a <verbatim|sheaf:> URI. A label may change later (<verbatim|osheaf label>, below); the permanent name does not.
+  A new paper gets a <strong|label> of your choice, which names it in your archive and gives a readable address of its page, <verbatim|paper/\<less\>label\<gtr\>/>; the descriptions deposited record the permanent one, <verbatim|paper/\<less\>name\<gtr\>/>, built from its name. <verbatim|-<no-break>-new> makes the new work; the deposit prints its permanent name, a <verbatim|sheaf:> URI. A label may change later (<verbatim|osheaf label>, below); the permanent name does not.
 
   <\html-div-class|language-bash>
   <\verbatim-code>
@@ -213,7 +211,7 @@
   </verbatim-code>
   </html-div-class>
 
-  The discovery document, the indexes and the website are written again; the featured collection is renamed in <verbatim|osheaf.json> too. The page moves to <verbatim|paper/\<less\>new\<gtr\>/>, and the HTML version of a TeXmacs paper to <verbatim|site/\<less\>new\<gtr\>/\<less\>new\<gtr\>.html>, with its images. The versions already deposited give the old address in their descriptions, and links to it are out in the world, so the old address leads to the new one: <verbatim|osheaf.json> records it in <verbatim|formerAddresses>, and the website keeps a small page there that sends the reader on. A takedown removes them with the paper.
+  The discovery document, the indexes and the website are written again; the featured collection is renamed in <verbatim|osheaf.json> too. The readable address moves to <verbatim|paper/\<less\>new\<gtr\>/>, and the HTML version of a TeXmacs paper to <verbatim|site/\<less\>new\<gtr\>/\<less\>new\<gtr\>.html>, with its images; the permanent address <verbatim|paper/\<less\>name\<gtr\>/>, which the descriptions record, does not change. As a courtesy to links shared with the old readable address, <verbatim|osheaf.json> records it in <verbatim|formerAddresses>, and the website keeps a small page there that sends the reader on, until another paper takes the label. A takedown removes them with the paper.
 
   <subsection*|Updating the archive and checking it><label|updating-the-archive-and-checking-it>
 

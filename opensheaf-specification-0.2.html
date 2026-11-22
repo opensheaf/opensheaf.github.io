@@ -331,8 +331,11 @@
       matches <tt class="verbatim">^[a-z0-9]+(-[a-z0-9]+)*$</tt>, has at most 64
       characters, and is unique in the discovery document. It is the archive's
       choice, may change, and is not an identifier; permanent links use <tt
-      class="verbatim">sheaf:</tt> URIs (section 12). Labels SHOULD be chosen by the
-      depositor, not derived from the title.
+      class="verbatim">sheaf:</tt> URIs (section 12). A label is never recorded in a
+      fixed file: an address written in an object version is built from the
+      line's name (appendix A.3), so that a label changes without leaving a
+      broken address behind. Labels SHOULD be chosen by the depositor, not
+      derived from the title.
     </p>
     <p>
       <strong>Private archives.</strong> An archive need not be public. Kept
@@ -939,12 +942,14 @@
       DOI (appendix A). <tt class="verbatim">publisher</tt> and <tt class="verbatim">affiliation</tt>
       SHOULD be objects, with <tt class="verbatim">name</tt> and, where available, an
       identifier; readers MUST also accept strings. <tt class="verbatim">doi</tt> and
-      <tt class="verbatim">url</tt> are present when the version has a DOI. <tt class="verbatim">resourceTypeGeneral</tt>
-      is from DataCite's list (<tt class="verbatim">Collection</tt> for collections),
-      with <tt class="verbatim">resourceType</tt> for detail (&quot;Lecture
-      notes&quot;). An author's versions of a work not published elsewhere,
-      the accepted manuscript included, are <tt class="verbatim">Preprint</tt>; <tt
-      class="verbatim">stage</tt> in <tt class="verbatim">object.json</tt> gives their stage.
+      <tt class="verbatim">url</tt> are present when the version has a DOI; <tt class="verbatim">url</tt>
+      is the line's landing page at the address built from its name, never
+      from a label (appendix A.3). <tt class="verbatim">resourceTypeGeneral</tt> is from
+      DataCite's list (<tt class="verbatim">Collection</tt> for collections), with <tt
+      class="verbatim">resourceType</tt> for detail (&quot;Lecture notes&quot;). An
+      author's versions of a work not published elsewhere, the accepted
+      manuscript included, are <tt class="verbatim">Preprint</tt>; <tt class="verbatim">stage</tt>
+      in <tt class="verbatim">object.json</tt> gives their stage.
     </p>
     <p>
       <strong>Mathematics.</strong> Titles and abstracts are plain text, in
@@ -4522,6 +4527,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #71: a
+          label is never recorded in a fixed file; the landing page of a line
+          is at an address built from its name, which <tt class="verbatim">url</tt> and
+          every other fixed file record, and a label MAY give a second address
+          leading to it, which may go or pass to another line when the label
+          changes (sections 3.1 and 4.4, appendices A.3 and C, D).
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>0.2 (draft), 22 November 2026:</strong> decided in #26: a
           notice is numbered by its position in <tt class="verbatim">notices</tt>, kept
           in order in every later version; a later notice about the same
@@ -4775,14 +4790,22 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <p>
           <strong>Landing pages.</strong> Each line listed by an owner
           catalogue has one landing page, at an address of the archive's
-          choice, distinct for each line and not an identifier (from its
-          label, section 3.1, or for a line without one from its name, and its
-          owner name when the archive holds several lines of that name), for
-          its current version (section 4.2), giving the full <tt class="verbatim">sheaf:</tt>
-          URI of the line in canonical form (sections 12.1 and 12.2) and every
-          signed document version in the order of the history, each with its
-          external labels, stage, change note, notices, renditions, sources
-          and DOI, and the withdrawal if any (sections 4.2, 4.3 and 13.1).
+          choice built from its name, followed by its owner name unless the
+          owner is the originator of the work, as in the canonical form of its
+          <tt class="verbatim">sheaf:</tt> URI (section 12.2): distinct for each line,
+          not an identifier, and the address that <tt class="verbatim">url</tt> (section
+          4.4) and every other fixed file record, which never changes. A line
+          with a label (section 3.1) MAY also have an address built from the
+          label, leading to the same page (a redirect, or a copy giving the
+          address from the name, or from the label, as canonical); it is a
+          convenience, given in links and to search engines, and may go or
+          pass to another line when the label changes. It never takes the
+          address of another line's page. The landing page is for its current
+          version (section 4.2), giving the full <tt class="verbatim">sheaf:</tt> URI of
+          the line in canonical form (sections 12.1 and 12.2) and every signed
+          document version in the order of the history, each with its external
+          labels, stage, change note, notices, renditions, sources and DOI,
+          and the withdrawal if any (sections 4.2, 4.3 and 13.1).
         </p>
       </li>
       <li>
@@ -5263,7 +5286,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <pre class="verbatim" xml:space="preserve">
 {
   &quot;doi&quot;: &quot;10.5281/zenodo.1234567&quot;,
-  &quot;url&quot;: &quot;https://mgubi.org/papers/fractional-phi42-mass-gap/&quot;,
+  &quot;url&quot;: &quot;https://mgubi.org/papers/paper/zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/&quot;,
   &quot;version&quot;: &quot;1&quot;,
   &quot;types&quot;: { &quot;resourceTypeGeneral&quot;: &quot;Preprint&quot; },
   &quot;titles&quot;: [ { &quot;title&quot;: &quot;Mass gap for the fractional $\\Phi^4_2$ model&quot; } ],
@@ -5814,6 +5837,17 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           Pages are listed explicitly, rather than found as index files by
           prefix, so that a reader over HTTP can enumerate the objects without
           trying every prefix (#19).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why fixed files record addresses from names, not
+          labels.</strong> A label is a local convenience the archive may
+          change; an address in a fixed file (the <tt class="verbatim">url</tt> of a
+          version's description, sent on with its DOI) cannot be changed, so
+          one built from a label would need redirects kept for ever and the
+          label reserved, turning a convenience into an identifier. Built from
+          the name, it never changes, and labels stay free (#71).
         </p>
       </li>
       <li>

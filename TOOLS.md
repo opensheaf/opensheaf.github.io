@@ -146,10 +146,11 @@ archive.
   document, which readers and tools start from, with the labels of your
   papers; beyond a thousand objects, the list of objects moves into pages
   under `objects/`, so that a deposit rewrites one small file;
-- `names/`, `owners/`, `sha512/`: indexes for looking things up;
-- the website: `index.html`, a page per paper at `paper/<label>/`, a page
-  per owner at `owner/<owner>/`, `sitemap.xml`, and the templates they are
-  made from in `templates/`, which you can edit.
+- `names/`, `owners/`, `sha512/`: indexes for looking things up; - the
+  website: `index.html`, a page per paper at `paper/<name>/` (the permanent
+  address the descriptions record) and at `paper/<label>/` (the readable one
+  the pages link to), a page per owner at `owner/<owner>/`, `sitemap.xml`, and
+  the templates they are made from in `templates/`, which you can edit.
 
 With `--index texmacs`, the home page is instead a TeXmacs document made
 from a template (`--index-template FILE`), with HTML versions of TeXmacs
@@ -162,9 +163,11 @@ paper.
 ### Depositing a paper
 
 A new paper gets a **label** of your choice, which names it in your archive
-and gives the address of its page, `paper/<label>/`. `--new` makes the new
-work; the deposit prints its permanent name, a `sheaf:` URI. A label may
-change later (`osheaf label`, below); the permanent name does not.
+and gives a readable address of its page, `paper/<label>/`; the descriptions
+deposited record the permanent one, `paper/<name>/`, built from its name.
+`--new` makes the new work; the deposit prints its permanent name, a `sheaf:`
+URI. A label may change later (`osheaf label`, below); the permanent name does
+not.
 
 ```sh
 osheaf deposit kpz-uniqueness paper.tex --pdf paper.pdf --new \
@@ -262,14 +265,15 @@ osheaf label --owner <owner> jane-doe               # the owner object
 osheaf label kpz-copy --unset                       # no label: the page is at paper/<name>/
 ```
 
-The discovery document, the indexes and the website are written again;
-the featured collection is renamed in `osheaf.json` too. The page moves to `paper/<new>/`, and the HTML version
-of a TeXmacs paper to `site/<new>/<new>.html`, with its images. The
-versions already deposited give the old address in their descriptions,
-and links to it are out in the world, so the old address leads to the
-new one: `osheaf.json` records it in `formerAddresses`, and the website
-keeps a small page there that sends the reader on. A takedown removes
-them with the paper.
+The discovery document, the indexes and the website are written again; the
+featured collection is renamed in `osheaf.json` too. The readable address
+moves to `paper/<new>/`, and the HTML version of a TeXmacs paper to
+`site/<new>/<new>.html`, with its images; the permanent address
+`paper/<name>/`, which the descriptions record, does not change. As a courtesy
+to links shared with the old readable address, `osheaf.json` records it in
+`formerAddresses`, and the website keeps a small page there that sends the
+reader on, until another paper takes the label. A takedown removes them with
+the paper.
 
 ### Updating the archive and checking it
 
