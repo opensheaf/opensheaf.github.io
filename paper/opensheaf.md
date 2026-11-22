@@ -428,9 +428,10 @@ keys decide.
 
 ### Lines, signatures and statuses {#sec:lines}
 
-A <dfn>line</dfn> is the history of a work as decided by one owner,
-`sheaf:<name>:<owner>`, and is its signed versions, wherever stored
-(specification, section 7). Every sealed version of a line other than a key log is signed by at least
+A <dfn>line</dfn> is the history of a work as decided by one owner, and is
+its signed versions, wherever stored; it is written `sheaf:<name>:<owner>`
+(specification, section 7). Every sealed version of a line other than a key
+log is signed by at least
 `threshold` current keys of one version of the owner's key log, each in a
 signature file kept in the object's witness folder, outside every version
 (Listing @lst:signature). The file's name is derived from its key, so a

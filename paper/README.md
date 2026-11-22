@@ -12,7 +12,7 @@ specification holds.
 - `build.py`: converts it to a two-column TeXmacs document, `opensheaf.tm`,
   reusing the inline rules of the site's converter (`../tools/md2tm.py`).
 - `opensheaf-paper.ts`: the style package: Linux Libertine for the text,
-  Linux Biolinum for the headings, Fira Mono for code, code listings
+  Linux Biolinum for the headings, IBM Plex Mono for code, code listings
   (`os-code`) on a tinted ground; the table colours (`TABLE_HEAD`,
   `TABLE_STRIPE`) are set in `build.py`.
 - `typeset.sh`, `typeset.scm`: build `opensheaf.tm` and typeset it twice

@@ -8,7 +8,7 @@
 
     <\src-purpose>
       The look of the OpenSheaf paper: Linux Libertine for the text, Linux
-      Biolinum for the headings, Fira Mono for code, code listings on a
+      Biolinum for the headings, IBM Plex Mono for code, code listings on a
       tinted ground. Table colours are set by build.py (cell-background).
     </src-purpose>
   </src-title>>
@@ -23,7 +23,7 @@
 
   <assign|os-sans-font|Linux Biolinum>
 
-  <assign|os-mono-font|Fira Mono>
+  <assign|os-mono-font|IBM Plex Mono>
 
   <assign|os-old-section-title|<value|section-title>>
 
@@ -54,10 +54,10 @@
 
   <assign|os-old-verbatim|<value|verbatim>>
 
-  <assign|verbatim|<macro|body|<with|font|<value|os-mono-font>|font-size|<times|<value|font-size>|0.88>|<os-old-verbatim|<arg|body>>>>>
+  <assign|verbatim|<macro|body|<with|font|<value|os-mono-font>|font-size|<times|<value|font-size>|0.85>|<os-old-verbatim|<arg|body>>>>>
 
   <assign|os-code|<\macro|body>
-    <\with|font|<value|os-mono-font>|font-size|0.92|par-first|0fn|ornament-shape|classic|ornament-color|<value|os-code-ground>|ornament-sunny-color|<value|os-code-rule>|ornament-shadow-color|<value|os-code-rule>|ornament-border|0.5ln|ornament-hpadding|0.6em|ornament-vpadding|0.5em>
+    <\with|font|<value|os-mono-font>|font-size|0.84|par-first|0fn|ornament-shape|classic|ornament-color|<value|os-code-ground>|ornament-sunny-color|<value|os-code-rule>|ornament-shadow-color|<value|os-code-rule>|ornament-border|0.5ln|ornament-hpadding|0.6em|ornament-vpadding|0.5em>
       <\ornament>
         <\verbatim-code>
           <arg|body>
@@ -65,6 +65,25 @@
       </ornament>
     </with>
   </macro>>
+  <\active*>
+    <\src-comment>
+      Highlighting of code blocks, as tagged by build.py.
+    </src-comment>
+  </active*>
+
+  <assign|os-code-grey|#6e7785>
+
+  <assign|os-code-light|#9aa3af>
+
+  <assign|os-kw|<macro|x|<with|font-series|bold|<arg|x>>>>
+
+  <assign|os-key|<macro|x|<with|font-series|bold|<arg|x>>>>
+
+  <assign|os-str|<macro|x|<with|color|<value|os-code-grey>|<arg|x>>>>
+
+  <assign|os-com|<macro|x|<with|color|<value|os-code-grey>|font-shape|italic|<arg|x>>>>
+
+  <assign|os-pun|<macro|x|<with|color|<value|os-code-light>|<arg|x>>>>
 </body>
 
 <\initial>

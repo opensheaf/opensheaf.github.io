@@ -186,63 +186,76 @@
 
     <\big-listing>
       <\os-code>
-        {
+        <os-pun|{>
 
-        \ \ "format": "opensheaf-archive/0.2",
+        \ \ <os-key|"format"><os-pun|:> <os-str|"opensheaf-archive/0.2"><os-pun|,>
 
-        \ \ "specification": "0.2",
+        \ \ <os-key|"specification"><os-pun|:> <os-str|"0.2"><os-pun|,>
 
-        \ \ "name": "Papers of Massimiliano Gubinelli",
+        \ \ <os-key|"name"><os-pun|:> <os-str|"Papers of Massimiliano
+        Gubinelli"><os-pun|,>
 
-        \ \ "storageRoot": "ocfl/",
+        \ \ <os-key|"storageRoot"><os-pun|:> <os-str|"ocfl/"><os-pun|,>
 
-        \ \ "storageLayout":
+        \ \ <os-key|"storageLayout"><os-pun|:>
 
-        \ \ \ \ "opensheaf-owner-name-storage-layout",
+        \ \ \ \ <os-str|"opensheaf-owner-name-storage-layout"><os-pun|,>
 
-        \ \ "profiles":
+        \ \ <os-key|"profiles"><os-pun|:>
 
-        \ \ \ \ [ "zenodo", "texmacs", "website" ],
+        \ \ \ \ <os-pun|[> <os-str|"zenodo"><os-pun|,>
+        <os-str|"texmacs"><os-pun|,> <os-str|"website"> <os-pun|]><os-pun|,>
 
-        \ \ "owners": [ {
+        \ \ <os-key|"owners"><os-pun|:> <os-pun|[> <os-pun|{>
 
-        \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ <os-key|"owner"><os-pun|:>
+        <os-str|"56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ \ \ "catalogue":
+        \ \ \ \ <os-key|"catalogue"><os-pun|:>
 
-        \ \ \ \ \ \ "sheaf:kdye5s4i.<no-break>.<no-break>.kxeq:56wo6cdp.<no-break>.<no-break>.z3pa"
+        \ \ \ \ \ \ <os-str|"sheaf:kdye5s4i.<no-break>.<no-break>.kxeq:56wo6cdp.<no-break>.<no-break>.z3pa">
 
-        \ \ } ],
+        \ \ <os-pun|}> <os-pun|]><os-pun|,>
 
-        \ \ "indexes": { "names": 2, "owners": 2,
+        \ \ <os-key|"indexes"><os-pun|:> <os-pun|{>
+        <os-key|"names"><os-pun|:> 2<os-pun|,> <os-key|"owners"><os-pun|:>
+        2<os-pun|,>
 
-        \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "sha512": 2 },
+        \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <os-key|"sha512"><os-pun|:> 2
+        <os-pun|}><os-pun|,>
 
-        \ \ "objects": [ .<no-break>.<no-break>., {
+        \ \ <os-key|"objects"><os-pun|:> <os-pun|[>
+        <os-pun|.<no-break>.<no-break>.><os-pun|,> <os-pun|{>
 
-        \ \ \ \ "id":
+        \ \ \ \ <os-key|"id"><os-pun|:>
 
-        \ \ \ \ \ \ "sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ \ \ <os-str|"sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ \ \ "kind": "document",
+        \ \ \ \ <os-key|"kind"><os-pun|:> <os-str|"document"><os-pun|,>
 
-        \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ \ \ <os-key|"name"><os-pun|:>
+        <os-str|"zzgdggwl.<no-break>.<no-break>.oz4q"><os-pun|,>
 
-        \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ <os-key|"owner"><os-pun|:>
+        <os-str|"56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ \ \ "head": "v2",
+        \ \ \ \ <os-key|"head"><os-pun|:> <os-str|"v2"><os-pun|,>
 
-        \ \ \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
+        \ \ \ \ <os-key|"inventorySha512"><os-pun|:>
+        <os-str|"e3e1.<no-break>.<no-break>.bb25"><os-pun|,>
 
-        \ \ \ \ "status": "active",
+        \ \ \ \ <os-key|"status"><os-pun|:> <os-str|"active"><os-pun|,>
 
-        \ \ \ \ "label": "fractional-phi42-mass-gap"
+        \ \ \ \ <os-key|"label"><os-pun|:>
+        <os-str|"fractional-phi42-mass-gap">
 
-        \ \ }, .<no-break>.<no-break>. ],
+        \ \ <os-pun|}><os-pun|,> <os-pun|.<no-break>.<no-break>.>
+        <os-pun|]><os-pun|,>
 
-        \ \ "tombstones": [ .<no-break>.<no-break>. ]
+        \ \ <os-key|"tombstones"><os-pun|:> <os-pun|[>
+        <os-pun|.<no-break>.<no-break>.> <os-pun|]>
 
-        }
+        <os-pun|}>
       </os-code>
     <|big-listing>
       An excerpt of the discovery document of appendix C.6:
@@ -322,63 +335,75 @@
 
     <\big-listing>
       <\os-code>
-        {
+        <os-pun|{>
 
-        \ \ "format": "opensheaf-object/0.2",
+        \ \ <os-key|"format"><os-pun|:> <os-str|"opensheaf-object/0.2"><os-pun|,>
 
-        \ \ "specification": "0.2",
+        \ \ <os-key|"specification"><os-pun|:> <os-str|"0.2"><os-pun|,>
 
-        \ \ "kind": "document",
+        \ \ <os-key|"kind"><os-pun|:> <os-str|"document"><os-pun|,>
 
-        \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ <os-key|"name"><os-pun|:> <os-str|"zzgdggwl.<no-break>.<no-break>.oz4q"><os-pun|,>
 
-        \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ <os-key|"owner"><os-pun|:> <os-str|"56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ "documentVersion": 1,
+        \ \ <os-key|"documentVersion"><os-pun|:> 1<os-pun|,>
 
-        \ \ "mainSource":
+        \ \ <os-key|"mainSource"><os-pun|:>
 
-        \ \ \ \ "fractional-phi42-mass-gap.tm",
+        \ \ \ \ <os-str|"fractional-phi42-mass-gap.tm"><os-pun|,>
 
-        \ \ "sourceFormat": "application/x-texmacs",
+        \ \ <os-key|"sourceFormat"><os-pun|:>
+        <os-str|"application/x-texmacs"><os-pun|,>
 
-        \ \ "renditions": [
+        \ \ <os-key|"renditions"><os-pun|:> <os-pun|[>
 
-        \ \ \ \ { "path": "fractional-phi42-mass-gap.pdf",
+        \ \ \ \ <os-pun|{> <os-key|"path"><os-pun|:>
+        <os-str|"fractional-phi42-mass-gap.pdf"><os-pun|,>
 
-        \ \ \ \ \ \ "mediaType": "application/pdf" } ],
+        \ \ \ \ \ \ <os-key|"mediaType"><os-pun|:> <os-str|"application/pdf">
+        <os-pun|}> <os-pun|]><os-pun|,>
 
-        \ \ "toolchain": [
+        \ \ <os-key|"toolchain"><os-pun|:> <os-pun|[>
 
-        \ \ \ \ { "name": "TeXmacs",
+        \ \ \ \ <os-pun|{> <os-key|"name"><os-pun|:>
+        <os-str|"TeXmacs"><os-pun|,>
 
-        \ \ \ \ \ \ "version": "2.1.5" } ],
+        \ \ \ \ \ \ <os-key|"version"><os-pun|:> <os-str|"2.1.5"> <os-pun|}>
+        <os-pun|]><os-pun|,>
 
-        \ \ "stage": { "scheme": "NISO-JAV",
+        \ \ <os-key|"stage"><os-pun|:> <os-pun|{> <os-key|"scheme"><os-pun|:>
+        <os-str|"NISO-JAV"><os-pun|,>
 
-        \ \ \ \ \ \ \ \ \ \ \ \ \ "value": "AO" },
+        \ \ \ \ \ \ \ \ \ \ \ \ \ <os-key|"value"><os-pun|:> <os-str|"AO">
+        <os-pun|}><os-pun|,>
 
-        \ \ "agreement": {
+        \ \ <os-key|"agreement"><os-pun|:> <os-pun|{>
 
-        \ \ \ \ "by": [ "P. Duch", "M. Gubinelli" ],
+        \ \ \ \ <os-key|"by"><os-pun|:> <os-pun|[> <os-str|"P.
+        Duch"><os-pun|,> <os-str|"M. Gubinelli"> <os-pun|]><os-pun|,>
 
-        \ \ \ \ "date": "2026-03-01",
+        \ \ \ \ <os-key|"date"><os-pun|:> <os-str|"2026-03-01"><os-pun|,>
 
-        \ \ \ \ "method": "by e-mail" },
+        \ \ \ \ <os-key|"method"><os-pun|:> <os-str|"by e-mail">
+        <os-pun|}><os-pun|,>
 
-        \ \ "external": [
+        \ \ <os-key|"external"><os-pun|:> <os-pun|[>
 
-        \ \ \ \ { "role": "deposit", "service": "Zenodo",
+        \ \ \ \ <os-pun|{> <os-key|"role"><os-pun|:>
+        <os-str|"deposit"><os-pun|,> <os-key|"service"><os-pun|:>
+        <os-str|"Zenodo"><os-pun|,>
 
-        \ \ \ \ \ \ "record":
+        \ \ \ \ \ \ <os-key|"record"><os-pun|:>
 
-        \ \ \ \ \ \ \ \ "https://zenodo.org/records/1234567",
+        \ \ \ \ \ \ \ \ <os-str|"https://zenodo.org/records/1234567"><os-pun|,>
 
-        \ \ \ \ \ \ "doi": "10.5281/zenodo.1234567" } ],
+        \ \ \ \ \ \ <os-key|"doi"><os-pun|:>
+        <os-str|"10.5281/zenodo.1234567"> <os-pun|}> <os-pun|]><os-pun|,>
 
-        \ \ "status": "active"
+        \ \ <os-key|"status"><os-pun|:> <os-str|"active">
 
-        }
+        <os-pun|}>
       </os-code>
     <|big-listing>
       The <no-break-start><verbatim|object.json><no-break-end> of the paper's
@@ -398,19 +423,20 @@
 
     <\big-listing>
       <\os-code>
-        {
+        <os-pun|{>
 
-        \ \ "format": "opensheaf-genesis/0.2",
+        \ \ <os-key|"format"><os-pun|:> <os-str|"opensheaf-genesis/0.2"><os-pun|,>
 
-        \ \ "kind": "document",
+        \ \ <os-key|"kind"><os-pun|:> <os-str|"document"><os-pun|,>
 
-        \ \ "created": "2026-03-02T09:14:00Z",
+        \ \ <os-key|"created"><os-pun|:> <os-str|"2026-03-02T09:14:00Z"><os-pun|,>
 
-        \ \ "originator": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ <os-key|"originator"><os-pun|:>
+        <os-str|"56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ "nonce": "6f65cd32058c16d6d78b05011772ff1d"
+        \ \ <os-key|"nonce"><os-pun|:> <os-str|"6f65cd32058c16d6d78b05011772ff1d">
 
-        }
+        <os-pun|}>
       </os-code>
     <|big-listing>
       The genesis record of the example paper (appendix
@@ -433,29 +459,34 @@
 
     <\big-listing>
       <\os-code>
-        import base64, hashlib, sys
+        <os-kw|import> base64<os-pun|,> hashlib<os-pun|,> sys
 
-        A = "abcdefghijklmnopqrstuvwxyz234567"
+        A <os-pun|=> <os-str|"abcdefghijklmnopqrstuvwxyz234567">
 
-        def name(g: bytes, k: int = 0) -\<gtr\> str:
+        <os-kw|def> name<os-pun|(>g<os-pun|:> bytes<os-pun|,> k<os-pun|:> int
+        <os-pun|=> 0<os-pun|)> -\<gtr\> str<os-pun|:>
 
-        \ \ \ \ seed = b"opensheaf-name-%d\\n" % k
+        \ \ \ \ seed <os-pun|=> <os-str|b"opensheaf-name-%d\\n"> % k
 
-        \ \ \ \ d = hashlib.sha256(seed + g).digest()
+        \ \ \ \ d <os-pun|=> hashlib.sha256<os-pun|(>seed +
+        g<os-pun|)>.digest<os-pun|(><os-pun|)>
 
-        \ \ \ \ s = base64.b32encode(d).decode()
+        \ \ \ \ s <os-pun|=> base64.b32encode<os-pun|(>d<os-pun|)>.decode<os-pun|(><os-pun|)>
 
-        \ \ \ \ s = s.rstrip("=").lower()
+        \ \ \ \ s <os-pun|=> s.rstrip<os-pun|(><os-str|"="><os-pun|)>.lower<os-pun|(><os-pun|)>
 
-        \ \ \ \ last = A.index(s[-1]) \| k
+        \ \ \ \ last <os-pun|=> A.index<os-pun|(>s<os-pun|[>-1<os-pun|]><os-pun|)>
+        <os-pun|\|> k
 
-        \ \ \ \ return s[:-1] + A[last]
+        \ \ \ \ <os-kw|return> s<os-pun|[><os-pun|:>-1<os-pun|]> +
+        A<os-pun|[>last<os-pun|]>
 
-        g = open(sys.argv[1], "rb").read()
+        g <os-pun|=> open<os-pun|(>sys.argv<os-pun|[>1<os-pun|]><os-pun|,>
+        <os-str|"rb"><os-pun|)>.read<os-pun|(><os-pun|)>
 
-        print(name(g, 0))
+        print<os-pun|(>name<os-pun|(>g<os-pun|,> 0<os-pun|)><os-pun|)>
 
-        print(name(g, 1))
+        print<os-pun|(>name<os-pun|(>g<os-pun|,> 1<os-pun|)><os-pun|)>
       </os-code>
     <|big-listing>
       Computing the names of a genesis record; checked against appendix
@@ -505,45 +536,46 @@
 
     <\big-listing>
       <\os-code>
-        {
+        <os-pun|{>
 
-        \ \ "format": "opensheaf-genesis/0.2",
+        \ \ <os-key|"format"><os-pun|:> <os-str|"opensheaf-genesis/0.2"><os-pun|,>
 
-        \ \ "kind": "owner",
+        \ \ <os-key|"kind"><os-pun|:> <os-str|"owner"><os-pun|,>
 
-        \ \ "created": "2026-03-01T17:40:00Z",
+        \ \ <os-key|"created"><os-pun|:> <os-str|"2026-03-01T17:40:00Z"><os-pun|,>
 
-        \ \ "nonce": "1b4d9964664d9825076eb8558af61162",
+        \ \ <os-key|"nonce"><os-pun|:> <os-str|"1b4d9964664d9825076eb8558af61162"><os-pun|,>
 
-        \ \ "keys": [
+        \ \ <os-key|"keys"><os-pun|:> <os-pun|[>
 
-        \ \ \ \ "did:key:z6MksKLD.<no-break>.<no-break>.MkMuVW"
+        \ \ \ \ <os-str|"did:key:z6MksKLD.<no-break>.<no-break>.MkMuVW">
 
-        \ \ ],
+        \ \ <os-pun|]><os-pun|,>
 
-        \ \ "threshold": 1,
+        \ \ <os-key|"threshold"><os-pun|:> 1<os-pun|,>
 
-        \ \ "next": [
+        \ \ <os-key|"next"><os-pun|:> <os-pun|[>
 
-        \ \ \ \ "oxthfb6b.<no-break>.<no-break>.qnalha",
+        \ \ \ \ <os-str|"oxthfb6b.<no-break>.<no-break>.qnalha"><os-pun|,>
 
-        \ \ \ \ "h6k4k6c5.<no-break>.<no-break>.vla6vq",
+        \ \ \ \ <os-str|"h6k4k6c5.<no-break>.<no-break>.vla6vq"><os-pun|,>
 
-        \ \ \ \ "lnaifwjn.<no-break>.<no-break>.npaklq"
+        \ \ \ \ <os-str|"lnaifwjn.<no-break>.<no-break>.npaklq">
 
-        \ \ ],
+        \ \ <os-pun|]><os-pun|,>
 
-        \ \ "nextThreshold": 2,
+        \ \ <os-key|"nextThreshold"><os-pun|:> 2<os-pun|,>
 
-        \ \ "keeper": [
+        \ \ <os-key|"keeper"><os-pun|:> <os-pun|[>
 
-        \ \ \ \ "https://orcid.org/0000-0002-1234-5677"
+        \ \ \ \ <os-str|"https://orcid.org/0000-0002-1234-5677">
 
-        \ \ ],
+        \ \ <os-pun|]><os-pun|,>
 
-        \ \ "extensions": { .<no-break>.<no-break>. }
+        \ \ <os-key|"extensions"><os-pun|:> <os-pun|{>
+        <os-pun|.<no-break>.<no-break>.> <os-pun|}>
 
-        }
+        <os-pun|}>
       </os-code>
     <|big-listing>
       The genesis record of the authors' owner (appendix C.1); the data of
@@ -584,13 +616,13 @@
 
     <subsection|Lines, signatures and statuses><label|sec:lines>
 
-    A <dfn|line> is the history of a work as decided by one owner,
-    <verbatim|sheaf:<line-break>\<less\>name\<gtr\>:<line-break>\<less\>owner\<gtr\>>,
-    and is its signed versions, wherever stored (specification, section 7).
-    Every sealed version of a line other than a key log is signed by at least
-    <no-break-start><verbatim|threshold><no-break-end> current keys of one
-    version of the owner's key log, each in a signature file kept in the
-    object's witness folder, outside every version (Listing
+    A <dfn|line> is the history of a work as decided by one owner, and is its
+    signed versions, wherever stored; it is written
+    <verbatim|sheaf:<line-break>\<less\>name\<gtr\>:<line-break>\<less\>owner\<gtr\>>
+    (specification, section 7). Every sealed version of a line other than a
+    key log is signed by at least <no-break-start><verbatim|threshold><no-break-end>
+    current keys of one version of the owner's key log, each in a signature
+    file kept in the object's witness folder, outside every version (Listing
     <reference|lst:signature>). The file's name is derived from its key, so a
     reader that knows the keys finds it without listing folders. What is
     signed is a message of five lines: a domain separator, the object, the
@@ -601,29 +633,31 @@
 
     <\big-listing>
       <\os-code>
-        {
+        <os-pun|{>
 
-        \ \ "format": "opensheaf-signature/0.2",
+        \ \ <os-key|"format"><os-pun|:> <os-str|"opensheaf-signature/0.2"><os-pun|,>
 
-        \ \ "object":
+        \ \ <os-key|"object"><os-pun|:>
 
-        \ \ \ \ "sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ <os-str|"sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ "version": "v2",
+        \ \ <os-key|"version"><os-pun|:> <os-str|"v2"><os-pun|,>
 
-        \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
+        \ \ <os-key|"inventorySha512"><os-pun|:>
+        <os-str|"e3e1.<no-break>.<no-break>.bb25"><os-pun|,>
 
-        \ \ "signer": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ <os-key|"signer"><os-pun|:> <os-str|"56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ "key": "did:key:z6MkugKq.<no-break>.<no-break>.DDvThn",
+        \ \ <os-key|"key"><os-pun|:> <os-str|"did:key:z6MkugKq.<no-break>.<no-break>.DDvThn"><os-pun|,>
 
-        \ \ "keyLog":
+        \ \ <os-key|"keyLog"><os-pun|:>
 
-        \ \ \ \ "sheaf:56wo6cdp.<no-break>.<no-break>.z3pa/v2?sha512=7673.<no-break>.<no-break>.3f84",
+        \ \ \ \ <os-str|"sheaf:56wo6cdp.<no-break>.<no-break>.z3pa/v2?sha512=7673.<no-break>.<no-break>.3f84"><os-pun|,>
 
-        \ \ "signature": "Gf9KOxH/.<no-break>.<no-break>.qipyBA=="
+        \ \ <os-key|"signature"><os-pun|:>
+        <os-str|"Gf9KOxH/.<no-break>.<no-break>.qipyBA==">
 
-        }
+        <os-pun|}>
       </os-code>
     <|big-listing>
       A signature file of the paper's second version (appendix
@@ -664,55 +698,66 @@
 
     <\big-listing>
       <\os-code>
-        {
+        <os-pun|{>
 
-        \ \ "format": "opensheaf-collection/0.2",
+        \ \ <os-key|"format"><os-pun|:> <os-str|"opensheaf-collection/0.2"><os-pun|,>
 
-        \ \ "type": "selection",
+        \ \ <os-key|"type"><os-pun|:> <os-str|"selection"><os-pun|,>
 
-        \ \ "members": [ {
+        \ \ <os-key|"members"><os-pun|:> <os-pun|[> <os-pun|{>
 
-        \ \ \ \ "kind": "document",
+        \ \ \ \ <os-key|"kind"><os-pun|:> <os-str|"document"><os-pun|,>
 
-        \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ \ \ <os-key|"name"><os-pun|:>
+        <os-str|"zzgdggwl.<no-break>.<no-break>.oz4q"><os-pun|,>
 
-        \ \ \ \ "owner": "tqr6lchn.<no-break>.<no-break>.tdka",
+        \ \ \ \ <os-key|"owner"><os-pun|:>
+        <os-str|"tqr6lchn.<no-break>.<no-break>.tdka"><os-pun|,>
 
-        \ \ \ \ "at": [ "https://journal.example.org/" ],
+        \ \ \ \ <os-key|"at"><os-pun|:> <os-pun|[>
+        <os-str|"https://journal.example.org/"> <os-pun|]><os-pun|,>
 
-        \ \ \ \ "revisions": [ {
+        \ \ \ \ <os-key|"revisions"><os-pun|:> <os-pun|[> <os-pun|{>
 
-        \ \ \ \ \ \ "documentVersion": 2,
+        \ \ \ \ \ \ <os-key|"documentVersion"><os-pun|:> 2<os-pun|,>
 
-        \ \ \ \ \ \ "version": "v1",
+        \ \ \ \ \ \ <os-key|"version"><os-pun|:> <os-str|"v1"><os-pun|,>
 
-        \ \ \ \ \ \ "inventorySha512": "1c4e.<no-break>.<no-break>.9a5a" } ],
+        \ \ \ \ \ \ <os-key|"inventorySha512"><os-pun|:>
+        <os-str|"1c4e.<no-break>.<no-break>.9a5a"> <os-pun|}>
+        <os-pun|]><os-pun|,>
 
-        \ \ \ \ "cite": { .<no-break>.<no-break>. }
+        \ \ \ \ <os-key|"cite"><os-pun|:> <os-pun|{>
+        <os-pun|.<no-break>.<no-break>.> <os-pun|}>
 
-        \ \ }, {
+        \ \ <os-pun|}><os-pun|,> <os-pun|{>
 
-        \ \ \ \ "kind": "document",
+        \ \ \ \ <os-key|"kind"><os-pun|:> <os-str|"document"><os-pun|,>
 
-        \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ \ \ <os-key|"name"><os-pun|:>
+        <os-str|"zzgdggwl.<no-break>.<no-break>.oz4q"><os-pun|,>
 
-        \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ <os-key|"owner"><os-pun|:>
+        <os-str|"56wo6cdp.<no-break>.<no-break>.z3pa"><os-pun|,>
 
-        \ \ \ \ "at": [ "https://mgubi.org/papers/" ],
+        \ \ \ \ <os-key|"at"><os-pun|:> <os-pun|[>
+        <os-str|"https://mgubi.org/papers/"> <os-pun|]><os-pun|,>
 
-        \ \ \ \ "revisions": [ {
+        \ \ \ \ <os-key|"revisions"><os-pun|:> <os-pun|[> <os-pun|{>
 
-        \ \ \ \ \ \ "documentVersion": 2,
+        \ \ \ \ \ \ <os-key|"documentVersion"><os-pun|:> 2<os-pun|,>
 
-        \ \ \ \ \ \ "version": "v2",
+        \ \ \ \ \ \ <os-key|"version"><os-pun|:> <os-str|"v2"><os-pun|,>
 
-        \ \ \ \ \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
+        \ \ \ \ \ \ <os-key|"inventorySha512"><os-pun|:>
+        <os-str|"e3e1.<no-break>.<no-break>.bb25"><os-pun|,>
 
-        \ \ \ \ \ \ "doi": "10.5281/zenodo.1234568" } ]
+        \ \ \ \ \ \ <os-key|"doi"><os-pun|:>
+        <os-str|"10.5281/zenodo.1234568"> <os-pun|}> <os-pun|]>
 
-        \ \ } ]
+        \ \ <os-pun|}> <os-pun|]>
 
-        }
+        <os-pun|}>
       </os-code>
     <|big-listing>
       A selection, an issue of a journal (appendix C.4);
@@ -806,31 +851,31 @@
       <\os-code>
         sheaf:\<less\>name\<gtr\>
 
-        \ \ \ \ the originator's line
+        \ \ \ \ <os-com|the originator's line>
 
         sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>
 
-        \ \ \ \ the line of that owner
+        \ \ \ \ <os-com|the line of that owner>
 
         sheaf:\<less\>name\<gtr\>:*
 
-        \ \ \ \ the work: all its lines
+        \ \ \ \ <os-com|the work: all its lines>
 
         sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>
 
-        \ \ \ \ document version n of the line
+        \ \ \ \ <os-com|document version n of the line>
 
         sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>
 
-        \ \ \ \ one object version holding it
+        \ \ \ \ <os-com|one object version holding it>
 
         sheaf:\<less\>owner\<gtr\>
 
-        \ \ \ \ an owner: its key log
+        \ \ \ \ <os-com|an owner: its key log>
 
         sheaf:\<less\>owner\<gtr\>/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>
 
-        \ \ \ \ a version of its key log
+        \ \ \ \ <os-com|a version of its key log>
       </os-code>
     <|big-listing>
       The forms of <no-break-start><verbatim|sheaf:><no-break-end> URIs
@@ -841,31 +886,31 @@
       <\os-code>
         sheaf:zzgdggwl.<no-break>.<no-break>.oz4q
 
-        \ \ \ \ the authors' line
+        \ \ \ \ <os-com|the authors' line>
 
         sheaf:zzgdggwl.<no-break>.<no-break>.oz4q/v2
 
-        \ \ \ \ document version 2 of the authors' line
+        \ \ \ \ <os-com|document version 2 of the authors' line>
 
         sheaf:zzgdggwl.<no-break>.<no-break>.oz4q/v2?sha512=e3e1.<no-break>.<no-break>.bb25
 
-        \ \ \ \ the authors' object version v2
+        \ \ \ \ <os-com|the authors' object version v2>
 
         sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:tqr6lchn.<no-break>.<no-break>.tdka/v2
 
-        \ \ \ \ document version 2 of the journal's line
+        \ \ \ \ <os-com|document version 2 of the journal's line>
 
         sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:*
 
-        \ \ \ \ the work: every line of it
+        \ \ \ \ <os-com|the work: every line of it>
 
         sheaf:56wo6cdp.<no-break>.<no-break>.z3pa
 
-        \ \ \ \ the authors' owner: its key log
+        \ \ \ \ <os-com|the authors' owner: its key log>
 
         sheaf:zzgdggwl/v2
 
-        \ \ \ \ a short form of the second
+        \ \ \ \ <os-com|a short form of the second>
       </os-code>
     <|big-listing>
       Some of the URIs of the paper, of the accepted copy and of the owner
@@ -888,49 +933,54 @@
 
     <\big-listing>
       <\os-code>
-        resolve(uri):
+        <os-kw|resolve><os-pun|(>uri<os-pun|)><os-pun|:>
 
-        \ \ name, owner, n, digest, at = parse(uri)
+        \ \ name<os-pun|,> owner<os-pun|,> n<os-pun|,> digest<os-pun|,> at
+        <os-pun|=> parse<os-pun|(>uri<os-pun|)>
 
-        \ \ for loc in at, members' at, parent.url,
+        \ \ <os-kw|for> loc <os-kw|in> at<os-pun|,> members' at<os-pun|,>
+        parent.url<os-pun|,>
 
-        \ \ \ \ \ \ \ \ \ \ \ \ \ indexes, configuration:
+        \ \ \ \ \ \ \ \ \ \ \ \ \ indexes<os-pun|,> configuration<os-pun|:>
 
-        \ \ \ \ read loc/opensheaf.json
+        \ \ \ \ <os-kw|read> loc/opensheaf.json
 
-        \ \ \ \ find (name, owner) in the indexes,
+        \ \ \ \ <os-kw|find> <os-pun|(>name<os-pun|,> owner<os-pun|)>
+        <os-kw|in> the indexes<os-pun|,>
 
-        \ \ \ \ \ \ or else in objects
+        \ \ \ \ \ \ <os-kw|or> <os-kw|else> <os-kw|in> objects
 
-        \ \ \ \ fetch the inventory of the version
+        \ \ \ \ <os-kw|fetch> the inventory of the version
 
-        \ \ \ \ check name is a name of genesis.json
+        \ \ \ \ <os-kw|check> name is a name of genesis.json
 
-        \ \ \ \ check object.json: name and owner
+        \ \ \ \ <os-kw|check> object.json<os-pun|:> name and owner
 
-        \ \ \ \ check signatures against the key log
+        \ \ \ \ <os-kw|check> signatures against the key log
 
-        \ \ \ \ \ \ beside the copy, or a longer copy
+        \ \ \ \ \ \ beside the copy<os-pun|,> <os-kw|or> a longer copy
 
-        \ \ \ \ check the version holds n
+        \ \ \ \ <os-kw|check> the version holds n
 
-        \ \ \ \ if digest: check the inventory bytes,
+        \ \ \ \ <os-kw|if> digest<os-pun|:> <os-kw|check> the inventory
+        bytes<os-pun|,>
 
         \ \ \ \ \ \ whatever the checksum file says
 
-        \ \ \ \ keep the copy and its signed versions;
+        \ \ \ \ <os-kw|keep> the copy and its signed versions<os-pun|;>
 
-        \ \ \ \ \ \ a contested one only for a digest
+        \ \ \ \ \ \ a contested one only <os-kw|for> a digest
 
-        \ \ report copies that do not match, forks,
+        \ \ <os-kw|report> copies that do not match<os-pun|,> forks<os-pun|,>
 
-        \ \ \ \ ended owners, exposed keys, tombstones
+        \ \ \ \ ended owners<os-pun|,> exposed keys<os-pun|,> tombstones
 
-        \ \ if digest: return a copy that matches,
+        \ \ <os-kw|if> digest<os-pun|:> <os-kw|return> a copy that
+        matches<os-pun|,>
 
-        \ \ \ \ or else report a mismatch
+        \ \ \ \ <os-kw|or> <os-kw|else> <os-kw|report> a mismatch
 
-        \ \ return the latest signed version
+        \ \ <os-kw|return> the latest signed version
 
         \ \ \ \ among the copies that agree
       </os-code>
@@ -1012,73 +1062,74 @@
 
     <\big-listing>
       <\os-code>
-        osheaf init my-papers \\
+        <os-kw|osheaf> init my-papers <os-pun|\\>
 
-        \ \ -<no-break>-name "Papers of Jane Doe" \\
+        \ \ -<no-break>-name <os-str|"Papers of Jane Doe"> <os-pun|\\>
 
-        \ \ -<no-break>-base-url \\
+        \ \ -<no-break>-base-url <os-pun|\\>
 
-        \ \ \ \ https://janedoe.github.io/papers/ \\
+        \ \ \ \ https<os-pun|:>//janedoe.github.io/papers/ <os-pun|\\>
 
-        \ \ -<no-break>-curator "Doe, Jane" \\
+        \ \ -<no-break>-curator <os-str|"Doe, Jane"> <os-pun|\\>
 
-        \ \ -<no-break>-affiliation "Example University" \\
+        \ \ -<no-break>-affiliation <os-str|"Example University"> <os-pun|\\>
 
-        \ \ -<no-break>-new-owner \\
+        \ \ -<no-break>-new-owner <os-pun|\\>
 
-        \ \ -<no-break>-export /Volumes/USB/opensheaf-keys \\
+        \ \ -<no-break>-export /Volumes/USB/opensheaf-keys <os-pun|\\>
 
         \ \ -<no-break>-print
 
-        cd my-papers
+        <os-kw|cd> my-papers
 
-        osheaf deposit kpz-uniqueness paper.tex \\
+        <os-kw|osheaf> deposit kpz-uniqueness paper.tex <os-pun|\\>
 
-        \ \ -<no-break>-pdf paper.pdf -<no-break>-new \\
+        \ \ -<no-break>-pdf paper.pdf -<no-break>-new <os-pun|\\>
 
-        \ \ -<no-break>-extra-source refs.bib \\
+        \ \ -<no-break>-extra-source refs.bib <os-pun|\\>
 
-        \ \ -<no-break>-extra-source \\
+        \ \ -<no-break>-extra-source <os-pun|\\>
 
-        \ \ \ \ figures/fig1.pdf=figures/fig1.pdf \\
+        \ \ \ \ figures/fig1.pdf<os-pun|=>figures/fig1.pdf <os-pun|\\>
 
-        \ \ -<no-break>-title \\
+        \ \ -<no-break>-title <os-pun|\\>
 
-        \ \ \ \ "Energy solutions of KPZ are unique" \\
+        \ \ \ \ <os-str|"Energy solutions of KPZ are unique"> <os-pun|\\>
 
-        \ \ -<no-break>-author "Doe, Jane\|Example University" \\
+        \ \ -<no-break>-author <os-str|"Doe, Jane\|Example University">
+        <os-pun|\\>
 
-        \ \ -<no-break>-author \\
+        \ \ -<no-break>-author <os-pun|\\>
 
-        \ \ \ \ "Roe, Richard\|Another University" \\
+        \ \ \ \ <os-str|"Roe, Richard\|Another University"> <os-pun|\\>
 
-        \ \ -<no-break>-abstract-file abstract.txt \\
+        \ \ -<no-break>-abstract-file abstract.txt <os-pun|\\>
 
-        \ \ -<no-break>-keyword "stochastic PDE" \\
+        \ \ -<no-break>-keyword <os-str|"stochastic PDE"> <os-pun|\\>
 
         \ \ -<no-break>-rights cc-by-4.0 -<no-break>-available 2015-08-31
 
-        osheaf deposit kpz-uniqueness paper.tex \\
+        <os-kw|osheaf> deposit kpz-uniqueness paper.tex <os-pun|\\>
 
-        \ \ -<no-break>-pdf paper.pdf \\
+        \ \ -<no-break>-pdf paper.pdf <os-pun|\\>
 
-        \ \ -<no-break>-changes "Lemma 2 corrected." \\
+        \ \ -<no-break>-changes <os-str|"Lemma 2 corrected."> <os-pun|\\>
 
-        \ \ -<no-break>-title \\
+        \ \ -<no-break>-title <os-pun|\\>
 
-        \ \ \ \ "Energy solutions of KPZ are unique" \\
+        \ \ \ \ <os-str|"Energy solutions of KPZ are unique"> <os-pun|\\>
 
-        \ \ -<no-break>-author "Doe, Jane\|Example University"
+        \ \ -<no-break>-author <os-str|"Doe, Jane\|Example University">
 
-        osheaf notice kpz-uniqueness -<no-break>-about 1 \\
+        <os-kw|osheaf> notice kpz-uniqueness -<no-break>-about 1 <os-pun|\\>
 
-        \ \ -<no-break>-text \\
+        \ \ -<no-break>-text <os-pun|\\>
 
-        \ \ "Lemma 2 is wrong as stated; see version 2."
+        \ \ <os-str|"Lemma 2 is wrong as stated; see version 2.">
 
-        osheaf collect
+        <os-kw|osheaf> collect
 
-        osheaf verify
+        <os-kw|osheaf> verify
       </os-code>
     <|big-listing>
       Creating an archive and an owner, depositing a paper and a second
@@ -1811,168 +1862,168 @@
     <associate|auto-12|<tuple|3|2>>
     <associate|auto-13|<tuple|3.1|2>>
     <associate|auto-14|<tuple|1|2>>
-    <associate|auto-15|<tuple|3.2|3>>
+    <associate|auto-15|<tuple|3.2|2>>
     <associate|auto-16|<tuple|2|3>>
     <associate|auto-17|<tuple|2|3>>
     <associate|auto-18|<tuple|3.3|3>>
     <associate|auto-19|<tuple|3|3>>
     <associate|auto-2|<tuple|1|1>>
-    <associate|auto-20|<tuple|4|4>>
-    <associate|auto-21|<tuple|3.4|4>>
+    <associate|auto-20|<tuple|4|3>>
+    <associate|auto-21|<tuple|3.4|3>>
     <associate|auto-22|<tuple|5|4>>
     <associate|auto-23|<tuple|1|4>>
     <associate|auto-24|<tuple|2|4>>
     <associate|auto-25|<tuple|3.5|4>>
-    <associate|auto-26|<tuple|6|5>>
-    <associate|auto-27|<tuple|3.6|5>>
+    <associate|auto-26|<tuple|6|4>>
+    <associate|auto-27|<tuple|3.6|4>>
     <associate|auto-28|<tuple|7|5>>
     <associate|auto-29|<tuple|3|5>>
     <associate|auto-3|<tuple|2|1>>
     <associate|auto-30|<tuple|3.7|5>>
-    <associate|auto-31|<tuple|3.8|6>>
-    <associate|auto-32|<tuple|3.9|6>>
-    <associate|auto-33|<tuple|8|6>>
+    <associate|auto-31|<tuple|3.8|5>>
+    <associate|auto-32|<tuple|3.9|5>>
+    <associate|auto-33|<tuple|8|5>>
     <associate|auto-34|<tuple|9|6>>
     <associate|auto-35|<tuple|10|6>>
     <associate|auto-36|<tuple|3.10|6>>
-    <associate|auto-37|<tuple|3.11|7>>
-    <associate|auto-38|<tuple|3.12|7>>
-    <associate|auto-39|<tuple|4|7>>
+    <associate|auto-37|<tuple|3.11|6>>
+    <associate|auto-38|<tuple|3.12|6>>
+    <associate|auto-39|<tuple|4|6>>
     <associate|auto-4|<tuple|1|2>>
-    <associate|auto-40|<tuple|4.1|7>>
+    <associate|auto-40|<tuple|4.1|6>>
     <associate|auto-41|<tuple|11|7>>
     <associate|auto-42|<tuple|4.2|7>>
-    <associate|auto-43|<tuple|4.3|8>>
-    <associate|auto-44|<tuple|4.4|8>>
+    <associate|auto-43|<tuple|4.3|7>>
+    <associate|auto-44|<tuple|4.4|7>>
     <associate|auto-45|<tuple|4.5|8>>
     <associate|auto-46|<tuple|1|8>>
     <associate|auto-47|<tuple|2|8>>
     <associate|auto-48|<tuple|3|8>>
     <associate|auto-49|<tuple|5|8>>
     <associate|auto-5|<tuple|2|2>>
-    <associate|auto-50|<tuple|4|9>>
-    <associate|auto-51|<tuple|5.1|9>>
+    <associate|auto-50|<tuple|4|8>>
+    <associate|auto-51|<tuple|5.1|8>>
     <associate|auto-52|<tuple|5.2|9>>
     <associate|auto-53|<tuple|5.3|9>>
-    <associate|auto-54|<tuple|5.4|10>>
-    <associate|auto-55|<tuple|5.5|10>>
-    <associate|auto-56|<tuple|5.6|10>>
-    <associate|auto-57|<tuple|5.7|10>>
+    <associate|auto-54|<tuple|5.4|9>>
+    <associate|auto-55|<tuple|5.5|9>>
+    <associate|auto-56|<tuple|5.6|9>>
+    <associate|auto-57|<tuple|5.7|9>>
     <associate|auto-58|<tuple|5.8|10>>
     <associate|auto-59|<tuple|5|10>>
     <associate|auto-6|<tuple|3|2>>
     <associate|auto-60|<tuple|6|10>>
-    <associate|auto-61|<tuple|1|11>>
-    <associate|auto-62|<tuple|2|11>>
-    <associate|auto-63|<tuple|3|11>>
-    <associate|auto-64|<tuple|4|11>>
-    <associate|auto-65|<tuple|5|11>>
-    <associate|auto-66|<tuple|6|11>>
-    <associate|auto-67|<tuple|7|11>>
-    <associate|auto-68|<tuple|7|11>>
+    <associate|auto-61|<tuple|1|10>>
+    <associate|auto-62|<tuple|2|10>>
+    <associate|auto-63|<tuple|3|10>>
+    <associate|auto-64|<tuple|4|10>>
+    <associate|auto-65|<tuple|5|10>>
+    <associate|auto-66|<tuple|6|10>>
+    <associate|auto-67|<tuple|7|10>>
+    <associate|auto-68|<tuple|7|10>>
     <associate|auto-7|<tuple|4|2>>
     <associate|auto-8|<tuple|5|2>>
     <associate|auto-9|<tuple|6|2>>
-    <associate|bib-activitypub|<tuple|56|13>>
-    <associate|bib-alphaxivwp|<tuple|19|12>>
-    <associate|bib-antieau2026|<tuple|63|13>>
-    <associate|bib-arxivwp|<tuple|17|12>>
-    <associate|bib-atproto|<tuple|57|13>>
+    <associate|bib-activitypub|<tuple|56|12>>
+    <associate|bib-alphaxivwp|<tuple|19|11>>
+    <associate|bib-antieau2026|<tuple|63|12>>
+    <associate|bib-arxivwp|<tuple|17|11>>
+    <associate|bib-atproto|<tuple|57|12>>
     <associate|bib-capadisli2017|<tuple|42|12>>
     <associate|bib-capadisli2020|<tuple|43|12>>
-    <associate|bib-ceramic2025|<tuple|38|12>>
-    <associate|bib-coarnotify|<tuple|54|13>>
-    <associate|bib-datacite|<tuple|24|12>>
-    <associate|bib-descinodes|<tuple|37|12>>
-    <associate|bib-dicosmo2018|<tuple|35|12>>
+    <associate|bib-ceramic2025|<tuple|38|11>>
+    <associate|bib-coarnotify|<tuple|54|12>>
+    <associate|bib-datacite|<tuple|24|11>>
+    <associate|bib-descinodes|<tuple|37|11>>
+    <associate|bib-dicosmo2018|<tuple|35|11>>
     <associate|bib-elife|<tuple|48|12>>
-    <associate|bib-ellerman2024b|<tuple|30|12>>
-    <associate|bib-episciences|<tuple|51|13>>
+    <associate|bib-ellerman2024b|<tuple|30|11>>
+    <associate|bib-episciences|<tuple|51|12>>
     <associate|bib-explorer|<tuple|10|11>>
-    <associate|bib-fedidentity|<tuple|22|12>>
-    <associate|bib-fedpub|<tuple|16|12>>
+    <associate|bib-fedidentity|<tuple|22|11>>
+    <associate|bib-fedpub|<tuple|16|11>>
     <associate|bib-git02|<tuple|7|11>>
-    <associate|bib-groth2010|<tuple|26|12>>
+    <associate|bib-groth2010|<tuple|26|11>>
     <associate|bib-hartgerink2019|<tuple|39|12>>
-    <associate|bib-hexagonwp|<tuple|18|12>>
+    <associate|bib-hexagonwp|<tuple|18|11>>
     <associate|bib-hochstenbach2023|<tuple|45|12>>
-    <associate|bib-ipfs|<tuple|59|13>>
-    <associate|bib-kademlia2002|<tuple|60|13>>
-    <associate|bib-keri2019|<tuple|25|12>>
-    <associate|bib-keysforks|<tuple|21|12>>
-    <associate|bib-kf2025b|<tuple|33|12>>
-    <associate|bib-kf2026a|<tuple|31|12>>
-    <associate|bib-kf2026c|<tuple|32|12>>
-    <associate|bib-kf2026f|<tuple|34|12>>
-    <associate|bib-kuhn2014|<tuple|27|12>>
-    <associate|bib-kuhn2016|<tuple|28|12>>
-    <associate|bib-kuhn2026|<tuple|29|12>>
+    <associate|bib-ipfs|<tuple|59|12>>
+    <associate|bib-kademlia2002|<tuple|60|12>>
+    <associate|bib-keri2019|<tuple|25|11>>
+    <associate|bib-keysforks|<tuple|21|11>>
+    <associate|bib-kf2025b|<tuple|33|11>>
+    <associate|bib-kf2026a|<tuple|31|11>>
+    <associate|bib-kf2026c|<tuple|32|11>>
+    <associate|bib-kf2026f|<tuple|34|11>>
+    <associate|bib-kuhn2014|<tuple|27|11>>
+    <associate|bib-kuhn2016|<tuple|28|11>>
+    <associate|bib-kuhn2026|<tuple|29|11>>
     <associate|bib-lean|<tuple|13|11>>
     <associate|bib-ledger|<tuple|40|12>>
-    <associate|bib-lockss|<tuple|53|13>>
+    <associate|bib-lockss|<tuple|53|12>>
     <associate|bib-manager|<tuple|11|11>>
-    <associate|bib-maniatis2003|<tuple|52|13>>
+    <associate|bib-maniatis2003|<tuple|52|12>>
     <associate|bib-mcdowell2021|<tuple|49|12>>
-    <associate|bib-nostr|<tuple|58|13>>
-    <associate|bib-oaipmh|<tuple|55|13>>
-    <associate|bib-ocfl|<tuple|23|12>>
+    <associate|bib-nostr|<tuple|58|12>>
+    <associate|bib-oaipmh|<tuple|55|12>>
+    <associate|bib-ocfl|<tuple|23|11>>
     <associate|bib-oric2pa|<tuple|47|12>>
     <associate|bib-papers|<tuple|14|11>>
-    <associate|bib-pci|<tuple|50|13>>
+    <associate|bib-pci|<tuple|50|12>>
     <associate|bib-pep740|<tuple|46|12>>
-    <associate|bib-positioning|<tuple|15|12>>
+    <associate|bib-positioning|<tuple|15|11>>
     <associate|bib-priem2012|<tuple|4|11>>
     <associate|bib-pubfair2019|<tuple|5|11>>
-    <associate|bib-radicle|<tuple|61|13>>
-    <associate|bib-radiclewp|<tuple|20|12>>
-    <associate|bib-rocrate2022|<tuple|36|12>>
-    <associate|bib-roosendaal1997|<tuple|1|11>>
+    <associate|bib-radicle|<tuple|61|12>>
+    <associate|bib-radiclewp|<tuple|20|11>>
+    <associate|bib-rocrate2022|<tuple|36|11>>
+    <associate|bib-roosendaal1997|<tuple|1|10>>
     <associate|bib-smith1999|<tuple|3|11>>
     <associate|bib-solid|<tuple|44|12>>
     <associate|bib-spec02|<tuple|6|11>>
     <associate|bib-template|<tuple|12|11>>
     <associate|bib-timestamps02|<tuple|8|11>>
     <associate|bib-tools|<tuple|9|11>>
-    <associate|bib-tuf|<tuple|62|13>>
-    <associate|bib-vandesompel2004|<tuple|2|11>>
+    <associate|bib-tuf|<tuple|62|12>>
+    <associate|bib-vandesompel2004|<tuple|2|10>>
     <associate|bib-wittek2020|<tuple|41|12>>
     <associate|lst:discovery|<tuple|1|2>>
     <associate|lst:genesis|<tuple|3|3>>
-    <associate|lst:name|<tuple|4|4>>
+    <associate|lst:name|<tuple|4|3>>
     <associate|lst:object|<tuple|2|3>>
     <associate|lst:osheaf|<tuple|11|7>>
     <associate|lst:owner|<tuple|5|4>>
     <associate|lst:resolve|<tuple|10|6>>
     <associate|lst:selection|<tuple|7|5>>
-    <associate|lst:signature|<tuple|6|5>>
-    <associate|lst:uriforms|<tuple|8|6>>
+    <associate|lst:signature|<tuple|6|4>>
+    <associate|lst:uriforms|<tuple|8|5>>
     <associate|lst:uris|<tuple|9|6>>
     <associate|sec:archives|<tuple|3.1|2>>
     <associate|sec:branches|<tuple|3.7|5>>
-    <associate|sec:collections|<tuple|3.6|5>>
-    <associate|sec:conclusion|<tuple|7|11>>
-    <associate|sec:drafts|<tuple|3.8|6>>
+    <associate|sec:collections|<tuple|3.6|4>>
+    <associate|sec:conclusion|<tuple|7|10>>
+    <associate|sec:drafts|<tuple|3.8|5>>
     <associate|sec:eval|<tuple|6|10>>
     <associate|sec:explorer|<tuple|4.2|7>>
     <associate|sec:format|<tuple|3|2>>
-    <associate|sec:impl|<tuple|4|7>>
+    <associate|sec:impl|<tuple|4|6>>
     <associate|sec:intro|<tuple|1|1>>
-    <associate|sec:lean|<tuple|4.3|8>>
+    <associate|sec:lean|<tuple|4.3|7>>
     <associate|sec:lessons|<tuple|4.5|8>>
     <associate|sec:lines|<tuple|3.5|4>>
     <associate|sec:names|<tuple|3.3|3>>
     <associate|sec:new|<tuple|5.8|10>>
-    <associate|sec:objects|<tuple|3.2|3>>
-    <associate|sec:owners|<tuple|3.4|4>>
-    <associate|sec:papers|<tuple|4.4|8>>
+    <associate|sec:objects|<tuple|3.2|2>>
+    <associate|sec:owners|<tuple|3.4|3>>
+    <associate|sec:papers|<tuple|4.4|7>>
     <associate|sec:principles|<tuple|2|1>>
-    <associate|sec:profiles|<tuple|3.12|7>>
+    <associate|sec:profiles|<tuple|3.12|6>>
     <associate|sec:related|<tuple|5|8>>
-    <associate|sec:tools|<tuple|4.1|7>>
-    <associate|sec:uris|<tuple|3.9|6>>
-    <associate|sec:verification|<tuple|3.11|7>>
+    <associate|sec:tools|<tuple|4.1|6>>
+    <associate|sec:uris|<tuple|3.9|5>>
+    <associate|sec:verification|<tuple|3.11|6>>
     <associate|sec:withdrawal|<tuple|3.10|6>>
-    <associate|tab:compare|<tuple|4|9>>
+    <associate|tab:compare|<tuple|4|8>>
     <associate|tab:files|<tuple|2|3>>
     <associate|tab:functions|<tuple|1|1>>
     <associate|tab:new|<tuple|5|10>>
@@ -2186,18 +2237,18 @@
     <\associate|listing>
       <tuple|normal|<\surround|<hidden-binding|<tuple>|1>|>
         An excerpt of the discovery document of appendix C.6:
-        <no-break-start><with|font|<quote|Fira
-        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|contact>><no-break-end>
-        and <no-break-start><with|font|<quote|Fira
-        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|extensions>><no-break-end>
-        are left out, and of <no-break-start><with|font|<quote|Fira
-        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|objects>><no-break-end>
+        <no-break-start><with|font|<quote|IBM Plex
+        Mono>|font-size|<quote|0.71485>|<with|font-family|<quote|tt>|language|<quote|verbatim>|contact>><no-break-end>
+        and <no-break-start><with|font|<quote|IBM Plex
+        Mono>|font-size|<quote|0.71485>|<with|font-family|<quote|tt>|language|<quote|verbatim>|extensions>><no-break-end>
+        are left out, and of <no-break-start><with|font|<quote|IBM Plex
+        Mono>|font-size|<quote|0.71485>|<with|font-family|<quote|tt>|language|<quote|verbatim>|objects>><no-break-end>
         only the paper's entry is shown.
       </surround>|<pageref|auto-14>>
 
       <tuple|normal|<\surround|<hidden-binding|<tuple>|2>|>
-        The <no-break-start><with|font|<quote|Fira
-        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|object.json>><no-break-end>
+        The <no-break-start><with|font|<quote|IBM Plex
+        Mono>|font-size|<quote|0.71485>|<with|font-family|<quote|tt>|language|<quote|verbatim>|object.json>><no-break-end>
         of the paper's first version (appendix C.2), lines broken to fit.
       </surround>|<pageref|auto-17>>
 
@@ -2220,14 +2271,14 @@
 
       <tuple|normal|<\surround|<hidden-binding|<tuple>|7>|>
         A selection, an issue of a journal (appendix C.4);
-        <no-break-start><with|font|<quote|Fira
-        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|cite>><no-break-end>
+        <no-break-start><with|font|<quote|IBM Plex
+        Mono>|font-size|<quote|0.71485>|<with|font-family|<quote|tt>|language|<quote|verbatim>|cite>><no-break-end>
         is elided.
       </surround>|<pageref|auto-28>>
 
       <tuple|normal|<\surround|<hidden-binding|<tuple>|8>|>
-        The forms of <no-break-start><with|font|<quote|Fira
-        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|sheaf:>><no-break-end>
+        The forms of <no-break-start><with|font|<quote|IBM Plex
+        Mono>|font-size|<quote|0.71485>|<with|font-family|<quote|tt>|language|<quote|verbatim>|sheaf:>><no-break-end>
         URIs (specification, section 12.1).
       </surround>|<pageref|auto-33>>
 

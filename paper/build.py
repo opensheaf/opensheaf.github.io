@@ -29,7 +29,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'tools'))
-from md2tm import inline as md_inline, esc, code_line  # noqa: E402
+from md2tm import inline as md_inline, esc, literal  # noqa: E402
 
 LABEL_RE = re.compile(r'\s*\{#([A-Za-z0-9:_-]+)\}\s*$')
 CITE_RE = re.compile(r'\[(@[A-Za-z0-9-]+(?:\s*;\s*@[A-Za-z0-9-]+)*)\]')
@@ -103,6 +103,80 @@ def heading(text):
 # Table colours, matching the code ground of opensheaf-paper.ts.
 TABLE_HEAD = '#dde4ee'
 TABLE_STRIPE = '#f2f4f7'
+
+
+# Syntax highlighting of code blocks. Each token gets a macro of
+# opensheaf-paper.ts, which sets its look: os-kw (keywords, commands), os-key
+# (JSON keys), os-str (strings), os-com (comments, descriptions), os-pun
+# (punctuation, elisions).
+PY_KW = {'import', 'from', 'def', 'return', 'for', 'in', 'if', 'else', 'or',
+         'and', 'not', 'while', 'with', 'as', 'class', 'None', 'True', 'False'}
+PSEUDO_KW = {'for', 'in', 'if', 'else', 'or', 'return', 'check', 'keep',
+             'report', 'find', 'fetch', 'read'}
+SH_CMDS = {'osheaf', 'cd'}
+TOKEN = re.compile(r"""
+    (?P<str>b?"(?:[^"\\]|\\.)*")
+  | (?P<com>\#.*$)
+  | (?P<ell>\.\.\.)
+  | (?P<word>[A-Za-z_][\w-]*)
+  | (?P<opt>--?[\w-]+)
+  | (?P<pun>[{}\[\](),:;=|\\])
+  | (?P<sp>\s+)
+  | (?P<other>.)""", re.X)
+
+
+def wrap(tag, text):
+    t = literal(esc(text))
+    return f'<{tag}|{t}>' if tag else t
+
+
+def spaces(n):
+    return ' ' + '\\ ' * (n - 1) if n > 1 else ' '
+
+
+def highlight_line(lang, c, uris=False):
+    if not c.strip():
+        return ''
+    n = len(c) - len(c.lstrip(' '))
+    rest = c.lstrip(' ')
+    out = []
+    if uris:
+        # a list of URIs: the indented lines describe the one above
+        out.append(wrap('os-com' if n else None, rest))
+    else:
+        toks = list(TOKEN.finditer(rest))
+        first_word = True
+        for k, m in enumerate(toks):
+            kind, text = m.lastgroup, m.group()
+            tag = None
+            if kind == 'sp':
+                out.append(spaces(len(text)))
+                continue
+            if kind == 'str':
+                nxt = next((x for x in toks[k + 1:] if x.lastgroup != 'sp'), None)
+                is_key = lang == 'json' and nxt is not None and nxt.group() == ':'
+                tag = 'os-key' if is_key else 'os-str'
+            elif kind == 'com':
+                tag = 'os-com' if lang in ('python', 'sh') else None
+            elif kind in ('ell', 'pun'):
+                tag = 'os-pun'
+            elif kind == 'word':
+                if lang == 'python' and text in PY_KW:
+                    tag = 'os-kw'
+                elif lang == 'text' and (text in PSEUDO_KW or (first_word and n == 0)):
+                    tag = 'os-kw'
+                elif lang == 'sh' and first_word and text in SH_CMDS:
+                    tag = 'os-kw'
+                elif lang == 'json' and text in ('true', 'false', 'null'):
+                    tag = 'os-kw'
+                first_word = False
+            out.append(wrap(tag, text))
+    return '    ' + '\\ ' * n + ''.join(out)
+
+
+def highlight(lang, code):
+    uris = lang == 'text' and any(c.startswith('sheaf:') for c in code)
+    return [highlight_line(lang, c, uris) for c in code]
 
 
 def table(rows):
@@ -182,7 +256,7 @@ def convert(md):
             while j < len(lines) and not lines[j].startswith('```'):
                 code.append(lines[j])
                 j += 1
-            body = '\n\n'.join(code_line(c) for c in code)
+            body = '\n\n'.join(highlight(l[3:].strip(), code))
             block = '<\\os-code>\n' + body + '\n</os-code>'
             if caption and caption[0] == 'listing':
                 block = (f'<\\big-listing>\n{block}\n<|big-listing>\n'
