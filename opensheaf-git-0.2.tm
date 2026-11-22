@@ -241,7 +241,7 @@
     <item>move to a host with other limits, or to its own server.
   </itemize>
 
-  Tools working on a large archive MAY use a partial clone (<verbatim|git clone -<no-break>-filter=blob:none>) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the owner-name layout reaches its limits first: every deposit rewrites the tree of an owner's folder, which lists every line of that owner, and the tree of <verbatim|ocfl/>, which lists every owner, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 3.2 of the specification), which spreads the objects over folders of a few entries each. (Indexes for archives of millions of objects are discussed in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19>.)
+  Tools working on a large archive MAY use a partial clone (<verbatim|git clone -<no-break>-filter=blob:none>) or a sparse checkout, since adding a version to an object needs only that object's folder and the discovery document. In git, the owner-name layout reaches its limits first: every deposit rewrites the tree of an owner's folder, which lists every line of that owner, and the tree of <verbatim|ocfl/>, which lists every owner, and the web views of forges show at most about a thousand entries of a folder. An archive expected to hold tens of thousands of objects or more SHOULD therefore be created with the hashed layout (section 3.2 of the specification), which spreads the objects over folders of a few entries each. Such an archive also pages the <verbatim|objects> of its discovery document (section 3.1 of the specification): a deposit then rewrites one page, and branches that add objects of different pages do not conflict on them.
 
   <section*|9. Takedown><label|9-takedown>
 
@@ -316,7 +316,7 @@
 
     <item><strong|Portable content paths> (section 4.3): a recommendation here, or a rule of the specification itself, since it matters for any copy made on another system?
 
-    <item><strong|Scale> (section 8): indexes and the size of git trees for very large archives, in <hlink|issue #19|https://github.com/opensheaf/opensheaf.github.io/issues/19> and <hlink|issue #32|https://github.com/opensheaf/opensheaf.github.io/issues/32>.
+    <item><strong|Scale> (section 8): the size of git trees for very large archives, in <hlink|issue #32|https://github.com/opensheaf/opensheaf.github.io/issues/32>.
 
     <item><strong|Objects held by others> (<hlink|issue #39|https://github.com/opensheaf/opensheaf.github.io/issues/39>): whether objects controlled by their authors and kept by custodians call for one repository per object, and how such repositories make up an archive without submodules.
   </enumerate>
@@ -345,6 +345,8 @@
     <item><strong|0.2 (draft), 22 November 2026:> the archive's main catalogue replaced by one owner catalogue per owner hosted, as in the specification (#72): a commit updates an owner catalogue, and merges conflict on the catalogue of an owner both branches changed (sections 6.1 and 6.3).
 
     <item><strong|0.2 (draft), 22 November 2026:> following the specification (#29): an archive in a private repository is a private archive, whose lines are published by copying them, never by pushing them to a public repository (sections 6.2 and 12); a deposit merged from a pull request is <verbatim|Available> from its deposit (section 6.3); open question 4 removed.
+
+    <item><strong|0.2 (draft), 22 November 2026:> following the specification (#19): an archive of many objects pages the <verbatim|objects> of its discovery document, so that a deposit rewrites one page (section 8); open question 4 restricted to the size of git trees.
   </itemize>
 
 </body>

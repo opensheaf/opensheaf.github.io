@@ -704,8 +704,10 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       of a folder. An archive expected to hold tens of thousands of objects or
       more SHOULD therefore be created with the hashed layout (section 3.2 of
       the specification), which spreads the objects over folders of a few
-      entries each. (Indexes for archives of millions of objects are discussed
-      in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a>.)
+      entries each. Such an archive also pages the <tt class="verbatim">objects</tt> of
+      its discovery document (section 3.1 of the specification): a deposit
+      then rewrites one page, and branches that add objects of different pages
+      do not conflict on them.
     </p>
     <h2 id="auto-24"><a id="9-takedown"></a>9. Takedown<span style="margin-left: 1em"></span></h2>
     <p>
@@ -961,9 +963,8 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       </li>
       <li>
         <p>
-          <strong>Scale</strong> (section 8): indexes and the size of git
-          trees for very large archives, in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/19">issue #19</a> and <a
-          href="https://github.com/opensheaf/opensheaf.github.io/issues/32">issue #32</a>.
+          <strong>Scale</strong> (section 8): the size of git trees for very
+          large archives, in <a href="https://github.com/opensheaf/opensheaf.github.io/issues/32">issue #32</a>.
         </p>
       </li>
       <li>
@@ -1112,6 +1113,14 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           them to a public repository (sections 6.2 and 12); a deposit merged
           from a pull request is <tt class="verbatim">Available</tt> from its deposit
           (section 6.3); open question 4 removed.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> following the
+          specification (#19): an archive of many objects pages the <tt class="verbatim">objects</tt>
+          of its discovery document, so that a deposit rewrites one page
+          (section 8); open question 4 restricted to the size of git trees.
         </p>
       </li>
     </ul>

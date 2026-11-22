@@ -66,7 +66,9 @@ questions are listed at the end of the sections they concern.
 - **Discovery document** (3.1): a map, never a witness: `format`,
   `specification`, `name`, `storageRoot`, `storageLayout`, `profiles`,
   `objects` (`id`, `kind`, `name`, `owner`, `head`, `inventorySha512`,
-  `status`, optional `label`; no drafts) and `owners` (each hosted
+  `status`, optional `label`; no drafts), or in its place `objectPages`,
+  the paths of pages (`opensheaf-objects/0.2`) of those entries, advised
+  beyond about a thousand objects (#19), and `owners` (each hosted
   owner with `owner` and `catalogue`, its owner catalogue, in the order of
   presentation; empty when the archive hosts no owner); SHOULD `contact`,
   `extensions`; MAY `drafts`, `indexes`, `feed`;
@@ -274,6 +276,7 @@ questions are listed at the end of the sections they concern.
 ## Schemas
 
 `schemas/opensheaf-archive-0.2.schema.json` (`opensheaf.json`),
+`opensheaf-objects-0.2.schema.json` (its pages of objects, `objectPages`),
 `opensheaf-object-0.2.schema.json` (`object.json`, also as
 `parent/object.json`), `opensheaf-collection-0.2.schema.json`
 (`members.json`), `opensheaf-genesis-0.2.schema.json` (`genesis.json`),

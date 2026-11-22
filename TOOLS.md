@@ -142,9 +142,10 @@ archive.
   [4.1](opensheaf-git-0.2.md#41-attributes) of
   [OpenSheaf archives in git](opensheaf-git-0.2.md));
 - `ocfl/`: the storage itself, one folder per work, with the key log of the
-  owner at `ocfl/<owner>/<owner>/`;
-- `opensheaf.json`: the discovery document, which readers and tools start
-  from, with the labels of your papers;
+  owner at `ocfl/<owner>/<owner>/`; - `opensheaf.json`: the discovery
+  document, which readers and tools start from, with the labels of your
+  papers; beyond a thousand objects, the list of objects moves into pages
+  under `objects/`, so that a deposit rewrites one small file;
 - `names/`, `owners/`, `sha512/`: indexes for looking things up;
 - the website: `index.html`, a page per paper at `paper/<label>/`, a page
   per owner at `owner/<owner>/`, `sitemap.xml`, and the templates they are

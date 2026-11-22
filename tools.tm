@@ -96,9 +96,7 @@
 
     <item><verbatim|.gitattributes>, unless the folder has one already: it tells git to keep every file of the archive byte for byte (section <hlink|4.1|opensheaf-git-0.2.tm#41-attributes> of <hlink|OpenSheaf archives in git|opensheaf-git-0.2.tm>);
 
-    <item><verbatim|ocfl/>: the storage itself, one folder per work, with the key log of the owner at <verbatim|ocfl/\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/>;
-
-    <item><verbatim|opensheaf.json>: the discovery document, which readers and tools start from, with the labels of your papers;
+    <item><verbatim|ocfl/>: the storage itself, one folder per work, with the key log of the owner at <verbatim|ocfl/\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/>; - <verbatim|opensheaf.json>: the discovery document, which readers and tools start from, with the labels of your papers; beyond a thousand objects, the list of objects moves into pages under <verbatim|objects/>, so that a deposit rewrites one small file;
 
     <item><verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>: indexes for looking things up;
 

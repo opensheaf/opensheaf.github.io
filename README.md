@@ -175,6 +175,8 @@ on GitHub, and archives made with them.
   specification, also published at `https://opensheaf.org/schemas/`:
   [`opensheaf-archive-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-archive-0.2.schema.json)
   for `opensheaf.json`,
+  [`opensheaf-objects-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-objects-0.2.schema.json)
+  for its pages of objects,
   [`opensheaf-object-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-object-0.2.schema.json)
   for `object.json`,
   [`opensheaf-collection-0.2.schema.json`](https://opensheaf.org/schemas/opensheaf-collection-0.2.schema.json)

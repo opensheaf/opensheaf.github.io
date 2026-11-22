@@ -227,12 +227,10 @@ osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://j
         <p>
           <tt class="verbatim">ocfl/</tt>: the storage itself, one folder per work, with
           the key log of the owner at <tt class="verbatim">ocfl/&lt;owner&gt;/&lt;owner&gt;/</tt>;
-        </p>
-      </li>
-      <li>
-        <p>
-          <tt class="verbatim">opensheaf.json</tt>: the discovery document, which
-          readers and tools start from, with the labels of your papers;
+          - <tt class="verbatim">opensheaf.json</tt>: the discovery document, which
+          readers and tools start from, with the labels of your papers; beyond
+          a thousand objects, the list of objects moves into pages under <tt
+          class="verbatim">objects/</tt>, so that a deposit rewrites one small file;
         </p>
       </li>
       <li>

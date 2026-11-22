@@ -11,8 +11,19 @@
     "storageRoot",
     "storageLayout",
     "owners",
-    "objects",
     "profiles"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "objects"
+      ]
+    },
+    {
+      "required": [
+        "objectPages"
+      ]
+    }
   ],
   "properties": {
     "format": {
@@ -58,79 +69,19 @@
     "objects": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "kind",
-          "head",
-          "inventorySha512",
-          "status",
-          "name",
-          "owner"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
-            "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
-          },
-          "kind": {
-            "enum": [
-              "document",
-              "collection",
-              "owner"
-            ]
-          },
-          "head": {
-            "type": "string",
-            "pattern": "^v[1-9][0-9]*$"
-          },
-          "inventorySha512": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{128}$"
-          },
-          "status": {
-            "enum": [
-              "active",
-              "withdrawn"
-            ]
-          },
-          "name": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{52}$",
-            "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
-          },
-          "owner": {
-            "type": "string",
-            "pattern": "^[a-z2-7]{51}[aq]$",
-            "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
-          },
-          "label": {
-            "type": "string",
-            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-            "maxLength": 64,
-            "$comment": "a readable label (section 3.1), not an identifier"
-          }
-        },
-        "allOf": [
-          {
-            "if": {
-              "properties": {
-                "kind": {
-                  "const": "owner"
-                }
-              }
-            },
-            "then": {
-              "properties": {
-                "status": {
-                  "const": "active"
-                }
-              }
-            }
-          }
-        ]
-      }
+        "$ref": "#/$defs/objectEntry"
+      },
+      "$comment": "every object of the storage root except drafts (section 3.1); or, in its place, objectPages"
+    },
+    "objectPages": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(?!/)(?![a-zA-Z][a-zA-Z0-9+.-]*:)(?!.*(^|/)\\.\\.?(/|$))[^?#\\\\]+\\.json$"
+      },
+      "$comment": "the paths, relative to the discovery document, of the pages of objects (section 3.1), each validated by opensheaf-objects-0.2.schema.json"
     },
     "tombstones": {
       "type": "array",
@@ -277,6 +228,82 @@
           }
         }
       }
+    }
+  },
+  "$defs": {
+    "objectEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "head",
+        "inventorySha512",
+        "status",
+        "name",
+        "owner"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^sheaf:[a-z2-7]{52}:[a-z2-7]{51}[aq]$",
+          "$comment": "the object's line (section 4), sheaf:<name>:<owner>"
+        },
+        "kind": {
+          "enum": [
+            "document",
+            "collection",
+            "owner"
+          ]
+        },
+        "head": {
+          "type": "string",
+          "pattern": "^v[1-9][0-9]*$"
+        },
+        "inventorySha512": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "withdrawn"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z2-7]{52}$",
+          "$comment": "a name of genesis.json (section 5.2): seeded SHA-256, lowercase base32, the algorithm number in the last character"
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^[a-z2-7]{51}[aq]$",
+          "$comment": "an owner name (section 6), the name of the owner's genesis record (52 characters of base32)"
+        },
+        "label": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "maxLength": 64,
+          "$comment": "a readable label (section 3.1), not an identifier"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "owner"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "active"
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

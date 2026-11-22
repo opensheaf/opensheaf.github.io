@@ -294,15 +294,16 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">objects</tt>: every object of the storage root except
-          drafts, each with <tt class="verbatim">id</tt> (section 4), <tt class="verbatim">kind</tt>,
-          <tt class="verbatim">name</tt> and <tt class="verbatim">owner</tt> (sections 5 and 6),
-          <tt class="verbatim">head</tt> (its OCFL head version), <tt class="verbatim">inventorySha512</tt>
-          (the SHA-512 digest of the head inventory, as its checksum file
-          states it) and <tt class="verbatim">status</tt> (<tt class="verbatim">active</tt> or <tt
-          class="verbatim">withdrawn</tt>, the line's status, read from its latest
-          signed version or, in a copy without one, from its head, section
-          13.1), and OPTIONALLY a <tt class="verbatim">label</tt>.
+          <tt class="verbatim">objects</tt> or, in its place, <tt class="verbatim">objectPages</tt>
+          (below): every object of the storage root except drafts, each with
+          <tt class="verbatim">id</tt> (section 4), <tt class="verbatim">kind</tt>, <tt class="verbatim">name</tt>
+          and <tt class="verbatim">owner</tt> (sections 5 and 6), <tt class="verbatim">head</tt>
+          (its OCFL head version), <tt class="verbatim">inventorySha512</tt> (the
+          SHA-512 digest of the head inventory, as its checksum file states
+          it) and <tt class="verbatim">status</tt> (<tt class="verbatim">active</tt> or <tt class="verbatim">withdrawn</tt>,
+          the line's status, read from its latest signed version or, in a copy
+          without one, from its head, section 13.1), and OPTIONALLY a <tt
+          class="verbatim">label</tt>.
         </p>
       </li>
     </ul>
@@ -348,8 +349,20 @@
       (section 8.5).
     </p>
     <p>
-      <strong>Open question.</strong> Archives with millions of objects:
-      whether <tt class="verbatim">objects</tt> and the feed are paged, and how (#19).
+      <strong>Pages.</strong> An archive with many objects lists them in
+      pages: in place of <tt class="verbatim">objects</tt>, <tt class="verbatim">objectPages</tt>,
+      a non-empty list of the paths of page files, relative to the discovery
+      document (no scheme, no leading <tt class="verbatim">/</tt>, no <tt class="verbatim">.</tt>
+      or <tt class="verbatim">..</tt> segment). A page is a JSON file with <tt class="verbatim">format</tt>,
+      <tt class="verbatim">&quot;opensheaf-objects/0.2&quot;</tt>, and <tt class="verbatim">objects</tt>,
+      a non-empty list of entries of the form above; every object is in
+      exactly one page, and labels are unique across the pages. Wherever this
+      specification speaks of <tt class="verbatim">objects</tt>, it means the entries of
+      the pages for an archive that pages them. Pages SHOULD group objects by
+      a prefix of their name, so that a deposit rewrites one page, and hold
+      about a thousand entries each (some 0.5 MB); tools SHOULD page <tt
+      class="verbatim">objects</tt> beyond about a thousand objects. Readers MUST accept
+      both forms.
     </p>
     <h3 id="auto-6"><a id="32-the-storage-root"></a>3.2 The storage root<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3538,7 +3551,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       (section 14.6); one with access to the files checks them. A verifier MAY
       bound the depth of the chains and collections it follows (section 9.3),
       SHOULD bound the size of what it fetches (section 15.2), and warns where
-      it stops.
+      it stops. A verifier MAY check part of an archive (one line, a
+      collection and what it pins, the versions the feed lists since a date),
+      and warns that the rest is not checked: an archive too large to check at
+      once is checked as it grows.
     </p>
     <h3 id="auto-65"><a id="142-files-and-storage"></a>14.2 Files and storage<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3753,19 +3769,21 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <ul>
       <li>
         <p>
-          <strong>the discovery document</strong> (section 3.1): that <tt
-          class="verbatim">objects</tt> lists every object of the storage root except
-          drafts, each entry with the values its object gives (<tt class="verbatim">status</tt>
-          as section 13.1 says), with distinct labels; that no two entries of
-          <tt class="verbatim">owners</tt> have the same <tt class="verbatim">owner</tt> or the
-          same <tt class="verbatim">catalogue</tt>, and that each <tt class="verbatim">catalogue</tt>
-          names a catalogue it lists, of the entry's owner (section 8.1); a
-          breach being a warning, that <tt class="verbatim">owners</tt> names only owner
-          objects it holds, and that the members of each owner catalogue are
-          documents of lines of its owner that the storage root holds (section
-          8.1); that <tt class="verbatim">drafts</tt> lists only drafts of the storage
-          root, with their heads; and, a breach being a warning, that <tt
-          class="verbatim">extensions</tt> lists every extension its objects use;
+          <strong>the discovery document</strong> (section 3.1): for an
+          archive that pages <tt class="verbatim">objects</tt>, that every page is found
+          and valid, and that no object is in two pages; that <tt class="verbatim">objects</tt>
+          lists every object of the storage root except drafts, each entry
+          with the values its object gives (<tt class="verbatim">status</tt> as section
+          13.1 says), with distinct labels; that no two entries of <tt class="verbatim">owners</tt>
+          have the same <tt class="verbatim">owner</tt> or the same <tt class="verbatim">catalogue</tt>,
+          and that each <tt class="verbatim">catalogue</tt> names a catalogue it lists,
+          of the entry's owner (section 8.1); a breach being a warning, that
+          <tt class="verbatim">owners</tt> names only owner objects it holds, and that
+          the members of each owner catalogue are documents of lines of its
+          owner that the storage root holds (section 8.1); that <tt class="verbatim">drafts</tt>
+          lists only drafts of the storage root, with their heads; and, a
+          breach being a warning, that <tt class="verbatim">extensions</tt> lists every
+          extension its objects use;
         </p>
       </li>
       <li>
@@ -4484,6 +4502,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #19: <tt
+          class="verbatim">objects</tt> may be paged, by <tt class="verbatim">objectPages</tt> and
+          page files of format <tt class="verbatim">opensheaf-objects/0.2</tt>, which
+          tools SHOULD use beyond about a thousand objects (section 3.1,
+          appendix B, with a new schema); the feed SHOULD hold the recent
+          versions and MAY link archived feeds (RFC 5005, appendix A.3); a
+          verifier MAY check part of an archive (section 14.1); the open
+          question of section 3.1 removed (appendix D).
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>0.2 (draft), 22 November 2026:</strong> decided in #26: a
           notice is numbered by its position in <tt class="verbatim">notices</tt>, kept
           in order in every later version; a later notice about the same
@@ -4766,9 +4796,11 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <p>
           <strong>Feed and harvesters.</strong> The feed (<tt class="verbatim">feed</tt>,
           section 3.1) lists the signed object versions the archive holds, by
-          the <tt class="verbatim">created</tt> date of their inventories. The website
-          SHOULD publish a <tt class="verbatim">sitemap.xml</tt>, and MAY publish an
-          OAI-PMH static repository or a ResourceSync description.
+          the <tt class="verbatim">created</tt> date of their inventories. It SHOULD
+          hold the recent versions only, and MAY link the earlier ones as
+          archived feeds (RFC 5005). The website SHOULD publish a <tt class="verbatim">sitemap.xml</tt>,
+          and MAY publish an OAI-PMH static repository or a ResourceSync
+          description.
         </p>
       </li>
     </ul>
@@ -4783,6 +4815,12 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
         <p>
           <tt class="verbatim">opensheaf-archive-0.2.schema.json</tt>: <tt class="verbatim">opensheaf.json</tt>
           (section 3.1);
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf-objects-0.2.schema.json</tt>: the pages of <tt
+          class="verbatim">objects</tt> (section 3.1);
         </p>
       </li>
       <li>
@@ -5761,6 +5799,17 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
+          <strong>Why <tt class="verbatim">objects</tt> may be paged.</strong> A
+          discovery document listing every object grows by some 0.5 MB a
+          thousand objects, is read first by every reader and rewritten at
+          every deposit; pages keep it small and a deposit's rewrite local.
+          Pages are listed explicitly, rather than found as index files by
+          prefix, so that a reader over HTTP can enumerate the objects without
+          trying every prefix (#19).
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>Why an archive serves all its lines or none.</strong> A
           discovery document listing only some objects of its storage root
           could no longer be checked against it, and readers could not tell a
@@ -6570,8 +6619,9 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           <a href="https://scholar.google.com/intl/en/scholar/inclusion.html">Google Scholar inclusion guidelines</a>, <a href="https://schema.org/ScholarlyArticle">schema.org
           ScholarlyArticle</a>, <a href="https://www.w3.org/TR/json-ld11/">JSON-LD 1.1</a>, <a href="https://signposting.org/FAIR/">FAIR
           Signposting</a>, <a href="https://www.bibtex.org/">BibTeX</a>, <a href="https://github.com/citation-style-language/schema">CSL-JSON</a>, <a
-          href="https://www.rfc-editor.org/rfc/rfc4287">Atom (RFC 4287)</a>, <a href="https://www.sitemaps.org/protocol.html">Sitemaps</a>, <a href="https://www.openarchives.org/OAI/2.0/guidelines-static-repository.htm">OAI-PMH
-          static repositories</a> and <a href="https://www.openarchives.org/rs/toc">ResourceSync</a>
+          href="https://www.rfc-editor.org/rfc/rfc4287">Atom (RFC 4287)</a> and its <a href="https://www.rfc-editor.org/rfc/rfc5005">paged and archived feeds
+          (RFC 5005)</a>, <a href="https://www.sitemaps.org/protocol.html">Sitemaps</a>, <a href="https://www.openarchives.org/OAI/2.0/guidelines-static-repository.htm">OAI-PMH static
+          repositories</a> and <a href="https://www.openarchives.org/rs/toc">ResourceSync</a>
         </p>
       </li>
       <li>
