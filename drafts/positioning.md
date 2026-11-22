@@ -15,7 +15,10 @@ kept by anyone below it, announcement, filtering, evaluation and
 preservation built by anyone above it, and federations of archives and
 services joined through it. The paper compares it with the infrastructure of
 scholarly communication and with federated and distributed systems, weighs
-what separating the functions costs, and makes proposals.*
+what separating the functions costs, and makes proposals. A companion
+paper, [federated-publishing.md](federated-publishing.md), surveys earlier
+proposals of federated publishing: most of OpenSheaf's parts exist
+elsewhere, and what is new is their combination.*
 
 > [!NOTE]
 > Revised for [version 0.2](../opensheaf-specification-0.2.md) of the
@@ -66,8 +69,12 @@ That they should be separated has been argued for a long time: the
 "deconstructed journal" (Smith, 1999), the distributed system of
 scholarly communication of Van de Sompel and others (2004), the
 "decoupled journal" (Priem and Hemminger, 2012), and the repository
-community's Pubfair (section 4). What this paper adds is a view of what
-the separated parties need in common, and a format for it (section 3).
+community's Pubfair (section 4). Decentralised publishing has been
+proposed and built many times since, on peer-to-peer networks,
+blockchains, linked data and signed records
+([federated-publishing.md](federated-publishing.md)). What this paper adds
+is a view of what the separated parties need in common, and a format for
+it (section 3).
 
 ## 2. How the functions are bundled today
 
@@ -102,7 +109,10 @@ Their weak point is that they rest on archives they do not control and
 which do not know about them. A selection of arXiv papers can name the
 version it vetted (`arXiv:...v2`), but only arXiv vouches for the bytes
 behind that name, and the selection itself is a web page, not a record
-that others can check or build on.
+that others can check or build on. None of the overlays surveyed in
+[federated-publishing.md](federated-publishing.md) (Peer Community In,
+Episciences, eLife) publishes a digest of the version it vetted; some keep
+their own copy, which no one else can check.
 
 **Each function is concentrated.** The arXiv listings are the
 announcement channel of whole disciplines, and journals are the merit
@@ -177,11 +187,18 @@ and assigning merit. These are services built on the layer: anyone can run
 them, several can work over the same documents, and each of their
 statements is an object that can be cited and verified as it stood.
 
-What is new, against the long literature on separating the functions, is
-this common form: statements pinned by digest and signed, across archives
-that can be kept by the authors themselves as static files, so that a
-filter, an index or a preservation network can be built by someone who
-controls none of the archives it works on.
+What is new is not any one part. Names from digests (Trusty URIs,
+SWHIDs), versions signed by their authors (Document Succession
+Identifiers, nanopublications), copies checked by digest (LOCKSS, the
+Underlay) and overlays that vet versions held elsewhere all exist (section
+5; [federated-publishing.md](federated-publishing.md)). What was not found
+elsewhere is their combination as a common form: a name of the work shared
+by the lines of several owners, apart from hosts and keys; owners whose key
+logs let them change keys and answer a theft; and statements pinned by
+digest and signed, across archives that can be kept by the authors
+themselves as static files, so that a filter, an index or a preservation
+network can be built by someone who controls none of the archives it works
+on.
 
 ### Record
 
@@ -702,6 +719,34 @@ snapshot of an archive is a further witness. Radicle, a peer-to-peer network
 for git repositories, is compared in [radicle.md](radicle.md), and Matrix,
 as a channel beside archives, in [matrix.md](matrix.md).
 
+### Earlier proposals of decentralised publishing
+
+Scholarly publishing has its own decentralised designs, surveyed in
+[federated-publishing.md](federated-publishing.md). Three are close to
+OpenSheaf in parts:
+
+- **Nanopublications** (since 2010): small signed RDF statements, named by
+  Trusty URIs (digests of their content), replicated between registries
+  that check digest and signature and give each key a quota derived from
+  endorsements. A Trusty URI names one content, so a work has no name
+  across its versions, and the documented queries count a supersession
+  only under the same key.
+  They are the natural form for statements about OpenSheaf versions
+  (section 7).
+- **Document Succession Identifiers** (Ellerman, 2024): a document's
+  editions kept as one git history, signed with keys listed in the
+  document, and named by the initial commit. It shares OpenSheaf's
+  premises, with one succession per name and no owners or collections.
+- **The Underlay** (Knowledge Futures, revived in 2026): collections of
+  content-addressed records, with immutable sequential versions, signed
+  log entries and mirrors; each collection has one authoritative server.
+
+The others (decentralised science on IPFS and blockchains, Dat and
+Hypercore, linked data on personal servers) show mostly what to avoid:
+every platform found that made a chain or token the basis of publishing,
+except DeSci Nodes, has closed or dropped the chain, and a design with one
+indispensable party, a registry or a server, is as fragile as that party.
+
 ### Summary
 
 | System | Unit | Changes | Delivery | Needs running software | Integrity | Identity |
@@ -715,13 +760,17 @@ as a channel beside archives, in [matrix.md](matrix.md).
 | Institutional repository | item | updated in place, versions as allowed | web, harvest | yes | checksums inside the platform | Handle or DOI |
 | OAI-PMH | metadata record | updated in place | harvest | yes, usually | none | repository identifiers |
 | DOI registries | registered work | metadata updated, target may move | resolution | yes (registry, resolver) | none | DOI |
+| Nanopublications | signed RDF statement | fixed; superseded or retracted by new records | replicating registries | yes (registries) | Trusty URI, signature | a key, declared with an ORCID iD |
+| Document Succession Identifiers | edition in a git history | append, signed | git host | no, a git host | git hashes, signatures | initial commit; keys listed in the document |
+| Underlay | collection version | immutable, sequential | server and mirrors | yes (an authoritative server) | SHA-256 content addresses, signed log | collection at its server |
 | OpenSheaf | object version | append-only, signed | pull, static files | no, a static web server | SHA-512 inventories, pins, owners' signatures | line: name of the work and owner, both digests |
 
-What sets OpenSheaf apart is the combination: append-only versions of
-large documents, fixed by digests and signed by their owners; names
-independent of where they are served, checked from any copy; static files
-that need no running software; and statements (collections) that are
-themselves versioned, signed, pinned objects. What it lacks, compared with the
+What sets OpenSheaf apart is the combination, not any one row: append-only
+versions of large documents, fixed by digests and signed by their owners;
+names of works independent of where they are served and of any one key,
+checked from any copy; static files that need no running software; and
+statements (collections) that are themselves versioned, signed, pinned
+objects. What it lacks, compared with the
 social systems, is everything about attention: pushing news to readers,
 following, replying. That is deliberate, and it is where bridges to those
 systems would help.
@@ -746,9 +795,28 @@ selection, a library runs an announcement service for its field), but
 whether it will be is a question of institutions, not of format.
 SciPost's model, in which the organisations that benefit are asked to
 sponsor it in proportion to their share of its papers, is one working
-answer for filtering. A risk to name: services that are free
-today (forges, hosting) may change their terms, which is one more reason
-for mirrors.
+answer for filtering. A risk to name: services that are free today
+(forges, hosting) may change their terms, which is one more reason for
+mirrors. Shared infrastructure has ended before when its funders or
+stewards left (Coko, reportedly; PubPub nearly; ResearchEquals asks for
+EUR 100k a year beyond 2027): OpenSheaf shares that risk for its tools,
+not for its archives, which stay valid and readable with any OCFL tool and
+the specification if every OpenSheaf tool stops
+([federated-publishing.md](federated-publishing.md), section 10).
+
+### Adoption and incentives
+
+The value of an exchange layer appears only when several parties use it,
+and OpenSheaf has one real archive. Earlier designs show how slow this is:
+nanopublications, the most successful decentralised design found, count
+some 80,000 records by some 600 signers after more than fifteen years.
+Researchers publish where evaluation counts, and a system outside the
+indexes is outside the incentives; OpenSheaf reaches them only through
+DOIs (appendix A.1, issue #8), landing pages for search engines (appendix
+A.3) and overlays that do count. And it asks more of authors than any
+comparable design: current keys on each device and rotation keys kept apart
+(section 6.2), for a better answer to theft. Whether authors will bear it
+is untested.
 
 ### Abuse and noise
 
@@ -917,6 +985,19 @@ keys decide, nor who wrote its documents.
   (issue #39), custody policies (issue #54), the Internet Archive as a
   mirror (issue #43), and bundles that carry a collection with its members
   in one file (issue #74).
+- **Neighbours.** Write to the authors of Document Succession
+  Identifiers, of the nanopublication network and of the Underlay, to test
+  OpenSheaf's choices against theirs and find where records could pass
+  between them; publish statements about pinned versions (reviews,
+  endorsements, errata) as nanopublications, as one answer to issue #21;
+  export the history of a selection as docmaps, which Sciety and Europe PMC
+  read; and suggest to overlays that they record, at each decision, the
+  digests of the version they vetted
+  ([federated-publishing.md](federated-publishing.md), section 11).
+- **If the project stops.** State on the site that archives remain valid,
+  readable and checkable with any OCFL tool and the specification if every
+  OpenSheaf tool and service ends: the answer to the commonest failure of
+  earlier projects.
 - **Adoption.** OpenSheaf works alongside existing services: a document
   can be on arXiv (`IsIdenticalTo`), have a DOI, and be found by Google
   Scholar; `osheaf arxiv import` brings an author's arXiv papers into an
@@ -932,6 +1013,11 @@ keys decide, nor who wrote its documents.
   left entirely to other networks, and how much should be bridged?
 - Should preservation federations be specified at all, or only made
   possible by the layer, as LOCKSS was by the web?
+- Is a per-owner key log worth its cost, against keys listed in each
+  document as in Document Succession Identifiers, for authors who will
+  never meet a theft?
+- Should statements about versions join an existing network (the
+  nanopublication registries) rather than have forms of their own?
 
 ## 8. Conclusion
 
@@ -945,6 +1031,10 @@ selections, that are themselves fixed and checkable. On that exchange
 layer, recording can stay with authors, preservation can be shared by
 federations of institutions, and announcing, filtering and evaluation can
 be built by anyone, over the same documents, without asking the archives.
+None of its parts is new by itself; earlier designs have each of them, and
+ended for want of funders, stewards or users more often than for any flaw
+of design. OpenSheaf needs nothing but static files, which removes one
+cause, and shares the others.
 
 What exists today is the format (specification 0.2, a draft), the tools that
 keep, sign and verify archives, a Manager and an Explorer that work with
@@ -1010,5 +1100,14 @@ community.
   [keys-and-forks.md](keys-and-forks.md),
   [federated-identity.md](federated-identity.md),
   [radicle.md](radicle.md), [matrix.md](matrix.md),
-  [arxiv.md](arxiv.md), [hexagon.md](hexagon.md) and
-  [alphaxiv.md](alphaxiv.md).
+  [arxiv.md](arxiv.md), [hexagon.md](hexagon.md),
+  [alphaxiv.md](alphaxiv.md) and
+  [federated-publishing.md](federated-publishing.md), whose references
+  give the sources for the systems of section 5 not listed here.
+- Kuhn, T. and Dumontier, M., *Trusty URIs: verifiable, immutable, and
+  permanent digital artifacts for linked data*, ESWC 2014, LNCS 8465, pp.
+  395-410, doi:10.1007/978-3-319-07443-6_27.
+- Ellerman, E. C., *Document Succession Git Layout*, edition 1.1, 20
+  February 2024, <https://castedo.github.io/dsgl-spec/>.
+- Knowledge Futures, *Underlay, revived*, 27 April 2026,
+  <https://www.knowledgefutures.org/updates/2026-04-27-underlay-revived>.
