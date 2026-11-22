@@ -655,23 +655,25 @@
       document version made after it, since the version cannot change (that a
       theorem of version 2 is wrong as stated, and corrected in version 3).
       Notices are added to <tt class="verbatim">notices</tt> by description-only
-      versions, and stay, unchanged, in every later object version (for a
-      branch whose branch point moves, see section 9); a notice is corrected
-      or withdrawn only by a later notice. Presentations showing a document
-      version SHOULD show the current notices about it.
+      versions, at its end, and stay, unchanged and in the same order, at the
+      start of <tt class="verbatim">notices</tt> in every later object version (for a
+      branch whose branch point moves, see section 9). A notice is thus
+      identified by its position: <strong>notice <em>k</em></strong> of a line
+      is the <em>k</em>-th entry of <tt class="verbatim">notices</tt>, counted from 1,
+      in every version that holds it. A notice is corrected or withdrawn only
+      by a later notice about the same document version that names it in <tt
+      class="verbatim">replaces</tt> (section 4.3), and saying what it corrects or that
+      it withdraws it; each notice is replaced at most once. The <dfn>current
+      notices</dfn> about a document version are its notices that no notice
+      replaces, read from the latest signed version of the line (section 7.3);
+      a withdrawing notice is itself current, so that readers see what was
+      said and taken back. Presentations showing a document version SHOULD
+      show the current notices about it, and MAY show those replaced, as such.
+      The <tt class="verbatim">date</tt> of a notice is the date its author issued it,
+      which may be earlier than its deposit (an erratum printed before); the
+      deposit is that of the object version that added it (section 4.1), and
+      the <tt class="verbatim">date</tt> SHOULD NOT be later.
     </p>
-    <p>
-      <strong>Open questions.</strong>
-    </p>
-    <ul>
-      <li>
-        <p>
-          How notices are identified, so that a later notice can correct or
-          withdraw an earlier one, what makes a notice current, and what its
-          <tt class="verbatim">date</tt> is (#26).
-        </p>
-      </li>
-    </ul>
     <h3 id="auto-10"><a id="43-the-object-record-objectjson"></a>4.3 The object record: object.json<span style="margin-left: 1em"></span></h3>
     <p>
       Every object version MUST contain <tt class="verbatim">object.json</tt>, the
@@ -781,7 +783,9 @@
         <p>
           <tt class="verbatim">history</tt> and <tt class="verbatim">notices</tt> (section 4.2),
           each notice a note with the <tt class="verbatim">documentVersion</tt> it is
-          about and a <tt class="verbatim">date</tt>;
+          about and a <tt class="verbatim">date</tt>, the date it was issued, and
+          OPTIONALLY <tt class="verbatim">replaces</tt>, the number of the earlier
+          notice it corrects or withdraws;
         </p>
       </li>
       <li>
@@ -3641,8 +3645,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           <strong>its records:</strong> the rules of sections 4.2 to 4.4 in
           every version and between versions (numbering, new versions, the
           fields that belong to a document version and <tt class="verbatim">external</tt>,
-          completion, <tt class="verbatim">history</tt>, notices), for collections as
-          for documents, as far as the files decide them;
+          completion, <tt class="verbatim">history</tt>, notices kept in order and the
+          notices they replace), and, as a warning, a notice dated after its
+          deposit, for collections as for documents, as far as the files
+          decide them;
         </p>
       </li>
       <li>
@@ -4351,6 +4357,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           fork, and verifiers report the key-log version they judged against
           (section 6.5); weighted thresholds (#69) and witnesses of the
           versions of key logs seen first (#70) are left for after 0.2.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #26: a
+          notice is numbered by its position in <tt class="verbatim">notices</tt>, kept
+          in order in every later version; a later notice about the same
+          document version corrects or withdraws one by naming it in <tt
+          class="verbatim">replaces</tt>, each notice being replaced at most once; the
+          current notices are those not replaced; the <tt class="verbatim">date</tt> of
+          a notice is the date its author issued it, not later than its
+          deposit (sections 4.2, 4.3 and 14.4, appendix D).
         </p>
       </li>
       <li>
@@ -5564,6 +5582,15 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           answer later, and a mistake in them is a notice, as for the files.
           Records at external services are added as they are made, after the
           deposit, and are evidence, so they are only added (#24).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why notices are numbered by position.</strong> The list only
+          grows, so a position never changes; an identifier chosen by the
+          owner would add a field to generate and check for uniqueness, and
+          give nothing more. A withdrawal is a replacement that stays visible,
+          since readers who saw the notice should see it taken back (#26).
         </p>
       </li>
       <li>

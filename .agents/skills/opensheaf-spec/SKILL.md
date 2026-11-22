@@ -102,8 +102,11 @@ questions are listed at the end of the sections they concern.
   `external`, while `mainSource`, `sourceFormat`, `sourcesMissing`,
   `renditions` and `toolchain` belong to the document version (#24,
   settled); completion of `sourcesMissing`, `history`, current version,
-  notices. A collection is a document whose source is `members.json`. `object.json` (4.3): `format`, `specification`, `kind`, `status`,
-  `documentVersion`, `name`, `owner`, `parent`, `previous`; documents
+  notices (numbered by position, kept in order; `replaces` corrects or
+  withdraws one, at most once; current notices are those not replaced;
+  `date` is the date of issue; #26 settled). A collection is a document
+  whose source is `members.json`. `object.json` (4.3): `format`,
+  `specification`, `kind`, `status`, `documentVersion`, `name`, `owner`, `parent`, `previous`; documents
   `mainSource`, `sourceFormat`, `renditions`, `toolchain`, `changes`,
   `stage`, `history`, `notices`, `licence` (collections have all but
   `mainSource`, `sourceFormat`, `sourcesMissing` and `licence`); documents and

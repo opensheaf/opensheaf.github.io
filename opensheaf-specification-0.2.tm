@@ -169,13 +169,7 @@
 
   <strong|Current version.> The <dfn|current version> of a document is the last of its history. The latest signed version may hold another document version, deposited out of order or newly described; the current version stays where it was. Landing pages, indexes and citations use the current version.
 
-  <strong|Notices.> A <dfn|notice> is a statement about a document version made after it, since the version cannot change (that a theorem of version 2 is wrong as stated, and corrected in version 3). Notices are added to <verbatim|notices> by description-only versions, and stay, unchanged, in every later object version (for a branch whose branch point moves, see section 9); a notice is corrected or withdrawn only by a later notice. Presentations showing a document version SHOULD show the current notices about it.
-
-  <strong|Open questions.>
-
-  <\itemize>
-    <item>How notices are identified, so that a later notice can correct or withdraw an earlier one, what makes a notice current, and what its <verbatim|date> is (#26).
-  </itemize>
+  <strong|Notices.> A <dfn|notice> is a statement about a document version made after it, since the version cannot change (that a theorem of version 2 is wrong as stated, and corrected in version 3). Notices are added to <verbatim|notices> by description-only versions, at its end, and stay, unchanged and in the same order, at the start of <verbatim|notices> in every later object version (for a branch whose branch point moves, see section 9). A notice is thus identified by its position: <strong|notice <em|k>> of a line is the <em|k>-th entry of <verbatim|notices>, counted from 1, in every version that holds it. A notice is corrected or withdrawn only by a later notice about the same document version that names it in <verbatim|replaces> (section 4.3), and saying what it corrects or that it withdraws it; each notice is replaced at most once. The <dfn|current notices> about a document version are its notices that no notice replaces, read from the latest signed version of the line (section 7.3); a withdrawing notice is itself current, so that readers see what was said and taken back. Presentations showing a document version SHOULD show the current notices about it, and MAY show those replaced, as such. The <verbatim|date> of a notice is the date its author issued it, which may be earlier than its deposit (an erratum printed before); the deposit is that of the object version that added it (section 4.1), and the <verbatim|date> SHOULD NOT be later.
 
   <subsection*|4.3 The object record: object.json><label|43-the-object-record-objectjson>
 
@@ -208,7 +202,7 @@
 
     <item><verbatim|stage>: the stage of this document version, with <verbatim|scheme> and <verbatim|value>; for articles the RECOMMENDED scheme is <verbatim|NISO-JAV> (NISO Journal Article Versions: <verbatim|AO>, <verbatim|SMUR>, <verbatim|AM>, <verbatim|P>, <verbatim|VoR>, <verbatim|CVoR>, <verbatim|EVoR>), and other content uses other schemes (editions, software releases), named by the archive;
 
-    <item><verbatim|history> and <verbatim|notices> (section 4.2), each notice a note with the <verbatim|documentVersion> it is about and a <verbatim|date>;
+    <item><verbatim|history> and <verbatim|notices> (section 4.2), each notice a note with the <verbatim|documentVersion> it is about and a <verbatim|date>, the date it was issued, and OPTIONALLY <verbatim|replaces>, the number of the earlier notice it corrects or withdraws;
 
     <item><verbatim|licence>: a note with the full text or terms of the licence (for licences without an SPDX identifier); <verbatim|rightsList> in <verbatim|datacite.json> remains the description for readers.
   </itemize>
@@ -1082,7 +1076,7 @@
   For every other object, the verifier checks:
 
   <\itemize>
-    <item><strong|its records:> the rules of sections 4.2 to 4.4 in every version and between versions (numbering, new versions, the fields that belong to a document version and <verbatim|external>, completion, <verbatim|history>, notices), for collections as for documents, as far as the files decide them;
+    <item><strong|its records:> the rules of sections 4.2 to 4.4 in every version and between versions (numbering, new versions, the fields that belong to a document version and <verbatim|external>, completion, <verbatim|history>, notices kept in order and the notices they replace), and, as a warning, a notice dated after its deposit, for collections as for documents, as far as the files decide them;
 
     <item><strong|its identity:> the genesis record, the name and the identifier in every version (sections 4 and 5), and that the objects and tombstones of the archive with the same genesis name are its originator's line and branches of it (section 5.4);
 
@@ -1261,6 +1255,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> decided in #55: the field names of <verbatim|keys.json>, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, <verbatim|inventorySha512> and <verbatim|keyLog> (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder <verbatim|parent/>, with <verbatim|parent/inventory.json>, <verbatim|parent/object.json>, <verbatim|parent/signatures/> and <verbatim|parent/parent/> for a branch of a branch, <verbatim|parent> being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
 
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #26: a notice is numbered by its position in <verbatim|notices>, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in <verbatim|replaces>, each notice being replaced at most once; the current notices are those not replaced; the <verbatim|date> of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #24, #45 and #27 (its first point): a collection is a document whose source is <verbatim|members.json>, with renditions and the fields of a document but <verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|sourcesMissing> and <verbatim|licence>, so any change of <verbatim|members.json> is a new document version and a description-only version of a collection may hold an earlier member list (sections 4.2, 4.3 and 8.2); a description-only version changes the description of the object and adds to <verbatim|external>, while <verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|sourcesMissing>, <verbatim|renditions> and <verbatim|toolchain> belong to the document version, except as a completion adds to them (section 4.2); a followed member moves with new document versions of its catalogue only (section 8.3); verifiers resolve the members of the current version (sections 14.4 and 14.5, appendix D).
 
@@ -2223,6 +2219,8 @@
     <item><strong|Why the owner numbers its document versions.> External numberings have gaps and miss versions never public there; external labels are kept beside the owner's numbers.
 
     <item><strong|Why the files of a document version are described once.> <verbatim|mainSource>, <verbatim|renditions> and <verbatim|toolchain> say what the deposited files are and how they were made; a reader who cited a version gets the same answer later, and a mistake in them is a notice, as for the files. Records at external services are added as they are made, after the deposit, and are evidence, so they are only added (#24).
+
+    <item><strong|Why notices are numbered by position.> The list only grows, so a position never changes; an identifier chosen by the owner would add a field to generate and check for uniqueness, and give nothing more. A withdrawal is a replacement that stays visible, since readers who saw the notice should see it taken back (#26).
 
     <item><strong|Why a revert is a new version.> The current version is the last of the history, so a revert holding the earlier number would leave the reverted version current; and readers who cited the later version need to see that the work went back. Files are compared with their paths, since <verbatim|object.json>, links and citations name files by path (#23).
 

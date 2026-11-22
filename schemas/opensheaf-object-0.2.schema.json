@@ -134,6 +134,11 @@
               "date": {
                 "type": "string",
                 "format": "date"
+              },
+              "replaces": {
+                "type": "integer",
+                "minimum": 1,
+                "$comment": "section 4.2: the number of an earlier notice of the line, its position in notices counted from 1"
               }
             }
           }
