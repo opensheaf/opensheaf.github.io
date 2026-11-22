@@ -2390,7 +2390,7 @@ keyLog &lt;the value of keyLog&gt;</pre>
       </li>
       <li>
         <p>
-          <strong>mismatch</strong>, when a copy is found and does not match
+          <strong>mismatch</strong>, when copies are found and none matches
           the pin;
         </p>
       </li>
@@ -2418,6 +2418,13 @@ keyLog &lt;the value of keyLog&gt;</pre>
         </p>
       </li>
     </ul>
+    <p>
+      Whether a copy matches is decided by the bytes of its inventory file: a
+      checksum file missing or wrong does not change the status. A copy that
+      does not match, found beside one that does, does not change it either:
+      the status is that of the copy that matches. Both are reported apart,
+      with their location (section 12.3).
+    </p>
     <h3 id="auto-37"><a id="86-description-and-rights"></a>8.6 Description and rights<span style="margin-left: 1em"></span></h3>
     <p>
       <strong>Description.</strong> A collection version's <tt class="verbatim">datacite.json</tt>
@@ -2438,12 +2445,6 @@ keyLog &lt;the value of keyLog&gt;</pre>
       <strong>Open questions.</strong>
     </p>
     <ul>
-      <li>
-        <p>
-          Which status a member has when the checksum file of its inventory is
-          missing or wrong (#48).
-        </p>
-      </li>
       <li>
         <p>
           What a collection may state about its members (volume, acceptance,
@@ -3104,14 +3105,19 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       has that <tt class="verbatim">name</tt> and the line's owner (the owner part, or
       the originator); its versions are signed (section 7.3), against the key
       log kept beside it (section 6.5) or a longer copy found elsewhere. For a
-      pin, the inventory file has the digest and the version holds document
-      version n (for a key log, is object version n, or is carried with that
-      number by a fork record, section 6.3); a copy that does not match is
-      reported as a mismatch (section 8.5). A copy that passes is a copy of
-      the line, wherever found. Unchecked versions and versions that are not
-      versions (section 7.3) are reported with their status and location, and
-      never resolved to; a contested version is resolved to only by a pin
-      naming it, and reported as contested.
+      pin, the bytes of the inventory file have the digest, whatever its
+      checksum file states, and the version holds document version n (for a
+      key log, is object version n, or is carried with that number by a fork
+      record, section 6.3). A copy that does not match is reported with its
+      location, and the pin is a mismatch only if no copy found matches
+      (section 8.5); a resolver MAY stop at the first copy that matches. A
+      checksum file missing, or not stating the digest of its inventory, is
+      reported with its location, and does not make the copy fail; the archive
+      holding it fails its own verification (section 4). A copy that passes is
+      a copy of the line, wherever found. Unchecked versions and versions that
+      are not versions (section 7.3) are reported with their status and
+      location, and never resolved to; a contested version is resolved to only
+      by a pin naming it, and reported as contested.
     </p>
     <p>
       <strong>Copies, forks and ended owners.</strong> Since a copy that stops
@@ -3740,14 +3746,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       selection) as a resolver does (section 12.3), and the members held in
       the archive in every earlier version; resolving the other members of
       earlier versions is OPTIONAL. The status of each member is a result
-      (section 8.5). It also checks that no owner of selections of the archive
-      keeps two accepted copies, two lines, of the same document (section
-      9.6); several selections of one owner listing the same accepted copy are
-      no breach. A member that is not a version is an error, and so is a
-      mismatch of a copy held in the archive; any other status but verified,
-      contested included, is a warning. A member whose document version pinned
-      (in a selection, a revision) is withdrawn, as the verifier reads the
-      member's line, is reported so, as a result, also when the line has been
+      (section 8.5); a copy that does not match, beside one that does, and a
+      checksum file missing or wrong at a location are warnings (section
+      12.3). It also checks that no owner of selections of the archive keeps
+      two accepted copies, two lines, of the same document (section 9.6);
+      several selections of one owner listing the same accepted copy are no
+      breach. A member that is not a version is an error, and so is a mismatch
+      of a copy held in the archive; any other status but verified, contested
+      included, is a warning. A member whose document version pinned (in a
+      selection, a revision) is withdrawn, as the verifier reads the member's
+      line, is reported so, as a result, also when the line has been
       reinstated since (section 13.1).
     </p>
     <h3 id="auto-69"><a id="146-the-archive-as-a-whole"></a>14.6 The archive as a whole<span style="margin-left: 1em"></span></h3>
@@ -3807,19 +3815,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       witnesses it finds and the extensions it knows, and warns of those it
       does not know (sections 2 and 7.2).
     </p>
-    <p>
-      <strong>Open questions.</strong>
-    </p>
-    <ul>
-      <li>
-        <p>
-          Which status a member has when the checksum file of its inventory is
-          missing or wrong (#48), and which status it has when one location
-          serves a copy that does not match and another one that matches
-          (#37).
-        </p>
-      </li>
-    </ul>
     <h2 id="auto-70"><a id="15-security-privacy-and-rights"></a>15. Security, privacy and rights<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-71"><a id="151-what-the-format-protects"></a>15.1 What the format protects<span style="margin-left: 1em"></span></h3>
     <p>
@@ -4475,6 +4470,18 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           and verifiers do not check (sections 9.7, 11.2 and 15.6, appendix
           D); the open questions of sections 11.2, 14.6 and 15.6 on licences
           removed.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #48 and
+          #37: whether a copy matches a pin is decided by the bytes of its
+          inventory file, a checksum file missing or wrong being reported with
+          its location without making the copy fail; a pin is a mismatch only
+          if no copy found matches, every copy that does not match being
+          reported with its location, and a resolver MAY stop at the first
+          copy that matches (sections 8.5, 12.3 and 14.5, appendix D); the
+          open questions of sections 8.5 and 14.6 removed.
         </p>
       </li>
       <li>
@@ -6306,6 +6313,24 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           breach the archive can repair; what it cannot repair (a version let
           in against section 7.5, another archive's copy), and states of the
           world (an end, a fork, a withdrawal), would make it fail for ever.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why the inventory's bytes decide a pin.</strong> A pin is
+          the digest of the inventory file; the checksum file only repeats it.
+          Discarding a copy whose bytes match for a checksum file missing or
+          wrong would make a member unavailable that every reader can check
+          (#48).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a copy that does not match does not decide.</strong>
+          Locations are equal hints, tried in any order, and any copy that
+          matches is the version pinned; a copy that does not is damage or
+          tampering at one location, reported there, and would otherwise make
+          the status depend on the order in which locations are tried (#37).
         </p>
       </li>
     </ul>
