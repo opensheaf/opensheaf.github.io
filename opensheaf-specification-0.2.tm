@@ -165,7 +165,7 @@
 
   <strong|Completion.> A document version deposited with <verbatim|sourcesMissing> (section 4.3) MAY be completed, keeping its number, by object versions that add its sources, possibly with renditions made from them (named in <verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|renditions> and <verbatim|toolchain>), and change or remove no file of the version. It keeps <verbatim|sourcesMissing> until the sources are complete; the object version that completes them names the main source and drops <verbatim|sourcesMissing>, and the version is then fixed like any other.
 
-  <strong|History.> The <dfn|history> of a document is the order of its document versions in the history of the work: the order of their numbers, unless <verbatim|object.json> has <verbatim|history>, the list, in that order, of the last object version holding each document version. An object version that deposits a document version out of order (an earlier version found later) MUST write <verbatim|history>, and every later object version MUST keep it. A version whose place is unknown goes just before the current version, and its change note SHOULD say so. The history is read from the latest signed version of the line (section 7); earlier object versions keep it as it was then known. Dates never order document versions.
+  <strong|History.> The <dfn|history> of a document is the order of its document versions in the history of the work: the order of their numbers, unless <verbatim|object.json> has <verbatim|history>, the list, in that order, of the last object version holding each document version. A document version deposited out of order (an earlier version found later) gets the next number like any other, and is placed earlier in the history by <verbatim|history>, which the object version depositing it writes: writing <verbatim|history> is how a deposit out of order is recorded, and a version deposited without it is the last of the history, and so the current version (a later description-only version MAY then write <verbatim|history> to place it). Once written, every later object version MUST keep <verbatim|history>. A version whose place is unknown goes just before the current version, and its change note SHOULD say so. The history is read from the latest signed version of the line (section 7); earlier object versions keep it as it was then known. Dates never order document versions.
 
   <strong|Current version.> The <dfn|current version> of a document is the last of its history. The latest signed version may hold another document version, deposited out of order or newly described; the current version stays where it was. Landing pages, indexes and citations use the current version.
 
@@ -1112,8 +1112,6 @@
 
     <item>Whether digests in OCFL files must be in lower case (#49).
 
-    <item>The part of section 4.2 that the files do not decide: whether a version deposited out of order wrote <verbatim|history> (#51).
-
     <item>How a verifier tells a licence from a rights statement in <verbatim|rightsList> (#50), and which licences allow a mirror (#34), which is therefore not checked.
 
     <item>What a verifier reports for a pin of an earlier version of a withdrawn line (#25).
@@ -1255,6 +1253,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> decided in #55: the field names of <verbatim|keys.json>, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, <verbatim|inventorySha512> and <verbatim|keyLog> (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder <verbatim|parent/>, with <verbatim|parent/inventory.json>, <verbatim|parent/object.json>, <verbatim|parent/signatures/> and <verbatim|parent/parent/> for a branch of a branch, <verbatim|parent> being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
 
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #51: a deposit out of order is recorded by writing <verbatim|history>, which defines the history, in place of a requirement verifiers cannot check; a version deposited without it is the current version (section 4.2, appendix D); the item is removed from the open questions of section 14.6.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #26: a notice is numbered by its position in <verbatim|notices>, kept in order in every later version; a later notice about the same document version corrects or withdraws one by naming it in <verbatim|replaces>, each notice being replaced at most once; the current notices are those not replaced; the <verbatim|date> of a notice is the date its author issued it, not later than its deposit (sections 4.2, 4.3 and 14.4, appendix D).
 
@@ -2223,6 +2223,8 @@
     <item><strong|Why notices are numbered by position.> The list only grows, so a position never changes; an identifier chosen by the owner would add a field to generate and check for uniqueness, and give nothing more. A withdrawal is a replacement that stays visible, since readers who saw the notice should see it taken back (#26).
 
     <item><strong|Why a revert is a new version.> The current version is the last of the history, so a revert holding the earlier number would leave the reverted version current; and readers who cited the later version need to see that the work went back. Files are compared with their paths, since <verbatim|object.json>, links and citations name files by path (#23).
+
+    <item><strong|Why a deposit out of order is recorded by <verbatim|history>.> Only the author knows that a version belongs earlier in the work; the files cannot show it, so no rule could require <verbatim|history> of such a version and be checked. The history is therefore defined by what is written: the order of the numbers, unless <verbatim|history> says otherwise (#51).
 
     <item><strong|Why an explicit history.> Dates may be approximate or unknown, and fixed versions cannot correct pointers to their predecessors when a version is found later. A list of object versions, read from the latest signed version, can be corrected; it cannot list digests, since a version cannot contain the digest of its own inventory.
 

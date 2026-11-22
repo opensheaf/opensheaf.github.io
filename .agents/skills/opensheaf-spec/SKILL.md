@@ -305,7 +305,7 @@ the same change in its schema, and the other way round.
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors, #44 aliases,
-  #48, #49, #50 and #51 verification details, #54 custody policies, #57
+  #48, #49 and #50 verification details, #54 custody policies, #57
   branch numbering, #69 weighted thresholds, #70 witnesses of key logs. Read the relevant issue before
   touching its topic; do not settle an open question without agreement.
 

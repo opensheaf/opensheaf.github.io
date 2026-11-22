@@ -635,13 +635,18 @@
       order of its document versions in the history of the work: the order of
       their numbers, unless <tt class="verbatim">object.json</tt> has <tt class="verbatim">history</tt>,
       the list, in that order, of the last object version holding each
-      document version. An object version that deposits a document version out
-      of order (an earlier version found later) MUST write <tt class="verbatim">history</tt>,
-      and every later object version MUST keep it. A version whose place is
-      unknown goes just before the current version, and its change note SHOULD
-      say so. The history is read from the latest signed version of the line
-      (section 7); earlier object versions keep it as it was then known. Dates
-      never order document versions.
+      document version. A document version deposited out of order (an earlier
+      version found later) gets the next number like any other, and is placed
+      earlier in the history by <tt class="verbatim">history</tt>, which the object
+      version depositing it writes: writing <tt class="verbatim">history</tt> is how a
+      deposit out of order is recorded, and a version deposited without it is
+      the last of the history, and so the current version (a later
+      description-only version MAY then write <tt class="verbatim">history</tt> to place
+      it). Once written, every later object version MUST keep <tt class="verbatim">history</tt>.
+      A version whose place is unknown goes just before the current version,
+      and its change note SHOULD say so. The history is read from the latest
+      signed version of the line (section 7); earlier object versions keep it
+      as it was then known. Dates never order document versions.
     </p>
     <p>
       <strong>Current version.</strong> The <dfn>current version</dfn> of a
@@ -3783,12 +3788,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
-          The part of section 4.2 that the files do not decide: whether a
-          version deposited out of order wrote <tt class="verbatim">history</tt> (#51).
-        </p>
-      </li>
-      <li>
-        <p>
           How a verifier tells a licence from a rights statement in <tt class="verbatim">rightsList</tt>
           (#50), and which licences allow a mirror (#34), which is therefore
           not checked.
@@ -4357,6 +4356,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           fork, and verifiers report the key-log version they judged against
           (section 6.5); weighted thresholds (#69) and witnesses of the
           versions of key logs seen first (#70) are left for after 0.2.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #51: a
+          deposit out of order is recorded by writing <tt class="verbatim">history</tt>,
+          which defines the history, in place of a requirement verifiers
+          cannot check; a version deposited without it is the current version
+          (section 4.2, appendix D); the item is removed from the open
+          questions of section 14.6.
         </p>
       </li>
       <li>
@@ -5601,6 +5610,16 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           later version need to see that the work went back. Files are
           compared with their paths, since <tt class="verbatim">object.json</tt>, links
           and citations name files by path (#23).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a deposit out of order is recorded by <tt class="verbatim">history</tt>.</strong>
+          Only the author knows that a version belongs earlier in the work;
+          the files cannot show it, so no rule could require <tt class="verbatim">history</tt>
+          of such a version and be checked. The history is therefore defined
+          by what is written: the order of the numbers, unless <tt class="verbatim">history</tt>
+          says otherwise (#51).
         </p>
       </li>
       <li>
