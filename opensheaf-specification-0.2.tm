@@ -136,6 +136,8 @@
 
     <item>version directories MUST NOT be zero-padded (<verbatim|v1>, not <verbatim|v001>);
 
+    <item>digests in inventories (<verbatim|manifest>, <verbatim|fixity>, <verbatim|state>) and in checksum files MUST be in lower case, which OCFL allows but does not require, so that a digest is compared as a string and quoted the same way everywhere (pins, <verbatim|previous>, signatures, the discovery document);
+
     <item>logical paths MUST be in UTF-8 and Unicode normalisation form C, and MUST NOT begin or end with <verbatim|/>, or contain empty, <verbatim|.> or <verbatim|.<no-break>.> segments, or <verbatim|\\>.
   </itemize>
 
@@ -1110,8 +1112,6 @@
   <\itemize>
     <item>Which status a member has when the checksum file of its inventory is missing or wrong (#48), and which status it has when one location serves a copy that does not match and another one that matches (#37).
 
-    <item>Whether digests in OCFL files must be in lower case (#49).
-
     <item>How a verifier tells a licence from a rights statement in <verbatim|rightsList> (#50), and which licences allow a mirror (#34), which is therefore not checked.
 
     <item>What a verifier reports for a pin of an earlier version of a withdrawn line (#25).
@@ -1253,6 +1253,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> decided in #55: the field names of <verbatim|keys.json>, of signature files and of the evidence of branches are those of the text; the lines of the signed message are named as the fields of the signature file, <verbatim|inventorySha512> and <verbatim|keyLog> (section 7.2), so every signature changes (appendix C recomputed); the evidence of a branch point is the folder <verbatim|parent/>, with <verbatim|parent/inventory.json>, <verbatim|parent/object.json>, <verbatim|parent/signatures/> and <verbatim|parent/parent/> for a branch of a branch, <verbatim|parent> being the reserved name (sections 4.1 and 9.2); exposing keys from when an archive learns of it, with no dated signatures in the core, is kept against backdating (section 6.4 and appendix D).
 
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #49: digests in inventories and checksum files MUST be in lower case (section 4.1, appendix D); the item is removed from the open questions of section 14.6.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #51: a deposit out of order is recorded by writing <verbatim|history>, which defines the history, in place of a requirement verifiers cannot check; a version deposited without it is the current version (section 4.2, appendix D); the item is removed from the open questions of section 14.6.
 
@@ -2223,6 +2225,8 @@
     <item><strong|Why notices are numbered by position.> The list only grows, so a position never changes; an identifier chosen by the owner would add a field to generate and check for uniqueness, and give nothing more. A withdrawal is a replacement that stays visible, since readers who saw the notice should see it taken back (#26).
 
     <item><strong|Why a revert is a new version.> The current version is the last of the history, so a revert holding the earlier number would leave the reverted version current; and readers who cited the later version need to see that the work went back. Files are compared with their paths, since <verbatim|object.json>, links and citations name files by path (#23).
+
+    <item><strong|Why digests in OCFL files are in lower case.> OCFL compares digests without regard to case; OpenSheaf quotes the digest of an inventory as its checksum file states it in pins, <verbatim|previous> and signatures, so one case keeps every quotation of a pin the same string, and tools compare digests as strings (#49).
 
     <item><strong|Why a deposit out of order is recorded by <verbatim|history>.> Only the author knows that a version belongs earlier in the work; the files cannot show it, so no rule could require <verbatim|history> of such a version and be checked. The history is therefore defined by what is written: the order of the numbers, unless <verbatim|history> says otherwise (#51).
 

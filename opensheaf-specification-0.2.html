@@ -494,6 +494,15 @@
       </li>
       <li>
         <p>
+          digests in inventories (<tt class="verbatim">manifest</tt>, <tt class="verbatim">fixity</tt>,
+          <tt class="verbatim">state</tt>) and in checksum files MUST be in lower case,
+          which OCFL allows but does not require, so that a digest is compared
+          as a string and quoted the same way everywhere (pins, <tt class="verbatim">previous</tt>,
+          signatures, the discovery document);
+        </p>
+      </li>
+      <li>
+        <p>
           logical paths MUST be in UTF-8 and Unicode normalisation form C, and
           MUST NOT begin or end with <tt class="verbatim">/</tt>, or contain empty, <tt
           class="verbatim">.</tt> or <tt class="verbatim">..</tt> segments, or <tt class="verbatim">\</tt>.
@@ -3783,11 +3792,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
-          Whether digests in OCFL files must be in lower case (#49).
-        </p>
-      </li>
-      <li>
-        <p>
           How a verifier tells a licence from a rights statement in <tt class="verbatim">rightsList</tt>
           (#50), and which licences allow a mirror (#34), which is therefore
           not checked.
@@ -4356,6 +4360,14 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           fork, and verifiers report the key-log version they judged against
           (section 6.5); weighted thresholds (#69) and witnesses of the
           versions of key logs seen first (#70) are left for after 0.2.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #49:
+          digests in inventories and checksum files MUST be in lower case
+          (section 4.1, appendix D); the item is removed from the open
+          questions of section 14.6.
         </p>
       </li>
       <li>
@@ -5610,6 +5622,15 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           later version need to see that the work went back. Files are
           compared with their paths, since <tt class="verbatim">object.json</tt>, links
           and citations name files by path (#23).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why digests in OCFL files are in lower case.</strong> OCFL
+          compares digests without regard to case; OpenSheaf quotes the digest
+          of an inventory as its checksum file states it in pins, <tt class="verbatim">previous</tt>
+          and signatures, so one case keeps every quotation of a pin the same
+          string, and tools compare digests as strings (#49).
         </p>
       </li>
       <li>

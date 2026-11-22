@@ -87,7 +87,8 @@ questions are listed at the end of the sections they concern.
   changes once made, except in a draft and by a takedown. **Document
   version** (4.2): numbered by the line's owner from 1 without gaps; new
   exactly when the document's own files change. **Pin** (4): (object
-  version, SHA-512 of its inventory file). **Inventory chain** (4.3): every
+  version, SHA-512 of its inventory file). Inventories and checksum files
+  use `sha512` and lower-case digests (4.1, #49 settled). **Inventory chain** (4.3): every
   sealed version after the first has `previous` in `object.json`, the digest
   of the inventory file before it (none in v1, the computed key-log v1, a
   branch's v1 or a draft), so signing a version fixes every earlier
@@ -305,7 +306,7 @@ the same change in its schema, and the other way round.
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors, #44 aliases,
-  #48, #49 and #50 verification details, #54 custody policies, #57
+  #48 and #50 verification details, #54 custody policies, #57
   branch numbering, #69 weighted thresholds, #70 witnesses of key logs. Read the relevant issue before
   touching its topic; do not settle an open question without agreement.
 
