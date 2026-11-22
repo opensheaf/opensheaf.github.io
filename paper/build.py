@@ -84,9 +84,12 @@ def breakable(t, every=14):
 
 def with_breaks(markup):
     markup = re.sub(r'<verbatim\|((?:[^<>]|<[^<>]*>)*)>',
-                    lambda m: '<verbatim|' + (breakable(m.group(1))
-                                              if len(m.group(1)) > (16 if re.search(r'[:/]', m.group(1)) else 30)
-                                              else m.group(1)) + '>',
+                    lambda m: ('<verbatim|' + breakable(m.group(1)) + '>'
+                               if len(re.sub(r'<[^<>]*>', '', m.group(1))) > (16 if re.search(r'[:/]', m.group(1)) else 30)
+                               # a short span stays whole: TeXmacs would
+                               # otherwise break it after a dot
+                               else '<no-break-start><verbatim|' + m.group(1)
+                               + '><no-break-end>'),
                     markup)
     return re.sub(r'(?<![|\w])(https?://[^\s<>|]+)', lambda m: breakable(m.group(1)), markup)
 
@@ -95,6 +98,11 @@ def heading(text):
     m = LABEL_RE.search(text)
     label = f'<label|{m.group(1)}>' if m else ''
     return inline(LABEL_RE.sub('', text).strip()), label
+
+
+# Table colours, matching the code ground of opensheaf-paper.ts.
+TABLE_HEAD = '#dde4ee'
+TABLE_STRIPE = '#f2f4f7'
 
 
 def table(rows):
@@ -107,6 +115,10 @@ def table(rows):
             '<cwith|1|-1|1|-1|cell-halign|l>|'
             '<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|'
             '<cwith|1|1|1|-1|font-series|bold>|'
+            + ''.join(f'<cwith|{k}|{k}|1|-1|cell-background|{TABLE_STRIPE}>|'
+                      for k in range(3, len(rows) + 1, 2))
+            + f'<cwith|1|1|1|-1|cell-background|{TABLE_HEAD}>|'
+            '<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|'
             '<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|'
             '<cwith|-1|-1|1|-1|cell-bborder|1ln>|'
             + '|'.join(f'<cwith|1|-1|{k}|{k}|cell-hpart|1>' for k in range(1, n + 1))
@@ -171,8 +183,7 @@ def convert(md):
                 code.append(lines[j])
                 j += 1
             body = '\n\n'.join(code_line(c) for c in code)
-            block = ('<\\with|font-size|0.84|par-first|0fn>\n  <\\verbatim-code>\n' + body
-                     + '\n  </verbatim-code>\n</with>')
+            block = '<\\os-code>\n' + body + '\n</os-code>'
             if caption and caption[0] == 'listing':
                 block = (f'<\\big-listing>\n{block}\n<|big-listing>\n'
                          f'  {caption[2]}{caption[3]}\n</big-listing>')
@@ -308,7 +319,7 @@ def convert(md):
     preamble = ('<\\hide-preamble>\n'
                 '  <new-figure|listing|Listing>\n'
                 '</hide-preamble>\n\n')
-    return ('<TeXmacs|2.1.5>\n\n<style|<tuple|article|british>>\n\n<\\body>\n'
+    return ('<TeXmacs|2.1.5>\n\n<style|<tuple|article|opensheaf-paper|british>>\n\n<\\body>\n'
             + '  ' + preamble.replace('\n', '\n  ').rstrip() + '\n\n'
             + body + '\n</body>\n\n<\\initial>\n  <\\collection>\n'
             '    <associate|font-base-size|10>\n'

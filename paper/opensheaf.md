@@ -313,9 +313,9 @@ writes the digest in lowercase base32 without padding: 52 characters, the last o
 which holds the last bit of the digest and four zero bits, set to *k*
 (specification, section 5.2). Names of different algorithms never coincide,
 and are compared as strings, never decoded. Listing @lst:name computes them.
-We ran it on the bytes of the genesis record of appendix C.2, with its final
-line feed: it prints `zzgdggwl...oz4q` and, by algorithm 1,
-`aajozkub...iknb`, the names given there in full. On the owner's record of
+On the bytes of the genesis record of appendix C.2, with its final line
+feed, it prints the two names given there in full, `zzgdggwl...oz4q` and, by
+algorithm 1, `aajozkub...iknb`. On the owner's record of
 appendix C.1 it prints the owner name given there, `56wo6cdp...z3pa`.
 
 Listing: Computing the names of a genesis record; checked against appendix C. {#lst:name}

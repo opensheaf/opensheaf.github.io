@@ -1,6 +1,6 @@
 <TeXmacs|2.1.5>
 
-<style|<tuple|article|british>>
+<style|<tuple|article|opensheaf-paper|british>>
 
 <\body>
   <\hide-preamble>
@@ -49,7 +49,7 @@
     and to <dfn|assign merit>. Table <reference|tab:functions> summarises
     what each function needs and who holds it today.
 
-    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Function>>|<cell|<with|par-mode|left|Needs>>|<cell|<with|par-mode|left|Held
+    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Function>>|<cell|<with|par-mode|left|Needs>>|<cell|<with|par-mode|left|Held
     today by>>>|<row|<cell|<with|par-mode|left|Record>>|<cell|<with|par-mode|left|fixity>>|<cell|<with|par-mode|left|arXiv,
     repositories, Zenodo, publishers>>>|<row|<cell|<with|par-mode|left|Preserve>>|<cell|<with|par-mode|left|institutions
     that last>>|<cell|<with|par-mode|left|repositories, LOCKSS, CLOCKSS,
@@ -173,8 +173,8 @@
     byte, and should be readable across origins, so that tools in a browser
     can check them.
 
-    The <dfn|discovery document>, <verbatim|opensheaf.json>, exists because
-    static web servers cannot list folders (Listing
+    The <dfn|discovery document>, <no-break-start><verbatim|opensheaf.json><no-break-end>,
+    exists because static web servers cannot list folders (Listing
     <reference|lst:discovery>). It names the storage root and its layout, the
     profiles followed, the owners hosted with their owner catalogues, every
     object but drafts with its head version, the digest of its head inventory
@@ -185,78 +185,77 @@
     website, never an identifier.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          {
+      <\os-code>
+        {
 
-          \ \ "format": "opensheaf-archive/0.2",
+        \ \ "format": "opensheaf-archive/0.2",
 
-          \ \ "specification": "0.2",
+        \ \ "specification": "0.2",
 
-          \ \ "name": "Papers of Massimiliano Gubinelli",
+        \ \ "name": "Papers of Massimiliano Gubinelli",
 
-          \ \ "storageRoot": "ocfl/",
+        \ \ "storageRoot": "ocfl/",
 
-          \ \ "storageLayout":
+        \ \ "storageLayout":
 
-          \ \ \ \ "opensheaf-owner-name-storage-layout",
+        \ \ \ \ "opensheaf-owner-name-storage-layout",
 
-          \ \ "profiles":
+        \ \ "profiles":
 
-          \ \ \ \ [ "zenodo", "texmacs", "website" ],
+        \ \ \ \ [ "zenodo", "texmacs", "website" ],
 
-          \ \ "owners": [ {
+        \ \ "owners": [ {
 
-          \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ \ \ "catalogue":
+        \ \ \ \ "catalogue":
 
-          \ \ \ \ \ \ "sheaf:kdye5s4i.<no-break>.<no-break>.kxeq:56wo6cdp.<no-break>.<no-break>.z3pa"
+        \ \ \ \ \ \ "sheaf:kdye5s4i.<no-break>.<no-break>.kxeq:56wo6cdp.<no-break>.<no-break>.z3pa"
 
-          \ \ } ],
+        \ \ } ],
 
-          \ \ "indexes": { "names": 2, "owners": 2,
+        \ \ "indexes": { "names": 2, "owners": 2,
 
-          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "sha512": 2 },
+        \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "sha512": 2 },
 
-          \ \ "objects": [ .<no-break>.<no-break>., {
+        \ \ "objects": [ .<no-break>.<no-break>., {
 
-          \ \ \ \ "id":
+        \ \ \ \ "id":
 
-          \ \ \ \ \ \ "sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ \ \ "sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ \ \ "kind": "document",
+        \ \ \ \ "kind": "document",
 
-          \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
 
-          \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ \ \ "head": "v2",
+        \ \ \ \ "head": "v2",
 
-          \ \ \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
+        \ \ \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
 
-          \ \ \ \ "status": "active",
+        \ \ \ \ "status": "active",
 
-          \ \ \ \ "label": "fractional-phi42-mass-gap"
+        \ \ \ \ "label": "fractional-phi42-mass-gap"
 
-          \ \ }, .<no-break>.<no-break>. ],
+        \ \ }, .<no-break>.<no-break>. ],
 
-          \ \ "tombstones": [ .<no-break>.<no-break>. ]
+        \ \ "tombstones": [ .<no-break>.<no-break>. ]
 
-          }
-        </verbatim-code>
-      </with>
+        }
+      </os-code>
     <|big-listing>
       An excerpt of the discovery document of appendix C.6:
-      <verbatim|contact> and <verbatim|extensions> are left out, and of
-      <verbatim|objects> only the paper's entry is
-      shown.<label|lst:discovery>
+      <no-break-start><verbatim|contact><no-break-end> and
+      <no-break-start><verbatim|extensions><no-break-end> are left out, and
+      of <no-break-start><verbatim|objects><no-break-end> only the paper's
+      entry is shown.<label|lst:discovery>
     </big-listing>
 
     The <dfn|storage root> is an OCFL 1.1 storage root. In its default
-    layout, an owner's key log is at <verbatim|\<less\>owner\<gtr\>/<line-break>\<less\>owner\<gtr\>/<line-break>>
+    layout, an owner's key log is at <no-break-start><verbatim|\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/><no-break-end>
     and each of its lines, <verbatim|sheaf:<line-break>\<less\>name\<gtr\>:<line-break>\<less\>owner\<gtr\>>,
-    at <verbatim|\<less\>owner\<gtr\>/<line-break>\<less\>name\<gtr\>/<line-break>>,
+    at <no-break-start><verbatim|\<less\>owner\<gtr\>/\<less\>name\<gtr\>/><no-break-end>,
     so that an owner moves to another archive by copying one folder; large
     archives use OCFL's hashed layout (specification, section 3.2). An
     archive need not be public. It serves all its lines or none, and a line
@@ -266,37 +265,41 @@
 
     <subsection|Objects, versions and pins><label|sec:objects>
 
-    An <dfn|object> is an OCFL object of kind <verbatim|document>,
-    <verbatim|collection> or <verbatim|owner>, with identifier
+    An <dfn|object> is an OCFL object of kind
+    <no-break-start><verbatim|document><no-break-end>,
+    <no-break-start><verbatim|collection><no-break-end> or
+    <no-break-start><verbatim|owner><no-break-end>, with identifier
     <verbatim|sheaf:<line-break>\<less\>name\<gtr\>:<line-break>\<less\>owner\<gtr\>>.
-    An <dfn|object version> (<verbatim|v1>, <verbatim|v2>, ...) is made at
-    every change and never changes once made. A <dfn|document version> is a
-    version of the work, numbered by the line's owner from 1 without gaps; it
-    changes only when the document's own files change, so several object
-    versions, with different descriptions or notices, may hold one document
-    version (specification, section 4). External numberings are kept as
-    labels: a work whose versions 1, 3 and 4 are on arXiv has document
-    versions 1, 2 and 3.
+    An <dfn|object version> (<no-break-start><verbatim|v1><no-break-end>,
+    <no-break-start><verbatim|v2><no-break-end>, ...) is made at every change
+    and never changes once made. A <dfn|document version> is a version of the
+    work, numbered by the line's owner from 1 without gaps; it changes only
+    when the document's own files change, so several object versions, with
+    different descriptions or notices, may hold one document version
+    (specification, section 4). External numberings are kept as labels: a
+    work whose versions 1, 3 and 4 are on arXiv has document versions 1, 2
+    and 3.
 
     A <dfn|pin> is the pair of an object version and the SHA-512 digest of
     its inventory file. An inventory records the digests of the files of its
     version and of every earlier one, and every sealed version after the
-    first records in <verbatim|previous> the digest of the inventory file
-    before it. A pin therefore fixes the object up to that version, the bytes
-    of every earlier inventory included, in any copy (specification, sections
-    4 and 4.3). Collections, branches and <verbatim|sheaf:> URIs refer to
-    object versions by pins. Table <reference|tab:files> lists the files of
-    an object.
+    first records in <no-break-start><verbatim|previous><no-break-end> the
+    digest of the inventory file before it. A pin therefore fixes the object
+    up to that version, the bytes of every earlier inventory included, in any
+    copy (specification, sections 4 and 4.3). Collections, branches and
+    <no-break-start><verbatim|sheaf:><no-break-end> URIs refer to object
+    versions by pins. Table <reference|tab:files> lists the files of an
+    object.
 
-    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|File>>|<cell|<with|par-mode|left|Role>>>|<row|<cell|<with|par-mode|left|<verbatim|genesis.json>>>|<cell|<with|par-mode|left|fixes
-    the name; every version>>>|<row|<cell|<with|par-mode|left|<verbatim|object.json>>>|<cell|<with|par-mode|left|identity,
-    versions, state>>>|<row|<cell|<with|par-mode|left|<verbatim|datacite.json>>>|<cell|<with|par-mode|left|description;
+    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|File>>|<cell|<with|par-mode|left|Role>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|genesis.json><no-break-end>>>|<cell|<with|par-mode|left|fixes
+    the name; every version>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|object.json><no-break-end>>>|<cell|<with|par-mode|left|identity,
+    versions, state>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|datacite.json><no-break-end>>>|<cell|<with|par-mode|left|description;
     not for owners>>>|<row|<cell|<with|par-mode|left|sources,
     renditions>>|<cell|<with|par-mode|left|the document's own
-    files>>>|<row|<cell|<with|par-mode|left|<verbatim|members.json>>>|<cell|<with|par-mode|left|a
-    collection's member list>>>|<row|<cell|<with|par-mode|left|<verbatim|keys.json>>>|<cell|<with|par-mode|left|an
-    owner's key-log version>>>|<row|<cell|<with|par-mode|left|<verbatim|parent/>>>|<cell|<with|par-mode|left|a
-    branch's evidence>>>|<row|<cell|<with|par-mode|left|<verbatim|inventory.json>>>|<cell|<with|par-mode|left|OCFL
+    files>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|members.json><no-break-end>>>|<cell|<with|par-mode|left|a
+    collection's member list>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|keys.json><no-break-end>>>|<cell|<with|par-mode|left|an
+    owner's key-log version>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|parent/><no-break-end>>>|<cell|<with|par-mode|left|a
+    branch's evidence>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|inventory.json><no-break-end>>>|<cell|<with|par-mode|left|OCFL
     inventory, per version>>>|<row|<cell|<with|par-mode|left|witness
     folder>>|<cell|<with|par-mode|left|signatures, outside versions>>>>>>|The
     files of an object and of its versions (specification, sections 4 to
@@ -312,154 +315,148 @@
     <dfn|notice>, a statement about a document version made after it, is
     identified by its position and corrected only by a later notice naming
     it. Dates never order document versions. Listing <reference|lst:object>
-    shows an <verbatim|object.json>; beside it, <verbatim|datacite.json>
-    holds the DataCite properties in the form of the DataCite REST API, with
-    relations to the same work elsewhere and to earlier versions
-    (specification, section 4.4).
+    shows an <no-break-start><verbatim|object.json><no-break-end>; beside it,
+    <no-break-start><verbatim|datacite.json><no-break-end> holds the DataCite
+    properties in the form of the DataCite REST API, with relations to the
+    same work elsewhere and to earlier versions (specification, section 4.4).
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          {
+      <\os-code>
+        {
 
-          \ \ "format": "opensheaf-object/0.2",
+        \ \ "format": "opensheaf-object/0.2",
 
-          \ \ "specification": "0.2",
+        \ \ "specification": "0.2",
 
-          \ \ "kind": "document",
+        \ \ "kind": "document",
 
-          \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
 
-          \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ "documentVersion": 1,
+        \ \ "documentVersion": 1,
 
-          \ \ "mainSource":
+        \ \ "mainSource":
 
-          \ \ \ \ "fractional-phi42-mass-gap.tm",
+        \ \ \ \ "fractional-phi42-mass-gap.tm",
 
-          \ \ "sourceFormat": "application/x-texmacs",
+        \ \ "sourceFormat": "application/x-texmacs",
 
-          \ \ "renditions": [
+        \ \ "renditions": [
 
-          \ \ \ \ { "path": "fractional-phi42-mass-gap.pdf",
+        \ \ \ \ { "path": "fractional-phi42-mass-gap.pdf",
 
-          \ \ \ \ \ \ "mediaType": "application/pdf" } ],
+        \ \ \ \ \ \ "mediaType": "application/pdf" } ],
 
-          \ \ "toolchain": [
+        \ \ "toolchain": [
 
-          \ \ \ \ { "name": "TeXmacs",
+        \ \ \ \ { "name": "TeXmacs",
 
-          \ \ \ \ \ \ "version": "2.1.5" } ],
+        \ \ \ \ \ \ "version": "2.1.5" } ],
 
-          \ \ "stage": { "scheme": "NISO-JAV",
+        \ \ "stage": { "scheme": "NISO-JAV",
 
-          \ \ \ \ \ \ \ \ \ \ \ \ \ "value": "AO" },
+        \ \ \ \ \ \ \ \ \ \ \ \ \ "value": "AO" },
 
-          \ \ "agreement": {
+        \ \ "agreement": {
 
-          \ \ \ \ "by": [ "P. Duch", "M. Gubinelli" ],
+        \ \ \ \ "by": [ "P. Duch", "M. Gubinelli" ],
 
-          \ \ \ \ "date": "2026-03-01",
+        \ \ \ \ "date": "2026-03-01",
 
-          \ \ \ \ "method": "by e-mail" },
+        \ \ \ \ "method": "by e-mail" },
 
-          \ \ "external": [
+        \ \ "external": [
 
-          \ \ \ \ { "role": "deposit", "service": "Zenodo",
+        \ \ \ \ { "role": "deposit", "service": "Zenodo",
 
-          \ \ \ \ \ \ "record":
+        \ \ \ \ \ \ "record":
 
-          \ \ \ \ \ \ \ \ "https://zenodo.org/records/1234567",
+        \ \ \ \ \ \ \ \ "https://zenodo.org/records/1234567",
 
-          \ \ \ \ \ \ "doi": "10.5281/zenodo.1234567" } ],
+        \ \ \ \ \ \ "doi": "10.5281/zenodo.1234567" } ],
 
-          \ \ "status": "active"
+        \ \ "status": "active"
 
-          }
-        </verbatim-code>
-      </with>
+        }
+      </os-code>
     <|big-listing>
-      The <verbatim|object.json> of the paper's first version (appendix C.2),
-      lines broken to fit.<label|lst:object>
+      The <no-break-start><verbatim|object.json><no-break-end> of the paper's
+      first version (appendix C.2), lines broken to fit.<label|lst:object>
     </big-listing>
 
     <subsection|Names and genesis records><label|sec:names>
 
     A work and an owner each have a <dfn|name>: a digest of a <dfn|genesis
-    record>, the file <verbatim|genesis.json> written when a work is sealed
-    or an owner created (specification, section 5). For a document it holds a
-    kind, a creation time, a nonce of at least 128 random bits and the
-    <verbatim|originator>, the owner of the first line (Listing
-    <reference|lst:genesis>). The record is part of every version of the work
-    and of its branches, byte for byte, and is never re-serialised, so no
-    canonical form of JSON is needed.
+    record>, the file <no-break-start><verbatim|genesis.json><no-break-end>
+    written when a work is sealed or an owner created (specification, section
+    5). For a document it holds a kind, a creation time, a nonce of at least
+    128 random bits and the <no-break-start><verbatim|originator><no-break-end>,
+    the owner of the first line (Listing <reference|lst:genesis>). The record
+    is part of every version of the work and of its branches, byte for byte,
+    and is never re-serialised, so no canonical form of JSON is needed.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          {
+      <\os-code>
+        {
 
-          \ \ "format": "opensheaf-genesis/0.2",
+        \ \ "format": "opensheaf-genesis/0.2",
 
-          \ \ "kind": "document",
+        \ \ "kind": "document",
 
-          \ \ "created": "2026-03-02T09:14:00Z",
+        \ \ "created": "2026-03-02T09:14:00Z",
 
-          \ \ "originator": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ "originator": "56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ "nonce": "6f65cd32058c16d6d78b05011772ff1d"
+        \ \ "nonce": "6f65cd32058c16d6d78b05011772ff1d"
 
-          }
-        </verbatim-code>
-      </with>
+        }
+      </os-code>
     <|big-listing>
       The genesis record of the example paper (appendix
       C.2).<label|lst:genesis>
     </big-listing>
 
     Algorithm <em|k>, for <em|k> from 0 to 15, hashes with SHA-256 a seed,
-    <verbatim|opensheaf-<line-break>name-<line-break>\<less\>k\<gtr\>>, then
-    a line feed and the bytes of <verbatim|genesis.json>, and writes the
-    digest in lowercase base32 without padding: 52 characters, the last of
-    which holds the last bit of the digest and four zero bits, set to <em|k>
-    (specification, section 5.2). Names of different algorithms never
-    coincide, and are compared as strings, never decoded. Listing
-    <reference|lst:name> computes them. We ran it on the bytes of the genesis
-    record of appendix C.2, with its final line feed: it prints
-    <verbatim|zzgdggwl.<line-break><no-break>.<line-break><no-break>.<line-break>oz4q>
-    and, by algorithm 1, <verbatim|aajozkub.<line-break><no-break>.<line-break><no-break>.<line-break>iknb>,
-    the names given there in full. On the owner's record of appendix C.1 it
-    prints the owner name given there, <verbatim|56wo6cdp.<line-break><no-break>.<line-break><no-break>.<line-break>z3pa>.
+    <no-break-start><verbatim|opensheaf-name-\<less\>k\<gtr\>><no-break-end>,
+    then a line feed and the bytes of <no-break-start><verbatim|genesis.json><no-break-end>,
+    and writes the digest in lowercase base32 without padding: 52 characters,
+    the last of which holds the last bit of the digest and four zero bits,
+    set to <em|k> (specification, section 5.2). Names of different algorithms
+    never coincide, and are compared as strings, never decoded. Listing
+    <reference|lst:name> computes them. On the bytes of the genesis record of
+    appendix C.2, with its final line feed, it prints the two names given
+    there in full, <no-break-start><verbatim|zzgdggwl.<no-break>.<no-break>.oz4q><no-break-end>
+    and, by algorithm 1, <no-break-start><verbatim|aajozkub.<no-break>.<no-break>.iknb><no-break-end>.
+    On the owner's record of appendix C.1 it prints the owner name given
+    there, <no-break-start><verbatim|56wo6cdp.<no-break>.<no-break>.z3pa><no-break-end>.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          import base64, hashlib, sys
+      <\os-code>
+        import base64, hashlib, sys
 
-          A = "abcdefghijklmnopqrstuvwxyz234567"
+        A = "abcdefghijklmnopqrstuvwxyz234567"
 
-          def name(g: bytes, k: int = 0) -\<gtr\> str:
+        def name(g: bytes, k: int = 0) -\<gtr\> str:
 
-          \ \ \ \ seed = b"opensheaf-name-%d\\n" % k
+        \ \ \ \ seed = b"opensheaf-name-%d\\n" % k
 
-          \ \ \ \ d = hashlib.sha256(seed + g).digest()
+        \ \ \ \ d = hashlib.sha256(seed + g).digest()
 
-          \ \ \ \ s = base64.b32encode(d).decode()
+        \ \ \ \ s = base64.b32encode(d).decode()
 
-          \ \ \ \ s = s.rstrip("=").lower()
+        \ \ \ \ s = s.rstrip("=").lower()
 
-          \ \ \ \ last = A.index(s[-1]) \| k
+        \ \ \ \ last = A.index(s[-1]) \| k
 
-          \ \ \ \ return s[:-1] + A[last]
+        \ \ \ \ return s[:-1] + A[last]
 
-          g = open(sys.argv[1], "rb").read()
+        g = open(sys.argv[1], "rb").read()
 
-          print(name(g, 0))
+        print(name(g, 0))
 
-          print(name(g, 1))
-        </verbatim-code>
-      </with>
+        print(name(g, 1))
+      </os-code>
     <|big-listing>
       Computing the names of a genesis record; checked against appendix
       C.<label|lst:name>
@@ -479,95 +476,99 @@
 
     <subsection|Owners and key logs><label|sec:owners>
 
-    An owner is an object of kind <verbatim|owner>, named by its own genesis
-    record, always by algorithm 0. Its object versions are its <dfn|key log>
-    (specification, section 6). The design follows the pre-rotation of KERI
-    <cite|keri2019>, after earlier drafts in which a thief could contest the
-    owner's answer to a theft <cite|keysforks|fedidentity>.
+    An owner is an object of kind <no-break-start><verbatim|owner><no-break-end>,
+    named by its own genesis record, always by algorithm 0. Its object
+    versions are its <dfn|key log> (specification, section 6). The design
+    follows the pre-rotation of KERI <cite|keri2019>, after earlier drafts in
+    which a thief could contest the owner's answer to a theft
+    <cite|keysforks|fedidentity>.
 
     Two kinds of keys have separate roles. <dfn|Current keys>, Ed25519 keys
-    written as <verbatim|did:key> URIs, sign the versions of the owner's
-    lines, at least <verbatim|threshold> of them per version. <dfn|Rotation
-    keys> sign only the next version of the key log; each version commits to
-    them in advance by their SHA-256 digests in <verbatim|next>, with a
-    <verbatim|nextThreshold>. A rotation key is used once, committed in one
-    version only, and never becomes a current key; current keys never sign
-    the key log. The first version is computed from the owner's genesis
-    record, its <verbatim|object.json>, <verbatim|keys.json> and inventory
-    written in the JSON Canonicalization Scheme so that every copy has the
-    same bytes, and is never signed, so the owner name commits to the first
+    written as <no-break-start><verbatim|did:key><no-break-end> URIs, sign
+    the versions of the owner's lines, at least
+    <no-break-start><verbatim|threshold><no-break-end> of them per version.
+    <dfn|Rotation keys> sign only the next version of the key log; each
+    version commits to them in advance by their SHA-256 digests in
+    <no-break-start><verbatim|next><no-break-end>, with a
+    <no-break-start><verbatim|nextThreshold><no-break-end>. A rotation key is
+    used once, committed in one version only, and never becomes a current
+    key; current keys never sign the key log. The first version is computed
+    from the owner's genesis record, its <no-break-start><verbatim|object.json><no-break-end>,
+    <no-break-start><verbatim|keys.json><no-break-end> and inventory written
+    in the JSON Canonicalization Scheme so that every copy has the same
+    bytes, and is never signed, so the owner name commits to the first
     current keys and to the digests of the first rotation keys (Listing
     <reference|lst:owner>). The specification advises one current key per
-    device and three rotation keys kept apart with a <verbatim|nextThreshold>
-    of 2, which survive the loss of one or the theft of one (specification,
-    section 6.2).
+    device and three rotation keys kept apart with a
+    <no-break-start><verbatim|nextThreshold><no-break-end> of 2, which
+    survive the loss of one or the theft of one (specification, section 6.2).
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          {
+      <\os-code>
+        {
 
-          \ \ "format": "opensheaf-genesis/0.2",
+        \ \ "format": "opensheaf-genesis/0.2",
 
-          \ \ "kind": "owner",
+        \ \ "kind": "owner",
 
-          \ \ "created": "2026-03-01T17:40:00Z",
+        \ \ "created": "2026-03-01T17:40:00Z",
 
-          \ \ "nonce": "1b4d9964664d9825076eb8558af61162",
+        \ \ "nonce": "1b4d9964664d9825076eb8558af61162",
 
-          \ \ "keys": [
+        \ \ "keys": [
 
-          \ \ \ \ "did:key:z6MksKLD.<no-break>.<no-break>.MkMuVW"
+        \ \ \ \ "did:key:z6MksKLD.<no-break>.<no-break>.MkMuVW"
 
-          \ \ ],
+        \ \ ],
 
-          \ \ "threshold": 1,
+        \ \ "threshold": 1,
 
-          \ \ "next": [
+        \ \ "next": [
 
-          \ \ \ \ "oxthfb6b.<no-break>.<no-break>.qnalha",
+        \ \ \ \ "oxthfb6b.<no-break>.<no-break>.qnalha",
 
-          \ \ \ \ "h6k4k6c5.<no-break>.<no-break>.vla6vq",
+        \ \ \ \ "h6k4k6c5.<no-break>.<no-break>.vla6vq",
 
-          \ \ \ \ "lnaifwjn.<no-break>.<no-break>.npaklq"
+        \ \ \ \ "lnaifwjn.<no-break>.<no-break>.npaklq"
 
-          \ \ ],
+        \ \ ],
 
-          \ \ "nextThreshold": 2,
+        \ \ "nextThreshold": 2,
 
-          \ \ "keeper": [
+        \ \ "keeper": [
 
-          \ \ \ \ "https://orcid.org/0000-0002-1234-5677"
+        \ \ \ \ "https://orcid.org/0000-0002-1234-5677"
 
-          \ \ ],
+        \ \ ],
 
-          \ \ "extensions": { .<no-break>.<no-break>. }
+        \ \ "extensions": { .<no-break>.<no-break>. }
 
-          }
-        </verbatim-code>
-      </with>
+        }
+      </os-code>
     <|big-listing>
       The genesis record of the authors' owner (appendix C.1); the data of
       the timestamps extension is elided.<label|lst:owner>
     </big-listing>
 
     <paragraph|Exposure, ending and forks>An owner whose current keys may
-    have been exposed, and could reach the <verbatim|threshold>, signs at
-    once, with rotation keys, a version listing them in <verbatim|exposed>,
-    or ends. Whoever holds the current keys can neither prevent nor contest
-    it. There is no revocation: signatures carry no time, so nothing tells
-    what a key signed before it leaked from what a thief signs after;
-    signatures stay good, and what needs an exposed key becomes contested
-    (Section <reference|sec:lines>). An owner ends by signing a last version
-    with <verbatim|ended> and, optionally, a successor. Two signed versions
-    of a key log with one number and different inventories are a <dfn|fork of
-    the key log>; only rotation keys can make one, stolen before use or kept
-    after it. The format cannot tell which side is the owner's, so a fork
-    ends the owner and freezes it: archives add no more versions of its lines
-    unless trusted evidence dates them before the fork (specification,
-    sections 6.3 and 7.5). An archive keeps the side it saw first and appends
-    a <dfn|fork record>, an unsigned version carrying the other side, so that
-    every copy shows the fork.
+    have been exposed, and could reach the
+    <no-break-start><verbatim|threshold><no-break-end>, signs at once, with
+    rotation keys, a version listing them in
+    <no-break-start><verbatim|exposed><no-break-end>, or ends. Whoever holds
+    the current keys can neither prevent nor contest it. There is no
+    revocation: signatures carry no time, so nothing tells what a key signed
+    before it leaked from what a thief signs after; signatures stay good, and
+    what needs an exposed key becomes contested (Section
+    <reference|sec:lines>). An owner ends by signing a last version with
+    <no-break-start><verbatim|ended><no-break-end> and, optionally, a
+    successor. Two signed versions of a key log with one number and different
+    inventories are a <dfn|fork of the key log>; only rotation keys can make
+    one, stolen before use or kept after it. The format cannot tell which
+    side is the owner's, so a fork ends the owner and freezes it: archives
+    add no more versions of its lines unless trusted evidence dates them
+    before the fork (specification, sections 6.3 and 7.5). An archive keeps
+    the side it saw first and appends a <dfn|fork record>, an unsigned
+    version carrying the other side, so that every copy shows the fork.
 
     <paragraph|Travel and keepers>A key log checks itself from its owner
     name, so a copy from any source is as good as the original. Every copy of
@@ -587,45 +588,43 @@
     <verbatim|sheaf:<line-break>\<less\>name\<gtr\>:<line-break>\<less\>owner\<gtr\>>,
     and is its signed versions, wherever stored (specification, section 7).
     Every sealed version of a line other than a key log is signed by at least
-    <verbatim|threshold> current keys of one version of the owner's key log,
-    each in a signature file kept in the object's witness folder, outside
-    every version (Listing <reference|lst:signature>). The file's name is
-    derived from its key, so a reader that knows the keys finds it without
-    listing folders. What is signed is a message of five lines: a domain
-    separator, the object, the version, the inventory digest and the key-log
-    version, as a pin. A signature is judged against that key-log version
-    alone, so retired keys leave earlier signatures good. Others'
-    attestations, and timestamps, are witnesses, never signatures of the
-    line.
+    <no-break-start><verbatim|threshold><no-break-end> current keys of one
+    version of the owner's key log, each in a signature file kept in the
+    object's witness folder, outside every version (Listing
+    <reference|lst:signature>). The file's name is derived from its key, so a
+    reader that knows the keys finds it without listing folders. What is
+    signed is a message of five lines: a domain separator, the object, the
+    version, the inventory digest and the key-log version, as a pin. A
+    signature is judged against that key-log version alone, so retired keys
+    leave earlier signatures good. Others' attestations, and timestamps, are
+    witnesses, never signatures of the line.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          {
+      <\os-code>
+        {
 
-          \ \ "format": "opensheaf-signature/0.2",
+        \ \ "format": "opensheaf-signature/0.2",
 
-          \ \ "object":
+        \ \ "object":
 
-          \ \ \ \ "sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ "sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ "version": "v2",
+        \ \ "version": "v2",
 
-          \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
+        \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
 
-          \ \ "signer": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ "signer": "56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ "key": "did:key:z6MkugKq.<no-break>.<no-break>.DDvThn",
+        \ \ "key": "did:key:z6MkugKq.<no-break>.<no-break>.DDvThn",
 
-          \ \ "keyLog":
+        \ \ "keyLog":
 
-          \ \ \ \ "sheaf:56wo6cdp.<no-break>.<no-break>.z3pa/v2?sha512=7673.<no-break>.<no-break>.3f84",
+        \ \ \ \ "sheaf:56wo6cdp.<no-break>.<no-break>.z3pa/v2?sha512=7673.<no-break>.<no-break>.3f84",
 
-          \ \ "signature": "Gf9KOxH/.<no-break>.<no-break>.qipyBA=="
+        \ \ "signature": "Gf9KOxH/.<no-break>.<no-break>.qipyBA=="
 
-          }
-        </verbatim-code>
-      </with>
+        }
+      </os-code>
     <|big-listing>
       A signature file of the paper's second version (appendix
       C.3).<label|lst:signature>
@@ -649,90 +648,91 @@
     <subsection|Collections><label|sec:collections>
 
     A <dfn|collection> is an object whose versions hold
-    <verbatim|members.json>, a list of lines of documents or collections, in
-    any archive, each pinned (specification, section 8). Its source is the
-    member list, so any change of it is a new document version. Keeping and
-    vetting are different acts. A <dfn|catalogue> keeps objects whole and is
-    impartial about their versions; a member may have <verbatim|follow> set
-    to <verbatim|latest>, and the catalogue's tool then writes a new document
-    version of the catalogue when that member's line has a new signed
-    version, never a contested one. A <dfn|selection> vets particular
-    versions: each member pins a revision set, the document versions vetted
-    (Listing <reference|lst:selection>), and later versions by the authors
-    enter only by a new version of the selection.
+    <no-break-start><verbatim|members.json><no-break-end>, a list of lines of
+    documents or collections, in any archive, each pinned (specification,
+    section 8). Its source is the member list, so any change of it is a new
+    document version. Keeping and vetting are different acts. A
+    <dfn|catalogue> keeps objects whole and is impartial about their
+    versions; a member may have <no-break-start><verbatim|follow><no-break-end>
+    set to <no-break-start><verbatim|latest><no-break-end>, and the
+    catalogue's tool then writes a new document version of the catalogue when
+    that member's line has a new signed version, never a contested one. A
+    <dfn|selection> vets particular versions: each member pins a revision
+    set, the document versions vetted (Listing <reference|lst:selection>),
+    and later versions by the authors enter only by a new version of the
+    selection.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          {
+      <\os-code>
+        {
 
-          \ \ "format": "opensheaf-collection/0.2",
+        \ \ "format": "opensheaf-collection/0.2",
 
-          \ \ "type": "selection",
+        \ \ "type": "selection",
 
-          \ \ "members": [ {
+        \ \ "members": [ {
 
-          \ \ \ \ "kind": "document",
+        \ \ \ \ "kind": "document",
 
-          \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
 
-          \ \ \ \ "owner": "tqr6lchn.<no-break>.<no-break>.tdka",
+        \ \ \ \ "owner": "tqr6lchn.<no-break>.<no-break>.tdka",
 
-          \ \ \ \ "at": [ "https://journal.example.org/" ],
+        \ \ \ \ "at": [ "https://journal.example.org/" ],
 
-          \ \ \ \ "revisions": [ {
+        \ \ \ \ "revisions": [ {
 
-          \ \ \ \ \ \ "documentVersion": 2,
+        \ \ \ \ \ \ "documentVersion": 2,
 
-          \ \ \ \ \ \ "version": "v1",
+        \ \ \ \ \ \ "version": "v1",
 
-          \ \ \ \ \ \ "inventorySha512": "1c4e.<no-break>.<no-break>.9a5a" }
-          ],
+        \ \ \ \ \ \ "inventorySha512": "1c4e.<no-break>.<no-break>.9a5a" } ],
 
-          \ \ \ \ "cite": { .<no-break>.<no-break>. }
+        \ \ \ \ "cite": { .<no-break>.<no-break>. }
 
-          \ \ }, {
+        \ \ }, {
 
-          \ \ \ \ "kind": "document",
+        \ \ \ \ "kind": "document",
 
-          \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
+        \ \ \ \ "name": "zzgdggwl.<no-break>.<no-break>.oz4q",
 
-          \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
+        \ \ \ \ "owner": "56wo6cdp.<no-break>.<no-break>.z3pa",
 
-          \ \ \ \ "at": [ "https://mgubi.org/papers/" ],
+        \ \ \ \ "at": [ "https://mgubi.org/papers/" ],
 
-          \ \ \ \ "revisions": [ {
+        \ \ \ \ "revisions": [ {
 
-          \ \ \ \ \ \ "documentVersion": 2,
+        \ \ \ \ \ \ "documentVersion": 2,
 
-          \ \ \ \ \ \ "version": "v2",
+        \ \ \ \ \ \ "version": "v2",
 
-          \ \ \ \ \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
+        \ \ \ \ \ \ "inventorySha512": "e3e1.<no-break>.<no-break>.bb25",
 
-          \ \ \ \ \ \ "doi": "10.5281/zenodo.1234568" } ]
+        \ \ \ \ \ \ "doi": "10.5281/zenodo.1234568" } ]
 
-          \ \ } ]
+        \ \ } ]
 
-          }
-        </verbatim-code>
-      </with>
+        }
+      </os-code>
     <|big-listing>
-      A selection, an issue of a journal (appendix C.4); <verbatim|cite> is
+      A selection, an issue of a journal (appendix C.4);
+      <no-break-start><verbatim|cite><no-break-end> is
       elided.<label|lst:selection>
     </big-listing>
 
-    A member names its line by <verbatim|name> and <verbatim|owner>, and
-    gives in <verbatim|at> base URLs where copies may be found, as equal
-    hints. Since a pin fixes an inventory, which fixes every file and earlier
-    version, collections are hash trees across archives, and pins cannot form
-    cycles. Each owner an archive hosts has there an <dfn|owner catalogue>,
-    signed by that owner only; it replaced a single catalogue per archive,
-    which would have needed one owner's keys for every other owner's deposits
-    (specification, appendix D.5). A verifier gives each member one of the
-    statuses of Table <reference|tab:status>; whether a copy matches is
-    decided by the bytes of its inventory file.
+    A member names its line by <no-break-start><verbatim|name><no-break-end>
+    and <no-break-start><verbatim|owner><no-break-end>, and gives in
+    <no-break-start><verbatim|at><no-break-end> base URLs where copies may be
+    found, as equal hints. Since a pin fixes an inventory, which fixes every
+    file and earlier version, collections are hash trees across archives, and
+    pins cannot form cycles. Each owner an archive hosts has there an
+    <dfn|owner catalogue>, signed by that owner only; it replaced a single
+    catalogue per archive, which would have needed one owner's keys for every
+    other owner's deposits (specification, appendix D.5). A verifier gives
+    each member one of the statuses of Table <reference|tab:status>; whether
+    a copy matches is decided by the bytes of its inventory file.
 
-    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Status>>|<cell|<with|par-mode|left|When>>>|<row|<cell|<with|par-mode|left|verified>>|<cell|<with|par-mode|left|a
+    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Status>>|<cell|<with|par-mode|left|When>>>|<row|<cell|<with|par-mode|left|verified>>|<cell|<with|par-mode|left|a
     copy matches the pin; signed, not contested>>>|<row|<cell|<with|par-mode|left|contested>>|<cell|<with|par-mode|left|a
     copy matches the pin; contested>>>|<row|<cell|<with|par-mode|left|mismatch>>|<cell|<with|par-mode|left|copies
     found, none matches the pin>>>|<row|<cell|<with|par-mode|left|unchecked>>|<cell|<with|par-mode|left|the
@@ -751,10 +751,11 @@
     successor of an ended owner, a journal keeping the version it vetted
     (specification, section 9). It has the work's genesis record, and is a
     new object. Its content holds the evidence of its branch point in
-    <verbatim|parent/>: the parent's inventory, its <verbatim|object.json>,
-    the parent owner's good signature files and, for a branch of a branch,
-    the parent's own evidence, back to the originator's line. A branch point
-    is thus checked without access to the parent's line, and is inconsistent,
+    <no-break-start><verbatim|parent/><no-break-end>: the parent's inventory,
+    its <no-break-start><verbatim|object.json><no-break-end>, the parent
+    owner's good signature files and, for a branch of a branch, the parent's
+    own evidence, back to the originator's line. A branch point is thus
+    checked without access to the parent's line, and is inconsistent,
     confirmed or unchecked. A branch numbers its own document versions from
     1, and may take a later version of the same parent line as a new branch
     point. A line is never handed over; work of another line is taken in by a
@@ -768,12 +769,13 @@
 
     <subsection|Drafts, mirrors and rights><label|sec:drafts>
 
-    A <dfn|draft> belongs to the reserved owner <verbatim|draft>: it is never
-    signed, pinned, copied or named by a <verbatim|sheaf:> URI, and is the
-    only object that may be rewritten or deleted (specification, section 10).
-    <dfn|Sealing> makes from a work, under a new genesis record, the first
-    signed version of its originator's line, at the owner's request, before a
-    version first leaves the owner's hands.
+    A <dfn|draft> belongs to the reserved owner
+    <no-break-start><verbatim|draft><no-break-end>: it is never signed,
+    pinned, copied or named by a <no-break-start><verbatim|sheaf:><no-break-end>
+    URI, and is the only object that may be rewritten or deleted
+    (specification, section 10). <dfn|Sealing> makes from a work, under a new
+    genesis record, the first signed version of its originator's line, at the
+    owner's request, before a version first leaves the owner's hands.
 
     A <dfn|mirror> is a copy of a line in an archive where its owner does not
     write. Nothing marks it: it is the same line, grown only by the owner's
@@ -787,86 +789,84 @@
 
     <subsection|Identifiers, resolution and indexes><label|sec:uris>
 
-    Lines, versions, pins, works and owners are written as <verbatim|sheaf:>
-    URIs (Listing <reference|lst:uriforms>). Without an owner part, a URI
-    names the originator's line, read from the genesis record every copy
-    carries; never "the latest" line. <verbatim|/<line-break>v\<less\>n\<gtr\>>
-    names a document version; a <verbatim|sha512> parameter names exactly one
-    object version; <verbatim|at> is a hint, not part of what is named
-    (specification, section 12.1). For people, names may be shortened to
-    prefixes of at least 8 characters, which a resolver expands only when one
-    candidate matches. Listing <reference|lst:uris> gives URIs of the
-    example.
+    Lines, versions, pins, works and owners are written as
+    <no-break-start><verbatim|sheaf:><no-break-end> URIs (Listing
+    <reference|lst:uriforms>). Without an owner part, a URI names the
+    originator's line, read from the genesis record every copy carries; never
+    "the latest" line. <no-break-start><verbatim|/v\<less\>n\<gtr\>><no-break-end>
+    names a document version; a <no-break-start><verbatim|sha512><no-break-end>
+    parameter names exactly one object version;
+    <no-break-start><verbatim|at><no-break-end> is a hint, not part of what
+    is named (specification, section 12.1). For people, names may be
+    shortened to prefixes of at least 8 characters, which a resolver expands
+    only when one candidate matches. Listing <reference|lst:uris> gives URIs
+    of the example.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          sheaf:\<less\>name\<gtr\>
+      <\os-code>
+        sheaf:\<less\>name\<gtr\>
 
-          \ \ \ \ the originator's line
+        \ \ \ \ the originator's line
 
-          sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>
+        sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>
 
-          \ \ \ \ the line of that owner
+        \ \ \ \ the line of that owner
 
-          sheaf:\<less\>name\<gtr\>:*
+        sheaf:\<less\>name\<gtr\>:*
 
-          \ \ \ \ the work: all its lines
+        \ \ \ \ the work: all its lines
 
-          sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>
+        sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>
 
-          \ \ \ \ document version n of the line
+        \ \ \ \ document version n of the line
 
-          sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>
+        sheaf:\<less\>name\<gtr\>[:\<less\>owner\<gtr\>]/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>
 
-          \ \ \ \ one object version holding it
+        \ \ \ \ one object version holding it
 
-          sheaf:\<less\>owner\<gtr\>
+        sheaf:\<less\>owner\<gtr\>
 
-          \ \ \ \ an owner: its key log
+        \ \ \ \ an owner: its key log
 
-          sheaf:\<less\>owner\<gtr\>/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>
+        sheaf:\<less\>owner\<gtr\>/v\<less\>n\<gtr\>?sha512=\<less\>digest\<gtr\>
 
-          \ \ \ \ a version of its key log
-        </verbatim-code>
-      </with>
+        \ \ \ \ a version of its key log
+      </os-code>
     <|big-listing>
-      The forms of <verbatim|sheaf:> URIs (specification, section
-      12.1).<label|lst:uriforms>
+      The forms of <no-break-start><verbatim|sheaf:><no-break-end> URIs
+      (specification, section 12.1).<label|lst:uriforms>
     </big-listing>
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          sheaf:zzgdggwl.<no-break>.<no-break>.oz4q
+      <\os-code>
+        sheaf:zzgdggwl.<no-break>.<no-break>.oz4q
 
-          \ \ \ \ the authors' line
+        \ \ \ \ the authors' line
 
-          sheaf:zzgdggwl.<no-break>.<no-break>.oz4q/v2
+        sheaf:zzgdggwl.<no-break>.<no-break>.oz4q/v2
 
-          \ \ \ \ document version 2 of the authors' line
+        \ \ \ \ document version 2 of the authors' line
 
-          sheaf:zzgdggwl.<no-break>.<no-break>.oz4q/v2?sha512=e3e1.<no-break>.<no-break>.bb25
+        sheaf:zzgdggwl.<no-break>.<no-break>.oz4q/v2?sha512=e3e1.<no-break>.<no-break>.bb25
 
-          \ \ \ \ the authors' object version v2
+        \ \ \ \ the authors' object version v2
 
-          sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:tqr6lchn.<no-break>.<no-break>.tdka/v2
+        sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:tqr6lchn.<no-break>.<no-break>.tdka/v2
 
-          \ \ \ \ document version 2 of the journal's line
+        \ \ \ \ document version 2 of the journal's line
 
-          sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:*
+        sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:*
 
-          \ \ \ \ the work: every line of it
+        \ \ \ \ the work: every line of it
 
-          sheaf:56wo6cdp.<no-break>.<no-break>.z3pa
+        sheaf:56wo6cdp.<no-break>.<no-break>.z3pa
 
-          \ \ \ \ the authors' owner: its key log
+        \ \ \ \ the authors' owner: its key log
 
-          sheaf:zzgdggwl/v2
+        sheaf:zzgdggwl/v2
 
-          \ \ \ \ a short form of the second
-        </verbatim-code>
-      </with>
+        \ \ \ \ a short form of the second
+      </os-code>
     <|big-listing>
       Some of the URIs of the paper, of the accepted copy and of the owner
       given in appendix C.7.<label|lst:uris>
@@ -887,55 +887,53 @@
     copies: they hold no inventory and resolve nothing.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          resolve(uri):
+      <\os-code>
+        resolve(uri):
 
-          \ \ name, owner, n, digest, at = parse(uri)
+        \ \ name, owner, n, digest, at = parse(uri)
 
-          \ \ for loc in at, members' at, parent.url,
+        \ \ for loc in at, members' at, parent.url,
 
-          \ \ \ \ \ \ \ \ \ \ \ \ \ indexes, configuration:
+        \ \ \ \ \ \ \ \ \ \ \ \ \ indexes, configuration:
 
-          \ \ \ \ read loc/opensheaf.json
+        \ \ \ \ read loc/opensheaf.json
 
-          \ \ \ \ find (name, owner) in the indexes,
+        \ \ \ \ find (name, owner) in the indexes,
 
-          \ \ \ \ \ \ or else in objects
+        \ \ \ \ \ \ or else in objects
 
-          \ \ \ \ fetch the inventory of the version
+        \ \ \ \ fetch the inventory of the version
 
-          \ \ \ \ check name is a name of genesis.json
+        \ \ \ \ check name is a name of genesis.json
 
-          \ \ \ \ check object.json: name and owner
+        \ \ \ \ check object.json: name and owner
 
-          \ \ \ \ check signatures against the key log
+        \ \ \ \ check signatures against the key log
 
-          \ \ \ \ \ \ beside the copy, or a longer copy
+        \ \ \ \ \ \ beside the copy, or a longer copy
 
-          \ \ \ \ check the version holds n
+        \ \ \ \ check the version holds n
 
-          \ \ \ \ if digest: check the inventory bytes,
+        \ \ \ \ if digest: check the inventory bytes,
 
-          \ \ \ \ \ \ whatever the checksum file says
+        \ \ \ \ \ \ whatever the checksum file says
 
-          \ \ \ \ keep the copy and its signed versions;
+        \ \ \ \ keep the copy and its signed versions;
 
-          \ \ \ \ \ \ a contested one only for a digest
+        \ \ \ \ \ \ a contested one only for a digest
 
-          \ \ report copies that do not match, forks,
+        \ \ report copies that do not match, forks,
 
-          \ \ \ \ ended owners, exposed keys, tombstones
+        \ \ \ \ ended owners, exposed keys, tombstones
 
-          \ \ if digest: return a copy that matches,
+        \ \ if digest: return a copy that matches,
 
-          \ \ \ \ or else report a mismatch
+        \ \ \ \ or else report a mismatch
 
-          \ \ return the latest signed version
+        \ \ return the latest signed version
 
-          \ \ \ \ among the copies that agree
-        </verbatim-code>
-      </with>
+        \ \ \ \ among the copies that agree
+      </os-code>
     <|big-listing>
       Resolution, after section 12.3 of the specification
       (pseudocode).<label|lst:resolve>
@@ -945,15 +943,15 @@
 
     An owner withdraws a line; an archive takes down an object
     (specification, section 13). A <dfn|withdrawal> is a description-only
-    version with status <verbatim|withdrawn>, a date and a reason, which
-    withdraws every document version deposited before it; they stay signed,
-    pinned and copied, and copies follow the withdrawal, since it is a signed
-    version. A new document version reinstates the line. A <dfn|takedown>
-    deletes a whole object from one archive, since OCFL cannot remove a file
-    without changing inventories and so every pin, and leaves a
-    <dfn|tombstone> in the discovery document. A tombstone is not signed and
-    speaks for its archive only: copies elsewhere do not follow it by
-    themselves, and resolution goes on to them.
+    version with status <no-break-start><verbatim|withdrawn><no-break-end>, a
+    date and a reason, which withdraws every document version deposited
+    before it; they stay signed, pinned and copied, and copies follow the
+    withdrawal, since it is a signed version. A new document version
+    reinstates the line. A <dfn|takedown> deletes a whole object from one
+    archive, since OCFL cannot remove a file without changing inventories and
+    so every pin, and leaves a <dfn|tombstone> in the discovery document. A
+    tombstone is not signed and speaks for its archive only: copies elsewhere
+    do not follow it by themselves, and resolution goes on to them.
 
     <subsection|Verification and security><label|sec:verification>
 
@@ -984,105 +982,104 @@
     normative for archives that declare it (specification, appendix A). The
     Zenodo profile makes each line a record and each document version a
     record version with its own DOI, records MD5 digests, which Zenodo
-    reports, in the inventories' <verbatim|fixity>, and signs a version
-    before the record is published. The TeXmacs profile fixes how renditions
-    are made from TeXmacs sources. The website profile makes landing pages
-    with the meta tags that Google Scholar reads, a feed, and optionally an
-    OAI-PMH static repository. Extensions record what the core leaves open,
-    under <verbatim|extensions>, without changing its meaning. The timestamps
-    extension keeps RFC 3161 tokens and OpenTimestamps proofs of signature
-    files beside them; they are evidence only, and change no status by
-    themselves <cite|timestamps02>. A companion text says how to keep an
-    archive in git without git changing a byte of it <cite|git02>.
+    reports, in the inventories' <no-break-start><verbatim|fixity><no-break-end>,
+    and signs a version before the record is published. The TeXmacs profile
+    fixes how renditions are made from TeXmacs sources. The website profile
+    makes landing pages with the meta tags that Google Scholar reads, a feed,
+    and optionally an OAI-PMH static repository. Extensions record what the
+    core leaves open, under <no-break-start><verbatim|extensions><no-break-end>,
+    without changing its meaning. The timestamps extension keeps RFC 3161
+    tokens and OpenTimestamps proofs of signature files beside them; they are
+    evidence only, and change no status by themselves <cite|timestamps02>. A
+    companion text says how to keep an archive in git without git changing a
+    byte of it <cite|git02>.
 
     <section|Implementation><label|sec:impl>
 
     <subsection|Reference tools><label|sec:tools>
 
     The reference implementation, opensheaf-py, provides the
-    <verbatim|osheaf> command <cite|tools>. It is a literate program that
-    explains the code along the specification, and follows the draft:
-    archives made now may have to be rebuilt. It deposits documents and new
-    versions and signs them; keeps notices, withdrawals, collections,
-    mirrors, branches, accepted copies and drafts; writes the discovery
-    document, the indexes and a website; imports papers from arXiv; deposits
-    on Zenodo, by default in its sandbox; and verifies an archive, optionally
-    also against the JSON Schemas and with an independent OCFL validator.
-    Listing <reference|lst:osheaf> shows a first session, as documented in
-    its guide.
+    <no-break-start><verbatim|osheaf><no-break-end> command <cite|tools>. It
+    is a literate program that explains the code along the specification, and
+    follows the draft: archives made now may have to be rebuilt. It deposits
+    documents and new versions and signs them; keeps notices, withdrawals,
+    collections, mirrors, branches, accepted copies and drafts; writes the
+    discovery document, the indexes and a website; imports papers from arXiv;
+    deposits on Zenodo, by default in its sandbox; and verifies an archive,
+    optionally also against the JSON Schemas and with an independent OCFL
+    validator. Listing <reference|lst:osheaf> shows a first session, as
+    documented in its guide.
 
     <\big-listing>
-      <\with|font-size|0.84|par-first|0fn>
-        <\verbatim-code>
-          osheaf init my-papers \\
+      <\os-code>
+        osheaf init my-papers \\
 
-          \ \ -<no-break>-name "Papers of Jane Doe" \\
+        \ \ -<no-break>-name "Papers of Jane Doe" \\
 
-          \ \ -<no-break>-base-url \\
+        \ \ -<no-break>-base-url \\
 
-          \ \ \ \ https://janedoe.github.io/papers/ \\
+        \ \ \ \ https://janedoe.github.io/papers/ \\
 
-          \ \ -<no-break>-curator "Doe, Jane" \\
+        \ \ -<no-break>-curator "Doe, Jane" \\
 
-          \ \ -<no-break>-affiliation "Example University" \\
+        \ \ -<no-break>-affiliation "Example University" \\
 
-          \ \ -<no-break>-new-owner \\
+        \ \ -<no-break>-new-owner \\
 
-          \ \ -<no-break>-export /Volumes/USB/opensheaf-keys \\
+        \ \ -<no-break>-export /Volumes/USB/opensheaf-keys \\
 
-          \ \ -<no-break>-print
+        \ \ -<no-break>-print
 
-          cd my-papers
+        cd my-papers
 
-          osheaf deposit kpz-uniqueness paper.tex \\
+        osheaf deposit kpz-uniqueness paper.tex \\
 
-          \ \ -<no-break>-pdf paper.pdf -<no-break>-new \\
+        \ \ -<no-break>-pdf paper.pdf -<no-break>-new \\
 
-          \ \ -<no-break>-extra-source refs.bib \\
+        \ \ -<no-break>-extra-source refs.bib \\
 
-          \ \ -<no-break>-extra-source \\
+        \ \ -<no-break>-extra-source \\
 
-          \ \ \ \ figures/fig1.pdf=figures/fig1.pdf \\
+        \ \ \ \ figures/fig1.pdf=figures/fig1.pdf \\
 
-          \ \ -<no-break>-title \\
+        \ \ -<no-break>-title \\
 
-          \ \ \ \ "Energy solutions of KPZ are unique" \\
+        \ \ \ \ "Energy solutions of KPZ are unique" \\
 
-          \ \ -<no-break>-author "Doe, Jane\|Example University" \\
+        \ \ -<no-break>-author "Doe, Jane\|Example University" \\
 
-          \ \ -<no-break>-author \\
+        \ \ -<no-break>-author \\
 
-          \ \ \ \ "Roe, Richard\|Another University" \\
+        \ \ \ \ "Roe, Richard\|Another University" \\
 
-          \ \ -<no-break>-abstract-file abstract.txt \\
+        \ \ -<no-break>-abstract-file abstract.txt \\
 
-          \ \ -<no-break>-keyword "stochastic PDE" \\
+        \ \ -<no-break>-keyword "stochastic PDE" \\
 
-          \ \ -<no-break>-rights cc-by-4.0 -<no-break>-available 2015-08-31
+        \ \ -<no-break>-rights cc-by-4.0 -<no-break>-available 2015-08-31
 
-          osheaf deposit kpz-uniqueness paper.tex \\
+        osheaf deposit kpz-uniqueness paper.tex \\
 
-          \ \ -<no-break>-pdf paper.pdf \\
+        \ \ -<no-break>-pdf paper.pdf \\
 
-          \ \ -<no-break>-changes "Lemma 2 corrected." \\
+        \ \ -<no-break>-changes "Lemma 2 corrected." \\
 
-          \ \ -<no-break>-title \\
+        \ \ -<no-break>-title \\
 
-          \ \ \ \ "Energy solutions of KPZ are unique" \\
+        \ \ \ \ "Energy solutions of KPZ are unique" \\
 
-          \ \ -<no-break>-author "Doe, Jane\|Example University"
+        \ \ -<no-break>-author "Doe, Jane\|Example University"
 
-          osheaf notice kpz-uniqueness -<no-break>-about 1 \\
+        osheaf notice kpz-uniqueness -<no-break>-about 1 \\
 
-          \ \ -<no-break>-text \\
+        \ \ -<no-break>-text \\
 
-          \ \ "Lemma 2 is wrong as stated; see version 2."
+        \ \ "Lemma 2 is wrong as stated; see version 2."
 
-          osheaf collect
+        osheaf collect
 
-          osheaf verify
-        </verbatim-code>
-      </with>
+        osheaf verify
+      </os-code>
     <|big-listing>
       Creating an archive and an owner, depositing a paper and a second
       version, adding a notice about the first, and checking the archive
@@ -1090,14 +1087,15 @@
     </big-listing>
 
     Key management is where the tools meet users most. By default
-    <verbatim|init> writes the rotation keys, encrypted under a passphrase,
-    to a removable drive and optionally to printed sheets, and asks the user
-    to type back a check of each; a key wallet in a private GitHub repository
-    or a password manager trades security for convenience, and the tools say
-    so. A wallet may be unlocked by a passkey. A lost computer is answered by
-    <verbatim|osheaf owner expose>, a version of the key log signed by two
-    rotation keys; versions the owner made that only the exposed key signed
-    are then signed again with a new key.
+    <no-break-start><verbatim|init><no-break-end> writes the rotation keys,
+    encrypted under a passphrase, to a removable drive and optionally to
+    printed sheets, and asks the user to type back a check of each; a key
+    wallet in a private GitHub repository or a password manager trades
+    security for convenience, and the tools say so. A wallet may be unlocked
+    by a passkey. A lost computer is answered by
+    <no-break-start><verbatim|osheaf owner expose><no-break-end>, a version
+    of the key log signed by two rotation keys; versions the owner made that
+    only the exposed key signed are then signed again with a new key.
 
     <subsection|The Explorer and the Manager><label|sec:explorer>
 
@@ -1108,7 +1106,8 @@
     template, a GitHub repository with its workflows and Pages already set up
     <cite|manager|template>. It can make the owner and add keys to its key
     log; rotation keys then pass through the page's memory, so the highest
-    security level keeps them offline, used by <verbatim|osheaf> alone.
+    security level keeps them offline, used by
+    <no-break-start><verbatim|osheaf><no-break-end> alone.
 
     <subsection|A formal model in Lean><label|sec:lean>
 
@@ -1124,51 +1123,60 @@
     takedowns, which remove, are modelled apart. The theorems include:
 
     <\itemize>
-      <item><verbatim|Step.resolveAt_ok>, immutability: once a pin resolves
-      at an archive, no step changes what it resolves to there, for any
-      digest function, since archives only add;
+      <item><no-break-start><verbatim|Step.resolveAt_ok><no-break-end>,
+      immutability: once a pin resolves at an archive, no step changes what
+      it resolves to there, for any digest function, since archives only add;
 
-      <item><verbatim|current_keys_cannot_extend>: holders of current keys
-      alone cannot extend a key log;
+      <item><no-break-start><verbatim|current_keys_cannot_extend><no-break-end>:
+      holders of current keys alone cannot extend a key log;
 
-      <item><verbatim|Events.fork_freezes_forever>: a recorded fork freezes
-      the owner there for ever;
+      <item><no-break-start><verbatim|Events.fork_freezes_forever><no-break-end>:
+      a recorded fork freezes the owner there for ever;
 
-      <item><verbatim|forgery_needs_owner_key>: in every world built by valid
-      steps and takedowns, the head of every copy of every line other than a
-      key log is signed with a current key of the owner's key log;
+      <item><no-break-start><verbatim|forgery_needs_owner_key><no-break-end>:
+      in every world built by valid steps and takedowns, the head of every
+      copy of every line other than a key log is signed with a current key of
+      the owner's key log;
 
-      <item><verbatim|Events.copiesAgree> and <verbatim|no_cycles>: copies
-      agree when the owner signs one history and no copy collides with it,
-      and pins then form no cycles;
+      <item><no-break-start><verbatim|Events.copiesAgree><no-break-end> and
+      <no-break-start><verbatim|no_cycles><no-break-end>: copies agree when
+      the owner signs one history and no copy collides with it, and pins then
+      form no cycles;
 
-      <item><verbatim|ReaderAccepts.no_forgery>: what a reader accepts from
-      one copy and a key log, wherever they came from, is a prefix of the
-      history the owner's keys signed, assuming only that signatures verify
-      only with their keys and that the inventories compared do not collide.
+      <item><no-break-start><verbatim|ReaderAccepts.no_forgery><no-break-end>:
+      what a reader accepts from one copy and a key log, wherever they came
+      from, is a prefix of the history the owner's keys signed, assuming only
+      that signatures verify only with their keys and that the inventories
+      compared do not collide.
     </itemize>
 
     The model also exhibits the residual risks of section 15.1 on concrete
     worlds. A second program reads worlds as sheaves, which makes the name
     precise: named document versions are the points of a space, each object
     version is a section, and the sections of all copies of a line glue into
-    exactly one when the owner signs one history (<verbatim|world_glues>);
-    when they do not glue, a fork of the line is the reason.
+    exactly one when the owner signs one history
+    (<no-break-start><verbatim|world_glues><no-break-end>); when they do not
+    glue, a fork of the line is the reason.
 
     <subsection|The first archive><label|sec:papers>
 
-    The first archive is the author's, at <verbatim|mgubi.org/papers>, kept
-    in the git repository mgubi/papers with these tools <cite|papers>. It
-    follows version 0.2 since its rebuild on 20 November 2026, and keeps
-    TeXmacs sources, HTML versions and PDFs. It holds 83 documents, 81 of
-    which have versions imported from arXiv, 154 arXiv versions in all
-    <cite|arxivwp>. The import records arXiv as an external record of role
-    <verbatim|source>, arXiv's <verbatim|vN> as a label, the SHA-512 digests
-    of the files received, and relations to the versioned arXiv identifier
-    and the arXiv DOI. Document versions do not follow arXiv's numbers: in
-    one line, document versions 1, 2 and 3 are arXiv's <verbatim|v1>,
-    <verbatim|v3> and <verbatim|v4>, version 4 is the authors' accepted
-    version, never on arXiv, and version 5 is arXiv's <verbatim|v5>.
+    The first archive is the author's, at
+    <no-break-start><verbatim|mgubi.org/papers><no-break-end>, kept in the
+    git repository mgubi/papers with these tools <cite|papers>. It follows
+    version 0.2 since its rebuild on 20 November 2026, and keeps TeXmacs
+    sources, HTML versions and PDFs. It holds 83 documents, 81 of which have
+    versions imported from arXiv, 154 arXiv versions in all <cite|arxivwp>.
+    The import records arXiv as an external record of role
+    <no-break-start><verbatim|source><no-break-end>, arXiv's
+    <no-break-start><verbatim|vN><no-break-end> as a label, the SHA-512
+    digests of the files received, and relations to the versioned arXiv
+    identifier and the arXiv DOI. Document versions do not follow arXiv's
+    numbers: in one line, document versions 1, 2 and 3 are arXiv's
+    <no-break-start><verbatim|v1><no-break-end>,
+    <no-break-start><verbatim|v3><no-break-end> and
+    <no-break-start><verbatim|v4><no-break-end>, version 4 is the authors'
+    accepted version, never on arXiv, and version 5 is arXiv's
+    <no-break-start><verbatim|v5><no-break-end>.
 
     Licences limit what others may do. Of the 81 lines imported from arXiv,
     the latest version of 52 carries arXiv's default licence, 20 the licence
@@ -1186,12 +1194,13 @@
 
     <paragraph|Rules a verifier can decide>Several rules were rewritten so
     that a verifier decides them from the files alone. That a version
-    deposited out of order must write <verbatim|history> became a definition:
-    the history is the order of numbers unless <verbatim|history> says
-    otherwise (#51). Digests became lower case, so that a pin is compared as
-    a string (#49). A copy whose inventory bytes match a pin matches,
-    whatever its checksum file says (#48). On 20 November 2026 a set of
-    ambiguities found while writing the tools was resolved in one revision.
+    deposited out of order must write <no-break-start><verbatim|history><no-break-end>
+    became a definition: the history is the order of numbers unless
+    <no-break-start><verbatim|history><no-break-end> says otherwise (#51).
+    Digests became lower case, so that a pin is compared as a string (#49). A
+    copy whose inventory bytes match a pin matches, whatever its checksum
+    file says (#48). On 20 November 2026 a set of ambiguities found while
+    writing the tools was resolved in one revision.
 
     <paragraph|What a pin fixes>A pin fixed the files of earlier versions but
     not the bytes of their inventories, so the pin of a version vouched for
@@ -1218,7 +1227,7 @@
     among them the three it finds closest.
   </with>
 
-  <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<cwith|1|-1|4|4|cell-hpart|1>|<cwith|1|-1|5|5|cell-hpart|1>|<cwith|1|-1|6|6|cell-hpart|1>|<cwith|1|-1|7|7|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|System>>|<cell|<with|par-mode|left|Fixity>>|<cell|<with|par-mode|left|Names>>|<cell|<with|par-mode|left|Who
+  <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<cwith|1|-1|4|4|cell-hpart|1>|<cwith|1|-1|5|5|cell-hpart|1>|<cwith|1|-1|6|6|cell-hpart|1>|<cwith|1|-1|7|7|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|System>>|<cell|<with|par-mode|left|Fixity>>|<cell|<with|par-mode|left|Names>>|<cell|<with|par-mode|left|Who
   writes>>|<cell|<with|par-mode|left|Copies>>|<cell|<with|par-mode|left|Identity>>|<cell|<with|par-mode|left|Requires>>>|<row|<cell|<with|par-mode|left|Nanopublications>>|<cell|<with|par-mode|left|SHA-256
   Trusty URI>>|<cell|<with|par-mode|left|content
   digest>>|<cell|<with|par-mode|left|any key, quota by
@@ -1322,16 +1331,17 @@
     as Ceramic streams anchored on Ethereum <cite|descinodes>; Ceramic's
     developers deprecated the software it used in 2025 <cite|ceramic2025>,
     and whether its anchor service has closed is unverified <cite|fedpub>. A
-    <verbatim|sheaf:> name is checked without a registry, chain or stream
-    service. <strong|Hypergraph>, built on Dat <cite|hartgerink2019>, named
-    each module by a public key, so the module's identity and the authority
-    to write it were one secret; it ended in 2021, for reasons unverified,
-    and its successor keeps a static archive as its safety net <cite|fedpub>.
-    The other <strong|blockchain platforms> for publishing found closed or
-    dropped the chain <cite|fedpub>; what lasted is the dated digest, as in
-    bloxberg's proofs of existence <cite|wittek2020> and Ledger's signed
-    digests, whose Bitcoin timestamps are unverified <cite|ledger>. OpenSheaf
-    keeps dated digests as optional witnesses, in its timestamps extension.
+    <no-break-start><verbatim|sheaf:><no-break-end> name is checked without a
+    registry, chain or stream service. <strong|Hypergraph>, built on Dat
+    <cite|hartgerink2019>, named each module by a public key, so the module's
+    identity and the authority to write it were one secret; it ended in 2021,
+    for reasons unverified, and its successor keeps a static archive as its
+    safety net <cite|fedpub>. The other <strong|blockchain platforms> for
+    publishing found closed or dropped the chain <cite|fedpub>; what lasted
+    is the dated digest, as in bloxberg's proofs of existence
+    <cite|wittek2020> and Ledger's signed digests, whose Bitcoin timestamps
+    are unverified <cite|ledger>. OpenSheaf keeps dated digests as optional
+    witnesses, in its timestamps extension.
 
     <subsection|Linked data, personal servers and signing>
 
@@ -1437,7 +1447,7 @@
     network with trust and quotas, the Underlay salted commitments and packs,
     DSGL the simplicity of one git history per document.
 
-    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Element>>|<cell|<with|par-mode|left|Earlier
+    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|11|11|1|-1|cell-background|#f2f4f7>|<cwith|13|13|1|-1|cell-background|#f2f4f7>|<cwith|15|15|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Element>>|<cell|<with|par-mode|left|Earlier
     work>>>|<row|<cell|<with|par-mode|left|names from content
     digests>>|<cell|<with|par-mode|left|Trusty URIs, SWHIDs,
     IPFS>>>|<row|<cell|<with|par-mode|left|versions signed by
@@ -1503,10 +1513,10 @@
     <paragraph|Discovery and scale>Without indexes of many archives, a line
     whose archives have gone is hard to find, however checkable its copies;
     who keeps them is open (#20), as are a gateway run by the project (#35)
-    and registering <verbatim|sheaf> with IANA (#36). Feeds exist, but
-    nothing aggregates them yet. Paged discovery documents and partial
-    verification address large archives (#19); an aggregation of arXiv's size
-    remains untried.
+    and registering <no-break-start><verbatim|sheaf><no-break-end> with IANA
+    (#36). Feeds exist, but nothing aggregates them yet. Paged discovery
+    documents and partial verification address large archives (#19); an
+    aggregation of arXiv's size remains untried.
 
     <paragraph|Funding and rights>The tools, the Explorer and any gateway
     need maintainers; an archive needs only a static web server, and stays
@@ -1817,7 +1827,7 @@
     <associate|auto-27|<tuple|3.6|5>>
     <associate|auto-28|<tuple|7|5>>
     <associate|auto-29|<tuple|3|5>>
-    <associate|auto-3|<tuple|2|2>>
+    <associate|auto-3|<tuple|2|1>>
     <associate|auto-30|<tuple|3.7|5>>
     <associate|auto-31|<tuple|3.8|6>>
     <associate|auto-32|<tuple|3.9|6>>
@@ -1831,27 +1841,27 @@
     <associate|auto-4|<tuple|1|2>>
     <associate|auto-40|<tuple|4.1|7>>
     <associate|auto-41|<tuple|11|7>>
-    <associate|auto-42|<tuple|4.2|8>>
+    <associate|auto-42|<tuple|4.2|7>>
     <associate|auto-43|<tuple|4.3|8>>
     <associate|auto-44|<tuple|4.4|8>>
     <associate|auto-45|<tuple|4.5|8>>
     <associate|auto-46|<tuple|1|8>>
     <associate|auto-47|<tuple|2|8>>
     <associate|auto-48|<tuple|3|8>>
-    <associate|auto-49|<tuple|5|9>>
+    <associate|auto-49|<tuple|5|8>>
     <associate|auto-5|<tuple|2|2>>
     <associate|auto-50|<tuple|4|9>>
     <associate|auto-51|<tuple|5.1|9>>
     <associate|auto-52|<tuple|5.2|9>>
-    <associate|auto-53|<tuple|5.3|10>>
+    <associate|auto-53|<tuple|5.3|9>>
     <associate|auto-54|<tuple|5.4|10>>
     <associate|auto-55|<tuple|5.5|10>>
     <associate|auto-56|<tuple|5.6|10>>
     <associate|auto-57|<tuple|5.7|10>>
     <associate|auto-58|<tuple|5.8|10>>
-    <associate|auto-59|<tuple|5|11>>
+    <associate|auto-59|<tuple|5|10>>
     <associate|auto-6|<tuple|3|2>>
-    <associate|auto-60|<tuple|6|11>>
+    <associate|auto-60|<tuple|6|10>>
     <associate|auto-61|<tuple|1|11>>
     <associate|auto-62|<tuple|2|11>>
     <associate|auto-63|<tuple|3|11>>
@@ -1868,24 +1878,24 @@
     <associate|bib-antieau2026|<tuple|63|13>>
     <associate|bib-arxivwp|<tuple|17|12>>
     <associate|bib-atproto|<tuple|57|13>>
-    <associate|bib-capadisli2017|<tuple|42|13>>
-    <associate|bib-capadisli2020|<tuple|43|13>>
-    <associate|bib-ceramic2025|<tuple|38|13>>
+    <associate|bib-capadisli2017|<tuple|42|12>>
+    <associate|bib-capadisli2020|<tuple|43|12>>
+    <associate|bib-ceramic2025|<tuple|38|12>>
     <associate|bib-coarnotify|<tuple|54|13>>
     <associate|bib-datacite|<tuple|24|12>>
-    <associate|bib-descinodes|<tuple|37|13>>
-    <associate|bib-dicosmo2018|<tuple|35|13>>
-    <associate|bib-elife|<tuple|48|13>>
+    <associate|bib-descinodes|<tuple|37|12>>
+    <associate|bib-dicosmo2018|<tuple|35|12>>
+    <associate|bib-elife|<tuple|48|12>>
     <associate|bib-ellerman2024b|<tuple|30|12>>
     <associate|bib-episciences|<tuple|51|13>>
-    <associate|bib-explorer|<tuple|10|12>>
+    <associate|bib-explorer|<tuple|10|11>>
     <associate|bib-fedidentity|<tuple|22|12>>
     <associate|bib-fedpub|<tuple|16|12>>
-    <associate|bib-git02|<tuple|7|12>>
+    <associate|bib-git02|<tuple|7|11>>
     <associate|bib-groth2010|<tuple|26|12>>
-    <associate|bib-hartgerink2019|<tuple|39|13>>
+    <associate|bib-hartgerink2019|<tuple|39|12>>
     <associate|bib-hexagonwp|<tuple|18|12>>
-    <associate|bib-hochstenbach2023|<tuple|45|13>>
+    <associate|bib-hochstenbach2023|<tuple|45|12>>
     <associate|bib-ipfs|<tuple|59|13>>
     <associate|bib-kademlia2002|<tuple|60|13>>
     <associate|bib-keri2019|<tuple|25|12>>
@@ -1897,35 +1907,35 @@
     <associate|bib-kuhn2014|<tuple|27|12>>
     <associate|bib-kuhn2016|<tuple|28|12>>
     <associate|bib-kuhn2026|<tuple|29|12>>
-    <associate|bib-lean|<tuple|13|12>>
-    <associate|bib-ledger|<tuple|40|13>>
+    <associate|bib-lean|<tuple|13|11>>
+    <associate|bib-ledger|<tuple|40|12>>
     <associate|bib-lockss|<tuple|53|13>>
-    <associate|bib-manager|<tuple|11|12>>
+    <associate|bib-manager|<tuple|11|11>>
     <associate|bib-maniatis2003|<tuple|52|13>>
-    <associate|bib-mcdowell2021|<tuple|49|13>>
+    <associate|bib-mcdowell2021|<tuple|49|12>>
     <associate|bib-nostr|<tuple|58|13>>
     <associate|bib-oaipmh|<tuple|55|13>>
     <associate|bib-ocfl|<tuple|23|12>>
-    <associate|bib-oric2pa|<tuple|47|13>>
-    <associate|bib-papers|<tuple|14|12>>
+    <associate|bib-oric2pa|<tuple|47|12>>
+    <associate|bib-papers|<tuple|14|11>>
     <associate|bib-pci|<tuple|50|13>>
-    <associate|bib-pep740|<tuple|46|13>>
+    <associate|bib-pep740|<tuple|46|12>>
     <associate|bib-positioning|<tuple|15|12>>
-    <associate|bib-priem2012|<tuple|4|12>>
-    <associate|bib-pubfair2019|<tuple|5|12>>
+    <associate|bib-priem2012|<tuple|4|11>>
+    <associate|bib-pubfair2019|<tuple|5|11>>
     <associate|bib-radicle|<tuple|61|13>>
     <associate|bib-radiclewp|<tuple|20|12>>
-    <associate|bib-rocrate2022|<tuple|36|13>>
+    <associate|bib-rocrate2022|<tuple|36|12>>
     <associate|bib-roosendaal1997|<tuple|1|11>>
     <associate|bib-smith1999|<tuple|3|11>>
-    <associate|bib-solid|<tuple|44|13>>
-    <associate|bib-spec02|<tuple|6|12>>
-    <associate|bib-template|<tuple|12|12>>
-    <associate|bib-timestamps02|<tuple|8|12>>
-    <associate|bib-tools|<tuple|9|12>>
+    <associate|bib-solid|<tuple|44|12>>
+    <associate|bib-spec02|<tuple|6|11>>
+    <associate|bib-template|<tuple|12|11>>
+    <associate|bib-timestamps02|<tuple|8|11>>
+    <associate|bib-tools|<tuple|9|11>>
     <associate|bib-tuf|<tuple|62|13>>
     <associate|bib-vandesompel2004|<tuple|2|11>>
-    <associate|bib-wittek2020|<tuple|41|13>>
+    <associate|bib-wittek2020|<tuple|41|12>>
     <associate|lst:discovery|<tuple|1|2>>
     <associate|lst:genesis|<tuple|3|3>>
     <associate|lst:name|<tuple|4|4>>
@@ -1942,8 +1952,8 @@
     <associate|sec:collections|<tuple|3.6|5>>
     <associate|sec:conclusion|<tuple|7|11>>
     <associate|sec:drafts|<tuple|3.8|6>>
-    <associate|sec:eval|<tuple|6|11>>
-    <associate|sec:explorer|<tuple|4.2|8>>
+    <associate|sec:eval|<tuple|6|10>>
+    <associate|sec:explorer|<tuple|4.2|7>>
     <associate|sec:format|<tuple|3|2>>
     <associate|sec:impl|<tuple|4|7>>
     <associate|sec:intro|<tuple|1|1>>
@@ -1955,9 +1965,9 @@
     <associate|sec:objects|<tuple|3.2|3>>
     <associate|sec:owners|<tuple|3.4|4>>
     <associate|sec:papers|<tuple|4.4|8>>
-    <associate|sec:principles|<tuple|2|2>>
+    <associate|sec:principles|<tuple|2|1>>
     <associate|sec:profiles|<tuple|3.12|7>>
-    <associate|sec:related|<tuple|5|9>>
+    <associate|sec:related|<tuple|5|8>>
     <associate|sec:tools|<tuple|4.1|7>>
     <associate|sec:uris|<tuple|3.9|6>>
     <associate|sec:verification|<tuple|3.11|7>>
@@ -1965,7 +1975,7 @@
     <associate|tab:compare|<tuple|4|9>>
     <associate|tab:files|<tuple|2|3>>
     <associate|tab:functions|<tuple|1|1>>
-    <associate|tab:new|<tuple|5|11>>
+    <associate|tab:new|<tuple|5|10>>
     <associate|tab:status|<tuple|3|5>>
   </collection>
 </references>
@@ -2176,14 +2186,18 @@
     <\associate|listing>
       <tuple|normal|<\surround|<hidden-binding|<tuple>|1>|>
         An excerpt of the discovery document of appendix C.6:
-        <with|font-family|<quote|tt>|language|<quote|verbatim>|contact> and
-        <with|font-family|<quote|tt>|language|<quote|verbatim>|extensions>
-        are left out, and of <with|font-family|<quote|tt>|language|<quote|verbatim>|objects>
+        <no-break-start><with|font|<quote|Fira
+        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|contact>><no-break-end>
+        and <no-break-start><with|font|<quote|Fira
+        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|extensions>><no-break-end>
+        are left out, and of <no-break-start><with|font|<quote|Fira
+        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|objects>><no-break-end>
         only the paper's entry is shown.
       </surround>|<pageref|auto-14>>
 
       <tuple|normal|<\surround|<hidden-binding|<tuple>|2>|>
-        The <with|font-family|<quote|tt>|language|<quote|verbatim>|object.json>
+        The <no-break-start><with|font|<quote|Fira
+        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|object.json>><no-break-end>
         of the paper's first version (appendix C.2), lines broken to fit.
       </surround>|<pageref|auto-17>>
 
@@ -2206,12 +2220,14 @@
 
       <tuple|normal|<\surround|<hidden-binding|<tuple>|7>|>
         A selection, an issue of a journal (appendix C.4);
-        <with|font-family|<quote|tt>|language|<quote|verbatim>|cite> is
-        elided.
+        <no-break-start><with|font|<quote|Fira
+        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|cite>><no-break-end>
+        is elided.
       </surround>|<pageref|auto-28>>
 
       <tuple|normal|<\surround|<hidden-binding|<tuple>|8>|>
-        The forms of <with|font-family|<quote|tt>|language|<quote|verbatim>|sheaf:>
+        The forms of <no-break-start><with|font|<quote|Fira
+        Mono>|font-size|<quote|0.74008>|<with|font-family|<quote|tt>|language|<quote|verbatim>|sheaf:>><no-break-end>
         URIs (specification, section 12.1).
       </surround>|<pageref|auto-33>>
 
