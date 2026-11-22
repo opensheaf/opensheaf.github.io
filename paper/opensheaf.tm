@@ -43,11 +43,11 @@
     registration, awareness, certification and archiving
     <cite|roosendaal1997>; Van de Sompel and others add rewarding
     <cite|vandesompel2004>. We use a division closer to what the actors of
-    today do <cite|positioning>: to <dfn|record> (fix every version of a work
-    and name it), to <dfn|preserve>, to <dfn|announce>, to <dfn|filter>
-    (select what deserves attention and vouch for it), to <dfn|distribute>
-    and to <dfn|assign merit>. Table <reference|tab:functions> summarises
-    what each function needs and who holds it today.
+    today do: to <dfn|record> (fix every version of a work and name it), to
+    <dfn|preserve>, to <dfn|announce>, to <dfn|filter> (select what deserves
+    attention and vouch for it), to <dfn|distribute> and to <dfn|assign
+    merit>. Table <reference|tab:functions> summarises what each function
+    needs and who holds it today.
 
     <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Function>>|<cell|<with|par-mode|left|Needs>>|<cell|<with|par-mode|left|Held
     today by>>>|<row|<cell|<with|par-mode|left|Record>>|<cell|<with|par-mode|left|fixity>>|<cell|<with|par-mode|left|arXiv,
@@ -61,35 +61,34 @@
     indexes>>>|<row|<cell|<with|par-mode|left|Assign
     merit>>|<cell|<with|par-mode|left|evidence others can
     check>>|<cell|<with|par-mode|left|journals, citation indexes>>>>>>|The
-    functions of scholarly communication, after
-    <cite|positioning>.<label|tab:functions>>
+    functions of scholarly communication.<label|tab:functions>>
 
     The functions have different costs, time scales and people, yet they are
     bundled: a publisher that holds the filter, which authors need for merit,
-    also obtains the record and the distribution <cite|positioning>. The case
-    for separating them is old: the deconstructed journal <cite|smith1999>,
-    the distributed system of Van de Sompel and others
-    <cite|vandesompel2004>, the decoupled journal <cite|priem2012>, the
-    repository community's Pubfair <cite|pubfair2019>. Unbundled actors
-    exist. Overlay journals, Peer Community In and SciPost vet documents that
-    stay where their authors put them. But they rest on archives they do not
-    control: a selection of arXiv papers can name the version it vetted
+    also obtains the record and the distribution. The case for separating
+    them is old: the deconstructed journal <cite|smith1999>, the distributed
+    system of Van de Sompel and others <cite|vandesompel2004>, the decoupled
+    journal <cite|priem2012>, the repository community's Pubfair
+    <cite|pubfair2019>. Unbundled actors exist. Overlay journals, Peer
+    Community In and SciPost vet documents that stay where their authors put
+    them. But they rest on archives they do not control: a selection of arXiv
+    papers can name the version it vetted
     (<verbatim|arXiv:<line-break>NNNN.<line-break>NNNNNv2>), yet only arXiv
-    vouches for the bytes behind that name, and none of the overlays surveyed
-    publishes a digest of the version it vetted <cite|fedpub>.
+    vouches for the bytes behind that name, and none of the overlays we
+    examined publishes a digest of the version it vetted
+    <cite|elife|pci|episciences>.
 
     Our thesis is that what has been missing is a common form in which
     separated parties exchange what they handle, so that each can rely on
-    what the others did without asking them: an <dfn|exchange layer>
-    <cite|positioning>. It is not a transport; HTTP, git or any copy moves
-    the bytes. It is a narrow waist, with any host below it (a static web
-    server, a forge, a repository, a preservation network) and any service
-    above it (an announcement service, a journal, an index). It defines how a
-    version of a document is fixed, named, found and checked, and how
-    statements about documents are expressed. It defines the forms of
-    statements, not the acts: a selection is the form in which a filter
-    states what it vetted, but who filters, and by what standard, is not its
-    business.
+    what the others did without asking them: an <dfn|exchange layer>. It is
+    not a transport; HTTP, git or any copy moves the bytes. It is a narrow
+    waist, with any host below it (a static web server, a forge, a
+    repository, a preservation network) and any service above it (an
+    announcement service, a journal, an index). It defines how a version of a
+    document is fixed, named, found and checked, and how statements about
+    documents are expressed. It defines the forms of statements, not the
+    acts: a selection is the form in which a filter states what it vetted,
+    but who filters, and by what standard, is not its business.
 
     OpenSheaf is a proposal for that layer <cite|spec02>. This paper
     describes it as of 22 November 2026. Version 0.2 of the specification is
@@ -511,8 +510,8 @@
     named by its own genesis record, always by algorithm 0. Its object
     versions are its <dfn|key log> (specification, section 6). The design
     follows the pre-rotation of KERI <cite|keri2019>, after earlier drafts in
-    which a thief could contest the owner's answer to a theft
-    <cite|keysforks|fedidentity>.
+    which a thief could contest the owner's answer to a theft (Section
+    <reference|sec:lessons>).
 
     Two kinds of keys have separate roles. <dfn|Current keys>, Ed25519 keys
     written as <no-break-start><verbatim|did:key><no-break-end> URIs, sign
@@ -1216,7 +1215,7 @@
     git repository mgubi/papers with these tools <cite|papers>. It follows
     version 0.2 since its rebuild on 20 November 2026, and keeps TeXmacs
     sources, HTML versions and PDFs. It holds 83 documents, 81 of which have
-    versions imported from arXiv, 154 arXiv versions in all <cite|arxivwp>.
+    versions imported from arXiv, 154 arXiv versions in all <cite|papers>.
     The import records arXiv as an external record of role
     <no-break-start><verbatim|source><no-break-end>, arXiv's
     <no-break-start><verbatim|vN><no-break-end> as a label, the SHA-512
@@ -1233,7 +1232,7 @@
     the latest version of 52 carries arXiv's default licence, 20 the licence
     assumed for submissions of 1991 to 2003, 8 CC BY 4.0 and 1 CC0; only 3
     lines carry an open licence in every version, and in 8 the licence
-    changes between versions <cite|arxivwp>. A custodian without the authors'
+    changes between versions <cite|papers>. A custodian without the authors'
     agreement has the right to redistribute few of them. The digests recorded
     fix what the owner received when it imported, not what arXiv served on
     the day of each version.
@@ -1261,21 +1260,22 @@
     <paragraph|Keys and forks>The rules on keys were rewritten several times;
     each version closed holes and opened others, and letting an owner heal a
     fork of its key log could not converge against a thief holding a listed
-    key <cite|keysforks>. A survey of identity systems found that recovery
-    from theft rests either on an order the thief cannot rewrite or on a
-    commitment made before the theft <cite|fedidentity>. OpenSheaf has no
-    order, so it took the commitment: pre-rotation, exposure that cannot be
-    contested, and a fork that ends the owner (#58). Among the lessons
-    recorded are never to remove on evidence an attacker can shape, to define
-    statuses once, and to rewrite rather than patch.
+    key. In the identity systems we examined, recovery from theft rests
+    either on an order the thief cannot rewrite, as in the directory of the
+    AT Protocol <cite|atproto>, or on a commitment made before the theft, as
+    in KERI <cite|keri2019>. OpenSheaf has no order, so it took the
+    commitment: pre-rotation, exposure that cannot be contested, and a fork
+    that ends the owner (#58). Among the lessons recorded are never to remove
+    on evidence an attacker can shape, to define statuses once, and to
+    rewrite rather than patch.
 
     <section|Related work><label|sec:related>
 
-    This section follows two working papers that survey decentralised and
-    federated publishing from their own sources <cite|fedpub|positioning>;
-    claims marked unverified there are marked so here. Table
-    <reference|tab:compare> sets OpenSheaf against ten systems of the survey,
-    among them the three it finds closest.
+    This section draws on our survey of decentralised and federated
+    publishing, made from the systems' own documents and code, which are
+    cited here; what we could not verify is marked so. Table
+    <reference|tab:compare> sets OpenSheaf against ten systems, among them
+    the three we found closest.
   </with>
 
   <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<cwith|1|-1|4|4|cell-hpart|1>|<cwith|1|-1|5|5|cell-hpart|1>|<cwith|1|-1|6|6|cell-hpart|1>|<cwith|1|-1|7|7|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|System>>|<cell|<with|par-mode|left|Fixity>>|<cell|<with|par-mode|left|Names>>|<cell|<with|par-mode|left|Who
@@ -1333,8 +1333,7 @@
   owner>>|<cell|<with|par-mode|left|any archive,
   checked>>|<cell|<with|par-mode|left|key log,
   pre-rotation>>|<cell|<with|par-mode|left|a static web
-  server>>>>>>|OpenSheaf and ten systems of the survey, in eight rows
-  <cite|fedpub>.<label|tab:compare>>
+  server>>>>>>|OpenSheaf and ten systems, in eight rows.<label|tab:compare>>
 
   <\with|par-columns|2>
     <subsection|Content-addressed and signed records>
@@ -1346,34 +1345,33 @@
     key a quota derived from endorsements by trusted agents, and lets a
     declaration bind an ORCID iD to a key <cite|kuhn2026>; a snapshot of 4
     May 2026 counts 79,672 nanopublications by 616 signing agents
-    <cite|kuhn2026|fedpub>. A Trusty URI names one content, so a work has no
-    name across its versions, and the documented queries count a supersession
-    only under the same key. Nanopublications are a natural form for
-    statements about OpenSheaf versions, which are open (#21).
+    <cite|kuhn2026>. A Trusty URI names one content, so a work has no name
+    across its versions, and the documented queries count a supersession only
+    under the same key. Nanopublications are a natural form for statements
+    about OpenSheaf versions, which are open (#21).
 
     <strong|Document Succession Identifiers> are the closest design in
     premises <cite|ellerman2024b>: a succession of editions is a git history
     named from its initial commit, each later commit signed with an SSH key
     listed in the succession. Authority rests on keys, so a succession moves
-    between hosts. As read in <cite|fedpub>, a listed key can sign a commit
-    that changes the list, so a thief holding one could extend and contest
-    the succession; pre-rotation exists to prevent this, at the cost of more
-    keys. A DSI names one succession, rests on SHA-1, and has no owners
-    shared across documents, no branches of other owners, no collections and
-    no withdrawal.
+    between hosts. As we read it, a listed key can sign a commit that changes
+    the list, so a thief holding one could extend and contest the succession;
+    pre-rotation exists to prevent this, at the cost of more keys. A DSI
+    names one succession, rests on SHA-1, and has no owners shared across
+    documents, no branches of other owners, no collections and no withdrawal.
 
     <strong|The Underlay> keeps collections of content-addressed records with
     immutable, sequential versions, append-only logs signed by the server
     after Certificate Transparency, and mirrors checked against hashes
     <cite|kf2026a|kf2026c>. Each collection has one authoritative server; in
     its draft third protocol authors may sign changes, but one authority
-    still accepts versions <cite|fedpub>. Its salted commitments to private
-    records bear on blind review (#63). <strong|SWHIDs> name source code by
-    intrinsic digests <cite|dicosmo2018> and are now an ISO standard
-    <cite|fedpub>, with no identity, signature or notion of a work; OpenSheaf
-    records them as relations and witnesses. <strong|RO-Crate> describes
-    research packages and leaves fixity to the packaging, OCFL among them
-    <cite|rocrate2022>.
+    still accepts versions <cite|underlayprotocol>. Its salted commitments to
+    private records bear on blind review (#63). <strong|SWHIDs> name source
+    code by intrinsic digests <cite|dicosmo2018> and are now an ISO standard
+    <cite|iso18670>, with no identity, signature or notion of a work;
+    OpenSheaf records them as relations and witnesses. <strong|RO-Crate>
+    describes research packages and leaves fixity to the packaging, OCFL
+    among them <cite|rocrate2022>.
 
     <subsection|Peer-to-peer and blockchain publishing>
 
@@ -1381,14 +1379,15 @@
     upgradeable registry contract deployed on a test network, with histories
     as Ceramic streams anchored on Ethereum <cite|descinodes>; Ceramic's
     developers deprecated the software it used in 2025 <cite|ceramic2025>,
-    and whether its anchor service has closed is unverified <cite|fedpub>. A
+    and we could not verify whether its anchor service has closed. A
     <no-break-start><verbatim|sheaf:><no-break-end> name is checked without a
     registry, chain or stream service. <strong|Hypergraph>, built on Dat
     <cite|hartgerink2019>, named each module by a public key, so the module's
     identity and the authority to write it were one secret; it ended in 2021,
-    for reasons unverified, and its successor keeps a static archive as its
-    safety net <cite|fedpub>. The other <strong|blockchain platforms> for
-    publishing found closed or dropped the chain <cite|fedpub>; what lasted
+    for reasons we could not verify, and its successor, ResearchEquals, keeps
+    a static archive as its safety net <cite|researchequals>. The other
+    <strong|blockchain platforms> for publishing we found closed or dropped
+    the chain, as Orvium and Pluto did <cite|orvium|pluto2019>; what lasted
     is the dated digest, as in bloxberg's proofs of existence
     <cite|wittek2020> and Ledger's signed digests, whose Bitcoin timestamps
     are unverified <cite|ledger>. OpenSheaf keeps dated digests as optional
@@ -1400,31 +1399,31 @@
     authors' servers <cite|capadisli2017|capadisli2020>; versions are fixed
     by Mementos and web archives, identity is a WebID, and since 2026 dokieli
     signs annotations, as nanopublications, with RSA keys that are added,
-    never replaced, and so cannot be rotated after a theft; whether whole
-    articles are signed is unverified <cite|fedpub>. <strong|Solid> pods are
-    mutable stores behind access control <cite|solid>, and the ResearcherPod
-    work records the life of an artefact as notifications kept by each party
-    <cite|hochstenbach2023>. <strong|Sigstore>, as used by PyPI, binds
-    short-lived certificates to a workflow identity and dates signatures in a
-    transparency log <cite|pep740>; <strong|C2PA> is proposed for research
-    images <cite|oric2pa>, but no publisher was found adopting it
-    <cite|fedpub>. These bind a signature to an identity checked at signing
-    time by a third party; OpenSheaf binds it to a key log that checks
-    itself, and its signatures carry no time. A Sigstore signature over a pin
-    could be a witness (#41).
+    never replaced, and so cannot be rotated after a theft <cite|dokieli>; we
+    could not verify whether whole articles are signed. <strong|Solid> pods
+    are mutable stores behind access control <cite|solid>, and the
+    ResearcherPod work records the life of an artefact as notifications kept
+    by each party <cite|hochstenbach2023>. <strong|Sigstore>, as used by
+    PyPI, binds short-lived certificates to a workflow identity and dates
+    signatures in a transparency log <cite|pep740>; <strong|C2PA> is proposed
+    for research images <cite|oric2pa>, but we found no publisher adopting
+    it. These bind a signature to an identity checked at signing time by a
+    third party; OpenSheaf binds it to a key log that checks itself, and its
+    signatures carry no time. A Sigstore signature over a pin could be a
+    witness (#41).
 
     <subsection|Overlays and platforms>
 
     <strong|eLife>'s docmaps fix the preprint versions it reviews by DOI,
-    version, URL and archived packages, but by no digest <cite|elife|fedpub>;
+    version, URL and archived packages, but by no digest <cite|elife>;
     <strong|Docmaps> describe such editorial events <cite|mcdowell2021>.
     <strong|Peer Community In> recommends a particular version of a preprint,
     and <strong|Episciences> asks for the version submitted
-    <cite|pci|episciences|fedpub>. Each overlay fixes what it vetted by a
-    number or URL, valid while the server keeps it; a selection pins it by
-    digest, checked in any copy. <strong|PubPub> has releases numbered from
-    1, like document versions, but fixed by a rule of its database, with DOIs
-    for pubs, not releases <cite|fedpub>; in June 2025, after a funder
+    <cite|pci|episciences>. Each overlay fixes what it vetted by a number or
+    URL, valid while the server keeps it; a selection pins it by digest,
+    checked in any copy. <strong|PubPub> has releases numbered from 1, like
+    document versions, but fixed by a rule of its database, with DOIs for
+    pubs, not releases <cite|pubpubcode>; in June 2025, after a funder
     withdrew, it announced the end of its hosted services, and in January
     2026 reversed this <cite|kf2025b|kf2026f>. Its export to the Underlay
     comes closest to OpenSheaf, with files named by SHA-256 but fixed by a
@@ -1441,8 +1440,8 @@
     signature, and could carry pins. <strong|OAI-PMH> harvests metadata
     <cite|oaipmh>; the discovery document and feed play its part with
     verifiable content. <strong|DOIs> resolve through registries to wherever
-    a work is said to be, and do not fix bytes <cite|positioning>; a pin says
-    which bytes a DOI's work is.
+    a work is said to be, and do not fix bytes; a pin says which bytes a
+    DOI's work is.
 
     <subsection|Federated and distributed systems>
 
@@ -1464,39 +1463,38 @@
     by keys, each peer writing only its own namespace, with delegates changed
     by a threshold of the previous ones <cite|radicle>; OpenSheaf took from
     it, as from The Update Framework <cite|tuf>, a key log signed by keys of
-    the version before, and added pre-rotation and plain files
-    <cite|radiclewp|fedidentity>.
+    the version before, and added pre-rotation and plain files.
 
     <subsection|arXiv, Hexagon and alphaXiv>
 
     <strong|arXiv> keeps every version and its sources, refuses changes in
     place because they would be backdated, and since 2026 has dark copies at
-    Portico and TIB <cite|arxivwp>. But its record is fixed only by its word,
-    with no digest published; its DOIs name articles, not versions; and its
-    default licence gives it a right to distribute that it cannot pass on.
-    OpenSheaf adds pins, signatures, versions never on arXiv and selections
-    that say what they vetted, and cannot replace arXiv's announcement.
-    <strong|Hexagon>, a repository for the mathematical sciences opened in
-    September 2026, accepts works written in part or entirely by language
-    models, records how each version was made and publishes SHA-256 digests
-    of files <cite|antieau2026|hexagonwp>; signatures were not found, and
-    OpenSheaf has no field for provenance. <strong|alphaXiv> grew from
-    discussing arXiv papers into a service that also records; its pages
-    describe no digests <cite|alphaxivwp>.
+    Portico and TIB <cite|arxivreplace|arxivblog2026>. But its record is
+    fixed only by its word, with no digest published; its DOIs name articles,
+    not versions; and its default licence gives it a right to distribute that
+    it cannot pass on. OpenSheaf adds pins, signatures, versions never on
+    arXiv and selections that say what they vetted, and cannot replace
+    arXiv's announcement. <strong|Hexagon>, a repository for the mathematical
+    sciences opened in September 2026, accepts works written in part or
+    entirely by language models, records how each version was made and
+    publishes SHA-256 digests of files <cite|antieau2026|hexagon>; signatures
+    were not found, and OpenSheaf has no field for provenance.
+    <strong|alphaXiv> grew from discussing arXiv papers into a service that
+    also records; its pages describe no digests <cite|alphaxiv>.
 
     <subsection|What is new, and what is not><label|sec:new>
 
     Most of OpenSheaf's parts exist elsewhere (Table <reference|tab:new>).
-    What the search did not find is their combination, for scholarly
-    documents <cite|fedpub>: a name of the work shared by the lines of
-    several owners, apart from hosts and keys; owners with key logs and
-    pre-rotation; collections that pin other parties' versions as signed
-    objects, keeping whole objects apart from vetting versions; rules for
-    withdrawal, takedown and the rights of copies in a federation where no
-    archive binds another; and static files as the whole requirement. Each
-    closest design has parts OpenSheaf lacks: nanopublications a working
-    network with trust and quotas, the Underlay salted commitments and packs,
-    DSGL the simplicity of one git history per document.
+    What we did not find is their combination, for scholarly documents: a
+    name of the work shared by the lines of several owners, apart from hosts
+    and keys; owners with key logs and pre-rotation; collections that pin
+    other parties' versions as signed objects, keeping whole objects apart
+    from vetting versions; rules for withdrawal, takedown and the rights of
+    copies in a federation where no archive binds another; and static files
+    as the whole requirement. Each closest design has parts OpenSheaf lacks:
+    nanopublications a working network with trust and quotas, the Underlay
+    salted commitments and packs, DSGL the simplicity of one git history per
+    document.
 
     <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|11|11|1|-1|cell-background|#f2f4f7>|<cwith|13|13|1|-1|cell-background|#f2f4f7>|<cwith|15|15|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Element>>|<cell|<with|par-mode|left|Earlier
     work>>>|<row|<cell|<with|par-mode|left|names from content
@@ -1527,39 +1525,39 @@
     federation>>|<cell|<with|par-mode|left|not
     found>>>|<row|<cell|<with|par-mode|left|all of the above as static
     files>>|<cell|<with|par-mode|left|not found>>>>>>|What is new and what is
-    not <cite|fedpub>.<label|tab:new>>
+    not, among the systems we examined.<label|tab:new>>
 
     <section|Evaluation and limitations><label|sec:eval>
 
     Earlier designs ended for lack of funding or of a steward, or by
     depending on a token, a chain, peers online or a service run by someone
     else; others were overtaken by other services, and the most successful
-    remains small <cite|fedpub>. OpenSheaf avoids the dependencies and shares
-    the rest; we weigh it against them.
+    remains small (Section <reference|sec:related>). OpenSheaf avoids the
+    dependencies and shares the rest; we weigh it against them.
 
     <paragraph|Adoption>An exchange layer is worth something only when
     several parties use it, and OpenSheaf has one real archive. The most
     successful decentralised design found, nanopublications, counts some
     80,000 records by some 600 signers after more than fifteen years
-    <cite|fedpub>. What is needed next is a service people use on top: an
+    <cite|kuhn2026>. What is needed next is a service people use on top: an
     announcement service for a field, or an overlay journal on authors' own
-    archives <cite|positioning>.
+    archives.
 
     <paragraph|Incentives>Researchers publish where evaluation counts:
     eLife's submissions fell by more than half after its indexing changed
-    <cite|fedpub>. An OpenSheaf archive counts for nothing by itself, and
+    <cite|elife2025>. An OpenSheaf archive counts for nothing by itself, and
     reaches the indexes only through DOIs, landing pages for search engines,
     and overlays that do count. DOIs with an archive's own prefix are open
     (#8).
 
     <paragraph|Key management>OpenSheaf asks more of authors than the
-    comparable designs surveyed (dokieli, DSGL, nanopublications)
-    <cite|fedpub>: a current key on each device and rotation keys kept apart,
-    for a better answer to theft. The Manager and passkeys lower the cost;
-    whether authors will bear it is untested, and a per-owner key log may not
-    be worth it to authors who never meet a theft. Weighted thresholds for
-    groups (#69) and witnesses of which key-log version was seen first (#70)
-    are left for after 0.2.
+    comparable designs we examined (dokieli, DSGL, nanopublications): a
+    current key on each device and rotation keys kept apart, for a better
+    answer to theft. The Manager and passkeys lower the cost; whether authors
+    will bear it is untested, and a per-owner key log may not be worth it to
+    authors who never meet a theft. Weighted thresholds for groups (#69) and
+    witnesses of which key-log version was seen first (#70) are left for
+    after 0.2.
 
     <paragraph|Discovery and scale>Without indexes of many archives, a line
     whose archives have gone is hard to find, however checkable its copies;
@@ -1599,7 +1597,7 @@
 
     <section*|References>
 
-    <\bib-list|63>
+    <\bib-list|67>
       <bibitem*|1><label|bib-roosendaal1997>H. E. Roosendaal and P. A. Th. M.
       Geurts. Forces and functions in scientific communication: an analysis
       of their interplay. CRISP 97, Cooperative Research Information Systems
@@ -1660,182 +1658,192 @@
       https://<line-break>mgubi.<line-break>org/<line-break>papers/<line-break>
       (repository: https://<line-break>github.<line-break>com/<line-break>mgubi/<line-break>papers)
 
-      <bibitem*|15><label|bib-positioning>OpenSheaf project. OpenSheaf as an
-      exchange layer for scholarly communication. Working paper, 2026.
-      https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>positioning.<line-break>md
-
-      <bibitem*|16><label|bib-fedpub>OpenSheaf project. Federated publishing:
-      proposals and systems compared with OpenSheaf. Working paper, 2026.
-      https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>federated-<line-break>publishing.<line-break>md
-
-      <bibitem*|17><label|bib-arxivwp>OpenSheaf project. arXiv and OpenSheaf.
-      Working paper, 2026. https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>arxiv.<line-break>md
-
-      <bibitem*|18><label|bib-hexagonwp>OpenSheaf project. Hexagon and
-      OpenSheaf. Working paper, 2026. https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>hexagon.<line-break>md
-
-      <bibitem*|19><label|bib-alphaxivwp>OpenSheaf project. alphaXiv and
-      OpenSheaf. Working paper, 2026. https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>alphaxiv.<line-break>md
-
-      <bibitem*|20><label|bib-radiclewp>OpenSheaf project. Radicle and
-      OpenSheaf. Working paper, 2026. https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>radicle.<line-break>md
-
-      <bibitem*|21><label|bib-keysforks>OpenSheaf project. Keys, revocation
-      and forks: what went wrong on the way. Working paper, 2026.
-      https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>keys-<line-break>and-<line-break>forks.<line-break>md
-
-      <bibitem*|22><label|bib-fedidentity>OpenSheaf project. Federated and
-      decentralized identity, and the key logs of OpenSheaf. Working paper,
-      2026. https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>blob/<line-break>main/<line-break>drafts/<line-break>federated-<line-break>identity.<line-break>md
-
-      <bibitem*|23><label|bib-ocfl>OCFL. Oxford Common File Layout
+      <bibitem*|15><label|bib-ocfl>OCFL. Oxford Common File Layout
       specification, version 1.1. https://<line-break>ocfl.<line-break>io/<line-break>1.<line-break>1/<line-break>spec/<line-break>
 
-      <bibitem*|24><label|bib-datacite>DataCite. DataCite Metadata Schema
+      <bibitem*|16><label|bib-datacite>DataCite. DataCite Metadata Schema
       4.7. https://<line-break>schema.<line-break>datacite.<line-break>org/<line-break>meta/<line-break>kernel-<line-break>4.<line-break>7/<line-break>
 
-      <bibitem*|25><label|bib-keri2019>S. M. Smith. Key Event Receipt
+      <bibitem*|17><label|bib-keri2019>S. M. Smith. Key Event Receipt
       Infrastructure (KERI). White paper, 2019.
       https://<line-break>arxiv.<line-break>org/<line-break>abs/<line-break>1907.<line-break>02143
 
-      <bibitem*|26><label|bib-groth2010>P. Groth, A. Gibson and J. Velterop.
+      <bibitem*|18><label|bib-groth2010>P. Groth, A. Gibson and J. Velterop.
       The anatomy of a nanopublication. Information Services and Use 30
       (1-2), 51-56, 2010. doi:10.3233/ISU-2010-0613
 
-      <bibitem*|27><label|bib-kuhn2014>T. Kuhn and M. Dumontier. Trusty URIs:
+      <bibitem*|19><label|bib-kuhn2014>T. Kuhn and M. Dumontier. Trusty URIs:
       verifiable, immutable, and permanent digital artifacts for linked data.
       ESWC 2014, LNCS 8465, 395-410, 2014. doi:10.1007/978-3-319-07443-6_27
 
-      <bibitem*|28><label|bib-kuhn2016>T. Kuhn and others. Decentralized
+      <bibitem*|20><label|bib-kuhn2016>T. Kuhn and others. Decentralized
       provenance-aware publishing with nanopublications. PeerJ Computer
       Science 2, e78, 2016. doi:10.7717/peerj-cs.78
 
-      <bibitem*|29><label|bib-kuhn2026>T. Kuhn, V. Balseiro, A. Caselli, Z.
+      <bibitem*|21><label|bib-kuhn2026>T. Kuhn, V. Balseiro, A. Caselli, Z.
       Plutschow, P. Sowinski and A. Danilenka. A robust decentralized
       infrastructure for trust-aware open knowledge sharing. ISWC 2026, LNCS,
       152-170, 2026. doi:10.1007/978-3-032-42015-2_8
 
-      <bibitem*|30><label|bib-ellerman2024b>E. C. Ellerman. Document
+      <bibitem*|22><label|bib-ellerman2024b>E. C. Ellerman. Document
       Succession Git Layout, edition 1.1. 2024.
       https://<line-break>pilot.<line-break>perm.<line-break>pub/<line-break>VGajCjaNP1Ugz5<line-break>8Khn1JWOEdMZ8/<line-break>
 
-      <bibitem*|31><label|bib-kf2026a>Knowledge Futures. Underlay, revived.
+      <bibitem*|23><label|bib-kf2026a>Knowledge Futures. Underlay, revived.
       2026. https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2026-<line-break>04-<line-break>27-<line-break>underlay-<line-break>revived
 
-      <bibitem*|32><label|bib-kf2026c>Knowledge Futures. Underlay moves to
+      <bibitem*|24><label|bib-kf2026c>Knowledge Futures. Underlay moves to
       protocol v2. 2026. https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2026-<line-break>10-<line-break>06-<line-break>underlay-<line-break>protocol-<line-break>v2
 
-      <bibitem*|33><label|bib-kf2025b>Knowledge Futures. Not enough: open
+      <bibitem*|25><label|bib-kf2025b>Knowledge Futures. Not enough: open
       infrastructure funding and the future of Knowledge Futures. 2025.
       https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2025-<line-break>06-<line-break>update/<line-break>
 
-      <bibitem*|34><label|bib-kf2026f>Knowledge Futures. A path forward for
+      <bibitem*|26><label|bib-kf2026f>Knowledge Futures. A path forward for
       PubPub. 2026. https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2026-<line-break>01-<line-break>update
 
-      <bibitem*|35><label|bib-dicosmo2018>R. Di Cosmo, M. Gruenpeter and S.
+      <bibitem*|27><label|bib-dicosmo2018>R. Di Cosmo, M. Gruenpeter and S.
       Zacchiroli. Identifiers for digital objects: the case of software
       source code preservation. iPRES 2018, 2018. doi:10.17605/OSF.IO/KDE56
 
-      <bibitem*|36><label|bib-rocrate2022>S. Soiland-Reyes and others.
+      <bibitem*|28><label|bib-rocrate2022>S. Soiland-Reyes and others.
       Packaging research artefacts with RO-Crate. Data Science 5 (2), 97-138,
       2022. doi:10.3233/DS-210053
 
-      <bibitem*|37><label|bib-descinodes>DeSci Labs. DeSci Nodes and Codex.
+      <bibitem*|29><label|bib-descinodes>DeSci Labs. DeSci Nodes and Codex.
       2026. https://<line-break>github.<line-break>com/<line-break>desci-<line-break>labs/<line-break>nodes
 
-      <bibitem*|38><label|bib-ceramic2025>Ceramic. The future of Ceramic.
+      <bibitem*|30><label|bib-ceramic2025>Ceramic. The future of Ceramic.
       2025. https://<line-break>blog.<line-break>ceramic.<line-break>network/<line-break>the-<line-break>future-<line-break>of-<line-break>ceramic-<line-break>focusing-<line-break>on-<line-break>recall/<line-break>
 
-      <bibitem*|39><label|bib-hartgerink2019>C. H. J. Hartgerink. Verified,
+      <bibitem*|31><label|bib-hartgerink2019>C. H. J. Hartgerink. Verified,
       shared, modular, and provenance based research communication with the
       Dat protocol. Publications 7 (2), 40, 2019.
       doi:10.3390/publications7020040
 
-      <bibitem*|40><label|bib-ledger>Ledger. About the journal.
+      <bibitem*|32><label|bib-ledger>Ledger. About the journal.
       https://<line-break>ledger.<line-break>pitt.<line-break>edu/<line-break>ojs/<line-break>ledger/<line-break>about
 
-      <bibitem*|41><label|bib-wittek2020>K. Wittek, D. Krakau, N. Wittek, J.
+      <bibitem*|33><label|bib-wittek2020>K. Wittek, D. Krakau, N. Wittek, J.
       Lawton and N. Pohlmann. Integrating bloxberg's proof of existence
       service with MATLAB. Frontiers in Blockchain 3, 2020.
       doi:10.3389/fbloc.2020.546264
 
-      <bibitem*|42><label|bib-capadisli2017>S. Capadisli, A. Guy, R.
+      <bibitem*|34><label|bib-capadisli2017>S. Capadisli, A. Guy, R.
       Verborgh, C. Lange, S. Auer and T. Berners-Lee. Decentralised
       authoring, annotations and notifications for a read-write web with
       dokieli. ICWE 2017, LNCS, 469-481, 2017.
       doi:10.1007/978-3-319-60131-1_33
 
-      <bibitem*|43><label|bib-capadisli2020>S. Capadisli. Linked Research on
+      <bibitem*|35><label|bib-capadisli2020>S. Capadisli. Linked Research on
       the Decentralised Web. Doctoral thesis, University of Bonn, 2020.
       https://<line-break>csarven.<line-break>ca/<line-break>linked-<line-break>research-<line-break>decentralised-<line-break>web
 
-      <bibitem*|44><label|bib-solid>W3C Solid Community Group. Solid
+      <bibitem*|36><label|bib-solid>W3C Solid Community Group. Solid
       Protocol, version 0.11.0. 2024. https://<line-break>solidproject.<line-break>org/<line-break>TR/<line-break>protocol
 
-      <bibitem*|45><label|bib-hochstenbach2023>P. Hochstenbach, R. Verborgh
+      <bibitem*|37><label|bib-hochstenbach2023>P. Hochstenbach, R. Verborgh
       and H. Van de Sompel. Using event notifications, Solid and
       orchestration for decentralizing and decoupling scholarly
       communication. Code4Lib Journal 58, 2023.
       https://<line-break>journal.<line-break>code4lib.<line-break>org/<line-break>articles/<line-break>17823
 
-      <bibitem*|46><label|bib-pep740>Python Software Foundation. PEP 740 and
+      <bibitem*|38><label|bib-pep740>Python Software Foundation. PEP 740 and
       PyPI digital attestations. 2024. https://<line-break>docs.<line-break>pypi.<line-break>org/<line-break>attestations/<line-break>
 
-      <bibitem*|47><label|bib-oric2pa>US Office of Research Integrity.
+      <bibitem*|39><label|bib-oric2pa>US Office of Research Integrity.
       Content provenance. https://<line-break>ori.<line-break>hhs.<line-break>gov/<line-break>content-<line-break>provenance
 
-      <bibitem*|48><label|bib-elife>eLife. eLife's new model: your questions
+      <bibitem*|40><label|bib-elife>eLife. eLife's new model: your questions
       answered. https://<line-break>elifesciences.<line-break>org/<line-break>inside-<line-break>elife/<line-break>2b765a27/<line-break>elife-<line-break>s-<line-break>new-<line-break>model-<line-break>your-<line-break>questions-<line-break>answered
 
-      <bibitem*|49><label|bib-mcdowell2021>G. S. McDowell, J. K. Polka, T.
+      <bibitem*|41><label|bib-mcdowell2021>G. S. McDowell, J. K. Polka, T.
       Ross-Hellauer and G. Stein. The DocMaps framework for representing
       assertions on research products in an extensible, machine-readable, and
       discoverable format. bioRxiv, 2021. doi:10.1101/2021.07.13.452204
 
-      <bibitem*|50><label|bib-pci>Peer Community In. Frequently asked
+      <bibitem*|42><label|bib-pci>Peer Community In. Frequently asked
       questions. https://<line-break>peercommunityi<line-break>n.<line-break>org/<line-break>faq/<line-break>
 
-      <bibitem*|51><label|bib-episciences>Episciences. Publishing model.
+      <bibitem*|43><label|bib-episciences>Episciences. Publishing model.
       https://<line-break>www.<line-break>episciences.<line-break>org/<line-break>publishing-<line-break>model/<line-break>
 
-      <bibitem*|52><label|bib-maniatis2003>P. Maniatis, D. S. H. Rosenthal,
+      <bibitem*|44><label|bib-maniatis2003>P. Maniatis, D. S. H. Rosenthal,
       M. Roussopoulos, M. Baker, T. J. Giuli and Y. Muliadi. Preserving peer
       replicas by rate-limited sampled voting. SOSP 2003, 44-59, 2003.
       doi:10.1145/945445.945451
 
-      <bibitem*|53><label|bib-lockss>LOCKSS and CLOCKSS.
+      <bibitem*|45><label|bib-lockss>LOCKSS and CLOCKSS.
       https://<line-break>www.<line-break>lockss.<line-break>org and
       https://<line-break>clockss.<line-break>org
 
-      <bibitem*|54><label|bib-coarnotify>COAR. COAR Notify, version 1.0.1.
+      <bibitem*|46><label|bib-coarnotify>COAR. COAR Notify, version 1.0.1.
       https://<line-break>coar-<line-break>notify.<line-break>net
 
-      <bibitem*|55><label|bib-oaipmh>Open Archives Initiative. The Protocol
+      <bibitem*|47><label|bib-oaipmh>Open Archives Initiative. The Protocol
       for Metadata Harvesting (OAI-PMH). https://<line-break>www.<line-break>openarchives.<line-break>org/<line-break>pmh/<line-break>
 
-      <bibitem*|56><label|bib-activitypub>W3C. ActivityPub. W3C
+      <bibitem*|48><label|bib-activitypub>W3C. ActivityPub. W3C
       Recommendation, 2018. https://<line-break>www.<line-break>w3.<line-break>org/<line-break>TR/<line-break>activitypub/<line-break>
 
-      <bibitem*|57><label|bib-atproto>Bluesky. AT Protocol.
+      <bibitem*|49><label|bib-atproto>Bluesky. AT Protocol.
       https://<line-break>atproto.<line-break>com
 
-      <bibitem*|58><label|bib-nostr>Nostr. Nostr Implementation Possibilities
+      <bibitem*|50><label|bib-nostr>Nostr. Nostr Implementation Possibilities
       (NIPs). https://<line-break>github.<line-break>com/<line-break>nostr-<line-break>protocol/<line-break>nips
 
-      <bibitem*|59><label|bib-ipfs>IPFS. https://<line-break>ipfs.<line-break>tech
+      <bibitem*|51><label|bib-ipfs>IPFS. https://<line-break>ipfs.<line-break>tech
 
-      <bibitem*|60><label|bib-kademlia2002>P. Maymounkov and D. Mazieres.
+      <bibitem*|52><label|bib-kademlia2002>P. Maymounkov and D. Mazieres.
       Kademlia: a peer-to-peer information system based on the XOR metric.
       IPTPS, 2002.
 
-      <bibitem*|61><label|bib-radicle>Radicle. Radicle protocol guide.
+      <bibitem*|53><label|bib-radicle>Radicle. Radicle protocol guide.
       https://<line-break>radicle.<line-break>xyz/<line-break>guides/<line-break>protocol
 
-      <bibitem*|62><label|bib-tuf>The Update Framework.
+      <bibitem*|54><label|bib-tuf>The Update Framework.
       https://<line-break>theupdateframe<line-break>work.<line-break>io/<line-break>
 
-      <bibitem*|63><label|bib-antieau2026>B. Antieau. Hexagon. 2026.
+      <bibitem*|55><label|bib-antieau2026>B. Antieau. Hexagon. 2026.
       https://<line-break>antieau.<line-break>github.<line-break>io/<line-break>2026/<line-break>10/<line-break>05/<line-break>hexagon.<line-break>html
+
+      <bibitem*|56><label|bib-underlayprotocol>Knowledge Futures. The
+      Underlay protocol. https://<line-break>underlay.<line-break>org/<line-break>docs/<line-break>protocol
+
+      <bibitem*|57><label|bib-iso18670>ISO/IEC 18670:2025. The SoftWare Hash
+      IDentifier (SWHID) specification. 2025.
+      https://<line-break>www.<line-break>iso.<line-break>org/<line-break>standard/<line-break>89985.<line-break>html
+
+      <bibitem*|58><label|bib-researchequals>ResearchEquals.
+      https://<line-break>researchequals<line-break>.<line-break>com/<line-break>
+
+      <bibitem*|59><label|bib-orvium>Orvium.
+      https://<line-break>orvium.<line-break>io/<line-break>
+
+      <bibitem*|60><label|bib-pluto2019>Pluto Labs. Blockchain is NOT a cure
+      to Academia. 2019. https://<line-break>medium.<line-break>com/<line-break>pluto-<line-break>inc/<line-break>blockchain-<line-break>is-<line-break>not-<line-break>a-<line-break>cure-<line-break>to-<line-break>academia-<line-break>ef352985526
+
+      <bibitem*|61><label|bib-dokieli>dokieli. Documentation.
+      https://<line-break>dokie.<line-break>li/<line-break>docs
+
+      <bibitem*|62><label|bib-elife2025>eLife. The eLife model: three-year
+      update. 2025. https://<line-break>elifesciences.<line-break>org/<line-break>inside-<line-break>elife/<line-break>7da92a51/<line-break>the-<line-break>elife-<line-break>model-<line-break>three-<line-break>year-<line-break>update
+
+      <bibitem*|63><label|bib-pubpubcode>Knowledge Futures. PubPub, source
+      code. https://<line-break>github.<line-break>com/<line-break>knowledgefutur<line-break>es/<line-break>pubpub
+
+      <bibitem*|64><label|bib-arxivreplace>arXiv. Replacing an article.
+      https://<line-break>info.<line-break>arxiv.<line-break>org/<line-break>help/<line-break>replace.<line-break>html
+
+      <bibitem*|65><label|bib-arxivblog2026>arXiv. Post of 3 February 2026 on
+      dark archives at Portico and TIB. arXiv blog, 2026.
+      https://<line-break>blog.<line-break>arxiv.<line-break>org/<line-break>
+
+      <bibitem*|66><label|bib-hexagon>Hexagon.
+      https://<line-break>hexagonmath.<line-break>org/<line-break>
+
+      <bibitem*|67><label|bib-alphaxiv>alphaXiv.
+      https://<line-break>www.<line-break>alphaxiv.<line-break>org/<line-break>
     </bib-list>
   </with>
 </body>
@@ -1924,69 +1932,73 @@
     <associate|auto-7|<tuple|4|2>>
     <associate|auto-8|<tuple|5|2>>
     <associate|auto-9|<tuple|6|2>>
-    <associate|bib-activitypub|<tuple|56|12>>
-    <associate|bib-alphaxivwp|<tuple|19|11>>
-    <associate|bib-antieau2026|<tuple|63|12>>
-    <associate|bib-arxivwp|<tuple|17|11>>
-    <associate|bib-atproto|<tuple|57|12>>
-    <associate|bib-capadisli2017|<tuple|42|12>>
-    <associate|bib-capadisli2020|<tuple|43|12>>
-    <associate|bib-ceramic2025|<tuple|38|11>>
-    <associate|bib-coarnotify|<tuple|54|12>>
-    <associate|bib-datacite|<tuple|24|11>>
-    <associate|bib-descinodes|<tuple|37|11>>
-    <associate|bib-dicosmo2018|<tuple|35|11>>
-    <associate|bib-elife|<tuple|48|12>>
-    <associate|bib-ellerman2024b|<tuple|30|11>>
-    <associate|bib-episciences|<tuple|51|12>>
+    <associate|bib-activitypub|<tuple|48|12>>
+    <associate|bib-alphaxiv|<tuple|67|12>>
+    <associate|bib-antieau2026|<tuple|55|12>>
+    <associate|bib-arxivblog2026|<tuple|65|12>>
+    <associate|bib-arxivreplace|<tuple|64|12>>
+    <associate|bib-atproto|<tuple|49|12>>
+    <associate|bib-capadisli2017|<tuple|34|11>>
+    <associate|bib-capadisli2020|<tuple|35|11>>
+    <associate|bib-ceramic2025|<tuple|30|11>>
+    <associate|bib-coarnotify|<tuple|46|12>>
+    <associate|bib-datacite|<tuple|16|11>>
+    <associate|bib-descinodes|<tuple|29|11>>
+    <associate|bib-dicosmo2018|<tuple|27|11>>
+    <associate|bib-dokieli|<tuple|61|12>>
+    <associate|bib-elife|<tuple|40|12>>
+    <associate|bib-elife2025|<tuple|62|12>>
+    <associate|bib-ellerman2024b|<tuple|22|11>>
+    <associate|bib-episciences|<tuple|43|12>>
     <associate|bib-explorer|<tuple|10|11>>
-    <associate|bib-fedidentity|<tuple|22|11>>
-    <associate|bib-fedpub|<tuple|16|11>>
     <associate|bib-git02|<tuple|7|11>>
-    <associate|bib-groth2010|<tuple|26|11>>
-    <associate|bib-hartgerink2019|<tuple|39|12>>
-    <associate|bib-hexagonwp|<tuple|18|11>>
-    <associate|bib-hochstenbach2023|<tuple|45|12>>
-    <associate|bib-ipfs|<tuple|59|12>>
-    <associate|bib-kademlia2002|<tuple|60|12>>
-    <associate|bib-keri2019|<tuple|25|11>>
-    <associate|bib-keysforks|<tuple|21|11>>
-    <associate|bib-kf2025b|<tuple|33|11>>
-    <associate|bib-kf2026a|<tuple|31|11>>
-    <associate|bib-kf2026c|<tuple|32|11>>
-    <associate|bib-kf2026f|<tuple|34|11>>
-    <associate|bib-kuhn2014|<tuple|27|11>>
-    <associate|bib-kuhn2016|<tuple|28|11>>
-    <associate|bib-kuhn2026|<tuple|29|11>>
+    <associate|bib-groth2010|<tuple|18|11>>
+    <associate|bib-hartgerink2019|<tuple|31|11>>
+    <associate|bib-hexagon|<tuple|66|12>>
+    <associate|bib-hochstenbach2023|<tuple|37|12>>
+    <associate|bib-ipfs|<tuple|51|12>>
+    <associate|bib-iso18670|<tuple|57|12>>
+    <associate|bib-kademlia2002|<tuple|52|12>>
+    <associate|bib-keri2019|<tuple|17|11>>
+    <associate|bib-kf2025b|<tuple|25|11>>
+    <associate|bib-kf2026a|<tuple|23|11>>
+    <associate|bib-kf2026c|<tuple|24|11>>
+    <associate|bib-kf2026f|<tuple|26|11>>
+    <associate|bib-kuhn2014|<tuple|19|11>>
+    <associate|bib-kuhn2016|<tuple|20|11>>
+    <associate|bib-kuhn2026|<tuple|21|11>>
     <associate|bib-lean|<tuple|13|11>>
-    <associate|bib-ledger|<tuple|40|12>>
-    <associate|bib-lockss|<tuple|53|12>>
+    <associate|bib-ledger|<tuple|32|11>>
+    <associate|bib-lockss|<tuple|45|12>>
     <associate|bib-manager|<tuple|11|11>>
-    <associate|bib-maniatis2003|<tuple|52|12>>
-    <associate|bib-mcdowell2021|<tuple|49|12>>
-    <associate|bib-nostr|<tuple|58|12>>
-    <associate|bib-oaipmh|<tuple|55|12>>
-    <associate|bib-ocfl|<tuple|23|11>>
-    <associate|bib-oric2pa|<tuple|47|12>>
+    <associate|bib-maniatis2003|<tuple|44|12>>
+    <associate|bib-mcdowell2021|<tuple|41|12>>
+    <associate|bib-nostr|<tuple|50|12>>
+    <associate|bib-oaipmh|<tuple|47|12>>
+    <associate|bib-ocfl|<tuple|15|11>>
+    <associate|bib-oric2pa|<tuple|39|12>>
+    <associate|bib-orvium|<tuple|59|12>>
     <associate|bib-papers|<tuple|14|11>>
-    <associate|bib-pci|<tuple|50|12>>
-    <associate|bib-pep740|<tuple|46|12>>
-    <associate|bib-positioning|<tuple|15|11>>
+    <associate|bib-pci|<tuple|42|12>>
+    <associate|bib-pep740|<tuple|38|12>>
+    <associate|bib-pluto2019|<tuple|60|12>>
     <associate|bib-priem2012|<tuple|4|11>>
     <associate|bib-pubfair2019|<tuple|5|11>>
-    <associate|bib-radicle|<tuple|61|12>>
-    <associate|bib-radiclewp|<tuple|20|11>>
-    <associate|bib-rocrate2022|<tuple|36|11>>
+    <associate|bib-pubpubcode|<tuple|63|12>>
+    <associate|bib-radicle|<tuple|53|12>>
+    <associate|bib-researchequals|<tuple|58|12>>
+    <associate|bib-rocrate2022|<tuple|28|11>>
     <associate|bib-roosendaal1997|<tuple|1|10>>
     <associate|bib-smith1999|<tuple|3|11>>
-    <associate|bib-solid|<tuple|44|12>>
+    <associate|bib-solid|<tuple|36|11>>
     <associate|bib-spec02|<tuple|6|11>>
     <associate|bib-template|<tuple|12|11>>
     <associate|bib-timestamps02|<tuple|8|11>>
     <associate|bib-tools|<tuple|9|11>>
-    <associate|bib-tuf|<tuple|62|12>>
-    <associate|bib-vandesompel2004|<tuple|2|10>>
-    <associate|bib-wittek2020|<tuple|41|12>>
+    <associate|bib-tuf|<tuple|54|12>>
+    <associate|bib-underlayprotocol|<tuple|56|12>>
+    <associate|bib-vandesompel2004|<tuple|2|11>>
+    <associate|bib-wittek2020|<tuple|33|11>>
     <associate|lst:discovery|<tuple|1|2>>
     <associate|lst:genesis|<tuple|3|3>>
     <associate|lst:name|<tuple|4|3>>
@@ -2038,12 +2050,6 @@
 
       vandesompel2004
 
-      positioning
-
-      positioning
-
-      positioning
-
       smith1999
 
       vandesompel2004
@@ -2052,9 +2058,11 @@
 
       pubfair2019
 
-      fedpub
+      elife
 
-      positioning
+      pci
+
+      episciences
 
       spec02
 
@@ -2065,10 +2073,6 @@
       spec02
 
       keri2019
-
-      keysforks
-
-      fedidentity
 
       timestamps02
 
@@ -2088,19 +2092,13 @@
 
       papers
 
-      arxivwp
+      papers
 
-      arxivwp
+      papers
 
-      keysforks
+      atproto
 
-      fedidentity
-
-      fedpub
-
-      positioning
-
-      fedpub
+      keri2019
 
       groth2010
 
@@ -2112,21 +2110,17 @@
 
       kuhn2026
 
-      fedpub
-
       ellerman2024b
-
-      fedpub
 
       kf2026a
 
       kf2026c
 
-      fedpub
+      underlayprotocol
 
       dicosmo2018
 
-      fedpub
+      iso18670
 
       rocrate2022
 
@@ -2134,13 +2128,13 @@
 
       ceramic2025
 
-      fedpub
-
       hartgerink2019
 
-      fedpub
+      researchequals
 
-      fedpub
+      orvium
+
+      pluto2019
 
       wittek2020
 
@@ -2150,7 +2144,7 @@
 
       capadisli2020
 
-      fedpub
+      dokieli
 
       solid
 
@@ -2160,11 +2154,7 @@
 
       oric2pa
 
-      fedpub
-
       elife
-
-      fedpub
 
       mcdowell2021
 
@@ -2172,9 +2162,7 @@
 
       episciences
 
-      fedpub
-
-      fedpub
+      pubpubcode
 
       kf2025b
 
@@ -2189,8 +2177,6 @@
       pubfair2019
 
       oaipmh
-
-      positioning
 
       activitypub
 
@@ -2208,31 +2194,19 @@
 
       tuf
 
-      radiclewp
+      arxivreplace
 
-      fedidentity
-
-      arxivwp
+      arxivblog2026
 
       antieau2026
 
-      hexagonwp
+      hexagon
 
-      alphaxivwp
+      alphaxiv
 
-      fedpub
+      kuhn2026
 
-      fedpub
-
-      fedpub
-
-      fedpub
-
-      positioning
-
-      fedpub
-
-      fedpub
+      elife2025
     </associate>
     <\associate|listing>
       <tuple|normal|<\surround|<hidden-binding|<tuple>|1>|>
@@ -2299,7 +2273,7 @@
     </associate>
     <\associate|table>
       <tuple|normal|<surround|<hidden-binding|<tuple>|1>||The functions of
-      scholarly communication, after [<write|bib|positioning><reference|bib-positioning>].>|<pageref|auto-2>>
+      scholarly communication.>|<pageref|auto-2>>
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|2>||The files of an
       object and of its versions (specification, sections 4 to
@@ -2310,11 +2284,10 @@
       8.5).>|<pageref|auto-29>>
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|4>||OpenSheaf and ten
-      systems of the survey, in eight rows
-      [<write|bib|fedpub><reference|bib-fedpub>].>|<pageref|auto-50>>
+      systems, in eight rows.>|<pageref|auto-50>>
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|5>||What is new and
-      what is not [<write|bib|fedpub><reference|bib-fedpub>].>|<pageref|auto-59>>
+      what is not, among the systems we examined.>|<pageref|auto-59>>
     </associate>
     <\associate|toc>
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>Introduction>

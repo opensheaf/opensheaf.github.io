@@ -29,13 +29,13 @@ keywords: scholarly communication, digital preservation, content addressing, sig
 A classic analysis of scientific communication distinguishes registration,
 awareness, certification and archiving [@roosendaal1997]; Van de Sompel and
 others add rewarding [@vandesompel2004]. We use a division closer to what the
-actors of today do [@positioning]: to <dfn>record</dfn> (fix every version
+actors of today do: to <dfn>record</dfn> (fix every version
 of a work and name it), to <dfn>preserve</dfn>, to <dfn>announce</dfn>, to
 <dfn>filter</dfn> (select what deserves attention and vouch for it), to
 <dfn>distribute</dfn> and to <dfn>assign merit</dfn>. Table @tab:functions
 summarises what each function needs and who holds it today.
 
-Table: The functions of scholarly communication, after [@positioning]. {#tab:functions}
+Table: The functions of scholarly communication. {#tab:functions}
 
 | Function | Needs | Held today by |
 |---|---|---|
@@ -48,7 +48,7 @@ Table: The functions of scholarly communication, after [@positioning]. {#tab:fun
 
 The functions have different costs, time scales and people, yet they are
 bundled: a publisher that holds the filter, which authors need for merit,
-also obtains the record and the distribution [@positioning]. The case for
+also obtains the record and the distribution. The case for
 separating them is old: the deconstructed journal [@smith1999], the
 distributed system of Van de Sompel and others [@vandesompel2004], the
 decoupled journal [@priem2012], the repository community's Pubfair
@@ -56,12 +56,12 @@ decoupled journal [@priem2012], the repository community's Pubfair
 and SciPost vet documents that stay where their authors put them. But they
 rest on archives they do not control: a selection of arXiv papers can name
 the version it vetted (`arXiv:NNNN.NNNNNv2`), yet only arXiv vouches for the bytes
-behind that name, and none of the overlays surveyed publishes a digest of the
-version it vetted [@fedpub].
+behind that name, and none of the overlays we examined publishes a digest of the
+version it vetted [@elife; @pci; @episciences].
 
 Our thesis is that what has been missing is a common form in which separated
 parties exchange what they handle, so that each can rely on what the others
-did without asking them: an <dfn>exchange layer</dfn> [@positioning]. It is
+did without asking them: an <dfn>exchange layer</dfn>. It is
 not a transport; HTTP, git or any copy moves the bytes. It is a narrow waist,
 with any host below it (a static web server, a forge, a repository, a
 preservation network) and any service above it (an announcement service, a
@@ -355,7 +355,7 @@ An owner is an object of kind `owner`, named by its own genesis record,
 always by algorithm 0. Its object versions are its <dfn>key log</dfn>
 (specification, section 6). The design follows the pre-rotation of KERI
 [@keri2019], after earlier drafts in which a thief could contest the owner's
-answer to a theft [@keysforks; @fedidentity].
+answer to a theft (Section @sec:lessons).
 
 Two kinds of keys have separate roles. <dfn>Current keys</dfn>, Ed25519 keys
 written as `did:key` URIs, sign the versions of the owner's lines, at least
@@ -839,7 +839,7 @@ The first archive is the author's, at `mgubi.org/papers`, kept in
 the git repository mgubi/papers with these tools [@papers]. It follows
 version 0.2 since its rebuild on 20 November 2026, and keeps TeXmacs sources,
 HTML versions and PDFs. It holds 83 documents, 81 of which have versions
-imported from arXiv, 154 arXiv versions in all [@arxivwp]. The import
+imported from arXiv, 154 arXiv versions in all [@papers]. The import
 records arXiv as an external record of role `source`, arXiv's `vN` as a
 label, the SHA-512 digests of the files received, and relations to the
 versioned arXiv identifier and the arXiv DOI. Document versions do not
@@ -851,7 +851,7 @@ Licences limit what others may do. Of the 81 lines imported from arXiv, the
 latest version of 52 carries arXiv's default licence, 20 the licence assumed
 for submissions of 1991 to 2003, 8 CC BY 4.0 and 1 CC0; only 3 lines carry
 an open licence in every version, and in 8 the licence changes between
-versions [@arxivwp]. A custodian without the authors' agreement has the
+versions [@papers]. A custodian without the authors' agreement has the
 right to redistribute few of them. The digests recorded fix what the owner
 received when it imported, not what arXiv served on the day of each version.
 
@@ -877,10 +877,10 @@ signed directly. The inventory chain closed the gap (#46).
 #### Keys and forks
 The rules on keys were rewritten several times; each version closed holes and
 opened others, and letting an owner heal a fork of its key log could not
-converge against a thief holding a listed key [@keysforks]. A survey of
-identity systems found that recovery from theft rests either on an order the
-thief cannot rewrite or on a commitment made before the theft
-[@fedidentity]. OpenSheaf has no order, so it took the commitment:
+converge against a thief holding a listed key. In the identity systems we
+examined, recovery from theft rests either on an order the thief cannot
+rewrite, as in the directory of the AT Protocol [@atproto], or on a
+commitment made before the theft, as in KERI [@keri2019]. OpenSheaf has no order, so it took the commitment:
 pre-rotation, exposure that cannot be contested, and a fork that ends the
 owner (#58). Among the lessons recorded are never to remove on evidence an
 attacker can shape, to define statuses once, and to rewrite rather than
@@ -888,13 +888,12 @@ patch.
 
 ## Related work {#sec:related}
 
-This section follows two working papers that survey decentralised and
-federated publishing from their own sources [@fedpub; @positioning]; claims
-marked unverified there are marked so here. Table @tab:compare sets
-OpenSheaf against ten systems of the survey, among them the three it finds
-closest.
+This section draws on our survey of decentralised and federated publishing,
+made from the systems' own documents and code, which are cited here; what we
+could not verify is marked so. Table @tab:compare sets OpenSheaf against ten
+systems, among them the three we found closest.
 
-Table*: OpenSheaf and ten systems of the survey, in eight rows [@fedpub]. {#tab:compare}
+Table*: OpenSheaf and ten systems, in eight rows. {#tab:compare}
 
 | System | Fixity | Names | Who writes | Copies | Identity | Requires |
 |---|---|---|---|---|---|---|
@@ -916,7 +915,7 @@ replicated between servers [@kuhn2016]. The current Nanopub Registry accepts
 only signed nanopublications, gives each key a quota derived from endorsements
 by trusted agents, and lets a declaration bind an ORCID iD to a key
 [@kuhn2026]; a snapshot of 4 May 2026 counts 79,672 nanopublications by 616
-signing agents [@kuhn2026; @fedpub]. A Trusty URI names one content, so a work
+signing agents [@kuhn2026]. A Trusty URI names one content, so a work
 has no name across its versions, and the documented queries count a
 supersession only under the same key. Nanopublications are a natural form for
 statements about OpenSheaf versions, which are open (#21).
@@ -925,7 +924,7 @@ statements about OpenSheaf versions, which are open (#21).
 [@ellerman2024b]: a succession of editions is a git history named from its
 initial commit, each later commit signed with an SSH key listed in the
 succession. Authority rests on keys, so a succession moves between hosts.
-As read in [@fedpub], a listed key can sign a commit that changes the list,
+As we read it, a listed key can sign a commit that changes the list,
 so a thief holding one could extend and contest the succession; pre-rotation
 exists to prevent this, at the cost of more keys. A DSI names one
 succession, rests on SHA-1, and has no owners shared across documents, no
@@ -936,9 +935,9 @@ immutable, sequential versions, append-only logs signed by the server after
 Certificate Transparency, and mirrors checked against hashes
 [@kf2026a; @kf2026c]. Each collection has one authoritative server; in its
 draft third protocol authors may sign changes, but one authority still
-accepts versions [@fedpub]. Its salted commitments to private records bear on blind
+accepts versions [@underlayprotocol]. Its salted commitments to private records bear on blind
 review (#63). **SWHIDs** name source code by intrinsic digests
-[@dicosmo2018] and are now an ISO standard [@fedpub], with no identity,
+[@dicosmo2018] and are now an ISO standard [@iso18670], with no identity,
 signature or notion of a work; OpenSheaf records them as relations and
 witnesses. **RO-Crate** describes research packages and leaves fixity to the
 packaging, OCFL among them [@rocrate2022].
@@ -948,14 +947,15 @@ packaging, OCFL among them [@rocrate2022].
 **DeSci Nodes** name research objects by dPIDs, integers in an upgradeable
 registry contract deployed on a test network, with histories as Ceramic
 streams anchored on Ethereum [@descinodes]; Ceramic's developers deprecated
-the software it used in 2025 [@ceramic2025], and whether its anchor service
-has closed is unverified [@fedpub]. A `sheaf:` name is checked without a
+the software it used in 2025 [@ceramic2025], and we could not verify whether its
+anchor service has closed. A `sheaf:` name is checked without a
 registry, chain or stream service. **Hypergraph**, built on Dat
 [@hartgerink2019], named each module by a public key, so the module's
 identity and the authority to write it were one secret; it ended in 2021,
-for reasons unverified, and its successor keeps a static archive as its
-safety net [@fedpub]. The other **blockchain platforms** for publishing found
-closed or dropped the chain [@fedpub]; what lasted is the dated digest, as
+for reasons we could not verify, and its successor,
+ResearchEquals, keeps a static archive as its safety net [@researchequals].
+The other **blockchain platforms** for publishing we found closed or
+dropped the chain, as Orvium and Pluto did [@orvium; @pluto2019]; what lasted is the dated digest, as
 in bloxberg's proofs of existence [@wittek2020] and Ledger's signed digests,
 whose Bitcoin timestamps are unverified [@ledger].
 OpenSheaf keeps dated digests as optional witnesses, in its timestamps
@@ -967,13 +967,13 @@ extension.
 servers [@capadisli2017; @capadisli2020]; versions are fixed by Mementos and
 web archives, identity is a WebID, and since 2026 dokieli signs annotations,
 as nanopublications, with RSA keys that are added, never replaced, and so
-cannot be rotated after a theft; whether whole articles are signed is
-unverified [@fedpub]. **Solid** pods are mutable stores behind access control
+cannot be rotated after a theft [@dokieli]; we could not verify whether
+whole articles are signed. **Solid** pods are mutable stores behind access control
 [@solid], and the ResearcherPod work records the life of an artefact as
 notifications kept by each party [@hochstenbach2023]. **Sigstore**, as used by
 PyPI, binds short-lived certificates to a workflow identity and dates
 signatures in a transparency log [@pep740]; **C2PA** is proposed for research
-images [@oric2pa], but no publisher was found adopting it [@fedpub]. These
+images [@oric2pa], but we found no publisher adopting it. These
 bind a signature to an identity checked at signing time by a third party;
 OpenSheaf binds it to a key log that checks itself, and its signatures carry
 no time. A Sigstore signature over a pin could be a witness (#41).
@@ -981,14 +981,14 @@ no time. A Sigstore signature over a pin could be a witness (#41).
 ### Overlays and platforms
 
 **eLife**'s docmaps fix the preprint versions it reviews by DOI, version, URL
-and archived packages, but by no digest [@elife; @fedpub]; **Docmaps**
+and archived packages, but by no digest [@elife]; **Docmaps**
 describe such editorial events [@mcdowell2021]. **Peer Community In**
 recommends a particular version of a preprint, and **Episciences** asks for
-the version submitted [@pci; @episciences; @fedpub]. Each overlay fixes what
+the version submitted [@pci; @episciences]. Each overlay fixes what
 it vetted by a number or URL, valid while the server keeps it; a selection
 pins it by digest, checked in any copy. **PubPub** has releases numbered from
 1, like document versions, but fixed by a rule of its database, with DOIs for
-pubs, not releases [@fedpub]; in June 2025, after a funder withdrew, it
+pubs, not releases [@pubpubcode]; in June 2025, after a funder withdrew, it
 announced the end of its hosted services, and in January 2026 reversed this
 [@kf2025b; @kf2026f]. Its export to the Underlay comes closest to OpenSheaf,
 with files named by SHA-256 but fixed by a server's log, not signed.
@@ -1004,7 +1004,7 @@ repositories and services [@coarnotify], implementing part of Pubfair
 signature, and could carry pins. **OAI-PMH** harvests metadata [@oaipmh];
 the discovery document and feed play its part with verifiable content.
 **DOIs** resolve through registries to wherever a work is said to be, and do
-not fix bytes [@positioning]; a pin says which bytes a DOI's work is.
+not fix bytes; a pin says which bytes a DOI's work is.
 
 ### Federated and distributed systems
 
@@ -1024,28 +1024,28 @@ OpenSheaf uses it as a store, its integrity staying in OCFL inventories
 peer writing only its own namespace, with delegates changed by a threshold of the
 previous ones [@radicle]; OpenSheaf took from it, as from The Update Framework
 [@tuf], a key log signed by keys of the version before, and added pre-rotation
-and plain files [@radiclewp; @fedidentity].
+and plain files.
 
 ### arXiv, Hexagon and alphaXiv
 
 **arXiv** keeps every version and its sources, refuses changes in place
 because they would be backdated, and since 2026 has dark copies at Portico
-and TIB [@arxivwp]. But its record is fixed only by its word, with no digest
+and TIB [@arxivreplace; @arxivblog2026]. But its record is fixed only by its word, with no digest
 published; its DOIs name articles, not versions; and its default licence
 gives it a right to distribute that it cannot pass on. OpenSheaf adds pins,
 signatures, versions never on arXiv and selections that say what they
 vetted, and cannot replace arXiv's announcement. **Hexagon**, a repository
 for the mathematical sciences opened in September 2026, accepts works written
 in part or entirely by language models, records how each version was made
-and publishes SHA-256 digests of files [@antieau2026; @hexagonwp];
+and publishes SHA-256 digests of files [@antieau2026; @hexagon];
 signatures were not found, and OpenSheaf has no field for provenance.
 **alphaXiv** grew from discussing arXiv papers into a service that also
-records; its pages describe no digests [@alphaxivwp].
+records; its pages describe no digests [@alphaxiv].
 
 ### What is new, and what is not {#sec:new}
 
-Most of OpenSheaf's parts exist elsewhere (Table @tab:new). What the search
-did not find is their combination, for scholarly documents [@fedpub]: a name
+Most of OpenSheaf's parts exist elsewhere (Table @tab:new). What we did not
+find is their combination, for scholarly documents: a name
 of the work shared by the lines of several owners, apart from hosts and keys;
 owners with key logs and pre-rotation; collections that pin other parties'
 versions as signed objects, keeping whole objects apart from vetting versions;
@@ -1055,7 +1055,7 @@ closest design has parts OpenSheaf lacks: nanopublications a working network
 with trust and quotas, the Underlay salted commitments and packs, DSGL the
 simplicity of one git history per document.
 
-Table: What is new and what is not [@fedpub]. {#tab:new}
+Table: What is new and what is not, among the systems we examined. {#tab:new}
 
 | Element | Earlier work |
 |---|---|
@@ -1080,27 +1080,27 @@ Table: What is new and what is not [@fedpub]. {#tab:new}
 Earlier designs ended for lack of funding or of a steward, or by depending
 on a token, a chain, peers online or a service run by someone else; others
 were overtaken by other services, and the most successful remains small
-[@fedpub]. OpenSheaf avoids the dependencies and shares the rest; we weigh
+(Section @sec:related). OpenSheaf avoids the dependencies and shares the rest; we weigh
 it against them.
 
 #### Adoption
 An exchange layer is worth something only when several parties use it, and
 OpenSheaf has one real archive. The most successful decentralised design
 found, nanopublications, counts some 80,000 records by some 600 signers
-after more than fifteen years [@fedpub]. What is needed next is a service
+after more than fifteen years [@kuhn2026]. What is needed next is a service
 people use on top: an announcement service for a field, or an overlay
-journal on authors' own archives [@positioning].
+journal on authors' own archives.
 
 #### Incentives
 Researchers publish where evaluation counts: eLife's submissions fell by more
-than half after its indexing changed [@fedpub]. An OpenSheaf archive counts
+than half after its indexing changed [@elife2025]. An OpenSheaf archive counts
 for nothing by itself, and reaches the indexes only through DOIs, landing
 pages for search engines, and overlays that do count. DOIs with an archive's
 own prefix are open (#8).
 
 #### Key management
-OpenSheaf asks more of authors than the comparable designs surveyed
-(dokieli, DSGL, nanopublications) [@fedpub]: a current key on
+OpenSheaf asks more of authors than the comparable designs we examined
+(dokieli, DSGL, nanopublications): a current key on
 each device and rotation keys kept apart, for a better answer to theft. The
 Manager and passkeys lower the cost; whether authors will bear it is
 untested, and a per-owner key log may not be worth it to authors who never
@@ -1159,14 +1159,6 @@ is adopted depends on the services built on it.
 - [template] OpenSheaf project. archive-template, a template for an OpenSheaf archive. 2026. https://github.com/opensheaf/archive-template
 - [lean] OpenSheaf project. OpenSheaf in Lean. Literate program, 2026. https://opensheaf.org/opensheaf-lean/ (source: https://github.com/opensheaf/opensheaf-lean)
 - [papers] M. Gubinelli. Papers of Massimiliano Gubinelli, an OpenSheaf archive. 2026. https://mgubi.org/papers/ (repository: https://github.com/mgubi/papers)
-- [positioning] OpenSheaf project. OpenSheaf as an exchange layer for scholarly communication. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/positioning.md
-- [fedpub] OpenSheaf project. Federated publishing: proposals and systems compared with OpenSheaf. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/federated-publishing.md
-- [arxivwp] OpenSheaf project. arXiv and OpenSheaf. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/arxiv.md
-- [hexagonwp] OpenSheaf project. Hexagon and OpenSheaf. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/hexagon.md
-- [alphaxivwp] OpenSheaf project. alphaXiv and OpenSheaf. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/alphaxiv.md
-- [radiclewp] OpenSheaf project. Radicle and OpenSheaf. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/radicle.md
-- [keysforks] OpenSheaf project. Keys, revocation and forks: what went wrong on the way. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/keys-and-forks.md
-- [fedidentity] OpenSheaf project. Federated and decentralized identity, and the key logs of OpenSheaf. Working paper, 2026. https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/federated-identity.md
 - [ocfl] OCFL. Oxford Common File Layout specification, version 1.1. https://ocfl.io/1.1/spec/
 - [datacite] DataCite. DataCite Metadata Schema 4.7. https://schema.datacite.org/meta/kernel-4.7/
 - [keri2019] S. M. Smith. Key Event Receipt Infrastructure (KERI). White paper, 2019. https://arxiv.org/abs/1907.02143
@@ -1208,4 +1200,15 @@ is adopted depends on the services built on it.
 - [radicle] Radicle. Radicle protocol guide. https://radicle.xyz/guides/protocol
 - [tuf] The Update Framework. https://theupdateframework.io/
 - [antieau2026] B. Antieau. Hexagon. 2026. https://antieau.github.io/2026/10/05/hexagon.html
-
+- [underlayprotocol] Knowledge Futures. The Underlay protocol. https://underlay.org/docs/protocol
+- [iso18670] ISO/IEC 18670:2025. The SoftWare Hash IDentifier (SWHID) specification. 2025. https://www.iso.org/standard/89985.html
+- [researchequals] ResearchEquals. https://researchequals.com/
+- [orvium] Orvium. https://orvium.io/
+- [pluto2019] Pluto Labs. Blockchain is NOT a cure to Academia. 2019. https://medium.com/pluto-inc/blockchain-is-not-a-cure-to-academia-ef352985526
+- [dokieli] dokieli. Documentation. https://dokie.li/docs
+- [elife2025] eLife. The eLife model: three-year update. 2025. https://elifesciences.org/inside-elife/7da92a51/the-elife-model-three-year-update
+- [pubpubcode] Knowledge Futures. PubPub, source code. https://github.com/knowledgefutures/pubpub
+- [arxivreplace] arXiv. Replacing an article. https://info.arxiv.org/help/replace.html
+- [arxivblog2026] arXiv. Post of 3 February 2026 on dark archives at Portico and TIB. arXiv blog, 2026. https://blog.arxiv.org/
+- [hexagon] Hexagon. https://hexagonmath.org/
+- [alphaxiv] alphaXiv. https://www.alphaxiv.org/
