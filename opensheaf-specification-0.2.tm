@@ -331,7 +331,7 @@
 
   When an object is created or deposited, an archive that holds an object or a tombstone with the same genesis record, compared by genesis name (<verbatim|genesisName> of a tombstone, section 13), MUST refuse it unless it is signed by the originator (the originator's line) or is a branch whose branch points are confirmed back to the originator's line (section 9.3).
 
-  <strong|Open question.> Whether aliases, new genesis records wrapping an old one, are needed if refusing reused genesis records proves too strict (#44).
+  A work refused for a reused genesis record is sealed anew, under a genesis record of its own, and its <verbatim|datacite.json> MAY relate it to the version it was refused as (<verbatim|IsIdenticalTo> or <verbatim|IsVariantFormOf>, section 4.4). No record wraps another: a genesis record never names another one.
 
   <section*|6. Owners><label|6-owners>
 
@@ -1249,6 +1249,8 @@
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #72 (follow-up): <verbatim|owners> of the discovery document is required, empty for an archive that hosts no owner, and the rule for an archive without it is removed (sections 3.1 and 8.1, appendix B); the index page presents the members of the owner catalogues grouped by owner, in the order of <verbatim|owners>, or together, naming the owner of each when the archive hosts several (appendix A.3).
+
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #44: no aliases; a work refused for a reused genesis record is sealed anew and MAY relate to the version it was refused as (section 5.4, appendix D); the open question of section 5.4 removed.
 
     <item><strong|0.2 (draft), 22 November 2026:> decided in #57: a branch numbers its own document versions from 1, <verbatim|parent.documentVersion> keeping the parent's number (sections 9.4 and 12.1); "moving the branch point" renamed taking a new branch point, by a new object version of the same branch, which is a new document version and keeps the branch's own notices with their files, the parent's notices staying in its evidence (sections 9.3 and 9.4); a line takes in another line's work by depositing it with a relation to the version taken in (sections 5.3 and 9.5); the open questions of sections 9.7 and 12.6 on branches removed.
 
@@ -2241,6 +2243,8 @@
     <item><strong|Why names from genesis records.> A digest of a file every copy carries is checked by anyone, needs no registry and names no archive; its nonce makes it unique in practice, and taking the bytes as stored needs no canonical form of JSON.
 
     <item><strong|Why algorithm numbers.> Clashes are resolved where lines are made, and a branch, sharing its parent's record, is renamed by another algorithm. The number fills the four bits that RFC 4648 leaves zero, so names of algorithm 0 are plain digests and algorithms never coincide.
+
+    <item><strong|Why no aliases.> A record wrapping an old one would give a work a second name that anyone could make, split its identity, and need exceptions to the rules of genesis records and branches. The clashes it was meant for are resolved where lines are made, a branch by another algorithm number (section 5.3); collisions are told apart by comparing genesis records byte for byte (section 12.3); and a reused record is useless to anyone else, so a work refused for one is sealed anew (#44).
 
     <item><strong|Why signatures decide reused genesis records.> Only the originator signs the originator's line, and every other line carries signed parents back to it, the whole chain, since one level would let a chain of branches pass. A reused record is useless to anyone else, and no archive keeps a first-come register of names (section 5.4).
   </itemize>

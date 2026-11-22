@@ -123,7 +123,8 @@ questions are listed at the end of the sections they concern.
   not canonical base32, compared as strings, never decoded. Originator's
   line has no parent; every other line of the record is a branch. Clashes
   resolved where a line is made; reused genesis records are refused unless
-  signed by the originator or a confirmed branch (5.4); aliases open (#44).
+  signed by the originator or a confirmed branch (5.4); no aliases: a work
+  refused for a reused record is sealed anew (#44 settled).
 - **Owners and key logs** (6): an owner object, named by its genesis record
   (first `keys`, `threshold`, `next`, `nextThreshold`; optional `keeper` and
   `extensions`, fixed by the owner name); its versions are its key log,
@@ -314,7 +315,7 @@ the same change in its schema, and the other way round.
   records and pins, #27 ordering collections, #28
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
-  registering `sheaf`, #37 resolution through mirrors, #44 aliases,
+  registering `sheaf`, #37 resolution through mirrors,
   #48 and #50 verification details, #54 custody policies,
   branch numbering, #69 weighted thresholds, #70 witnesses of key logs. Read the relevant issue before
   touching its topic; do not settle an open question without agreement.
