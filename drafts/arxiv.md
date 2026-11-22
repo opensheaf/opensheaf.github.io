@@ -69,17 +69,17 @@ rules, limits what OpenSheaf can do with arXiv papers?
 ## 2. What arXiv is
 
 **Who runs it.** arXiv was founded by Paul Ginsparg in 1991 and was hosted by
-Cornell University for decades. "On July 1, 2026, arXiv established itself
-as an independent nonprofit organization" (spinout FAQ): arXiv, Inc., "a
+Cornell University for decades. "On July 1, 2026, arXiv established itself as
+an independent nonprofit organization" (spinout FAQ): arXiv, Inc., "a
 nonprofit, nonstock Delaware Corporation", granted tax-exempt status, with
 "two founding Members: the Simons Foundation and Cornell University". It is
 governed by a Board of Directors; a Chief Executive Officer leads its
 operations (Penelope Lewis from 17 August 2026), with "numerous volunteer
 subject moderators" and three advisory councils (editorial, institutions,
-science). For the near term its headquarters remain at Cornell Tech. It is funded by Simons
-Foundation International, member institutions and donors, and remains
-"committed to being free to use". It "now hosts more than three million
-scholarly articles in eight subject areas" (about page).
+science). For the near term its headquarters remain at Cornell Tech. It is
+funded by Simons Foundation International, member institutions and donors, and
+remains "committed to being free to use". It "now hosts more than three
+million scholarly articles in eight subject areas" (about page).
 
 **Who may submit.** A registered user, endorsed for the category: "arXiv
 requires that users be endorsed before submitting their first paper to arXiv
@@ -233,20 +233,21 @@ version; for older versions the two are separated by years.
 **Who stands behind a version.** On arXiv, the account of the submitter,
 endorsed for the category, who certifies "the right to grant this license";
 the abstract page names the submitter, and a withdrawal says by whom. No
-version is signed. In OpenSheaf an owner's keys sign each version it publishes (section 7.1;
-drafts are not signed, section 10); a keeper may answer for the owner (section 6.6), and authorship stays
-in `creators` (section 4.4). An imported arXiv version is signed by the
-owner that imported it: the signature says that this owner decided the
-version and received these bytes, not that arXiv or every author agreed.
+version is signed. In OpenSheaf an owner's keys sign each version it publishes
+(section 7.1; drafts are not signed, section 10); a keeper may answer for the
+owner (section 6.6), and authorship stays in `creators` (section 4.4). An
+imported arXiv version is signed by the owner that imported it: the signature
+says that this owner decided the version and received these bytes, not that
+arXiv or every author agreed.
 
 **Names and DOIs.** `arXiv:YYMM.NNNNNvN` names a version in one service, and
 without `vN` the latest. arXiv's DOI is an article's, resolved to the latest
-version: a citation by DOI does not say which version was read. A `sheaf:` URI names a document
-version, and with `?sha512=` exactly one object version (section 12.1),
-resolved from any copy that passes the checks (section 12.3). OpenSheaf
-records arXiv's names beside its own: in the reference archive, an imported
-version has `IsIdenticalTo` `arXiv:1406.7675v5` and `IsVersionOf` the DOI
-`10.48550/arXiv.1406.7675` in `datacite.json` (section 4.4). DOIs of an
+version: a citation by DOI does not say which version was read. A `sheaf:` URI
+names a document version, and with `?sha512=` exactly one object version
+(section 12.1), resolved from any copy that passes the checks (section 12.3).
+OpenSheaf records arXiv's names beside its own: in the reference archive, an
+imported version has `IsIdenticalTo` `arXiv:1406.7675v5` and `IsVersionOf` the
+DOI `10.48550/arXiv.1406.7675` in `datacite.json` (section 4.4). DOIs of an
 archive's own are open
 ([#8](https://github.com/opensheaf/opensheaf.github.io/issues/8)).
 
@@ -400,16 +401,16 @@ issues.
 
 ### Where OpenSheaf's position is weak
 
-- **It depends on arXiv for content.** 81 of the 83 documents of the
-  reference archive have versions imported from arXiv; OpenSheaf there adds to arXiv's record,
-  it does not replace it.
+- **It depends on arXiv for content.** 81 of the 83 documents of the reference
+  archive have versions imported from arXiv; OpenSheaf there adds to arXiv's
+  record, it does not replace it.
 - **It cannot copy most of what it imports.** By its own rule (section 11.2),
   arXiv's licences confine most imported papers to the author's archive.
 - **Dates come from arXiv.** An imported version is deposited and signed when
   imported; its `Available` date is arXiv's, a claim recorded by the owner.
   Priority stays with arXiv's record.
-- **No audience and no announcement.** Feeds exist; no service aggregates
-  them ([#19](https://github.com/opensheaf/opensheaf.github.io/issues/19)).
+- **No audience and no announcement.** Feeds exist; no service aggregates them
+  ([#19](https://github.com/opensheaf/opensheaf.github.io/issues/19)).
 - **Cost to authors.** Keys, a host and tools, against an upload.
 
 ### The relation
