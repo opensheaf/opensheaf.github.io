@@ -424,53 +424,10 @@
             },
             {
               "required": [
-                "renditions"
-              ]
-            },
-            {
-              "required": [
-                "toolchain"
-              ]
-            },
-            {
-              "required": [
-                "changes"
-              ]
-            },
-            {
-              "required": [
-                "stage"
-              ]
-            },
-            {
-              "required": [
-                "history"
-              ]
-            },
-            {
-              "required": [
-                "notices"
-              ]
-            },
-            {
-              "required": [
                 "licence"
               ]
             }
           ]
-        },
-        "properties": {
-          "withdrawal": {
-            "properties": {
-              "reason": {
-                "not": {
-                  "required": [
-                    "path"
-                  ]
-                }
-              }
-            }
-          }
         }
       }
     },

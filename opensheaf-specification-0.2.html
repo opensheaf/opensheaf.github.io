@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf: an open format for document archives and collections, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Specification, version 0.2 (draft), 21 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
+    <meta name="description" content="Specification, version 0.2 (draft), 22 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -33,7 +33,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.2 (draft), 21 November 2026. OpenSheaf is a
+      Specification, version 0.2 (draft), 22 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). The text is licensed under CC
@@ -562,7 +562,10 @@
     </ul>
     <p>
       The sources, the renditions and the change note (<tt class="verbatim">changes</tt>,
-      section 4.3) are the document's own files. HTML versions and other
+      section 4.3) are the document's own files. A collection (section 8) is a
+      document whose source is its member list: its own files are <tt class="verbatim">members.json</tt>,
+      its renditions, if any, and its change note, and the rules of this
+      section hold for it as for any document. HTML versions and other
       presentation files SHOULD NOT be deposited.
     </p>
     <p>
@@ -584,32 +587,47 @@
       completion) holds exactly its own files. Own files that are those of an
       earlier document version other than the current one, deposited again,
       are a <dfn>revert</dfn>: a new document version, with the next number,
-      whose change note SHOULD name the version it returns to. A collection
-      makes a new document version exactly when its member list changes
-      (section 8). A version not public at the time (the manuscript submitted
-      to a journal), deposited later, is a document version like any other; a
-      version published by someone else (the journal's version of record) is
-      not, and is linked by a relation (section 4.4).
+      whose change note SHOULD name the version it returns to. For a
+      collection, any change of <tt class="verbatim">members.json</tt> is thus a new
+      document version: a member added or removed, a pin moved, a reorder, a
+      citation refreshed (section 8.2). A version not public at the time (the
+      manuscript submitted to a journal), deposited later, is a document
+      version like any other; a version published by someone else (the
+      journal's version of record) is not, and is linked by a relation
+      (section 4.4).
     </p>
     <p>
       <strong>Description-only versions.</strong> A <dfn>description-only
-      version</dfn> holds an existing document version with its files
-      unchanged, and changes only its description (<tt class="verbatim">datacite.json</tt>:
-      a DOI, a link to the published article), its <tt class="verbatim">stage</tt>, the
-      state of the object or its notices. It MAY hold any document version, so
-      that an earlier one can be described; tools otherwise hold the current
-      version. If the object has <tt class="verbatim">history</tt>, the entry of that
-      document version becomes the new object version.
+      version</dfn> holds an existing document version with its own files
+      unchanged, and changes only the description of the object: <tt class="verbatim">datacite.json</tt>
+      (a DOI, a link to the published article, the licence in <tt class="verbatim">rightsList</tt>)
+      and, in <tt class="verbatim">object.json</tt>, <tt class="verbatim">stage</tt>, <tt class="verbatim">agreement</tt>,
+      <tt class="verbatim">licence</tt>, <tt class="verbatim">extensions</tt>, the state of the
+      object (<tt class="verbatim">status</tt> and <tt class="verbatim">withdrawal</tt>, section
+      13), its notices and its history (below); it MAY add entries to <tt
+      class="verbatim">external</tt>, which stay, unchanged, in every later object
+      version holding that document version. The fields that say what the
+      files of a document version are (<tt class="verbatim">mainSource</tt>, <tt class="verbatim">sourceFormat</tt>,
+      <tt class="verbatim">sourcesMissing</tt>, <tt class="verbatim">renditions</tt> and <tt
+      class="verbatim">toolchain</tt>, section 4.3) belong to the document version, like
+      its change note, and are the same in every object version holding it,
+      except as a completion adds to them (below): a wrong one is corrected by
+      a notice or by a new document version. A description-only version MAY
+      hold any document version, so that an earlier one can be described, a
+      collection's earlier member list included; tools otherwise hold the
+      current version. If the object has <tt class="verbatim">history</tt>, the entry of
+      that document version becomes the new object version.
     </p>
     <p>
       <strong>Completion.</strong> A document version deposited with <tt
       class="verbatim">sourcesMissing</tt> (section 4.3) MAY be completed, keeping its
       number, by object versions that add its sources, possibly with
-      renditions made from them, and change or remove no file of the version.
-      It keeps <tt class="verbatim">sourcesMissing</tt> until the sources are complete;
-      the object version that completes them names the main source and drops
-      <tt class="verbatim">sourcesMissing</tt>, and the version is then fixed like any
-      other.
+      renditions made from them (named in <tt class="verbatim">mainSource</tt>, <tt
+      class="verbatim">sourceFormat</tt>, <tt class="verbatim">renditions</tt> and <tt class="verbatim">toolchain</tt>),
+      and change or remove no file of the version. It keeps <tt class="verbatim">sourcesMissing</tt>
+      until the sources are complete; the object version that completes them
+      names the main source and drops <tt class="verbatim">sourcesMissing</tt>, and the
+      version is then fixed like any other.
     </p>
     <p>
       <strong>History.</strong> The <dfn>history</dfn> of a document is the
@@ -645,15 +663,6 @@
       <strong>Open questions.</strong>
     </p>
     <ul>
-      <li>
-        <p>
-          What a description-only version may change: which fields of <tt
-          class="verbatim">object.json</tt> besides the state and the notices (<tt
-          class="verbatim">external</tt>, the licence, <tt class="verbatim">toolchain</tt>, the
-          media types of renditions), and whether a description-only version
-          of a collection may hold an earlier member list (#24).
-        </p>
-      </li>
       <li>
         <p>
           How notices are identified, so that a later notice can correct or
@@ -784,8 +793,12 @@
       </li>
     </ul>
     <p>
-      A collection has none of these fields of a document, and its notes are
-      text only (section 8.2). A document or a collection MAY have:
+      A collection has no <tt class="verbatim">mainSource</tt>, <tt class="verbatim">sourceFormat</tt>,
+      <tt class="verbatim">sourcesMissing</tt> or <tt class="verbatim">licence</tt>, since its
+      source is <tt class="verbatim">members.json</tt> and its own files are under CC0
+      (section 8.6); it MAY have the other fields of a document, its
+      renditions holding no part of its members. A document or a collection
+      MAY have:
     </p>
     <ul>
       <li>
@@ -2122,7 +2135,9 @@ keyLog &lt;the value of keyLog&gt;</pre>
     <h3 id="auto-33"><a id="82-the-member-list-membersjson"></a>8.2 The member list: members.json<span style="margin-left: 1em"></span></h3>
     <p>
       Every collection version MUST contain, besides the files of section 4.1,
-      <tt class="verbatim">members.json</tt>, and no other files of its own, with:
+      <tt class="verbatim">members.json</tt>, and no other files of its own but its
+      renditions (a table of contents, the cover of an issue) and the files of
+      its notes (section 4.3), with:
     </p>
     <ul>
       <li>
@@ -2186,7 +2201,10 @@ keyLog &lt;the value of keyLog&gt;</pre>
       and ordered without resolving its members, also when they become
       unavailable: <tt class="verbatim">title</tt>, <tt class="verbatim">creators</tt> (a list of
       names), <tt class="verbatim">year</tt>, and <tt class="verbatim">issued</tt>, the member's
-      <tt class="verbatim">Issued</tt> date.
+      <tt class="verbatim">Issued</tt> date. Since <tt class="verbatim">members.json</tt> is the
+      source of the collection, any change of it, <tt class="verbatim">cite</tt>
+      included, is a new document version (section 4.2); tools SHOULD refresh
+      <tt class="verbatim">cite</tt> only when the member list changes otherwise.
     </p>
     <h3 id="auto-34"><a id="83-members-of-a-catalogue"></a>8.3 Members of a catalogue<span style="margin-left: 1em"></span></h3>
     <p>
@@ -2199,11 +2217,15 @@ keyLog &lt;the value of keyLog&gt;</pre>
       A member MAY have <tt class="verbatim">follow</tt>, <tt class="verbatim">&quot;latest&quot;</tt>:
       a setting of the curator, not a floating reference. A followed member
       pins the latest signed version of its line (section 7.3) when the
-      collection version was made; a member without <tt class="verbatim">follow</tt>
-      keeps the version its curator pinned, which MAY be earlier, until the
-      curator changes it. A tool maintaining the catalogue reads the member's
-      archive (its discovery document or feed) and, when a followed line has a
-      new signed version, writes a new collection version pinning it, whatever
+      document version of the collection that holds it was made; a
+      description-only version of the collection keeps the member list of the
+      document version it holds (section 4.2), so that a catalogue with
+      followed members can be described and withdrawn without moving them
+      (#45); a member without <tt class="verbatim">follow</tt> keeps the version its
+      curator pinned, which MAY be earlier, until the curator changes it. A
+      tool maintaining the catalogue reads the member's archive (its discovery
+      document or feed) and, when a followed line has a new signed version,
+      writes a new document version of the collection pinning it, whatever
       that version holds (a new document version, a description, a notice, a
       withdrawal): a catalogue does not judge the versions of its members, but
       never follows to a contested version, which is not the latest signed
@@ -2370,29 +2392,14 @@ keyLog &lt;the value of keyLog&gt;</pre>
       its <tt class="verbatim">object.json</tt> are as sections 4.2 and 4.3 say.
     </p>
     <p>
-      <strong>Rights.</strong> A collection version holds only metadata,
-      placed under CC0 (section 15.6), and its <tt class="verbatim">rightsList</tt>
+      <strong>Rights.</strong> A collection version holds only metadata, its
+      renditions included, placed under CC0 (section 15.6), and its <tt class="verbatim">rightsList</tt>
       SHOULD say so. The licence of a collection never extends to its members.
     </p>
     <p>
       <strong>Open questions.</strong>
     </p>
     <ul>
-      <li>
-        <p>
-          Whether <tt class="verbatim">follow</tt> applies to every object version of a
-          catalogue or only to its document versions, so that a catalogue with
-          followed members can still have description-only versions and a
-          withdrawal (#45).
-        </p>
-      </li>
-      <li>
-        <p>
-          What counts as a change of the member list: every change of <tt
-          class="verbatim">members.json</tt> (<tt class="verbatim">cite</tt> and a reorder
-          included), or of the members and pins only (#27).
-        </p>
-      </li>
       <li>
         <p>
           Ordering by <tt class="verbatim">Available</tt> without resolving members,
@@ -3615,9 +3622,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           <strong>its records:</strong> the rules of sections 4.2 to 4.4 in
-          every version and between versions (numbering, new versions,
-          completion, <tt class="verbatim">history</tt>, notices), as far as the files
-          decide them;
+          every version and between versions (numbering, new versions, the
+          fields that belong to a document version and <tt class="verbatim">external</tt>,
+          completion, <tt class="verbatim">history</tt>, notices), for collections as
+          for documents, as far as the files decide them;
         </p>
       </li>
       <li>
@@ -3665,16 +3673,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <p>
       For each collection version, the verifier checks the rules of section 8
       on <tt class="verbatim">members.json</tt> and its members. It resolves every
-      member of the head version (every revision, in a selection) as a
-      resolver does (section 12.3), and the members held in the archive in
-      every earlier version; resolving the other members of earlier versions
-      is OPTIONAL. The status of each member is a result (section 8.5). It
-      also checks that no owner of selections of the archive keeps two
-      accepted copies, two lines, of the same document (section 9.6); several
-      selections of one owner listing the same accepted copy are no breach. A
-      member that is not a version is an error, and so is a mismatch of a copy
-      held in the archive; any other status but verified, contested included,
-      is a warning.
+      member of the current version (section 4.2; every revision, in a
+      selection) as a resolver does (section 12.3), and the members held in
+      the archive in every earlier version; resolving the other members of
+      earlier versions is OPTIONAL. The status of each member is a result
+      (section 8.5). It also checks that no owner of selections of the archive
+      keeps two accepted copies, two lines, of the same document (section
+      9.6); several selections of one owner listing the same accepted copy are
+      no breach. A member that is not a version is an error, and so is a
+      mismatch of a copy held in the archive; any other status but verified,
+      contested included, is a warning.
     </p>
     <h3 id="auto-69"><a id="146-the-archive-as-a-whole"></a>14.6 The archive as a whole<span style="margin-left: 1em"></span></h3>
     <p>
@@ -4328,6 +4336,26 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #24, #45
+          and #27 (its first point): a collection is a document whose source
+          is <tt class="verbatim">members.json</tt>, with renditions and the fields of a
+          document but <tt class="verbatim">mainSource</tt>, <tt class="verbatim">sourceFormat</tt>,
+          <tt class="verbatim">sourcesMissing</tt> and <tt class="verbatim">licence</tt>, so any
+          change of <tt class="verbatim">members.json</tt> is a new document version and
+          a description-only version of a collection may hold an earlier
+          member list (sections 4.2, 4.3 and 8.2); a description-only version
+          changes the description of the object and adds to <tt class="verbatim">external</tt>,
+          while <tt class="verbatim">mainSource</tt>, <tt class="verbatim">sourceFormat</tt>, <tt
+          class="verbatim">sourcesMissing</tt>, <tt class="verbatim">renditions</tt> and <tt
+          class="verbatim">toolchain</tt> belong to the document version, except as a
+          completion adds to them (section 4.2); a followed member moves with
+          new document versions of its catalogue only (section 8.3); verifiers
+          resolve the members of the current version (sections 14.4 and 14.5,
+          appendix D).
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>0.2 (draft), 21 November 2026:</strong> decided in #23: a
           new document version is made when the own files differ from those of
           the current version, compared by logical path and digest, so that a
@@ -4747,8 +4775,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           <strong>Follow it in a catalogue</strong> (sections 8.1 to 8.3). The
           archive's main catalogue, a collection of the same owner, pins each
           paper by its object version and inventory digest; with <tt class="verbatim">follow</tt>
-          <tt class="verbatim">latest</tt>, its tool writes a new version of the
-          catalogue pinning <tt class="verbatim">v2</tt> once <tt class="verbatim">v2</tt> is
+          <tt class="verbatim">latest</tt>, its tool writes a new document version of
+          the catalogue pinning <tt class="verbatim">v2</tt> once <tt class="verbatim">v2</tt> is
           signed (section C.4). A journal that accepts the paper keeps an
           accepted copy, a branch of its own, and lists it in a selection
           (sections C.4 and C.5).
@@ -5485,6 +5513,17 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
       </li>
       <li>
         <p>
+          <strong>Why the files of a document version are described
+          once.</strong> <tt class="verbatim">mainSource</tt>, <tt class="verbatim">renditions</tt>
+          and <tt class="verbatim">toolchain</tt> say what the deposited files are and
+          how they were made; a reader who cited a version gets the same
+          answer later, and a mistake in them is a notice, as for the files.
+          Records at external services are added as they are made, after the
+          deposit, and are evidence, so they are only added (#24).
+        </p>
+      </li>
+      <li>
+        <p>
           <strong>Why a revert is a new version.</strong> The current version
           is the last of the history, so a revert holding the earlier number
           would leave the reverted version current; and readers who cited the
@@ -5786,6 +5825,17 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           <strong>Why <tt class="verbatim">follow</tt> is a setting.</strong> A
           collection version states exactly what it contains; a floating
           &quot;latest&quot; would change its meaning over time.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why a collection is a document.</strong> One set of rules
+          for versions, history, reverts, notices and description-only
+          versions serves both; a collection whose member list changed without
+          a new document version would make &quot;version 3&quot; of it name
+          different lists, or need a history of its own. A followed member
+          moves only with a new document version, so a catalogue can still be
+          described or withdrawn (#24, #45).
         </p>
       </li>
     </ul>

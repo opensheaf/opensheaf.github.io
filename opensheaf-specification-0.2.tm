@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf: an open format for document archives and collections>
 
-  <notes-abstract|Specification, version 0.2 (draft), 21 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
+  <notes-abstract|Specification, version 0.2 (draft), 22 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
 
   <os-alert|warning|Warning.|<strong|Draft.> Until version 1.0, any revision may change the format in incompatible ways. Version 0.2 is incompatible with <hlink|version 0.1|opensheaf-specification-0.1.tm>, which is kept as published (section 16.1). The text before its rebuild, with the changelog of every revision of the draft, is kept as the <hlink|reference text|reference/opensheaf-specification-0.1-full.md>.>
 
@@ -155,15 +155,15 @@
     <item>the files of its notes, if any (section 4.3).
   </itemize>
 
-  The sources, the renditions and the change note (<verbatim|changes>, section 4.3) are the document's own files. HTML versions and other presentation files SHOULD NOT be deposited.
+  The sources, the renditions and the change note (<verbatim|changes>, section 4.3) are the document's own files. A collection (section 8) is a document whose source is its member list: its own files are <verbatim|members.json>, its renditions, if any, and its change note, and the rules of this section hold for it as for any document. HTML versions and other presentation files SHOULD NOT be deposited.
 
   <strong|Numbering.> The owner of the line numbers document versions from 1, without gaps, independently of any external numbering: a work whose versions 1, 3 and 4 are on arXiv has document versions 1, 2 and 3. External labels (arXiv's <verbatim|v3>) are recorded in <verbatim|external> (section 4.3); presentations SHOULD show them with the document version. Branches number as section 9 says.
 
-  <strong|New versions.> The own files of a document version are compared as pairs of a logical path and a digest, so that a renamed file is a change. A new document version is made exactly when the document's own files differ from those of the current version (a file added, changed, renamed or removed, the change note included), except when a version without sources is completed (below). An object version that holds an existing document version (a description-only version, a completion) holds exactly its own files. Own files that are those of an earlier document version other than the current one, deposited again, are a <dfn|revert>: a new document version, with the next number, whose change note SHOULD name the version it returns to. A collection makes a new document version exactly when its member list changes (section 8). A version not public at the time (the manuscript submitted to a journal), deposited later, is a document version like any other; a version published by someone else (the journal's version of record) is not, and is linked by a relation (section 4.4).
+  <strong|New versions.> The own files of a document version are compared as pairs of a logical path and a digest, so that a renamed file is a change. A new document version is made exactly when the document's own files differ from those of the current version (a file added, changed, renamed or removed, the change note included), except when a version without sources is completed (below). An object version that holds an existing document version (a description-only version, a completion) holds exactly its own files. Own files that are those of an earlier document version other than the current one, deposited again, are a <dfn|revert>: a new document version, with the next number, whose change note SHOULD name the version it returns to. For a collection, any change of <verbatim|members.json> is thus a new document version: a member added or removed, a pin moved, a reorder, a citation refreshed (section 8.2). A version not public at the time (the manuscript submitted to a journal), deposited later, is a document version like any other; a version published by someone else (the journal's version of record) is not, and is linked by a relation (section 4.4).
 
-  <strong|Description-only versions.> A <dfn|description-only version> holds an existing document version with its files unchanged, and changes only its description (<verbatim|datacite.json>: a DOI, a link to the published article), its <verbatim|stage>, the state of the object or its notices. It MAY hold any document version, so that an earlier one can be described; tools otherwise hold the current version. If the object has <verbatim|history>, the entry of that document version becomes the new object version.
+  <strong|Description-only versions.> A <dfn|description-only version> holds an existing document version with its own files unchanged, and changes only the description of the object: <verbatim|datacite.json> (a DOI, a link to the published article, the licence in <verbatim|rightsList>) and, in <verbatim|object.json>, <verbatim|stage>, <verbatim|agreement>, <verbatim|licence>, <verbatim|extensions>, the state of the object (<verbatim|status> and <verbatim|withdrawal>, section 13), its notices and its history (below); it MAY add entries to <verbatim|external>, which stay, unchanged, in every later object version holding that document version. The fields that say what the files of a document version are (<verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|sourcesMissing>, <verbatim|renditions> and <verbatim|toolchain>, section 4.3) belong to the document version, like its change note, and are the same in every object version holding it, except as a completion adds to them (below): a wrong one is corrected by a notice or by a new document version. A description-only version MAY hold any document version, so that an earlier one can be described, a collection's earlier member list included; tools otherwise hold the current version. If the object has <verbatim|history>, the entry of that document version becomes the new object version.
 
-  <strong|Completion.> A document version deposited with <verbatim|sourcesMissing> (section 4.3) MAY be completed, keeping its number, by object versions that add its sources, possibly with renditions made from them, and change or remove no file of the version. It keeps <verbatim|sourcesMissing> until the sources are complete; the object version that completes them names the main source and drops <verbatim|sourcesMissing>, and the version is then fixed like any other.
+  <strong|Completion.> A document version deposited with <verbatim|sourcesMissing> (section 4.3) MAY be completed, keeping its number, by object versions that add its sources, possibly with renditions made from them (named in <verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|renditions> and <verbatim|toolchain>), and change or remove no file of the version. It keeps <verbatim|sourcesMissing> until the sources are complete; the object version that completes them names the main source and drops <verbatim|sourcesMissing>, and the version is then fixed like any other.
 
   <strong|History.> The <dfn|history> of a document is the order of its document versions in the history of the work: the order of their numbers, unless <verbatim|object.json> has <verbatim|history>, the list, in that order, of the last object version holding each document version. An object version that deposits a document version out of order (an earlier version found later) MUST write <verbatim|history>, and every later object version MUST keep it. A version whose place is unknown goes just before the current version, and its change note SHOULD say so. The history is read from the latest signed version of the line (section 7); earlier object versions keep it as it was then known. Dates never order document versions.
 
@@ -174,8 +174,6 @@
   <strong|Open questions.>
 
   <\itemize>
-    <item>What a description-only version may change: which fields of <verbatim|object.json> besides the state and the notices (<verbatim|external>, the licence, <verbatim|toolchain>, the media types of renditions), and whether a description-only version of a collection may hold an earlier member list (#24).
-
     <item>How notices are identified, so that a later notice can correct or withdraw an earlier one, what makes a notice current, and what its <verbatim|date> is (#26).
   </itemize>
 
@@ -215,7 +213,7 @@
     <item><verbatim|licence>: a note with the full text or terms of the licence (for licences without an SPDX identifier); <verbatim|rightsList> in <verbatim|datacite.json> remains the description for readers.
   </itemize>
 
-  A collection has none of these fields of a document, and its notes are text only (section 8.2). A document or a collection MAY have:
+  A collection has no <verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|sourcesMissing> or <verbatim|licence>, since its source is <verbatim|members.json> and its own files are under CC0 (section 8.6); it MAY have the other fields of a document, its renditions holding no part of its members. A document or a collection MAY have:
 
   <\itemize>
     <item><verbatim|agreement>: a minimal record that the authors agreed to the deposit and the licence: <verbatim|by> (names only), <verbatim|date> and <verbatim|method> ("by e-mail"), all REQUIRED. It MUST NOT contain e-mail addresses, correspondence or signatures of persons;
@@ -601,7 +599,7 @@
 
   <subsection*|8.2 The member list: members.json><label|82-the-member-list-membersjson>
 
-  Every collection version MUST contain, besides the files of section 4.1, <verbatim|members.json>, and no other files of its own, with:
+  Every collection version MUST contain, besides the files of section 4.1, <verbatim|members.json>, and no other files of its own but its renditions (a table of contents, the cover of an issue) and the files of its notes (section 4.3), with:
 
   <\itemize>
     <item><verbatim|format>: <verbatim|"opensheaf-collection/0.2">;
@@ -623,13 +621,13 @@
     <item><verbatim|at>: a non-empty list of base URLs where copies of the line may be found, also of one URL: equal hints, which need no signature (section 3), read as the <verbatim|at> parameter of a <verbatim|sheaf:> URI (section 12). They locate copies of the member's own line, mirrors included (section 11), never a branch of it (section 9).
   </itemize>
 
-  Each member MAY have <verbatim|doi>, the version DOI, and <verbatim|conceptDoi>, the concept DOI, of the member; and <verbatim|cite>, a cached citation, not authoritative, so that the collection can be read and ordered without resolving its members, also when they become unavailable: <verbatim|title>, <verbatim|creators> (a list of names), <verbatim|year>, and <verbatim|issued>, the member's <verbatim|Issued> date.
+  Each member MAY have <verbatim|doi>, the version DOI, and <verbatim|conceptDoi>, the concept DOI, of the member; and <verbatim|cite>, a cached citation, not authoritative, so that the collection can be read and ordered without resolving its members, also when they become unavailable: <verbatim|title>, <verbatim|creators> (a list of names), <verbatim|year>, and <verbatim|issued>, the member's <verbatim|Issued> date. Since <verbatim|members.json> is the source of the collection, any change of it, <verbatim|cite> included, is a new document version (section 4.2); tools SHOULD refresh <verbatim|cite> only when the member list changes otherwise.
 
   <subsection*|8.3 Members of a catalogue><label|83-members-of-a-catalogue>
 
   Each member of a catalogue MUST have <verbatim|version>, the object version pinned, and <verbatim|inventorySha512>, the SHA-512 digest of its inventory file: a pin (section 4), which fixes the object with all its versions up to that one. It MUST NOT have <verbatim|revisions>.
 
-  A member MAY have <verbatim|follow>, <verbatim|"latest">: a setting of the curator, not a floating reference. A followed member pins the latest signed version of its line (section 7.3) when the collection version was made; a member without <verbatim|follow> keeps the version its curator pinned, which MAY be earlier, until the curator changes it. A tool maintaining the catalogue reads the member's archive (its discovery document or feed) and, when a followed line has a new signed version, writes a new collection version pinning it, whatever that version holds (a new document version, a description, a notice, a withdrawal): a catalogue does not judge the versions of its members, but never follows to a contested version, which is not the latest signed version (section 7.3), nor, once it knows the owner's key log forks, to a version that an archive would not add (section 7.5). A tool follows only a signed version that extends the version pinned; a copy that does not is a fork of the line (section 7.4), which it reports, keeping the pin.
+  A member MAY have <verbatim|follow>, <verbatim|"latest">: a setting of the curator, not a floating reference. A followed member pins the latest signed version of its line (section 7.3) when the document version of the collection that holds it was made; a description-only version of the collection keeps the member list of the document version it holds (section 4.2), so that a catalogue with followed members can be described and withdrawn without moving them (#45); a member without <verbatim|follow> keeps the version its curator pinned, which MAY be earlier, until the curator changes it. A tool maintaining the catalogue reads the member's archive (its discovery document or feed) and, when a followed line has a new signed version, writes a new document version of the collection pinning it, whatever that version holds (a new document version, a description, a notice, a withdrawal): a catalogue does not judge the versions of its members, but never follows to a contested version, which is not the latest signed version (section 7.3), nor, once it knows the owner's key log forks, to a version that an archive would not add (section 7.5). A tool follows only a signed version that extends the version pinned; a copy that does not is a fork of the line (section 7.4), which it reports, keeping the pin.
 
   A withdrawn member stays, and presentations show its withdrawal (section 13.1), also one made after the version pinned. Presentations show the current version of each member as read from the history of the version pinned (section 4.2), not from later versions of its line: a pin that is not followed is the curator's choice.
 
@@ -687,15 +685,11 @@
 
   <strong|Description.> A collection version's <verbatim|datacite.json> (section 4.4) has <verbatim|resourceTypeGeneral> <verbatim|Collection>, and MUST have in <verbatim|relatedIdentifiers> a <verbatim|HasPart> relation to the version DOI of each member of a catalogue (its <verbatim|doi>) and of each revision of a selection (the revision's <verbatim|doi>) that has one; members without a DOI are listed only in <verbatim|members.json>. Its document versions and the fields of its <verbatim|object.json> are as sections 4.2 and 4.3 say.
 
-  <strong|Rights.> A collection version holds only metadata, placed under CC0 (section 15.6), and its <verbatim|rightsList> SHOULD say so. The licence of a collection never extends to its members.
+  <strong|Rights.> A collection version holds only metadata, its renditions included, placed under CC0 (section 15.6), and its <verbatim|rightsList> SHOULD say so. The licence of a collection never extends to its members.
 
   <strong|Open questions.>
 
   <\itemize>
-    <item>Whether <verbatim|follow> applies to every object version of a catalogue or only to its document versions, so that a catalogue with followed members can still have description-only versions and a withdrawal (#45).
-
-    <item>What counts as a change of the member list: every change of <verbatim|members.json> (<verbatim|cite> and a reorder included), or of the members and pins only (#27).
-
     <item>Ordering by <verbatim|Available> without resolving members, which <verbatim|cite> does not cache (#27).
 
     <item>Which status a member has when the checksum file of its inventory is missing or wrong (#48).
@@ -1086,7 +1080,7 @@
   For every other object, the verifier checks:
 
   <\itemize>
-    <item><strong|its records:> the rules of sections 4.2 to 4.4 in every version and between versions (numbering, new versions, completion, <verbatim|history>, notices), as far as the files decide them;
+    <item><strong|its records:> the rules of sections 4.2 to 4.4 in every version and between versions (numbering, new versions, the fields that belong to a document version and <verbatim|external>, completion, <verbatim|history>, notices), for collections as for documents, as far as the files decide them;
 
     <item><strong|its identity:> the genesis record, the name and the identifier in every version (sections 4 and 5), and that the objects and tombstones of the archive with the same genesis name are its originator's line and branches of it (section 5.4);
 
@@ -1099,7 +1093,7 @@
 
   <subsection*|14.5 Collections><label|145-collections>
 
-  For each collection version, the verifier checks the rules of section 8 on <verbatim|members.json> and its members. It resolves every member of the head version (every revision, in a selection) as a resolver does (section 12.3), and the members held in the archive in every earlier version; resolving the other members of earlier versions is OPTIONAL. The status of each member is a result (section 8.5). It also checks that no owner of selections of the archive keeps two accepted copies, two lines, of the same document (section 9.6); several selections of one owner listing the same accepted copy are no breach. A member that is not a version is an error, and so is a mismatch of a copy held in the archive; any other status but verified, contested included, is a warning.
+  For each collection version, the verifier checks the rules of section 8 on <verbatim|members.json> and its members. It resolves every member of the current version (section 4.2; every revision, in a selection) as a resolver does (section 12.3), and the members held in the archive in every earlier version; resolving the other members of earlier versions is OPTIONAL. The status of each member is a result (section 8.5). It also checks that no owner of selections of the archive keeps two accepted copies, two lines, of the same document (section 9.6); several selections of one owner listing the same accepted copy are no breach. A member that is not a version is an error, and so is a mismatch of a copy held in the archive; any other status but verified, contested included, is a warning.
 
   <subsection*|14.6 The archive as a whole><label|146-the-archive-as-a-whole>
 
@@ -1266,6 +1260,8 @@
 
     <item><strong|0.2 (draft), 21 November 2026:> decided in #58: pre-rotation, exposed keys, fork records and a fork that ends and freezes the owner are no longer provisional (sections 6.1 to 6.4, 7.5, 14.6 and C.8); a reader holding one side of a fork sees no fork, and verifiers report the key-log version they judged against (section 6.5); weighted thresholds (#69) and witnesses of the versions of key logs seen first (#70) are left for after 0.2.
 
+    <item><strong|0.2 (draft), 22 November 2026:> decided in #24, #45 and #27 (its first point): a collection is a document whose source is <verbatim|members.json>, with renditions and the fields of a document but <verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|sourcesMissing> and <verbatim|licence>, so any change of <verbatim|members.json> is a new document version and a description-only version of a collection may hold an earlier member list (sections 4.2, 4.3 and 8.2); a description-only version changes the description of the object and adds to <verbatim|external>, while <verbatim|mainSource>, <verbatim|sourceFormat>, <verbatim|sourcesMissing>, <verbatim|renditions> and <verbatim|toolchain> belong to the document version, except as a completion adds to them (section 4.2); a followed member moves with new document versions of its catalogue only (section 8.3); verifiers resolve the members of the current version (sections 14.4 and 14.5, appendix D).
+
     <item><strong|0.2 (draft), 21 November 2026:> decided in #23: a new document version is made when the own files differ from those of the current version, compared by logical path and digest, so that a rename is a change; an object version holding an existing document version holds exactly its files; files of an earlier version deposited again are a revert, a new document version (section 4.2, appendix D).
   </itemize>
 
@@ -1380,7 +1376,7 @@
 
     <item><strong|Make a new version> (sections 4.2, 4.3 and 7.1). A corrected paper is a new object version, <verbatim|v2>, holding document version 2. Its <verbatim|object.json> has <verbatim|previous>, the digest of the inventory file of <verbatim|v1>, and it is signed like the first; signing it fixes <verbatim|v1> too, byte for byte, so a pin of either is reliable (section C.2).
 
-    <item><strong|Follow it in a catalogue> (sections 8.1 to 8.3). The archive's main catalogue, a collection of the same owner, pins each paper by its object version and inventory digest; with <verbatim|follow> <verbatim|latest>, its tool writes a new version of the catalogue pinning <verbatim|v2> once <verbatim|v2> is signed (section C.4). A journal that accepts the paper keeps an accepted copy, a branch of its own, and lists it in a selection (sections C.4 and C.5).
+    <item><strong|Follow it in a catalogue> (sections 8.1 to 8.3). The archive's main catalogue, a collection of the same owner, pins each paper by its object version and inventory digest; with <verbatim|follow> <verbatim|latest>, its tool writes a new document version of the catalogue pinning <verbatim|v2> once <verbatim|v2> is signed (section C.4). A journal that accepts the paper keeps an accepted copy, a branch of its own, and lists it in a selection (sections C.4 and C.5).
   </enumerate>
 
   A new device, or a lost one, is a new version of the key log, signed by the rotation keys (section C.1); a stolen key is exposed the same way (section C.8).
@@ -2218,6 +2214,8 @@
 
     <item><strong|Why the owner numbers its document versions.> External numberings have gaps and miss versions never public there; external labels are kept beside the owner's numbers.
 
+    <item><strong|Why the files of a document version are described once.> <verbatim|mainSource>, <verbatim|renditions> and <verbatim|toolchain> say what the deposited files are and how they were made; a reader who cited a version gets the same answer later, and a mistake in them is a notice, as for the files. Records at external services are added as they are made, after the deposit, and are evidence, so they are only added (#24).
+
     <item><strong|Why a revert is a new version.> The current version is the last of the history, so a revert holding the earlier number would leave the reverted version current; and readers who cited the later version need to see that the work went back. Files are compared with their paths, since <verbatim|object.json>, links and citations name files by path (#23).
 
     <item><strong|Why an explicit history.> Dates may be approximate or unknown, and fixed versions cannot correct pointers to their predecessors when a version is found later. A list of object versions, read from the latest signed version, can be corrected; it cannot list digests, since a version cannot contain the digest of its own inventory.
@@ -2291,6 +2289,8 @@
     <item><strong|Why catalogues and selections.> Keeping and vetting are different acts. A catalogue keeps every version without judging it; a selection attests particular revisions, so a later version cannot enter by itself, and a change of what is vetted is an editorial act in the selection's history.
 
     <item><strong|Why <verbatim|follow> is a setting.> A collection version states exactly what it contains; a floating "latest" would change its meaning over time.
+
+    <item><strong|Why a collection is a document.> One set of rules for versions, history, reverts, notices and description-only versions serves both; a collection whose member list changed without a new document version would make "version 3" of it name different lists, or need a history of its own. A followed member moves only with a new document version, so a catalogue can still be described or withdrawn (#24, #45).
   </itemize>
 
   <subsection*|D.6 Branches and accepted copies><label|d6-branches-and-accepted-copies>

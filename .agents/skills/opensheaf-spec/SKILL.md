@@ -91,13 +91,20 @@ questions are listed at the end of the sections they concern.
   branch's v1 or a draft), so signing a version fixes every earlier
   inventory byte for byte and pins of vouched-for versions are as reliable
   as signed ones (#46, settled). Identity files (4.1): `genesis.json` and a
-  branch's `parent.*`; reserved top-level names.
-- **Documents** (4.2): sources, renditions, notes; description-only
-  versions, completion of `sourcesMissing`, `history`, current version,
-  notices. `object.json` (4.3): `format`, `specification`, `kind`, `status`,
+  branch's `parent/`; reserved top-level names.
+- **Documents** (4.2): sources, renditions, notes; a new document version
+  exactly when the own files (path and digest, change note included)
+  differ from the current version's, a revert being a new version;
+  description-only versions change the description, `stage`, `agreement`,
+  `licence`, `extensions`, state, notices and `history`, and add to
+  `external`, while `mainSource`, `sourceFormat`, `sourcesMissing`,
+  `renditions` and `toolchain` belong to the document version (#24,
+  settled); completion of `sourcesMissing`, `history`, current version,
+  notices. A collection is a document whose source is `members.json`. `object.json` (4.3): `format`, `specification`, `kind`, `status`,
   `documentVersion`, `name`, `owner`, `parent`, `previous`; documents
   `mainSource`, `sourceFormat`, `renditions`, `toolchain`, `changes`,
-  `stage`, `history`, `notices`, `licence` (documents only); documents and
+  `stage`, `history`, `notices`, `licence` (collections have all but
+  `mainSource`, `sourceFormat`, `sourcesMissing` and `licence`); documents and
   collections `agreement`, `external` (deposit or source records),
   `withdrawal`, `extensions`. `datacite.json` (4.4): required and
   recommended properties, mathematics in `$...$`, dates, relations; DOIs
@@ -194,7 +201,8 @@ questions are listed at the end of the sections they concern.
   are reported, never recorded. Adding (7.5): only versions signed once
   added; versions held stay, but for takedowns.
 - **Collections** (8): `members.json` with `type` `catalogue` (pins whole
-  objects, MAY `follow` `"latest"`) or `selection` (revision sets of
+  objects, MAY `follow` `"latest"`, which moves only with new document
+  versions of the catalogue, #45 settled) or `selection` (revision sets of
   `documentVersion`, `version`, `inventorySha512`); members name `kind`,
   `name`, `owner`, `at` (equal hints); member statuses verified, mismatch,
   contested, unchecked, not a version, unavailable, removed (8.5).
@@ -282,7 +290,7 @@ the same change in its schema, and the other way round.
 - Open questions go to issues on `opensheaf/opensheaf.github.io`, among
   them: #13 decentralised holding (split into #39 custodians' copies, #40
   statements by collections, #41 owner proofs), #19 scale, #22 external
-  records and pins, #25 withdrawal details, #27 and #45 collections, #28
+  records and pins, #25 withdrawal details, #27 ordering collections, #28
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
   registering `sheaf`, #37 resolution through mirrors, #44 aliases,
