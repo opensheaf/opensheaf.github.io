@@ -59,7 +59,7 @@ def inline(t):
 TOKEN_RE = re.compile(r'(\\<[^>]*\\>|<[^>|]*>|\\.)')
 
 
-def breakable(t, every=14):
+def breakable(t, every=22):
     """Allow line breaks in a long code span or URL, which a column cannot
     hold: after `/ : . ? & = -` and `,`, and every few characters of a run
     without them. Markup and escapes inside are kept whole."""
@@ -137,7 +137,7 @@ def spaces(n):
 
 def highlight_line(lang, c, uris=False):
     if not c.strip():
-        return ''
+        return '    \\ '  # a blank line kept (an empty one would vanish)
     n = len(c) - len(c.lstrip(' '))
     rest = c.lstrip(' ')
     out = []
@@ -164,7 +164,11 @@ def highlight_line(lang, c, uris=False):
             elif kind == 'word':
                 if lang == 'python' and text in PY_KW:
                     tag = 'os-kw'
-                elif lang == 'text' and (text in PSEUDO_KW or (first_word and n == 0)):
+                elif lang == 'text' and first_word and (n == 0 or text in PSEUDO_KW):
+                    tag = 'os-kw'
+                elif lang == 'text' and text == 'else' and rest.startswith('or else'):
+                    tag = 'os-kw'
+                elif lang == 'text' and text == 'in' and rest.startswith('for '):
                     tag = 'os-kw'
                 elif lang == 'sh' and first_word and text in SH_CMDS:
                     tag = 'os-kw'

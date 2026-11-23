@@ -73,7 +73,7 @@
 
   <assign|os-code-grey|#6e7785>
 
-  <assign|os-code-light|#9aa3af>
+  <assign|os-code-light|#7c8592>
 
   <assign|os-kw|<macro|x|<with|font-series|bold|<arg|x>>>>
 
