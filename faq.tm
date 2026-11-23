@@ -131,11 +131,19 @@
 
   <section*|Can I use "All rights reserved"?><label|can-i-use-all-rights-reserved>
 
-  Yes. Each document carries the licence its authors choose; "All rights reserved" means readers may access the document but not reuse it. The metadata (descriptions, object records, member lists, inventories) is CC0, so that it can be harvested and mirrored freely. On Zenodo, "All rights reserved" is entered as a custom licence.
+  Yes. Each document carries the licence its authors choose, and must say something: <verbatim|rightsList> holds at least one licence or rights statement, and where the rights are not known, a statement says so (section 4.4). "All rights reserved" means readers may access the document but not reuse it. The metadata (descriptions, object records, member lists, inventories) is CC0, so that it can be harvested and mirrored freely. On Zenodo, "All rights reserved" is entered as a custom licence.
 
   <section*|Will Google Scholar find the papers?><label|will-google-scholar-find-the-papers>
 
-  If the archive follows the website profile: each document then has a landing page with the <verbatim|citation_*> meta tags Google Scholar reads, and a PDF on the same host. The profile (appendix A.3) also recommends a sitemap and FAIR Signposting links.
+  If the archive follows the website profile: each document then has a landing page with the <verbatim|citation_*> meta tags Google Scholar reads, and a PDF on the same host. The profile (appendix A.3) also requires FAIR Signposting links and a schema.org record in JSON-LD on each landing page, which other search engines and harvesters read, and recommends a sitemap.
+
+  <section*|Is OpenSheaf FAIR?><label|is-opensheaf-fair>
+
+  In substance, largely; in what assessment tools measure, less so. The FAIR principles ask that research outputs be findable, accessible, interoperable and reusable, by people and by programs. OpenSheaf is strong where most repositories are weak: a <verbatim|sheaf:> URI with a pin names exact bytes, wherever they are kept; the metadata is fixed with the data by one inventory; every version records who deposited it and why, and is signed by its owner; the sources are kept with the tools that typeset them; and the metadata is CC0. Every version states its licence or rights (section 4.4).
+
+  It is weaker in three places. <verbatim|sheaf:> is not yet a registered scheme with a common resolver (#36, #35), so assessment tools do not recognise it as a persistent identifier; a DOI, through the Zenodo profile, is recognised. Being found is left to the profiles: section 3 asks a public archive to be indexed through the website or Zenodo profile, or an OAI-PMH static repository. And the metadata is JSON checked by schemas, not RDF; the landing pages of the website profile carry schema.org JSON-LD and FAIR Signposting, which is what search engines and assessment tools read, and a JSON-LD context for the files is discussed in #77.
+
+  A takedown keeps less than the principle A2 asks (metadata outliving the data): its tombstone keeps names and a pin only, since a takedown may be by law or to erase personal data. A withdrawal keeps everything. The working paper <hlink|drafts/fair.md|https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/fair.md> goes through the principles one by one.
 
   <section*|How do I check an archive?><label|how-do-i-check-an-archive>
 

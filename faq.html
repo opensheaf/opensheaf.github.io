@@ -454,20 +454,56 @@
     </p>
     <h2 id="auto-28"><a id="can-i-use-all-rights-reserved"></a>Can I use &quot;All rights reserved&quot;?<span style="margin-left: 1em"></span></h2>
     <p>
-      Yes. Each document carries the licence its authors choose; &quot;All
-      rights reserved&quot; means readers may access the document but not
-      reuse it. The metadata (descriptions, object records, member lists,
-      inventories) is CC0, so that it can be harvested and mirrored freely. On
-      Zenodo, &quot;All rights reserved&quot; is entered as a custom licence.
+      Yes. Each document carries the licence its authors choose, and must say
+      something: <tt class="verbatim">rightsList</tt> holds at least one licence or
+      rights statement, and where the rights are not known, a statement says
+      so (section 4.4). &quot;All rights reserved&quot; means readers may
+      access the document but not reuse it. The metadata (descriptions, object
+      records, member lists, inventories) is CC0, so that it can be harvested
+      and mirrored freely. On Zenodo, &quot;All rights reserved&quot; is
+      entered as a custom licence.
     </p>
     <h2 id="auto-29"><a id="will-google-scholar-find-the-papers"></a>Will Google Scholar find the papers?<span style="margin-left: 1em"></span></h2>
     <p>
       If the archive follows the website profile: each document then has a
       landing page with the <tt class="verbatim">citation_*</tt> meta tags Google
       Scholar reads, and a PDF on the same host. The profile (appendix A.3)
-      also recommends a sitemap and FAIR Signposting links.
+      also requires FAIR Signposting links and a schema.org record in JSON-LD
+      on each landing page, which other search engines and harvesters read,
+      and recommends a sitemap.
     </p>
-    <h2 id="auto-30"><a id="how-do-i-check-an-archive"></a>How do I check an archive?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-30"><a id="is-opensheaf-fair"></a>Is OpenSheaf FAIR?<span style="margin-left: 1em"></span></h2>
+    <p>
+      In substance, largely; in what assessment tools measure, less so. The
+      FAIR principles ask that research outputs be findable, accessible,
+      interoperable and reusable, by people and by programs. OpenSheaf is
+      strong where most repositories are weak: a <tt class="verbatim">sheaf:</tt> URI
+      with a pin names exact bytes, wherever they are kept; the metadata is
+      fixed with the data by one inventory; every version records who
+      deposited it and why, and is signed by its owner; the sources are kept
+      with the tools that typeset them; and the metadata is CC0. Every version
+      states its licence or rights (section 4.4).
+    </p>
+    <p>
+      It is weaker in three places. <tt class="verbatim">sheaf:</tt> is not yet a
+      registered scheme with a common resolver (#36, #35), so assessment tools
+      do not recognise it as a persistent identifier; a DOI, through the
+      Zenodo profile, is recognised. Being found is left to the profiles:
+      section 3 asks a public archive to be indexed through the website or
+      Zenodo profile, or an OAI-PMH static repository. And the metadata is
+      JSON checked by schemas, not RDF; the landing pages of the website
+      profile carry schema.org JSON-LD and FAIR Signposting, which is what
+      search engines and assessment tools read, and a JSON-LD context for the
+      files is discussed in #77.
+    </p>
+    <p>
+      A takedown keeps less than the principle A2 asks (metadata outliving the
+      data): its tombstone keeps names and a pin only, since a takedown may be
+      by law or to erase personal data. A withdrawal keeps everything. The
+      working paper <a href="https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/fair.md">drafts/fair.md</a> goes through the principles
+      one by one.
+    </p>
+    <h2 id="auto-31"><a id="how-do-i-check-an-archive"></a>How do I check an archive?<span style="margin-left: 1em"></span></h2>
     <p>
       A verifier validates the JSON files against the schemas in <a href="schemas/">schemas/</a>,
       validates the storage root with a standard OCFL validator (such as <tt
@@ -482,7 +518,7 @@
       verify</tt> runs them on an archive on your computer, and the <a href="https://opensheaf.org/explorer/">Explorer</a>
       on a published one (see <a href="tools.html#updating-the-archive-and-checking-it">the command-line tools</a>).
     </p>
-    <h2 id="auto-31"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-32"><a id="is-the-format-stable"></a>Is the format stable?<span style="margin-left: 1em"></span></h2>
     <p>
       Not yet: version 0.2 is a draft, and versions before 1.0 may change in
       incompatible ways. Version 0.2 is incompatible with <a href="opensheaf-specification-0.1.html">version
@@ -491,7 +527,7 @@
       declares the version of the format it follows, so that tools can tell.
       From version 1.0, minor versions will be backward compatible.
     </p>
-    <h2 id="auto-32"><a id="why-the-name"></a>Why the name?<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-33"><a id="why-the-name"></a>Why the name?<span style="margin-left: 1em"></span></h2>
     <p>
       A sheaf is a bundle of papers. In mathematics, a sheaf is the structure
       in which local pieces glue into a whole: archives kept and verified

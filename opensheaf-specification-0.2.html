@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf: an open format for document archives and collections, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Specification, version 0.2 (draft), 22 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
+    <meta name="description" content="Specification, version 0.2 (draft), 23 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -33,7 +33,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.2 (draft), 22 November 2026. OpenSheaf is a
+      Specification, version 0.2 (draft), 23 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). The text is licensed under CC
@@ -234,6 +234,17 @@
       *</tt>), so that tools in a browser can read them. Any static web server
       will do; an archive kept in git follows <a href="opensheaf-git-0.2.html">OpenSheaf archives in
       git</a>.
+    </p>
+    <p>
+      <strong>Being found.</strong> How readers and services learn of an
+      archive is not part of this specification, and indexes (section 12.5)
+      are maps for resolvers, not search services. A public archive SHOULD
+      nevertheless be indexed by at least one searchable service: by following
+      the website profile (appendix A.3), whose landing pages search engines
+      and Google Scholar read; by following the Zenodo profile (appendix A.1),
+      whose DOIs are searchable in DataCite and in the aggregators it feeds;
+      or by publishing an OAI-PMH static repository for harvesters (appendix
+      A.3).
     </p>
     <p>
       <strong>Moving.</strong> An archive moving to another site, or served at
@@ -889,8 +900,8 @@
       SHOULD also have <tt class="verbatim">givenName</tt> and <tt class="verbatim">familyName</tt>),
       <tt class="verbatim">publicationYear</tt>, <tt class="verbatim">types</tt> (with <tt class="verbatim">resourceTypeGeneral</tt>),
       <tt class="verbatim">version</tt> (the document version as a decimal string
-      without leading zeros, <tt class="verbatim">&quot;3&quot;</tt>) and <tt class="verbatim">publisher</tt>.
-      It SHOULD contain:
+      without leading zeros, <tt class="verbatim">&quot;3&quot;</tt>), <tt class="verbatim">publisher</tt>
+      and <tt class="verbatim">rightsList</tt> (below). It SHOULD contain:
     </p>
     <ul>
       <li>
@@ -903,19 +914,6 @@
       <li>
         <p>
           <tt class="verbatim">dates</tt> (below);
-        </p>
-      </li>
-      <li>
-        <p>
-          <tt class="verbatim">rightsList</tt>: licences and rights statements. An entry
-          with <tt class="verbatim">rightsIdentifier</tt> or <tt class="verbatim">rightsUri</tt>
-          is a <dfn>licence</dfn>: one with an SPDX identifier has it in <tt
-          class="verbatim">rightsIdentifier</tt>, in lower case, with <tt class="verbatim">rightsIdentifierScheme</tt>
-          <tt class="verbatim">SPDX</tt>, and SHOULD have the licence URL; one without
-          has its name in <tt class="verbatim">rights</tt> and the URL identifying it in
-          <tt class="verbatim">rightsUri</tt> (for arXiv's default licence, <tt class="verbatim">http://arxiv.org/licenses/nonexclusive-distrib/1.0/</tt>).
-          An entry with neither is a <dfn>rights statement</dfn>, such as
-          &quot;All rights reserved&quot;;
         </p>
       </li>
       <li>
@@ -950,6 +948,21 @@
       author's versions of a work not published elsewhere, the accepted
       manuscript included, are <tt class="verbatim">Preprint</tt>; <tt class="verbatim">stage</tt>
       in <tt class="verbatim">object.json</tt> gives their stage.
+    </p>
+    <p>
+      <strong>Rights.</strong> <tt class="verbatim">rightsList</tt> lists licences and
+      rights statements, at least one, so that a reader always knows on what
+      terms the files may be used (#79). An entry with <tt class="verbatim">rightsIdentifier</tt>
+      or <tt class="verbatim">rightsUri</tt> is a <dfn>licence</dfn>: one with an SPDX
+      identifier has it in <tt class="verbatim">rightsIdentifier</tt>, in lower case,
+      with <tt class="verbatim">rightsIdentifierScheme</tt> <tt class="verbatim">SPDX</tt>, and
+      SHOULD have the licence URL; one without has its name in <tt class="verbatim">rights</tt>
+      and the URL identifying it in <tt class="verbatim">rightsUri</tt> (for arXiv's
+      default licence, <tt class="verbatim">http://arxiv.org/licenses/nonexclusive-distrib/1.0/</tt>).
+      An entry with neither is a <dfn>rights statement</dfn>, such as
+      &quot;All rights reserved&quot;. Where the rights are not known (an old
+      paper imported without its terms), a rights statement says so, rather
+      than the list being left out or empty.
     </p>
     <p>
       <strong>Mathematics.</strong> Titles and abstracts are plain text, in
@@ -4598,6 +4611,22 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           owner catalogues are left open (#72).
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 23 November 2026:</strong> decided in #79 and
+          #77 (its first point), from the survey of the FAIR principles: <tt
+          class="verbatim">rightsList</tt> is required in <tt class="verbatim">datacite.json</tt>,
+          with at least one licence or rights statement, a statement saying so
+          where the rights are not known (section 4.4); landing pages of the
+          website profile MUST carry FAIR Signposting links (<tt class="verbatim">cite-as</tt>,
+          <tt class="verbatim">describedby</tt>, <tt class="verbatim">item</tt>, <tt class="verbatim">license</tt>,
+          <tt class="verbatim">type</tt>, <tt class="verbatim">author</tt>) and a schema.org
+          record in JSON-LD whose contents are listed, withdrawn lines
+          included (appendix A.3); a public archive SHOULD be indexed by a
+          searchable service, through the website or Zenodo profile or an
+          OAI-PMH static repository (section 3); the rationale in appendix D.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -4817,10 +4846,52 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           date of the current version) and <tt class="verbatim">citation_pdf_url</tt>, a
           PDF on the landing page's host (served, where the host allows, with
           <tt class="verbatim">Content-Security-Policy: sandbox</tt>, section 15.3).
-          They SHOULD carry schema.org <tt class="verbatim">ScholarlyArticle</tt>
-          JSON-LD and FAIR Signposting links (<tt class="verbatim">cite-as</tt>, <tt
-          class="verbatim">describedby</tt>, <tt class="verbatim">item</tt>, <tt class="verbatim">license</tt>),
-          and offer BibTeX and CSL-JSON entries made from <tt class="verbatim">datacite.json</tt>.
+          They SHOULD offer BibTeX and CSL-JSON entries made from <tt class="verbatim">datacite.json</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Machine-readable description.</strong> Landing pages MUST
+          carry FAIR Signposting links and a schema.org record in JSON-LD,
+          made from the current version's <tt class="verbatim">datacite.json</tt> and
+          <tt class="verbatim">object.json</tt>, so that programs, and assessments of
+          FAIR principles, read what the page shows (#77). A withdrawn line
+          carries them too, the record with <tt class="verbatim">creativeWorkStatus</tt>
+          <tt class="verbatim">Withdrawn</tt>.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Signposting.</strong> The links are given as <tt class="verbatim">&lt;link&gt;</tt>
+          elements, and as HTTP <tt class="verbatim">Link</tt> headers where the host
+          allows: <tt class="verbatim">cite-as</tt>, the DOI of the version (<tt class="verbatim">https://doi.org/...</tt>)
+          if it has one, or else the landing page; <tt class="verbatim">describedby</tt>,
+          the <tt class="verbatim">datacite.json</tt> of the current version, typed <tt
+          class="verbatim">application/vnd.datacite.datacite+json</tt>; <tt class="verbatim">item</tt>,
+          each rendition and the main source, with its media type; <tt class="verbatim">license</tt>,
+          the URL of each licence of <tt class="verbatim">rightsList</tt> that has one;
+          <tt class="verbatim">type</tt>, the schema.org type of the record; and <tt
+          class="verbatim">author</tt>, the ORCID iD of each creator that has one.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>JSON-LD.</strong> The record is a schema.org <tt class="verbatim">ScholarlyArticle</tt>,
+          or the type matching <tt class="verbatim">resourceTypeGeneral</tt> (<tt class="verbatim">Collection</tt>
+          for a collection), with <tt class="verbatim">name</tt>, <tt class="verbatim">url</tt>
+          (the landing page), <tt class="verbatim">author</tt> (each creator, with its
+          ORCID iD as <tt class="verbatim">@id</tt> where it has one), <tt class="verbatim">datePublished</tt>,
+          <tt class="verbatim">version</tt>, <tt class="verbatim">license</tt> (each licence URL,
+          or the text of a rights statement), <tt class="verbatim">encoding</tt> for
+          each rendition, <tt class="verbatim">identifier</tt> (the full <tt class="verbatim">sheaf:</tt>
+          URI of the line in canonical form, section 12.2, and the DOI and
+          concept DOI if any), <tt class="verbatim">sameAs</tt> (the URLs of the same
+          work elsewhere, from <tt class="verbatim">IsIdenticalTo</tt> in <tt class="verbatim">relatedIdentifiers</tt>),
+          <tt class="verbatim">abstract</tt> and <tt class="verbatim">keywords</tt> where <tt
+          class="verbatim">datacite.json</tt> has them, and for a collection <tt class="verbatim">hasPart</tt>,
+          the landing pages or DOIs of its members. It follows DataCite's
+          correspondence between its schema and schema.org where that gives
+          one.
         </p>
       </li>
       <li>
@@ -6487,6 +6558,15 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           identified, a statement is not (#50).
         </p>
       </li>
+      <li>
+        <p>
+          <strong>Why a rights entry is required.</strong> Reuse needs a clear
+          licence, not an open one (FAIR principle R1.1): silence leaves every
+          reader, mirror and harvester to guess, while &quot;All rights
+          reserved&quot; or &quot;rights unknown&quot; tells them where they
+          stand (#79).
+        </p>
+      </li>
     </ul>
     <h3 id="auto-107"><a id="d13-versioning"></a>D.13 Versioning<span style="margin-left: 1em"></span></h3>
     <ul>
@@ -6534,6 +6614,16 @@ https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q
           logs and keeper files decide names and keys, and a signature file
           holds exactly what it signs; an extra property there would seem
           committed to.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>Why Signposting and JSON-LD are required on landing
+          pages.</strong> They are what search engines, harvesters and FAIR
+          assessments read; an archive with landing pages that programs cannot
+          read is found by people only. They are presentation files, made from
+          the authoritative ones, so they bind nothing and can be improved
+          without a new version (#77).
         </p>
       </li>
       <li>

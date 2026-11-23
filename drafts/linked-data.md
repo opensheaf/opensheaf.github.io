@@ -157,6 +157,9 @@ and none needs to be decided before 0.2 is final.
 
 ### 6.1 Landing pages
 
+*Done on 23 November 2026: appendix A.3 now requires the Signposting links
+and the JSON-LD record, with the contents below (#77, first point).*
+
 Make the JSON-LD and Signposting of appendix A.3 a MUST, as the Google
 Scholar tags already are, and say what the JSON-LD contains:
 

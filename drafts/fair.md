@@ -1,6 +1,6 @@
 # FAIR and OpenSheaf
 
-*Working paper, draft of 22 November 2026. Non-normative: ideas and positions,
+*Working paper, draft of 22 November 2026, revised 23 November 2026. Non-normative: ideas and positions,
 not decisions. The FAIR principles ask that research outputs be Findable,
 Accessible, Interoperable and Reusable, by people and above all by machines.
 This paper surveys the principles and the work built on them (the RDA
@@ -11,6 +11,16 @@ where OpenSheaf is strong, where it is weak and where it departs on purpose,
 and ends with proposals, experiments and open questions. It is a companion
 to [linked-data.md](linked-data.md), which treats the interoperability
 principles at greater length.*
+
+> [!NOTE]
+> **Revised 23 November 2026.** Most proposals of section 6 are now in the
+> specification ([#79](https://github.com/opensheaf/opensheaf.github.io/issues/79),
+> and the first point of
+> [#77](https://github.com/opensheaf/opensheaf.github.io/issues/77)): a
+> rights entry is required, the website profile requires Signposting and
+> JSON-LD with listed contents, and section 3 asks a public archive to be
+> indexed. The table of section 3 and section 6 say what changed; the rest
+> of the paper is as first written.
 
 > [!NOTE]
 > The principles are quoted from Wilkinson and others, "The FAIR Guiding
@@ -109,16 +119,16 @@ data, but are applied to every research output, papers included.
 | F1 Persistent identifier | **Strong, but not recognised.** `sheaf:` URIs are unique by construction (digests) and do not depend on a host; a pin names one set of bytes. Not a registered scheme (#36), no common resolver (#35, #20). DOIs only under the Zenodo profile. | 5, 12, A.1 |
 | F2 Rich metadata | **Yes.** DataCite 4.7 in `datacite.json`, with `object.json` (sources, renditions, toolchain, stage, history, notices). | 4.3, 4.4 |
 | F3 Metadata include the identifier | **Yes.** `object.json` has `name` and `owner`; `datacite.json` has `doi`, `url` and the `sheaf:` URI as a related `URL`; metadata and data are fixed together by one inventory. | 4.3, 4.4 |
-| F4 Indexed in a searchable resource | **Optional.** Indexes are maps for resolvers, not search services. Google Scholar, sitemaps, OAI-PMH static repositories and DataCite (through Zenodo) come with the profiles. Discovery is outside the specification. | 12.5, A.1, A.3 |
+| F4 Indexed in a searchable resource | **Recommended.** Indexes are maps for resolvers, not search services. A public archive SHOULD be indexed, through the website profile (search engines, Google Scholar), the Zenodo profile (DataCite) or an OAI-PMH static repository. Discovery itself is outside the specification. | 3, 12.5, A.1, A.3 |
 | A1 Retrievable by identifier, standard protocol | **Partly.** Files are fetched over HTTPS, but a `sheaf:` URI is retrieved by an OpenSheaf resolver, not by a generic client. A DOI or a landing page is retrieved by any client. | 3, 12.3 |
 | A1.1 Open, free protocol | **Yes.** HTTPS, plain files, cross-origin requests. | 3, 15.3 |
 | A1.2 Authentication where necessary | **Yes, outside the format.** Private archives, and archives served to some readers only, follow the specification all the same; access control is the host's. | 3.1 |
 | A2 Metadata outlive the data | **Partly.** A withdrawn line keeps all its versions and metadata. A takedown leaves a tombstone with only name, owner, pin, date and reason, by design. Collections cache a citation of each member (`cite`); mirrors and Zenodo records keep metadata elsewhere. | 8.2, 13 |
-| I1 Formal shared language | **Partly.** JSON with JSON Schema and the DataCite schema: formal, shared, open; not RDF. Schema.org JSON-LD on landing pages (SHOULD). | 4.4, A.3 |
+| I1 Formal shared language | **Partly.** JSON with JSON Schema and the DataCite schema: formal, shared, open; not RDF. Schema.org JSON-LD and Signposting on landing pages (MUST, under the website profile). | 4.4, A.3 |
 | I2 FAIR vocabularies | **Largely.** DataCite's controlled lists, SPDX, NISO-JAV, media types, MSC2020, ORCID, ROR. OpenSheaf's own terms are defined in the specification, not published as a vocabulary. | 4.3, 4.4 |
 | I3 Qualified references | **Yes, in JSON.** `relatedIdentifiers` with `relationType`; member pins; `parent` with its evidence; `external` with `role`. | 4.4, 8, 9 |
 | R1 Plurality of attributes | **Yes.** | 4.3, 4.4 |
-| R1.1 Clear licence | **Recommended only.** `rightsList` is a SHOULD; a rights statement such as "All rights reserved" is allowed. Metadata is CC0. | 4.4, 15.6 |
+| R1.1 Clear licence | **Yes.** `rightsList` is required, with at least one licence or rights statement ("All rights reserved", or that the rights are not known). Metadata is CC0. | 4.4, 15.6 |
 | R1.2 Detailed provenance | **Strong.** Depositor, date and message of every version; signatures by the owner; key logs; change notes, history and notices; branches with evidence of their parent; external records; toolchain; agreement. Not expressed in PROV. | 4, 6, 7, 9 |
 | R1.3 Community standards | **Yes.** OCFL 1.1, DataCite 4.7, SPDX, NISO-JAV, Google Scholar, Signposting; a TeXmacs profile. | 4, A |
 
@@ -229,6 +239,10 @@ record. An archive that follows neither is FAIR in substance and hard to
 see.
 
 ## 6. Proposals
+
+Status on 23 November 2026: the first four are in the specification
+(#79, #77); the PROV-O mapping belongs to the JSON-LD context still open in
+#77; the FAQ entry is written.
 
 - **Require a rights entry.** Make `rightsList` in `datacite.json`
   REQUIRED, with at least one licence or rights statement, so that R1.1 is
