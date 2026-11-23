@@ -22,6 +22,53 @@ and control, that stores sources (not only PDFs) in a documented layout, that
 anyone can verify file by file, and that can be combined with other archives
 into collections and selections without asking any central service.
 
+## How does it compare with nanopublications, DSIs, the Underlay or alphaXiv?
+
+These are the closest designs, and each has parts OpenSheaf lacks. What none
+of them combines is a name for a work shared by the lines of several
+owners, apart from hosts and keys; owners whose key logs use pre-rotation;
+collections that pin other parties' versions; and static files as the whole
+requirement.
+
+- **Nanopublications** are small RDF statements, named by Trusty URIs that
+  end with a digest of their content, signed, and replicated between
+  registries that give each key a quota. A Trusty URI names one content, so
+  a work has no name across its versions, and a supersession counts only
+  under the same key. OpenSheaf names the work from its genesis record,
+  keeps every version of a line under that name, and lets the owner change
+  keys. Nanopublications have what OpenSheaf lacks, a working network with
+  trust and quotas, and are a natural form for statements about OpenSheaf
+  versions, which are open (#21).
+- **Document Succession Identifiers** (DSIs, with the Document Succession
+  Git Layout) are the closest in premises: a succession of editions is a git
+  history named from its initial commit, each later commit signed with an
+  SSH key listed in the succession, so that it moves between hosts. A
+  listed key can change the list, so a thief holding one could extend and
+  contest the succession; OpenSheaf's key logs commit to the next keys in
+  advance (pre-rotation) to prevent this. A DSI rests on SHA-1 and names one
+  succession: there are no owners shared across documents, no branches by
+  other owners, no collections and no withdrawal. Its simplicity, one git
+  history per document, is its strength.
+- **The Underlay** keeps collections of content-addressed records with
+  immutable, numbered versions, append-only logs signed by the server, and
+  mirrors checked against hashes. Each collection has one authoritative
+  server: in its third protocol authors sign changes, but the server alone
+  accepts versions. In OpenSheaf no server decides: the owner's signatures
+  do, and any archive may hold a copy of a line. The Underlay's salted
+  commitments to private records bear on blind review (#63).
+- **alphaXiv** began as a place to discuss arXiv papers and now also
+  publishes papers submitted to it, with versions and identifiers of its
+  own. It is a service, not a format: its pages describe no digests, what
+  it holds is fixed by its word, and its papers live on its servers. It
+  could work with OpenSheaf as an overlay, pinning the versions it discusses
+  in authors' own archives, or as a service that also keeps an archive.
+
+The working paper
+[drafts/federated-publishing.md](https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/federated-publishing.md)
+compares some thirty systems with OpenSheaf, and
+[drafts/alphaxiv.md](https://github.com/opensheaf/opensheaf.github.io/blob/main/drafts/alphaxiv.md)
+looks at alphaXiv in detail.
+
 ## Do I need Zenodo, TeXmacs, git or GitHub?
 
 No. The core of the format is an OCFL storage root and a discovery document
