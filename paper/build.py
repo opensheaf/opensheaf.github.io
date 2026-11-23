@@ -25,6 +25,7 @@ columns. The file is written in Latin-1; the source is kept in ASCII.
 """
 
 import os
+import html
 import re
 import sys
 
@@ -412,6 +413,10 @@ def main():
     src, dst = sys.argv[1:3]
     with open(src, encoding='utf-8') as f:
         md = f.read()
+    # accented letters in an ASCII source, as HTML entities (&eacute;)
+    md = re.sub(r'&[A-Za-z]+;', lambda m: html.unescape(m.group())
+                if len(html.unescape(m.group())) == 1
+                and ord(html.unescape(m.group())) < 256 else m.group(), md)
     tm = convert(md)
     with open(dst, 'w', encoding='latin-1', newline='') as f:
         f.write(tm)

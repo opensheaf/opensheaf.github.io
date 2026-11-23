@@ -76,7 +76,8 @@
     (<verbatim|arXiv:<line-break>NNNN.<line-break>NNNNNv2>), yet only arXiv
     vouches for the bytes behind that name, and none of the overlays we
     examined publishes a digest of the version it vetted
-    <cite|elife|pci|episciences>.
+    <cite|elife|pci|episciences>. Beyond the archives, the links of scholarly
+    articles rot and their targets drift <cite|klein2014|jones2016>.
 
     Our thesis is that what has been missing is a common form in which
     separated parties exchange what they handle, so that each can rely on
@@ -1271,11 +1272,12 @@
 
     <section|Related work><label|sec:related>
 
-    This section draws on our survey of decentralised and federated
-    publishing, made from the systems' own documents and code, which are
-    cited here; what we could not verify is marked so. Table
-    <reference|tab:compare> sets OpenSheaf against ten systems, among them
-    the three we found closest.
+    This section sets OpenSheaf first against the digital-library literature
+    on versions, links and identifiers, then against our survey of
+    decentralised and federated publishing, made from the systems' own
+    documents and code, which are cited here; what we could not verify is
+    marked so. Table <reference|tab:compare> sets OpenSheaf against ten
+    systems, among them the three we found closest.
   </with>
 
   <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<cwith|1|-1|4|4|cell-hpart|1>|<cwith|1|-1|5|5|cell-hpart|1>|<cwith|1|-1|6|6|cell-hpart|1>|<cwith|1|-1|7|7|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|System>>|<cell|<with|par-mode|left|Fixity>>|<cell|<with|par-mode|left|Names>>|<cell|<with|par-mode|left|Who
@@ -1336,6 +1338,51 @@
   server>>>>>>|OpenSheaf and ten systems, in eight rows.<label|tab:compare>>
 
   <\with|par-columns|2>
+    <subsection|Versions, links and identifiers><label|sec:dl>
+
+    The digital-library literature has measured what OpenSheaf is meant to
+    prevent. One article in five in science, technology and medicine suffers
+    from reference rot, and seven in ten of those that cite web resources
+    <cite|klein2014>; for over three quarters of the references to the web,
+    the content has drifted from what was cited <cite|jones2016>.
+    <strong|Memento> reaches earlier states of a resource through its
+    original URI and a datetime <cite|rfc7089|vandesompel2009>, and
+    <strong|Robust Links> add to a link the address of an archived snapshot
+    and its date <cite|vandesompel2014|jones2016>. Both find a version by
+    time and rely on the archive that returns it; a pin names a version by
+    digest, and any copy can be checked against it. A Memento of a landing
+    page still records what a server showed, which a pin does not.
+
+    Versions of articles have names for their stages but no identifiers. The
+    NISO/ALPSP recommendations name seven stages, from the author's original
+    to the version of record <cite|jav2008>; OpenSheaf records the stage as a
+    field of a version (Listing <reference|lst:object>), not as its identity.
+    Studies of preprints find that the text changes little between a preprint
+    and the published article <cite|klein2019>, but that the conclusions of
+    some abstracts change <cite|brierley2022>; to compare versions, each
+    study had first to match them, by identifiers, titles and authors. Data
+    versioning meets the same gap: the first of its proposed principles asks
+    that each revision be identified on its own <cite|klump2021>, which a pin
+    does for every object version.
+
+    Persistent identifiers rest on services. Kahn and Wilensky's framework
+    names digital objects by handles resolved by a registry <cite|kahn2006>;
+    DOIs <cite|paskin2010> and ARKs follow it, and the ARK scheme states that
+    "persistence is purely a matter of service" <cite|kunze2026>. Guidance
+    for identifiers asks that they never be deleted or reassigned, and carry
+    nothing likely to change <cite|mcmurry2017>. OpenSheaf's names follow
+    this guidance and add what a service cannot give: a name checked against
+    the genesis record, and versions checked against the bytes, without the
+    registry. They do not replace DOIs, which OpenSheaf records as relations.
+    OAIS asks an archive to keep fixity information <cite|oais2012>; an OCFL
+    inventory keeps it, and a pin turns it into a name. Van de Sompel and
+    Nelson observe that "the notion of a repository does not exist in the
+    Architecture of the World Wide Web" <cite|vandesompel2015>; OpenSheaf
+    likewise names lines and versions, not archives. <strong|Signposting>
+    exposes, by typed links on a landing page, the identifier to cite, the
+    files and the metadata <cite|signposting2023>; the landing pages of the
+    website profile could carry them.
+
     <subsection|Content-addressed and signed records>
 
     <strong|Nanopublications> are small RDF statements <cite|groth2010>,
@@ -1597,7 +1644,7 @@
 
     <section*|References>
 
-    <\bib-list|67>
+    <\bib-list|83>
       <bibitem*|1><label|bib-roosendaal1997>H. E. Roosendaal and P. A. Th. M.
       Geurts. Forces and functions in scientific communication: an analysis
       of their interplay. CRISP 97, Cooperative Research Information Systems
@@ -1620,230 +1667,302 @@
       Shearer and E. Rodrigues. Pubfair: a distributed framework for open
       publishing services, version 2. COAR, 2019.
 
-      <bibitem*|6><label|bib-spec02>OpenSheaf project. OpenSheaf: an open
+      <bibitem*|6><label|bib-elife>eLife. eLife's new model: your questions
+      answered. https://<line-break>elifesciences.<line-break>org/<line-break>inside-<line-break>elife/<line-break>2b765a27/<line-break>elife-<line-break>s-<line-break>new-<line-break>model-<line-break>your-<line-break>questions-<line-break>answered
+
+      <bibitem*|7><label|bib-pci>Peer Community In. Frequently asked
+      questions. https://<line-break>peercommunityi<line-break>n.<line-break>org/<line-break>faq/<line-break>
+
+      <bibitem*|8><label|bib-episciences>Episciences. Publishing model.
+      https://<line-break>www.<line-break>episciences.<line-break>org/<line-break>publishing-<line-break>model/<line-break>
+
+      <bibitem*|9><label|bib-klein2014>M. Klein, H. Van de Sompel, R.
+      Sanderson, H. Shankar, L. Balakireva, K. Zhou and R. Tobin. Scholarly
+      context not found: one in five articles suffers from reference rot.
+      PLoS ONE 9 (12), e115253, 2014. doi:10.1371/journal.pone.0115253
+
+      <bibitem*|10><label|bib-jones2016>S. M. Jones, H. Van de Sompel, H.
+      Shankar, M. Klein, R. Tobin and C. Grover. Scholarly context adrift:
+      three out of four URI references lead to changed content. PLoS ONE 11
+      (12), e0167475, 2016. doi:10.1371/journal.pone.0167475
+
+      <bibitem*|11><label|bib-spec02>OpenSheaf project. OpenSheaf: an open
       format for document archives and collections, version 0.2 (draft), 22
       November 2026. OpenSheaf, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>specification-<line-break>0.<line-break>2
 
-      <bibitem*|7><label|bib-git02>OpenSheaf project. OpenSheaf archives in
-      git, version 0.2 (draft), 22 November 2026. Companion to the OpenSheaf
-      specification 0.2, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>git-<line-break>0.<line-break>2
+      <bibitem*|12><label|bib-ocfl>OCFL. Oxford Common File Layout
+      specification, version 1.1. https://<line-break>ocfl.<line-break>io/<line-break>1.<line-break>1/<line-break>spec/<line-break>
 
-      <bibitem*|8><label|bib-timestamps02>OpenSheaf project. OpenSheaf
+      <bibitem*|13><label|bib-datacite>DataCite. DataCite Metadata Schema
+      4.7. https://<line-break>schema.<line-break>datacite.<line-break>org/<line-break>meta/<line-break>kernel-<line-break>4.<line-break>7/<line-break>
+
+      <bibitem*|14><label|bib-keri2019>S. M. Smith. Key Event Receipt
+      Infrastructure (KERI). White paper, 2019.
+      https://<line-break>arxiv.<line-break>org/<line-break>abs/<line-break>1907.<line-break>02143
+
+      <bibitem*|15><label|bib-timestamps02>OpenSheaf project. OpenSheaf
       timestamps, version 0.2 (draft), 21 November 2026. Extension to the
       OpenSheaf specification 0.2, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>timestamps-<line-break>0.<line-break>2
 
-      <bibitem*|9><label|bib-tools>OpenSheaf project. opensheaf-py, a
+      <bibitem*|16><label|bib-git02>OpenSheaf project. OpenSheaf archives in
+      git, version 0.2 (draft), 22 November 2026. Companion to the OpenSheaf
+      specification 0.2, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>git-<line-break>0.<line-break>2
+
+      <bibitem*|17><label|bib-tools>OpenSheaf project. opensheaf-py, a
       literate program, and The command-line tools, its guide. 2026.
       https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf-<line-break>py
       and https://<line-break>opensheaf.<line-break>org/<line-break>tools
 
-      <bibitem*|10><label|bib-explorer>OpenSheaf project. The OpenSheaf
+      <bibitem*|18><label|bib-explorer>OpenSheaf project. The OpenSheaf
       Explorer. Literate program, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>explorer/<line-break>
       (source: https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>explorer)
 
-      <bibitem*|11><label|bib-manager>OpenSheaf project. The OpenSheaf
+      <bibitem*|19><label|bib-manager>OpenSheaf project. The OpenSheaf
       Manager. 2026. https://<line-break>manager.<line-break>opensheaf.<line-break>org/<line-break>
       (source: https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>manager)
 
-      <bibitem*|12><label|bib-template>OpenSheaf project. archive-template, a
+      <bibitem*|20><label|bib-template>OpenSheaf project. archive-template, a
       template for an OpenSheaf archive. 2026.
       https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>archive-<line-break>template
 
-      <bibitem*|13><label|bib-lean>OpenSheaf project. OpenSheaf in Lean.
+      <bibitem*|21><label|bib-lean>OpenSheaf project. OpenSheaf in Lean.
       Literate program, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>lean/<line-break>
       (source: https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf-<line-break>lean)
 
-      <bibitem*|14><label|bib-papers>M. Gubinelli. Papers of Massimiliano
+      <bibitem*|22><label|bib-papers>M. Gubinelli. Papers of Massimiliano
       Gubinelli, an OpenSheaf archive. 2026.
       https://<line-break>mgubi.<line-break>org/<line-break>papers/<line-break>
       (repository: https://<line-break>github.<line-break>com/<line-break>mgubi/<line-break>papers)
 
-      <bibitem*|15><label|bib-ocfl>OCFL. Oxford Common File Layout
-      specification, version 1.1. https://<line-break>ocfl.<line-break>io/<line-break>1.<line-break>1/<line-break>spec/<line-break>
+      <bibitem*|23><label|bib-atproto>Bluesky. AT Protocol.
+      https://<line-break>atproto.<line-break>com
 
-      <bibitem*|16><label|bib-datacite>DataCite. DataCite Metadata Schema
-      4.7. https://<line-break>schema.<line-break>datacite.<line-break>org/<line-break>meta/<line-break>kernel-<line-break>4.<line-break>7/<line-break>
+      <bibitem*|24><label|bib-rfc7089>H. Van de Sompel, M. Nelson and R.
+      Sanderson. HTTP framework for time-based access to resource states:
+      Memento. RFC 7089, 2013. doi:10.17487/RFC7089
 
-      <bibitem*|17><label|bib-keri2019>S. M. Smith. Key Event Receipt
-      Infrastructure (KERI). White paper, 2019.
-      https://<line-break>arxiv.<line-break>org/<line-break>abs/<line-break>1907.<line-break>02143
+      <bibitem*|25><label|bib-vandesompel2009>H. Van de Sompel, M. L. Nelson,
+      R. Sanderson, L. L. Balakireva, S. Ainsworth and H. Shankar. Memento:
+      time travel for the Web. arXiv:0911.1112, 2009.
 
-      <bibitem*|18><label|bib-groth2010>P. Groth, A. Gibson and J. Velterop.
+      <bibitem*|26><label|bib-vandesompel2014>H. Van de Sompel, M. Klein and
+      H. Shankar. Towards robust hyperlinks for web-based scholarly
+      communication. CICM 2014, LNCS 8543, 12-25, 2014.
+      doi:10.1007/978-3-319-08434-3_2
+
+      <bibitem*|27><label|bib-jav2008>NISO/ALPSP. Journal Article Versions
+      (JAV): recommendations of the NISO/ALPSP JAV Technical Working Group.
+      NISO RP-8-2008, 2008. doi:10.3789/niso-rp-8-2008
+
+      <bibitem*|28><label|bib-klein2019>M. Klein, P. Broadwell, S. E. Farb
+      and T. Grappone. Comparing published scientific journal articles to
+      their pre-print versions. International Journal on Digital Libraries 20
+      (4), 335-350, 2019. doi:10.1007/s00799-018-0234-1
+
+      <bibitem*|29><label|bib-brierley2022>L. Brierley, F. Nanni, J. K.
+      Polka, G. Dey, M. Pálfy, N. Fraser and J. A. Coates. Tracking changes
+      between preprint posting and journal publication during a pandemic.
+      PLOS Biology 20 (2), e3001285, 2022. doi:10.1371/journal.pbio.3001285
+
+      <bibitem*|30><label|bib-klump2021>J. Klump, L. Wyborn, M. Wu, J.
+      Martin, R. R. Downs and A. Asmi. Versioning data is about more than
+      revisions: a conceptual framework and proposed principles. Data Science
+      Journal 20, 12, 2021. doi:10.5334/dsj-2021-012
+
+      <bibitem*|31><label|bib-kahn2006>R. Kahn and R. Wilensky. A framework
+      for distributed digital object services. International Journal on
+      Digital Libraries 6 (2), 115-123, 2006. doi:10.1007/s00799-005-0128-x
+
+      <bibitem*|32><label|bib-paskin2010>N. Paskin. Digital Object Identifier
+      (DOI) system. Encyclopedia of Library and Information Sciences, 3rd
+      edition, 1586-1592, 2010. doi:10.1081/E-ELIS3-120044418
+
+      <bibitem*|33><label|bib-kunze2026>J. Kunze and E. Bermès. The ARK
+      identifier scheme. IETF Internet-Draft draft-kunze-ark-44, 2026.
+      https://<line-break>datatracker.<line-break>ietf.<line-break>org/<line-break>doc/<line-break>draft-<line-break>kunze-<line-break>ark/<line-break>
+
+      <bibitem*|34><label|bib-mcmurry2017>J. A. McMurry and others.
+      Identifiers for the 21st century: how to design, provision, and reuse
+      persistent identifiers to maximize utility and impact of life science
+      data. PLOS Biology 15 (6), e2001414, 2017.
+      doi:10.1371/journal.pbio.2001414
+
+      <bibitem*|35><label|bib-oais2012>CCSDS. Reference Model for an Open
+      Archival Information System (OAIS). Recommended Practice CCSDS
+      650.0-M-2, 2012 (ISO 14721:2012; now CCSDS 650.0-M-3, ISO 14721:2025).
+
+      <bibitem*|36><label|bib-vandesompel2015>H. Van de Sompel and M. L.
+      Nelson. Reminiscing about 15 years of interoperability efforts. D-Lib
+      Magazine 21 (11/12), 2015. doi:10.1045/november2015-vandesompel
+
+      <bibitem*|37><label|bib-signposting2023>H. Van de Sompel, M. Klein, S.
+      Jones, M. L. Nelson and others. FAIR Signposting profile. 2023.
+      https://<line-break>signposting.<line-break>org/<line-break>FAIR/<line-break>
+
+      <bibitem*|38><label|bib-groth2010>P. Groth, A. Gibson and J. Velterop.
       The anatomy of a nanopublication. Information Services and Use 30
       (1-2), 51-56, 2010. doi:10.3233/ISU-2010-0613
 
-      <bibitem*|19><label|bib-kuhn2014>T. Kuhn and M. Dumontier. Trusty URIs:
+      <bibitem*|39><label|bib-kuhn2014>T. Kuhn and M. Dumontier. Trusty URIs:
       verifiable, immutable, and permanent digital artifacts for linked data.
       ESWC 2014, LNCS 8465, 395-410, 2014. doi:10.1007/978-3-319-07443-6_27
 
-      <bibitem*|20><label|bib-kuhn2016>T. Kuhn and others. Decentralized
+      <bibitem*|40><label|bib-kuhn2016>T. Kuhn and others. Decentralized
       provenance-aware publishing with nanopublications. PeerJ Computer
       Science 2, e78, 2016. doi:10.7717/peerj-cs.78
 
-      <bibitem*|21><label|bib-kuhn2026>T. Kuhn, V. Balseiro, A. Caselli, Z.
+      <bibitem*|41><label|bib-kuhn2026>T. Kuhn, V. Balseiro, A. Caselli, Z.
       Plutschow, P. Sowinski and A. Danilenka. A robust decentralized
       infrastructure for trust-aware open knowledge sharing. ISWC 2026, LNCS,
       152-170, 2026. doi:10.1007/978-3-032-42015-2_8
 
-      <bibitem*|22><label|bib-ellerman2024b>E. C. Ellerman. Document
+      <bibitem*|42><label|bib-ellerman2024b>E. C. Ellerman. Document
       Succession Git Layout, edition 1.1. 2024.
       https://<line-break>pilot.<line-break>perm.<line-break>pub/<line-break>VGajCjaNP1Ugz5<line-break>8Khn1JWOEdMZ8/<line-break>
 
-      <bibitem*|23><label|bib-kf2026a>Knowledge Futures. Underlay, revived.
+      <bibitem*|43><label|bib-kf2026a>Knowledge Futures. Underlay, revived.
       2026. https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2026-<line-break>04-<line-break>27-<line-break>underlay-<line-break>revived
 
-      <bibitem*|24><label|bib-kf2026c>Knowledge Futures. Underlay moves to
+      <bibitem*|44><label|bib-kf2026c>Knowledge Futures. Underlay moves to
       protocol v2. 2026. https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2026-<line-break>10-<line-break>06-<line-break>underlay-<line-break>protocol-<line-break>v2
 
-      <bibitem*|25><label|bib-kf2025b>Knowledge Futures. Not enough: open
-      infrastructure funding and the future of Knowledge Futures. 2025.
-      https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2025-<line-break>06-<line-break>update/<line-break>
+      <bibitem*|45><label|bib-underlayprotocol>Knowledge Futures. The
+      Underlay protocol. https://<line-break>underlay.<line-break>org/<line-break>docs/<line-break>protocol
 
-      <bibitem*|26><label|bib-kf2026f>Knowledge Futures. A path forward for
-      PubPub. 2026. https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2026-<line-break>01-<line-break>update
-
-      <bibitem*|27><label|bib-dicosmo2018>R. Di Cosmo, M. Gruenpeter and S.
+      <bibitem*|46><label|bib-dicosmo2018>R. Di Cosmo, M. Gruenpeter and S.
       Zacchiroli. Identifiers for digital objects: the case of software
       source code preservation. iPRES 2018, 2018. doi:10.17605/OSF.IO/KDE56
 
-      <bibitem*|28><label|bib-rocrate2022>S. Soiland-Reyes and others.
+      <bibitem*|47><label|bib-iso18670>ISO/IEC 18670:2025. The SoftWare Hash
+      IDentifier (SWHID) specification. 2025.
+      https://<line-break>www.<line-break>iso.<line-break>org/<line-break>standard/<line-break>89985.<line-break>html
+
+      <bibitem*|48><label|bib-rocrate2022>S. Soiland-Reyes and others.
       Packaging research artefacts with RO-Crate. Data Science 5 (2), 97-138,
       2022. doi:10.3233/DS-210053
 
-      <bibitem*|29><label|bib-descinodes>DeSci Labs. DeSci Nodes and Codex.
+      <bibitem*|49><label|bib-descinodes>DeSci Labs. DeSci Nodes and Codex.
       2026. https://<line-break>github.<line-break>com/<line-break>desci-<line-break>labs/<line-break>nodes
 
-      <bibitem*|30><label|bib-ceramic2025>Ceramic. The future of Ceramic.
+      <bibitem*|50><label|bib-ceramic2025>Ceramic. The future of Ceramic.
       2025. https://<line-break>blog.<line-break>ceramic.<line-break>network/<line-break>the-<line-break>future-<line-break>of-<line-break>ceramic-<line-break>focusing-<line-break>on-<line-break>recall/<line-break>
 
-      <bibitem*|31><label|bib-hartgerink2019>C. H. J. Hartgerink. Verified,
+      <bibitem*|51><label|bib-hartgerink2019>C. H. J. Hartgerink. Verified,
       shared, modular, and provenance based research communication with the
       Dat protocol. Publications 7 (2), 40, 2019.
       doi:10.3390/publications7020040
 
-      <bibitem*|32><label|bib-ledger>Ledger. About the journal.
-      https://<line-break>ledger.<line-break>pitt.<line-break>edu/<line-break>ojs/<line-break>ledger/<line-break>about
+      <bibitem*|52><label|bib-researchequals>ResearchEquals.
+      https://<line-break>researchequals<line-break>.<line-break>com/<line-break>
 
-      <bibitem*|33><label|bib-wittek2020>K. Wittek, D. Krakau, N. Wittek, J.
+      <bibitem*|53><label|bib-orvium>Orvium.
+      https://<line-break>orvium.<line-break>io/<line-break>
+
+      <bibitem*|54><label|bib-pluto2019>Pluto Labs. Blockchain is NOT a cure
+      to Academia. 2019. https://<line-break>medium.<line-break>com/<line-break>pluto-<line-break>inc/<line-break>blockchain-<line-break>is-<line-break>not-<line-break>a-<line-break>cure-<line-break>to-<line-break>academia-<line-break>ef352985526
+
+      <bibitem*|55><label|bib-wittek2020>K. Wittek, D. Krakau, N. Wittek, J.
       Lawton and N. Pohlmann. Integrating bloxberg's proof of existence
       service with MATLAB. Frontiers in Blockchain 3, 2020.
       doi:10.3389/fbloc.2020.546264
 
-      <bibitem*|34><label|bib-capadisli2017>S. Capadisli, A. Guy, R.
+      <bibitem*|56><label|bib-ledger>Ledger. About the journal.
+      https://<line-break>ledger.<line-break>pitt.<line-break>edu/<line-break>ojs/<line-break>ledger/<line-break>about
+
+      <bibitem*|57><label|bib-capadisli2017>S. Capadisli, A. Guy, R.
       Verborgh, C. Lange, S. Auer and T. Berners-Lee. Decentralised
       authoring, annotations and notifications for a read-write web with
       dokieli. ICWE 2017, LNCS, 469-481, 2017.
       doi:10.1007/978-3-319-60131-1_33
 
-      <bibitem*|35><label|bib-capadisli2020>S. Capadisli. Linked Research on
+      <bibitem*|58><label|bib-capadisli2020>S. Capadisli. Linked Research on
       the Decentralised Web. Doctoral thesis, University of Bonn, 2020.
       https://<line-break>csarven.<line-break>ca/<line-break>linked-<line-break>research-<line-break>decentralised-<line-break>web
 
-      <bibitem*|36><label|bib-solid>W3C Solid Community Group. Solid
+      <bibitem*|59><label|bib-dokieli>dokieli. Documentation.
+      https://<line-break>dokie.<line-break>li/<line-break>docs
+
+      <bibitem*|60><label|bib-solid>W3C Solid Community Group. Solid
       Protocol, version 0.11.0. 2024. https://<line-break>solidproject.<line-break>org/<line-break>TR/<line-break>protocol
 
-      <bibitem*|37><label|bib-hochstenbach2023>P. Hochstenbach, R. Verborgh
+      <bibitem*|61><label|bib-hochstenbach2023>P. Hochstenbach, R. Verborgh
       and H. Van de Sompel. Using event notifications, Solid and
       orchestration for decentralizing and decoupling scholarly
       communication. Code4Lib Journal 58, 2023.
       https://<line-break>journal.<line-break>code4lib.<line-break>org/<line-break>articles/<line-break>17823
 
-      <bibitem*|38><label|bib-pep740>Python Software Foundation. PEP 740 and
+      <bibitem*|62><label|bib-pep740>Python Software Foundation. PEP 740 and
       PyPI digital attestations. 2024. https://<line-break>docs.<line-break>pypi.<line-break>org/<line-break>attestations/<line-break>
 
-      <bibitem*|39><label|bib-oric2pa>US Office of Research Integrity.
+      <bibitem*|63><label|bib-oric2pa>US Office of Research Integrity.
       Content provenance. https://<line-break>ori.<line-break>hhs.<line-break>gov/<line-break>content-<line-break>provenance
 
-      <bibitem*|40><label|bib-elife>eLife. eLife's new model: your questions
-      answered. https://<line-break>elifesciences.<line-break>org/<line-break>inside-<line-break>elife/<line-break>2b765a27/<line-break>elife-<line-break>s-<line-break>new-<line-break>model-<line-break>your-<line-break>questions-<line-break>answered
-
-      <bibitem*|41><label|bib-mcdowell2021>G. S. McDowell, J. K. Polka, T.
+      <bibitem*|64><label|bib-mcdowell2021>G. S. McDowell, J. K. Polka, T.
       Ross-Hellauer and G. Stein. The DocMaps framework for representing
       assertions on research products in an extensible, machine-readable, and
       discoverable format. bioRxiv, 2021. doi:10.1101/2021.07.13.452204
 
-      <bibitem*|42><label|bib-pci>Peer Community In. Frequently asked
-      questions. https://<line-break>peercommunityi<line-break>n.<line-break>org/<line-break>faq/<line-break>
+      <bibitem*|65><label|bib-pubpubcode>Knowledge Futures. PubPub, source
+      code. https://<line-break>github.<line-break>com/<line-break>knowledgefutur<line-break>es/<line-break>pubpub
 
-      <bibitem*|43><label|bib-episciences>Episciences. Publishing model.
-      https://<line-break>www.<line-break>episciences.<line-break>org/<line-break>publishing-<line-break>model/<line-break>
+      <bibitem*|66><label|bib-kf2025b>Knowledge Futures. Not enough: open
+      infrastructure funding and the future of Knowledge Futures. 2025.
+      https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2025-<line-break>06-<line-break>update/<line-break>
 
-      <bibitem*|44><label|bib-maniatis2003>P. Maniatis, D. S. H. Rosenthal,
+      <bibitem*|67><label|bib-kf2026f>Knowledge Futures. A path forward for
+      PubPub. 2026. https://<line-break>www.<line-break>knowledgefutur<line-break>es.<line-break>org/<line-break>updates/<line-break>2026-<line-break>01-<line-break>update
+
+      <bibitem*|68><label|bib-maniatis2003>P. Maniatis, D. S. H. Rosenthal,
       M. Roussopoulos, M. Baker, T. J. Giuli and Y. Muliadi. Preserving peer
       replicas by rate-limited sampled voting. SOSP 2003, 44-59, 2003.
       doi:10.1145/945445.945451
 
-      <bibitem*|45><label|bib-lockss>LOCKSS and CLOCKSS.
+      <bibitem*|69><label|bib-lockss>LOCKSS and CLOCKSS.
       https://<line-break>www.<line-break>lockss.<line-break>org and
       https://<line-break>clockss.<line-break>org
 
-      <bibitem*|46><label|bib-coarnotify>COAR. COAR Notify, version 1.0.1.
+      <bibitem*|70><label|bib-coarnotify>COAR. COAR Notify, version 1.0.1.
       https://<line-break>coar-<line-break>notify.<line-break>net
 
-      <bibitem*|47><label|bib-oaipmh>Open Archives Initiative. The Protocol
+      <bibitem*|71><label|bib-oaipmh>Open Archives Initiative. The Protocol
       for Metadata Harvesting (OAI-PMH). https://<line-break>www.<line-break>openarchives.<line-break>org/<line-break>pmh/<line-break>
 
-      <bibitem*|48><label|bib-activitypub>W3C. ActivityPub. W3C
+      <bibitem*|72><label|bib-activitypub>W3C. ActivityPub. W3C
       Recommendation, 2018. https://<line-break>www.<line-break>w3.<line-break>org/<line-break>TR/<line-break>activitypub/<line-break>
 
-      <bibitem*|49><label|bib-atproto>Bluesky. AT Protocol.
-      https://<line-break>atproto.<line-break>com
-
-      <bibitem*|50><label|bib-nostr>Nostr. Nostr Implementation Possibilities
+      <bibitem*|73><label|bib-nostr>Nostr. Nostr Implementation Possibilities
       (NIPs). https://<line-break>github.<line-break>com/<line-break>nostr-<line-break>protocol/<line-break>nips
 
-      <bibitem*|51><label|bib-ipfs>IPFS. https://<line-break>ipfs.<line-break>tech
+      <bibitem*|74><label|bib-ipfs>IPFS. https://<line-break>ipfs.<line-break>tech
 
-      <bibitem*|52><label|bib-kademlia2002>P. Maymounkov and D. Mazieres.
+      <bibitem*|75><label|bib-kademlia2002>P. Maymounkov and D. Mazieres.
       Kademlia: a peer-to-peer information system based on the XOR metric.
       IPTPS, 2002.
 
-      <bibitem*|53><label|bib-radicle>Radicle. Radicle protocol guide.
+      <bibitem*|76><label|bib-radicle>Radicle. Radicle protocol guide.
       https://<line-break>radicle.<line-break>xyz/<line-break>guides/<line-break>protocol
 
-      <bibitem*|54><label|bib-tuf>The Update Framework.
+      <bibitem*|77><label|bib-tuf>The Update Framework.
       https://<line-break>theupdateframe<line-break>work.<line-break>io/<line-break>
 
-      <bibitem*|55><label|bib-antieau2026>B. Antieau. Hexagon. 2026.
-      https://<line-break>antieau.<line-break>github.<line-break>io/<line-break>2026/<line-break>10/<line-break>05/<line-break>hexagon.<line-break>html
-
-      <bibitem*|56><label|bib-underlayprotocol>Knowledge Futures. The
-      Underlay protocol. https://<line-break>underlay.<line-break>org/<line-break>docs/<line-break>protocol
-
-      <bibitem*|57><label|bib-iso18670>ISO/IEC 18670:2025. The SoftWare Hash
-      IDentifier (SWHID) specification. 2025.
-      https://<line-break>www.<line-break>iso.<line-break>org/<line-break>standard/<line-break>89985.<line-break>html
-
-      <bibitem*|58><label|bib-researchequals>ResearchEquals.
-      https://<line-break>researchequals<line-break>.<line-break>com/<line-break>
-
-      <bibitem*|59><label|bib-orvium>Orvium.
-      https://<line-break>orvium.<line-break>io/<line-break>
-
-      <bibitem*|60><label|bib-pluto2019>Pluto Labs. Blockchain is NOT a cure
-      to Academia. 2019. https://<line-break>medium.<line-break>com/<line-break>pluto-<line-break>inc/<line-break>blockchain-<line-break>is-<line-break>not-<line-break>a-<line-break>cure-<line-break>to-<line-break>academia-<line-break>ef352985526
-
-      <bibitem*|61><label|bib-dokieli>dokieli. Documentation.
-      https://<line-break>dokie.<line-break>li/<line-break>docs
-
-      <bibitem*|62><label|bib-elife2025>eLife. The eLife model: three-year
-      update. 2025. https://<line-break>elifesciences.<line-break>org/<line-break>inside-<line-break>elife/<line-break>7da92a51/<line-break>the-<line-break>elife-<line-break>model-<line-break>three-<line-break>year-<line-break>update
-
-      <bibitem*|63><label|bib-pubpubcode>Knowledge Futures. PubPub, source
-      code. https://<line-break>github.<line-break>com/<line-break>knowledgefutur<line-break>es/<line-break>pubpub
-
-      <bibitem*|64><label|bib-arxivreplace>arXiv. Replacing an article.
+      <bibitem*|78><label|bib-arxivreplace>arXiv. Replacing an article.
       https://<line-break>info.<line-break>arxiv.<line-break>org/<line-break>help/<line-break>replace.<line-break>html
 
-      <bibitem*|65><label|bib-arxivblog2026>arXiv. Post of 3 February 2026 on
+      <bibitem*|79><label|bib-arxivblog2026>arXiv. Post of 3 February 2026 on
       dark archives at Portico and TIB. arXiv blog, 2026.
       https://<line-break>blog.<line-break>arxiv.<line-break>org/<line-break>
 
-      <bibitem*|66><label|bib-hexagon>Hexagon.
+      <bibitem*|80><label|bib-antieau2026>B. Antieau. Hexagon. 2026.
+      https://<line-break>antieau.<line-break>github.<line-break>io/<line-break>2026/<line-break>10/<line-break>05/<line-break>hexagon.<line-break>html
+
+      <bibitem*|81><label|bib-hexagon>Hexagon.
       https://<line-break>hexagonmath.<line-break>org/<line-break>
 
-      <bibitem*|67><label|bib-alphaxiv>alphaXiv.
+      <bibitem*|82><label|bib-alphaxiv>alphaXiv.
       https://<line-break>www.<line-break>alphaxiv.<line-break>org/<line-break>
+
+      <bibitem*|83><label|bib-elife2025>eLife. The eLife model: three-year
+      update. 2025. https://<line-break>elifesciences.<line-break>org/<line-break>inside-<line-break>elife/<line-break>7da92a51/<line-break>the-<line-break>elife-<line-break>model-<line-break>three-<line-break>year-<line-break>update
     </bib-list>
   </with>
 </body>
@@ -1897,7 +2016,7 @@
     <associate|auto-37|<tuple|3.11|6>>
     <associate|auto-38|<tuple|3.12|6>>
     <associate|auto-39|<tuple|4|6>>
-    <associate|auto-4|<tuple|1|2>>
+    <associate|auto-4|<tuple|1|1>>
     <associate|auto-40|<tuple|4.1|6>>
     <associate|auto-41|<tuple|11|7>>
     <associate|auto-42|<tuple|4.2|7>>
@@ -1915,90 +2034,107 @@
     <associate|auto-53|<tuple|5.3|9>>
     <associate|auto-54|<tuple|5.4|9>>
     <associate|auto-55|<tuple|5.5|9>>
-    <associate|auto-56|<tuple|5.6|9>>
-    <associate|auto-57|<tuple|5.7|9>>
+    <associate|auto-56|<tuple|5.6|10>>
+    <associate|auto-57|<tuple|5.7|10>>
     <associate|auto-58|<tuple|5.8|10>>
-    <associate|auto-59|<tuple|5|10>>
+    <associate|auto-59|<tuple|5.9|10>>
     <associate|auto-6|<tuple|3|2>>
-    <associate|auto-60|<tuple|6|10>>
-    <associate|auto-61|<tuple|1|10>>
-    <associate|auto-62|<tuple|2|10>>
-    <associate|auto-63|<tuple|3|10>>
-    <associate|auto-64|<tuple|4|10>>
-    <associate|auto-65|<tuple|5|10>>
-    <associate|auto-66|<tuple|6|10>>
-    <associate|auto-67|<tuple|7|10>>
-    <associate|auto-68|<tuple|7|10>>
+    <associate|auto-60|<tuple|5|10>>
+    <associate|auto-61|<tuple|6|10>>
+    <associate|auto-62|<tuple|1|10>>
+    <associate|auto-63|<tuple|2|10>>
+    <associate|auto-64|<tuple|3|11>>
+    <associate|auto-65|<tuple|4|11>>
+    <associate|auto-66|<tuple|5|11>>
+    <associate|auto-67|<tuple|6|11>>
+    <associate|auto-68|<tuple|7|11>>
+    <associate|auto-69|<tuple|7|11>>
     <associate|auto-7|<tuple|4|2>>
     <associate|auto-8|<tuple|5|2>>
     <associate|auto-9|<tuple|6|2>>
-    <associate|bib-activitypub|<tuple|48|12>>
-    <associate|bib-alphaxiv|<tuple|67|12>>
-    <associate|bib-antieau2026|<tuple|55|12>>
-    <associate|bib-arxivblog2026|<tuple|65|12>>
-    <associate|bib-arxivreplace|<tuple|64|12>>
-    <associate|bib-atproto|<tuple|49|12>>
-    <associate|bib-capadisli2017|<tuple|34|11>>
-    <associate|bib-capadisli2020|<tuple|35|11>>
-    <associate|bib-ceramic2025|<tuple|30|11>>
-    <associate|bib-coarnotify|<tuple|46|12>>
-    <associate|bib-datacite|<tuple|16|11>>
-    <associate|bib-descinodes|<tuple|29|11>>
-    <associate|bib-dicosmo2018|<tuple|27|11>>
-    <associate|bib-dokieli|<tuple|61|12>>
-    <associate|bib-elife|<tuple|40|12>>
-    <associate|bib-elife2025|<tuple|62|12>>
-    <associate|bib-ellerman2024b|<tuple|22|11>>
-    <associate|bib-episciences|<tuple|43|12>>
-    <associate|bib-explorer|<tuple|10|11>>
-    <associate|bib-git02|<tuple|7|11>>
-    <associate|bib-groth2010|<tuple|18|11>>
-    <associate|bib-hartgerink2019|<tuple|31|11>>
-    <associate|bib-hexagon|<tuple|66|12>>
-    <associate|bib-hochstenbach2023|<tuple|37|12>>
-    <associate|bib-ipfs|<tuple|51|12>>
-    <associate|bib-iso18670|<tuple|57|12>>
-    <associate|bib-kademlia2002|<tuple|52|12>>
-    <associate|bib-keri2019|<tuple|17|11>>
-    <associate|bib-kf2025b|<tuple|25|11>>
-    <associate|bib-kf2026a|<tuple|23|11>>
-    <associate|bib-kf2026c|<tuple|24|11>>
-    <associate|bib-kf2026f|<tuple|26|11>>
-    <associate|bib-kuhn2014|<tuple|19|11>>
-    <associate|bib-kuhn2016|<tuple|20|11>>
-    <associate|bib-kuhn2026|<tuple|21|11>>
-    <associate|bib-lean|<tuple|13|11>>
-    <associate|bib-ledger|<tuple|32|11>>
-    <associate|bib-lockss|<tuple|45|12>>
-    <associate|bib-manager|<tuple|11|11>>
-    <associate|bib-maniatis2003|<tuple|44|12>>
-    <associate|bib-mcdowell2021|<tuple|41|12>>
-    <associate|bib-nostr|<tuple|50|12>>
-    <associate|bib-oaipmh|<tuple|47|12>>
-    <associate|bib-ocfl|<tuple|15|11>>
-    <associate|bib-oric2pa|<tuple|39|12>>
-    <associate|bib-orvium|<tuple|59|12>>
-    <associate|bib-papers|<tuple|14|11>>
-    <associate|bib-pci|<tuple|42|12>>
-    <associate|bib-pep740|<tuple|38|12>>
-    <associate|bib-pluto2019|<tuple|60|12>>
+    <associate|bib-activitypub|<tuple|72|13>>
+    <associate|bib-alphaxiv|<tuple|82|13>>
+    <associate|bib-antieau2026|<tuple|80|13>>
+    <associate|bib-arxivblog2026|<tuple|79|13>>
+    <associate|bib-arxivreplace|<tuple|78|13>>
+    <associate|bib-atproto|<tuple|23|12>>
+    <associate|bib-brierley2022|<tuple|29|12>>
+    <associate|bib-capadisli2017|<tuple|57|13>>
+    <associate|bib-capadisli2020|<tuple|58|13>>
+    <associate|bib-ceramic2025|<tuple|50|12>>
+    <associate|bib-coarnotify|<tuple|70|13>>
+    <associate|bib-datacite|<tuple|13|11>>
+    <associate|bib-descinodes|<tuple|49|12>>
+    <associate|bib-dicosmo2018|<tuple|46|12>>
+    <associate|bib-dokieli|<tuple|59|13>>
+    <associate|bib-elife|<tuple|6|11>>
+    <associate|bib-elife2025|<tuple|83|13>>
+    <associate|bib-ellerman2024b|<tuple|42|12>>
+    <associate|bib-episciences|<tuple|8|11>>
+    <associate|bib-explorer|<tuple|18|11>>
+    <associate|bib-git02|<tuple|16|11>>
+    <associate|bib-groth2010|<tuple|38|12>>
+    <associate|bib-hartgerink2019|<tuple|51|12>>
+    <associate|bib-hexagon|<tuple|81|13>>
+    <associate|bib-hochstenbach2023|<tuple|61|13>>
+    <associate|bib-ipfs|<tuple|74|13>>
+    <associate|bib-iso18670|<tuple|47|12>>
+    <associate|bib-jav2008|<tuple|27|12>>
+    <associate|bib-jones2016|<tuple|10|11>>
+    <associate|bib-kademlia2002|<tuple|75|13>>
+    <associate|bib-kahn2006|<tuple|31|12>>
+    <associate|bib-keri2019|<tuple|14|11>>
+    <associate|bib-kf2025b|<tuple|66|13>>
+    <associate|bib-kf2026a|<tuple|43|12>>
+    <associate|bib-kf2026c|<tuple|44|12>>
+    <associate|bib-kf2026f|<tuple|67|13>>
+    <associate|bib-klein2014|<tuple|9|11>>
+    <associate|bib-klein2019|<tuple|28|12>>
+    <associate|bib-klump2021|<tuple|30|12>>
+    <associate|bib-kuhn2014|<tuple|39|12>>
+    <associate|bib-kuhn2016|<tuple|40|12>>
+    <associate|bib-kuhn2026|<tuple|41|12>>
+    <associate|bib-kunze2026|<tuple|33|12>>
+    <associate|bib-lean|<tuple|21|12>>
+    <associate|bib-ledger|<tuple|56|13>>
+    <associate|bib-lockss|<tuple|69|13>>
+    <associate|bib-manager|<tuple|19|11>>
+    <associate|bib-maniatis2003|<tuple|68|13>>
+    <associate|bib-mcdowell2021|<tuple|64|13>>
+    <associate|bib-mcmurry2017|<tuple|34|12>>
+    <associate|bib-nostr|<tuple|73|13>>
+    <associate|bib-oaipmh|<tuple|71|13>>
+    <associate|bib-oais2012|<tuple|35|12>>
+    <associate|bib-ocfl|<tuple|12|11>>
+    <associate|bib-oric2pa|<tuple|63|13>>
+    <associate|bib-orvium|<tuple|53|13>>
+    <associate|bib-papers|<tuple|22|12>>
+    <associate|bib-paskin2010|<tuple|32|12>>
+    <associate|bib-pci|<tuple|7|11>>
+    <associate|bib-pep740|<tuple|62|13>>
+    <associate|bib-pluto2019|<tuple|54|13>>
     <associate|bib-priem2012|<tuple|4|11>>
     <associate|bib-pubfair2019|<tuple|5|11>>
-    <associate|bib-pubpubcode|<tuple|63|12>>
-    <associate|bib-radicle|<tuple|53|12>>
-    <associate|bib-researchequals|<tuple|58|12>>
-    <associate|bib-rocrate2022|<tuple|28|11>>
-    <associate|bib-roosendaal1997|<tuple|1|10>>
+    <associate|bib-pubpubcode|<tuple|65|13>>
+    <associate|bib-radicle|<tuple|76|13>>
+    <associate|bib-researchequals|<tuple|52|13>>
+    <associate|bib-rfc7089|<tuple|24|12>>
+    <associate|bib-rocrate2022|<tuple|48|12>>
+    <associate|bib-roosendaal1997|<tuple|1|11>>
+    <associate|bib-signposting2023|<tuple|37|12>>
     <associate|bib-smith1999|<tuple|3|11>>
-    <associate|bib-solid|<tuple|36|11>>
-    <associate|bib-spec02|<tuple|6|11>>
-    <associate|bib-template|<tuple|12|11>>
-    <associate|bib-timestamps02|<tuple|8|11>>
-    <associate|bib-tools|<tuple|9|11>>
-    <associate|bib-tuf|<tuple|54|12>>
-    <associate|bib-underlayprotocol|<tuple|56|12>>
+    <associate|bib-solid|<tuple|60|13>>
+    <associate|bib-spec02|<tuple|11|11>>
+    <associate|bib-template|<tuple|20|12>>
+    <associate|bib-timestamps02|<tuple|15|11>>
+    <associate|bib-tools|<tuple|17|11>>
+    <associate|bib-tuf|<tuple|77|13>>
+    <associate|bib-underlayprotocol|<tuple|45|12>>
     <associate|bib-vandesompel2004|<tuple|2|11>>
-    <associate|bib-wittek2020|<tuple|33|11>>
+    <associate|bib-vandesompel2009|<tuple|25|12>>
+    <associate|bib-vandesompel2014|<tuple|26|12>>
+    <associate|bib-vandesompel2015|<tuple|36|12>>
+    <associate|bib-wittek2020|<tuple|55|13>>
     <associate|lst:discovery|<tuple|1|2>>
     <associate|lst:genesis|<tuple|3|3>>
     <associate|lst:name|<tuple|4|3>>
@@ -2013,7 +2149,8 @@
     <associate|sec:archives|<tuple|3.1|2>>
     <associate|sec:branches|<tuple|3.7|5>>
     <associate|sec:collections|<tuple|3.6|4>>
-    <associate|sec:conclusion|<tuple|7|10>>
+    <associate|sec:conclusion|<tuple|7|11>>
+    <associate|sec:dl|<tuple|5.1|8>>
     <associate|sec:drafts|<tuple|3.8|5>>
     <associate|sec:eval|<tuple|6|10>>
     <associate|sec:explorer|<tuple|4.2|7>>
@@ -2024,7 +2161,7 @@
     <associate|sec:lessons|<tuple|4.5|8>>
     <associate|sec:lines|<tuple|3.5|4>>
     <associate|sec:names|<tuple|3.3|3>>
-    <associate|sec:new|<tuple|5.8|10>>
+    <associate|sec:new|<tuple|5.9|10>>
     <associate|sec:objects|<tuple|3.2|2>>
     <associate|sec:owners|<tuple|3.4|3>>
     <associate|sec:papers|<tuple|4.4|7>>
@@ -2064,6 +2201,10 @@
 
       episciences
 
+      klein2014
+
+      jones2016
+
       spec02
 
       ocfl
@@ -2099,6 +2240,40 @@
       atproto
 
       keri2019
+
+      klein2014
+
+      jones2016
+
+      rfc7089
+
+      vandesompel2009
+
+      vandesompel2014
+
+      jones2016
+
+      jav2008
+
+      klein2019
+
+      brierley2022
+
+      klump2021
+
+      kahn2006
+
+      paskin2010
+
+      kunze2026
+
+      mcmurry2017
+
+      oais2012
+
+      vandesompel2015
+
+      signposting2023
 
       groth2010
 
@@ -2287,7 +2462,7 @@
       systems, in eight rows.>|<pageref|auto-50>>
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|5>||What is new and
-      what is not, among the systems we examined.>|<pageref|auto-59>>
+      what is not, among the systems we examined.>|<pageref|auto-60>>
     </associate>
     <\associate|toc>
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>Introduction>
@@ -2430,73 +2605,77 @@
       work> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-49><vspace|0.5fn>
 
-      <with|par-left|<quote|1tab>|5.1<space|2spc>Content-addressed and signed
-      records <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1tab>|5.1<space|2spc>Versions, links and
+      identifiers <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-51>>
 
-      <with|par-left|<quote|1tab>|5.2<space|2spc>Peer-to-peer and blockchain
-      publishing <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1tab>|5.2<space|2spc>Content-addressed and signed
+      records <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-52>>
 
-      <with|par-left|<quote|1tab>|5.3<space|2spc>Linked data, personal
-      servers and signing <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1tab>|5.3<space|2spc>Peer-to-peer and blockchain
+      publishing <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-53>>
 
-      <with|par-left|<quote|1tab>|5.4<space|2spc>Overlays and platforms
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1tab>|5.4<space|2spc>Linked data, personal
+      servers and signing <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-54>>
 
-      <with|par-left|<quote|1tab>|5.5<space|2spc>Repositories, preservation
-      and harvesting <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1tab>|5.5<space|2spc>Overlays and platforms
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-55>>
 
-      <with|par-left|<quote|1tab>|5.6<space|2spc>Federated and distributed
-      systems <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1tab>|5.6<space|2spc>Repositories, preservation
+      and harvesting <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-56>>
 
-      <with|par-left|<quote|1tab>|5.7<space|2spc>arXiv, Hexagon and alphaXiv
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <with|par-left|<quote|1tab>|5.7<space|2spc>Federated and distributed
+      systems <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-57>>
 
-      <with|par-left|<quote|1tab>|5.8<space|2spc>What is new, and what is not
+      <with|par-left|<quote|1tab>|5.8<space|2spc>arXiv, Hexagon and alphaXiv
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-58>>
 
+      <with|par-left|<quote|1tab>|5.9<space|2spc>What is new, and what is not
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-59>>
+
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|6<space|2spc>Evaluation
       and limitations> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-60><vspace|0.5fn>
+      <no-break><pageref|auto-61><vspace|0.5fn>
 
       <with|par-left|<quote|3tab>|Adoption
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-61>>
+      <no-break><pageref|auto-62>>
 
       <with|par-left|<quote|3tab>|Incentives
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-62>>
+      <no-break><pageref|auto-63>>
 
       <with|par-left|<quote|3tab>|Key management
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-63>>
+      <no-break><pageref|auto-64>>
 
       <with|par-left|<quote|3tab>|Discovery and scale
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-64>>
+      <no-break><pageref|auto-65>>
 
       <with|par-left|<quote|3tab>|Funding and rights
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-65>>
+      <no-break><pageref|auto-66>>
 
       <with|par-left|<quote|3tab>|Open questions
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-66>>
+      <no-break><pageref|auto-67>>
 
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|7<space|2spc>Conclusion>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-67><vspace|0.5fn>
+      <no-break><pageref|auto-68><vspace|0.5fn>
 
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|References>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-68><vspace|0.5fn>
+      <no-break><pageref|auto-69><vspace|0.5fn>
     </associate>
   </collection>
 </auxiliary>

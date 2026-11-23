@@ -57,7 +57,8 @@ and SciPost vet documents that stay where their authors put them. But they
 rest on archives they do not control: a selection of arXiv papers can name
 the version it vetted (`arXiv:NNNN.NNNNNv2`), yet only arXiv vouches for the bytes
 behind that name, and none of the overlays we examined publishes a digest of the
-version it vetted [@elife; @pci; @episciences].
+version it vetted [@elife; @pci; @episciences]. Beyond the archives, the links
+of scholarly articles rot and their targets drift [@klein2014; @jones2016].
 
 Our thesis is that what has been missing is a common form in which separated
 parties exchange what they handle, so that each can rely on what the others
@@ -888,9 +889,10 @@ patch.
 
 ## Related work {#sec:related}
 
-This section draws on our survey of decentralised and federated publishing,
-made from the systems' own documents and code, which are cited here; what we
-could not verify is marked so. Table @tab:compare sets OpenSheaf against ten
+This section sets OpenSheaf first against the digital-library literature on
+versions, links and identifiers, then against our survey of decentralised
+and federated publishing, made from the systems' own documents and code,
+which are cited here; what we could not verify is marked so. Table @tab:compare sets OpenSheaf against ten
 systems, among them the three we found closest.
 
 Table*: OpenSheaf and ten systems, in eight rows. {#tab:compare}
@@ -906,6 +908,50 @@ Table*: OpenSheaf and ten systems, in eight rows. {#tab:compare}
 | eLife, PCI, Episciences | none published | DOI, version, URL | journal or group | own copies at most | accounts, ORCID | the preprint server |
 | PubPub | by the application | DOI per pub, URL | community members | exports, self-hosting | accounts, ORCID sign-in | running services |
 | OpenSheaf | SHA-512 inventories, pins | genesis digest and owner name | the line's owner | any archive, checked | key log, pre-rotation | a static web server |
+
+### Versions, links and identifiers {#sec:dl}
+
+The digital-library literature has measured what OpenSheaf is meant to
+prevent. One article in five in science, technology and medicine suffers
+from reference rot, and seven in ten of those that cite web resources
+[@klein2014]; for over three quarters of the references to the web, the
+content has drifted from what was cited [@jones2016]. **Memento** reaches
+earlier states of a resource through its original URI and a datetime
+[@rfc7089; @vandesompel2009], and **Robust Links** add to a link the
+address of an archived snapshot and its date [@vandesompel2014; @jones2016].
+Both find a version by time and rely on the archive that returns it; a pin
+names a version by digest, and any copy can be checked against it. A
+Memento of a landing page still records what a server showed, which a pin
+does not.
+
+Versions of articles have names for their stages but no identifiers. The
+NISO/ALPSP recommendations name seven stages, from the author's original to
+the version of record [@jav2008]; OpenSheaf records the stage as a field of
+a version (Listing @lst:object), not as its identity. Studies of preprints
+find that the text changes little between a preprint and the published
+article [@klein2019], but that the conclusions of some abstracts change
+[@brierley2022]; to compare versions, each study had first to match them,
+by identifiers, titles and authors. Data versioning meets the same gap: the
+first of its proposed principles asks that each revision be identified on
+its own [@klump2021], which a pin does for every object version.
+
+Persistent identifiers rest on services. Kahn and Wilensky's framework
+names digital objects by handles resolved by a registry [@kahn2006]; DOIs
+[@paskin2010] and ARKs follow it, and the ARK scheme states that
+"persistence is purely a matter of service" [@kunze2026]. Guidance for
+identifiers asks that they never be deleted or reassigned, and carry
+nothing likely to change [@mcmurry2017]. OpenSheaf's names follow this
+guidance and add what a service cannot give: a name checked against the
+genesis record, and versions checked against the bytes, without the
+registry. They do not replace DOIs, which OpenSheaf records as relations.
+OAIS asks an archive to keep fixity information [@oais2012]; an OCFL
+inventory keeps it, and a pin turns it into a name. Van de Sompel and Nelson
+observe that "the notion of a repository does not exist in the
+Architecture of the World Wide Web" [@vandesompel2015]; OpenSheaf likewise
+names lines and versions, not archives. **Signposting** exposes, by typed
+links on a landing page, the identifier to cite, the files and the metadata
+[@signposting2023]; the landing pages of the website profile could carry
+them.
 
 ### Content-addressed and signed records
 
@@ -1150,18 +1196,38 @@ is adopted depends on the services built on it.
 - [smith1999] J. W. T. Smith. The deconstructed journal: a new model for academic publishing. Learned Publishing 12 (2), 1999.
 - [priem2012] J. Priem and B. M. Hemminger. Decoupling the scholarly journal. Frontiers in Computational Neuroscience 6, 2012.
 - [pubfair2019] T. Ross-Hellauer, B. Fecher, K. Shearer and E. Rodrigues. Pubfair: a distributed framework for open publishing services, version 2. COAR, 2019.
+- [elife] eLife. eLife's new model: your questions answered. https://elifesciences.org/inside-elife/2b765a27/elife-s-new-model-your-questions-answered
+- [pci] Peer Community In. Frequently asked questions. https://peercommunityin.org/faq/
+- [episciences] Episciences. Publishing model. https://www.episciences.org/publishing-model/
+- [klein2014] M. Klein, H. Van de Sompel, R. Sanderson, H. Shankar, L. Balakireva, K. Zhou and R. Tobin. Scholarly context not found: one in five articles suffers from reference rot. PLoS ONE 9 (12), e115253, 2014. doi:10.1371/journal.pone.0115253
+- [jones2016] S. M. Jones, H. Van de Sompel, H. Shankar, M. Klein, R. Tobin and C. Grover. Scholarly context adrift: three out of four URI references lead to changed content. PLoS ONE 11 (12), e0167475, 2016. doi:10.1371/journal.pone.0167475
 - [spec02] OpenSheaf project. OpenSheaf: an open format for document archives and collections, version 0.2 (draft), 22 November 2026. OpenSheaf, 2026. https://opensheaf.org/opensheaf-specification-0.2
-- [git02] OpenSheaf project. OpenSheaf archives in git, version 0.2 (draft), 22 November 2026. Companion to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-git-0.2
+- [ocfl] OCFL. Oxford Common File Layout specification, version 1.1. https://ocfl.io/1.1/spec/
+- [datacite] DataCite. DataCite Metadata Schema 4.7. https://schema.datacite.org/meta/kernel-4.7/
+- [keri2019] S. M. Smith. Key Event Receipt Infrastructure (KERI). White paper, 2019. https://arxiv.org/abs/1907.02143
 - [timestamps02] OpenSheaf project. OpenSheaf timestamps, version 0.2 (draft), 21 November 2026. Extension to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-timestamps-0.2
+- [git02] OpenSheaf project. OpenSheaf archives in git, version 0.2 (draft), 22 November 2026. Companion to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-git-0.2
 - [tools] OpenSheaf project. opensheaf-py, a literate program, and The command-line tools, its guide. 2026. https://github.com/opensheaf/opensheaf-py and https://opensheaf.org/tools
 - [explorer] OpenSheaf project. The OpenSheaf Explorer. Literate program, 2026. https://opensheaf.org/explorer/ (source: https://github.com/opensheaf/explorer)
 - [manager] OpenSheaf project. The OpenSheaf Manager. 2026. https://manager.opensheaf.org/ (source: https://github.com/opensheaf/manager)
 - [template] OpenSheaf project. archive-template, a template for an OpenSheaf archive. 2026. https://github.com/opensheaf/archive-template
 - [lean] OpenSheaf project. OpenSheaf in Lean. Literate program, 2026. https://opensheaf.org/opensheaf-lean/ (source: https://github.com/opensheaf/opensheaf-lean)
 - [papers] M. Gubinelli. Papers of Massimiliano Gubinelli, an OpenSheaf archive. 2026. https://mgubi.org/papers/ (repository: https://github.com/mgubi/papers)
-- [ocfl] OCFL. Oxford Common File Layout specification, version 1.1. https://ocfl.io/1.1/spec/
-- [datacite] DataCite. DataCite Metadata Schema 4.7. https://schema.datacite.org/meta/kernel-4.7/
-- [keri2019] S. M. Smith. Key Event Receipt Infrastructure (KERI). White paper, 2019. https://arxiv.org/abs/1907.02143
+- [atproto] Bluesky. AT Protocol. https://atproto.com
+- [rfc7089] H. Van de Sompel, M. Nelson and R. Sanderson. HTTP framework for time-based access to resource states: Memento. RFC 7089, 2013. doi:10.17487/RFC7089
+- [vandesompel2009] H. Van de Sompel, M. L. Nelson, R. Sanderson, L. L. Balakireva, S. Ainsworth and H. Shankar. Memento: time travel for the Web. arXiv:0911.1112, 2009.
+- [vandesompel2014] H. Van de Sompel, M. Klein and H. Shankar. Towards robust hyperlinks for web-based scholarly communication. CICM 2014, LNCS 8543, 12-25, 2014. doi:10.1007/978-3-319-08434-3_2
+- [jav2008] NISO/ALPSP. Journal Article Versions (JAV): recommendations of the NISO/ALPSP JAV Technical Working Group. NISO RP-8-2008, 2008. doi:10.3789/niso-rp-8-2008
+- [klein2019] M. Klein, P. Broadwell, S. E. Farb and T. Grappone. Comparing published scientific journal articles to their pre-print versions. International Journal on Digital Libraries 20 (4), 335-350, 2019. doi:10.1007/s00799-018-0234-1
+- [brierley2022] L. Brierley, F. Nanni, J. K. Polka, G. Dey, M. P&aacute;lfy, N. Fraser and J. A. Coates. Tracking changes between preprint posting and journal publication during a pandemic. PLOS Biology 20 (2), e3001285, 2022. doi:10.1371/journal.pbio.3001285
+- [klump2021] J. Klump, L. Wyborn, M. Wu, J. Martin, R. R. Downs and A. Asmi. Versioning data is about more than revisions: a conceptual framework and proposed principles. Data Science Journal 20, 12, 2021. doi:10.5334/dsj-2021-012
+- [kahn2006] R. Kahn and R. Wilensky. A framework for distributed digital object services. International Journal on Digital Libraries 6 (2), 115-123, 2006. doi:10.1007/s00799-005-0128-x
+- [paskin2010] N. Paskin. Digital Object Identifier (DOI) system. Encyclopedia of Library and Information Sciences, 3rd edition, 1586-1592, 2010. doi:10.1081/E-ELIS3-120044418
+- [kunze2026] J. Kunze and E. Berm&egrave;s. The ARK identifier scheme. IETF Internet-Draft draft-kunze-ark-44, 2026. https://datatracker.ietf.org/doc/draft-kunze-ark/
+- [mcmurry2017] J. A. McMurry and others. Identifiers for the 21st century: how to design, provision, and reuse persistent identifiers to maximize utility and impact of life science data. PLOS Biology 15 (6), e2001414, 2017. doi:10.1371/journal.pbio.2001414
+- [oais2012] CCSDS. Reference Model for an Open Archival Information System (OAIS). Recommended Practice CCSDS 650.0-M-2, 2012 (ISO 14721:2012; now CCSDS 650.0-M-3, ISO 14721:2025).
+- [vandesompel2015] H. Van de Sompel and M. L. Nelson. Reminiscing about 15 years of interoperability efforts. D-Lib Magazine 21 (11/12), 2015. doi:10.1045/november2015-vandesompel
+- [signposting2023] H. Van de Sompel, M. Klein, S. Jones, M. L. Nelson and others. FAIR Signposting profile. 2023. https://signposting.org/FAIR/
 - [groth2010] P. Groth, A. Gibson and J. Velterop. The anatomy of a nanopublication. Information Services and Use 30 (1-2), 51-56, 2010. doi:10.3233/ISU-2010-0613
 - [kuhn2014] T. Kuhn and M. Dumontier. Trusty URIs: verifiable, immutable, and permanent digital artifacts for linked data. ESWC 2014, LNCS 8465, 395-410, 2014. doi:10.1007/978-3-319-07443-6_27
 - [kuhn2016] T. Kuhn and others. Decentralized provenance-aware publishing with nanopublications. PeerJ Computer Science 2, e78, 2016. doi:10.7717/peerj-cs.78
@@ -1169,46 +1235,42 @@ is adopted depends on the services built on it.
 - [ellerman2024b] E. C. Ellerman. Document Succession Git Layout, edition 1.1. 2024. https://pilot.perm.pub/VGajCjaNP1Ugz58Khn1JWOEdMZ8/
 - [kf2026a] Knowledge Futures. Underlay, revived. 2026. https://www.knowledgefutures.org/updates/2026-04-27-underlay-revived
 - [kf2026c] Knowledge Futures. Underlay moves to protocol v2. 2026. https://www.knowledgefutures.org/updates/2026-10-06-underlay-protocol-v2
-- [kf2025b] Knowledge Futures. Not enough: open infrastructure funding and the future of Knowledge Futures. 2025. https://www.knowledgefutures.org/updates/2025-06-update/
-- [kf2026f] Knowledge Futures. A path forward for PubPub. 2026. https://www.knowledgefutures.org/updates/2026-01-update
+- [underlayprotocol] Knowledge Futures. The Underlay protocol. https://underlay.org/docs/protocol
 - [dicosmo2018] R. Di Cosmo, M. Gruenpeter and S. Zacchiroli. Identifiers for digital objects: the case of software source code preservation. iPRES 2018, 2018. doi:10.17605/OSF.IO/KDE56
+- [iso18670] ISO/IEC 18670:2025. The SoftWare Hash IDentifier (SWHID) specification. 2025. https://www.iso.org/standard/89985.html
 - [rocrate2022] S. Soiland-Reyes and others. Packaging research artefacts with RO-Crate. Data Science 5 (2), 97-138, 2022. doi:10.3233/DS-210053
 - [descinodes] DeSci Labs. DeSci Nodes and Codex. 2026. https://github.com/desci-labs/nodes
 - [ceramic2025] Ceramic. The future of Ceramic. 2025. https://blog.ceramic.network/the-future-of-ceramic-focusing-on-recall/
 - [hartgerink2019] C. H. J. Hartgerink. Verified, shared, modular, and provenance based research communication with the Dat protocol. Publications 7 (2), 40, 2019. doi:10.3390/publications7020040
-- [ledger] Ledger. About the journal. https://ledger.pitt.edu/ojs/ledger/about
+- [researchequals] ResearchEquals. https://researchequals.com/
+- [orvium] Orvium. https://orvium.io/
+- [pluto2019] Pluto Labs. Blockchain is NOT a cure to Academia. 2019. https://medium.com/pluto-inc/blockchain-is-not-a-cure-to-academia-ef352985526
 - [wittek2020] K. Wittek, D. Krakau, N. Wittek, J. Lawton and N. Pohlmann. Integrating bloxberg's proof of existence service with MATLAB. Frontiers in Blockchain 3, 2020. doi:10.3389/fbloc.2020.546264
+- [ledger] Ledger. About the journal. https://ledger.pitt.edu/ojs/ledger/about
 - [capadisli2017] S. Capadisli, A. Guy, R. Verborgh, C. Lange, S. Auer and T. Berners-Lee. Decentralised authoring, annotations and notifications for a read-write web with dokieli. ICWE 2017, LNCS, 469-481, 2017. doi:10.1007/978-3-319-60131-1_33
 - [capadisli2020] S. Capadisli. Linked Research on the Decentralised Web. Doctoral thesis, University of Bonn, 2020. https://csarven.ca/linked-research-decentralised-web
+- [dokieli] dokieli. Documentation. https://dokie.li/docs
 - [solid] W3C Solid Community Group. Solid Protocol, version 0.11.0. 2024. https://solidproject.org/TR/protocol
 - [hochstenbach2023] P. Hochstenbach, R. Verborgh and H. Van de Sompel. Using event notifications, Solid and orchestration for decentralizing and decoupling scholarly communication. Code4Lib Journal 58, 2023. https://journal.code4lib.org/articles/17823
 - [pep740] Python Software Foundation. PEP 740 and PyPI digital attestations. 2024. https://docs.pypi.org/attestations/
 - [oric2pa] US Office of Research Integrity. Content provenance. https://ori.hhs.gov/content-provenance
-- [elife] eLife. eLife's new model: your questions answered. https://elifesciences.org/inside-elife/2b765a27/elife-s-new-model-your-questions-answered
 - [mcdowell2021] G. S. McDowell, J. K. Polka, T. Ross-Hellauer and G. Stein. The DocMaps framework for representing assertions on research products in an extensible, machine-readable, and discoverable format. bioRxiv, 2021. doi:10.1101/2021.07.13.452204
-- [pci] Peer Community In. Frequently asked questions. https://peercommunityin.org/faq/
-- [episciences] Episciences. Publishing model. https://www.episciences.org/publishing-model/
+- [pubpubcode] Knowledge Futures. PubPub, source code. https://github.com/knowledgefutures/pubpub
+- [kf2025b] Knowledge Futures. Not enough: open infrastructure funding and the future of Knowledge Futures. 2025. https://www.knowledgefutures.org/updates/2025-06-update/
+- [kf2026f] Knowledge Futures. A path forward for PubPub. 2026. https://www.knowledgefutures.org/updates/2026-01-update
 - [maniatis2003] P. Maniatis, D. S. H. Rosenthal, M. Roussopoulos, M. Baker, T. J. Giuli and Y. Muliadi. Preserving peer replicas by rate-limited sampled voting. SOSP 2003, 44-59, 2003. doi:10.1145/945445.945451
 - [lockss] LOCKSS and CLOCKSS. https://www.lockss.org and https://clockss.org
 - [coarnotify] COAR. COAR Notify, version 1.0.1. https://coar-notify.net
 - [oaipmh] Open Archives Initiative. The Protocol for Metadata Harvesting (OAI-PMH). https://www.openarchives.org/pmh/
 - [activitypub] W3C. ActivityPub. W3C Recommendation, 2018. https://www.w3.org/TR/activitypub/
-- [atproto] Bluesky. AT Protocol. https://atproto.com
 - [nostr] Nostr. Nostr Implementation Possibilities (NIPs). https://github.com/nostr-protocol/nips
 - [ipfs] IPFS. https://ipfs.tech
 - [kademlia2002] P. Maymounkov and D. Mazieres. Kademlia: a peer-to-peer information system based on the XOR metric. IPTPS, 2002.
 - [radicle] Radicle. Radicle protocol guide. https://radicle.xyz/guides/protocol
 - [tuf] The Update Framework. https://theupdateframework.io/
-- [antieau2026] B. Antieau. Hexagon. 2026. https://antieau.github.io/2026/10/05/hexagon.html
-- [underlayprotocol] Knowledge Futures. The Underlay protocol. https://underlay.org/docs/protocol
-- [iso18670] ISO/IEC 18670:2025. The SoftWare Hash IDentifier (SWHID) specification. 2025. https://www.iso.org/standard/89985.html
-- [researchequals] ResearchEquals. https://researchequals.com/
-- [orvium] Orvium. https://orvium.io/
-- [pluto2019] Pluto Labs. Blockchain is NOT a cure to Academia. 2019. https://medium.com/pluto-inc/blockchain-is-not-a-cure-to-academia-ef352985526
-- [dokieli] dokieli. Documentation. https://dokie.li/docs
-- [elife2025] eLife. The eLife model: three-year update. 2025. https://elifesciences.org/inside-elife/7da92a51/the-elife-model-three-year-update
-- [pubpubcode] Knowledge Futures. PubPub, source code. https://github.com/knowledgefutures/pubpub
 - [arxivreplace] arXiv. Replacing an article. https://info.arxiv.org/help/replace.html
 - [arxivblog2026] arXiv. Post of 3 February 2026 on dark archives at Portico and TIB. arXiv blog, 2026. https://blog.arxiv.org/
+- [antieau2026] B. Antieau. Hexagon. 2026. https://antieau.github.io/2026/10/05/hexagon.html
 - [hexagon] Hexagon. https://hexagonmath.org/
 - [alphaxiv] alphaXiv. https://www.alphaxiv.org/
+- [elife2025] eLife. The eLife model: three-year update. 2025. https://elifesciences.org/inside-elife/7da92a51/the-elife-model-three-year-update

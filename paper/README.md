@@ -8,7 +8,9 @@ relates to the systems surveyed in the working papers
 specification holds.
 
 - `opensheaf.md`: the source, in a restricted Markdown (see `build.py`);
-  edit this file only.
+  edit this file only. It stays ASCII: accented letters are written as HTML
+  entities (`&aacute;`), and references are listed in order of first
+  citation.
 - `build.py`: converts it to a two-column TeXmacs document, `opensheaf.tm`,
   reusing the inline rules of the site's converter (`../tools/md2tm.py`).
 - `opensheaf-paper.ts`: the style package: Linux Libertine for the text,
