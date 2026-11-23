@@ -107,8 +107,8 @@ on GitHub, and archives made with them.
     (repository [mgubi/papers](https://github.com/mgubi/papers)): the first
     OpenSheaf archive, following version 0.2 since its rebuild on 20 November
     2026 (its owner has a key log, and the versions of its lines are
-    signed), with TeXmacs sources, HTML versions and PDFs (profile
-    `texmacs`).
+    signed), with TeXmacs sources, HTML versions and PDFs (profiles
+    `texmacs` and `website`).
 - **Tools:** [opensheaf-py](https://github.com/opensheaf/opensheaf-py)
   (Python, the `osheaf` command, written as a
   [literate program](https://opensheaf.org/opensheaf-py/) that explains it

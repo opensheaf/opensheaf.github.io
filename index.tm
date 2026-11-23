@@ -65,7 +65,7 @@
     <item><strong|Archives>
 
     <\itemize>
-      <item><hlink|Papers of Massimiliano Gubinelli|https://mgubi.org/papers/> (repository <hlink|mgubi/papers|https://github.com/mgubi/papers>): the first OpenSheaf archive, following version 0.2 since its rebuild on 20 November 2026 (its owner has a key log, and the versions of its lines are signed), with TeXmacs sources, HTML versions and PDFs (profile <verbatim|texmacs>).
+      <item><hlink|Papers of Massimiliano Gubinelli|https://mgubi.org/papers/> (repository <hlink|mgubi/papers|https://github.com/mgubi/papers>): the first OpenSheaf archive, following version 0.2 since its rebuild on 20 November 2026 (its owner has a key log, and the versions of its lines are signed), with TeXmacs sources, HTML versions and PDFs (profiles <verbatim|texmacs> and <verbatim|website>).
     </itemize>
 
     <item><strong|Tools:> <hlink|opensheaf-py|https://github.com/opensheaf/opensheaf-py> (Python, the <verbatim|osheaf> command, written as a <hlink|literate program|https://opensheaf.org/opensheaf-py/> that explains it along the specification): deposits documents as OCFL objects with DataCite and OpenSheaf metadata (any source with its PDF, or TeXmacs sources typeset by the archive), keeps document versions and their history, notices and withdrawals, keeps catalogues and selections across archives, mirrors objects and keeps accepted copies of vetted versions, writes the discovery document and a website with landing pages, deposits on Zenodo, imports from arXiv, and verifies an archive (also with the JSON Schemas and the <verbatim|ocfl-py> validator). <hlink|The command-line tools|tools.tm> shows how to use it, task by task.
