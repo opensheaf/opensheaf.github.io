@@ -749,8 +749,20 @@ osheaf sign kpz-uniqueness --version v3</pre>
       class="verbatim">--expose DID</tt> also exposes keys. An ended owner signs nothing
       more; what it signed before stays good.
     </p>
-    <h2 id="auto-20"><a id="collections-and-other-archives"></a>Collections and other archives<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-21"><a id="collections"></a>Collections<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-20"><a id="if-writing-the-key-log-was-interrupted"></a>If writing the key log was interrupted<span style="margin-left: 1em"></span></h3>
+    <p>
+      A new version of a key log is written in its own folder before the root
+      inventory names it. If that is interrupted (a crash, a full disk), the
+      folder is left after the head, and the tools sign no other version of
+      that number, since two signed versions of one number would fork the key
+      log, and a fork ends the owner. <tt class="verbatim">osheaf owner complete</tt>
+      settles it: a signed version that passes the checks is completed and
+      becomes the head, an unsigned one is removed, and a signed one that
+      fails the checks is left with an explanation, since removing it is safe
+      only if it was never copied.
+    </p>
+    <h2 id="auto-21"><a id="collections-and-other-archives"></a>Collections and other archives<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-22"><a id="collections"></a>Collections<span style="margin-left: 1em"></span></h3>
     <p>
       A <dfn>collection</dfn> gathers papers of any archive, each pinned to a
       version (section <a href="opensheaf-specification-0.2.html#8-collections">8</a>). A <strong>catalogue</strong> may
@@ -781,7 +793,7 @@ osheaf collection status reading</pre>
       &quot;reading&quot;</tt> under <tt class="verbatim">index</tt>, <tt class="verbatim">html</tt>
       in <tt class="verbatim">osheaf.json</tt>.
     </p>
-    <h3 id="auto-22"><a id="finding-a-paper"></a>Finding a paper<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-23"><a id="finding-a-paper"></a>Finding a paper<span style="margin-left: 1em"></span></h3>
     <p>
       <tt class="verbatim">osheaf resolve</tt> finds and checks what a <tt class="verbatim">sheaf:</tt>
       URI names, in any archive: every copy found is checked against its
@@ -794,7 +806,7 @@ osheaf collection status reading</pre>
 osheaf resolve &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://mgubi.org/papers/</pre>
       </div>
     </div>
-    <h3 id="auto-23"><a id="mirrors"></a>Mirrors<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-24"><a id="mirrors"></a>Mirrors<span style="margin-left: 1em"></span></h3>
     <p>
       A library, or a colleague keeping a preservation copy,
       <strong>mirrors</strong> a paper written elsewhere: a byte-for-byte
@@ -813,7 +825,7 @@ osheaf resolve &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://mgub
 osheaf mirror &quot;sheaf:&lt;name&gt;:&lt;owner&gt;&quot; --at https://mgubi.org/papers/ --label kpz-copy</pre>
       </div>
     </div>
-    <h3 id="auto-24"><a id="branches-and-accepted-copies"></a>Branches and accepted copies<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-25"><a id="branches-and-accepted-copies"></a>Branches and accepted copies<span style="margin-left: 1em"></span></h3>
     <p>
       A <strong>branch</strong> continues a signed version of someone else's
       paper as a paper of your own, keeping the evidence of where it started
@@ -834,7 +846,7 @@ osheaf branch &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v3&quot; --at https://other
 osheaf accept &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://other.example/papers/ --selection issue-1</pre>
       </div>
     </div>
-    <h3 id="auto-25"><a id="key-logs-of-other-owners"></a>Key logs of other owners<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-26"><a id="key-logs-of-other-owners"></a>Key logs of other owners<span style="margin-left: 1em"></span></h3>
     <p>
       <tt class="verbatim">osheaf owner pull URL</tt> compares your copy of an owner's
       key log with the copy at another archive: it extends yours, or, if the
@@ -846,7 +858,7 @@ osheaf accept &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://other
 osheaf owner pull https://other.example/papers/ --owner &lt;owner&gt;</pre>
       </div>
     </div>
-    <h3 id="auto-26"><a id="drafts-and-sealing"></a>Drafts and sealing<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-27"><a id="drafts-and-sealing"></a>Drafts and sealing<span style="margin-left: 1em"></span></h3>
     <p>
       A <strong>draft</strong> is unsigned work in progress at <tt class="verbatim">draft/&lt;id&gt;/</tt>,
       listed apart in the discovery document and deleted without a trace
@@ -861,7 +873,7 @@ osheaf draft deposit notes notes.tex --pdf notes.pdf --replace
 osheaf seal notes --label kpz-notes --delete-draft</pre>
       </div>
     </div>
-    <h3 id="auto-27"><a id="taking-down"></a>Taking down<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-28"><a id="taking-down"></a>Taking down<span style="margin-left: 1em"></span></h3>
     <p>
       <tt class="verbatim">osheaf takedown</tt> deletes an object, leaving a tombstone
       in the discovery document. It is for what must not be served (by law,
@@ -875,8 +887,8 @@ osheaf seal notes --label kpz-notes --delete-draft</pre>
 osheaf takedown kpz-notes --reason &quot;Deposited by mistake.&quot;</pre>
       </div>
     </div>
-    <h2 id="auto-28"><a id="arxiv-and-zenodo"></a>arXiv and Zenodo<span style="margin-left: 1em"></span></h2>
-    <h3 id="auto-29"><a id="importing-from-arxiv"></a>Importing from arXiv<span style="margin-left: 1em"></span></h3>
+    <h2 id="auto-29"><a id="arxiv-and-zenodo"></a>arXiv and Zenodo<span style="margin-left: 1em"></span></h2>
+    <h3 id="auto-30"><a id="importing-from-arxiv"></a>Importing from arXiv<span style="margin-left: 1em"></span></h3>
     <p>
       <tt class="verbatim">osheaf arxiv fetch</tt> downloads papers from arXiv, every
       version with its licence and comments (it needs no archive, and can be
@@ -899,7 +911,7 @@ osheaf arxiv import downloads 1508.07764 --update</pre>
       <tt class="verbatim">--dry-run</tt> shows what would be imported, and <tt class="verbatim">--versions
       v1,v3</tt> imports only some versions.
     </p>
-    <h3 id="auto-30"><a id="dois-from-zenodo"></a>DOIs from Zenodo<span style="margin-left: 1em"></span></h3>
+    <h3 id="auto-31"><a id="dois-from-zenodo"></a>DOIs from Zenodo<span style="margin-left: 1em"></span></h3>
     <p>
       <tt class="verbatim">osheaf zenodo LABEL</tt> deposits the current version of a
       paper on Zenodo and records its DOI in a new, signed version (appendix
@@ -920,7 +932,7 @@ osheaf zenodo kpz-uniqueness --production</pre>
       class="verbatim">ZENODO_TOKEN</tt>, or from the credential store under <tt class="verbatim">zenodo-sandbox-token</tt>
       and <tt class="verbatim">zenodo-token</tt>.
     </p>
-    <h2 id="auto-31"><a id="command-reference"></a>Command reference<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-32"><a id="command-reference"></a>Command reference<span style="margin-left: 1em"></span></h2>
     <p>
       <table style="display: inline-table; vertical-align: middle">
         <tbody><tr>
@@ -1023,6 +1035,10 @@ osheaf zenodo kpz-uniqueness --production</pre>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner end</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">the last version of the key log</td>
         </tr><tr>
+          <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner complete</tt></td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">settle a version of the key log left by an interrupted
+          write</td>
+        </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner pull URL</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">meet another copy of a key log</td>
         </tr><tr>
@@ -1035,7 +1051,8 @@ osheaf zenodo kpz-uniqueness --production</pre>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key push</tt>, <tt class="verbatim">pull</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">current keys to and from the key wallet (<tt class="verbatim">--wallet
-          WALLET</tt>)</td>
+          WALLET</tt>; a wallet only <tt class="verbatim">osheaf.json</tt> names is used
+          after asking, or with <tt class="verbatim">--yes</tt>)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key list</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">what the key wallet holds</td>
@@ -1049,8 +1066,8 @@ osheaf zenodo kpz-uniqueness --production</pre>
           <tt class="verbatim">--remove</tt>)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key forget</tt></td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">remove keys from this computer (<tt class="verbatim">--from-wallet</tt>:
-          also from the wallet)</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">remove keys from this computer, after asking (<tt class="verbatim">--yes</tt>;
+          <tt class="verbatim">--from-wallet</tt>: also from the wallet)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key forget --rp RP</tt>, <tt class="verbatim">--passkey
           CRED</tt></td>
@@ -1077,7 +1094,7 @@ osheaf zenodo kpz-uniqueness --production</pre>
         </tr></tbody>
       </table>
     </p>
-    <h2 id="auto-32"><a id="where-to-go-next"></a>Where to go next<span style="margin-left: 1em"></span></h2>
+    <h2 id="auto-33"><a id="where-to-go-next"></a>Where to go next<span style="margin-left: 1em"></span></h2>
     <ul>
       <li>
         <p>

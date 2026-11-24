@@ -556,6 +556,18 @@ rotation keys, for instance when the work moves to another owner
 the one thing an exposure cannot repair; `--expose DID` also exposes keys.
 An ended owner signs nothing more; what it signed before stays good.
 
+### If writing the key log was interrupted
+
+A new version of a key log is written in its own folder before the root
+inventory names it. If that is interrupted (a crash, a full disk), the
+folder is left after the head, and the tools sign no other version of
+that number, since two signed versions of one number would fork the key
+log, and a fork ends the owner. `osheaf owner complete` settles it: a
+signed version that passes the checks is completed and becomes the head,
+an unsigned one is removed, and a signed one that fails the checks is
+left with an explanation, since removing it is safe only if it was never
+copied.
+
 ## Collections and other archives
 
 ### Collections
@@ -735,14 +747,15 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `owner rotate` | add or retire current keys, new rotation keys |
 | `owner expose DID` | declare stolen or leaked keys |
 | `owner end` | the last version of the key log |
+| `owner complete` | settle a version of the key log left by an interrupted write |
 | `owner pull URL` | meet another copy of a key log |
 | `sign LABEL` | sign again a version contested by an exposed key (`--version vN`) |
 | `key new` | a new current key for this computer |
-| `key push`, `pull` | current keys to and from the key wallet (`--wallet WALLET`) |
+| `key push`, `pull` | current keys to and from the key wallet (`--wallet WALLET`; a wallet only `osheaf.json` names is used after asking, or with `--yes`) |
 | `key list` | what the key wallet holds |
 | `key wallet` | the wallets an owner's keys are looked for in; hints in `osheaf.json` (`--add`, `--remove`) |
 | `key wallets` | your wallets and the owners each holds (`--add`, `--remove`) |
-| `key forget` | remove keys from this computer (`--from-wallet`: also from the wallet) |
+| `key forget` | remove keys from this computer, after asking (`--yes`; `--from-wallet`: also from the wallet) |
 | `key forget --rp RP`, `--passkey CRED` | remove the passkey locks of a relying party or a passkey |
 | `key export`, `import` | a key to and from a password manager |
 | `key enroll`, `unlock` | open the keys of the wallet with a passkey |

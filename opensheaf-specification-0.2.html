@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf: an open format for document archives and collections, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Specification, version 0.2 (draft), 23 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
+    <meta name="description" content="Specification, version 0.2 (draft), 24 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -33,7 +33,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.2 (draft), 23 November 2026. OpenSheaf is a
+      Specification, version 0.2 (draft), 24 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). The text is licensed under CC
@@ -1699,13 +1699,16 @@
       (section 5.1), a single person or institution who answers for it, as a
       list of one URI: an ORCID iD (<tt class="verbatim">https://orcid.org/...</tt>),
       whose last character is a check digit (ISO 7064 MOD 11-2) that verifiers
-      check (section 14.3), since no schema pattern can, or a domain written
-      as <tt class="verbatim">https://&lt;domain&gt;/</tt>. The keeper is fixed by the
-      owner name: no version of the key log names or changes it, and another
-      keeper means another owner. The keeper MAY confirm it, in a place only
-      the keeper controls: a link naming the owner in its ORCID record, or the
-      file <tt class="verbatim">https://&lt;domain&gt;/.well-known/opensheaf</tt> on its
-      domain, a JSON object with <tt class="verbatim">format</tt> <tt class="verbatim">&quot;opensheaf-keeper/0.2&quot;</tt>,
+      check (section 14.3), since no schema pattern can, or a domain name
+      written as <tt class="verbatim">https://&lt;domain&gt;/</tt>, in lower case: a DNS
+      name of two labels or more, each of letters, digits and hyphens, neither
+      starting nor ending with a hyphen, the last not all digits, so that no
+      IP address and no single name such as <tt class="verbatim">localhost</tt> is a
+      keeper. The keeper is fixed by the owner name: no version of the key log
+      names or changes it, and another keeper means another owner. The keeper
+      MAY confirm it, in a place only the keeper controls: a link naming the
+      owner in its ORCID record, or the file <tt class="verbatim">https://&lt;domain&gt;/.well-known/opensheaf</tt>
+      on its domain, a JSON object with <tt class="verbatim">format</tt> <tt class="verbatim">&quot;opensheaf-keeper/0.2&quot;</tt>,
       <tt class="verbatim">owners</tt>, the owner names it answers for, and OPTIONALLY
       <tt class="verbatim">successors</tt>, an object mapping owner names it answers for
       to their successors (on ORCID, a link naming both).
@@ -4625,6 +4628,15 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           included (appendix A.3); a public archive SHOULD be indexed by a
           searchable service, through the website or Zenodo profile or an
           OAI-PMH static repository (section 3); the rationale in appendix D.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 24 November 2026:</strong> a keeper named by
+          its domain is a DNS name of two labels or more, not an IP address
+          and not a single name such as <tt class="verbatim">localhost</tt> (section
+          6.6); the pattern of <tt class="verbatim">keeper</tt> in the schema of genesis
+          records says so.
         </p>
       </li>
     </ul>
