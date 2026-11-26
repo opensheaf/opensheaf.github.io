@@ -1,6 +1,6 @@
 # OpenSheaf: an open format for document archives and collections
 
-*Specification, version 0.2 (draft), 24 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).*
+*Specification, version 0.2 (draft), 26 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).*
 
 > [!WARNING]
 > **Draft.** Until version 1.0, any revision may change the format in incompatible ways. Version 0.2 is incompatible with [version 0.1](opensheaf-specification-0.1.md), which is kept as published (section 16.1). The text before its rebuild, with the changelog of every revision of the draft, is kept as the [reference text](reference/opensheaf-specification-0.1-full.md).
@@ -955,6 +955,7 @@ Before 1.0, a minor version MAY be incompatible with the one before it. Version 
 - **0.2 (draft), 22 November 2026:** decided in #72: each owner an archive hosts has an owner catalogue there, a catalogue of that owner created when the owner is set up, listing the documents of its own lines in the archive, branches included, and changed by that owner only; it replaces the archive's main catalogue, and is never mirrored (sections 8.1, 9 and 11.1); `owners` of the discovery document becomes recommended and names each owner with its catalogue, in the order of presentation, and `mainCollection` is dropped (section 3.1, appendix B); the index page presents the owner catalogues in that order (appendix A.3); verifiers check `owners` and the owner catalogues (section 14.6); a takedown is followed by a version of the owner catalogue that listed the line (section 13.2); appendix C and the rationale (appendix D) updated. Binding a catalogue to its archive, keys an archive requires to create lines, and an archive-wide selection over the owner catalogues are left open (#72).
 - **0.2 (draft), 23 November 2026:** decided in #79 and #77 (its first point), from the survey of the FAIR principles: `rightsList` is required in `datacite.json`, with at least one licence or rights statement, a statement saying so where the rights are not known (section 4.4); landing pages of the website profile MUST carry FAIR Signposting links (`cite-as`, `describedby`, `item`, `license`, `type`, `author`) and a schema.org record in JSON-LD whose contents are listed, withdrawn lines included (appendix A.3); a public archive SHOULD be indexed by a searchable service, through the website or Zenodo profile or an OAI-PMH static repository (section 3); the rationale in appendix D.
 - **0.2 (draft), 24 November 2026:** a keeper named by its domain is a DNS name of two labels or more, not an IP address and not a single name such as `localhost` (section 6.6); the pattern of `keeper` in the schema of genesis records says so.
+- **0.2 (draft), 26 November 2026:** editorial: the examples of appendix C brought into line with #57. The journal's accepted copy is its document version 1, not 2 (sections C.4, C.5 and C.7), its `parent.documentVersion` keeping the authors' 2; the inventory digest of its first version, in the issue's revision set (section C.4), recomputed.
 
 ## Appendix A. Profiles (normative for archives declaring them)
 
@@ -1298,8 +1299,8 @@ The `members.json` of an issue of the journal, a selection owned by the journal'
       "name": "zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q",
       "owner": "tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka",
       "at": [ "https://journal.example.org/" ],
-      "revisions": [ { "documentVersion": 2, "version": "v1",
-                       "inventorySha512": "1c4e62bb1f89510405cbf63998b049f49b8b5349231bc928313ad17ab1e9fd7460aa570e3bbbce70a9627f2ec71440f0f55facd1c4fc1fb5050f23f6127a9a5a" } ],
+      "revisions": [ { "documentVersion": 1, "version": "v1",
+                       "inventorySha512": "60c3708f3c4ee14b7201d45be5c12fa20ba9cdb2cb8a43c4231f96ed5918cd8865a7f25f9f72bd51c5793269f8637d1314f4ba525b0f7f580fdeaa6410742e68" } ],
       "cite": { "title": "Mass gap for the fractional $\\Phi^4_2$ model",
                 "creators": [ "P. Duch", "M. Gubinelli" ], "year": 2026, "issued": "2026-03-02" } },
     { "kind": "document",
@@ -1315,7 +1316,7 @@ The `members.json` of an issue of the journal, a selection owned by the journal'
 
 ### C.5 A branch: an accepted copy
 
-The `object.json` of the first version of the journal's accepted copy, a branch of the authors' line at their object version `v2` (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is `sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka`. The first version of a line, it has no `previous`:
+The `object.json` of the first version of the journal's accepted copy, a branch of the authors' line at their object version `v2` (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is `sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka`. The first version of a line, it has no `previous`, and it is the branch's document version 1, the authors' document version 2 being kept in `parent.documentVersion` (section 9.4):
 
 ```json
 {
@@ -1332,7 +1333,7 @@ The `object.json` of the first version of the journal's accepted copy, a branch 
     "inventorySha512": "e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25",
     "url": "https://mgubi.org/papers/ocfl/56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2/"
   },
-  "documentVersion": 2,
+  "documentVersion": 1,
   "mainSource": "fractional-phi42-mass-gap.tm",
   "sourceFormat": "application/x-texmacs",
   "renditions": [ { "path": "fractional-phi42-mass-gap.pdf", "mediaType": "application/pdf" } ],
@@ -1423,8 +1424,8 @@ sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2?sha512=e3e1319055b
     the authors' object version v2, which the journal vetted
 sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2?sha512=e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25&at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
     the same, with a hint
-sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka/v2
-    document version 2 of the journal's line, its accepted copy
+sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka/v1
+    document version 1 of the journal's line, its accepted copy
 sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:*
     the work: the authors' line, the journal's and any other
 sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa
@@ -1432,7 +1433,7 @@ sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa
 sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84
     version 2 of its key log, as keyLog names it
 sheaf:zzgdggwl/v2
-sheaf:zzgdggwl:tqr6lchn/v2
+sheaf:zzgdggwl:tqr6lchn/v1
     short forms of the second and fifth (section 12.2)
 https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2
     the second, through a gateway (provisional, #35)

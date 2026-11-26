@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf: an open format for document archives and collections, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Specification, version 0.2 (draft), 24 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
+    <meta name="description" content="Specification, version 0.2 (draft), 26 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -33,7 +33,7 @@
     <h1 id="auto-1">OpenSheaf: an open format for document archives and
     collections<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Specification, version 0.2 (draft), 24 November 2026. OpenSheaf is a
+      Specification, version 0.2 (draft), 26 November 2026. OpenSheaf is a
       common, open format for archives of scholarly documents and for
       collections of them, built on the Oxford Common File Layout (OCFL 1.1)
       and the DataCite Metadata Schema (4.7). The text is licensed under CC
@@ -4639,6 +4639,16 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           records says so.
         </p>
       </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> editorial: the
+          examples of appendix C brought into line with #57. The journal's
+          accepted copy is its document version 1, not 2 (sections C.4, C.5
+          and C.7), its <tt class="verbatim">parent.documentVersion</tt> keeping the
+          authors' 2; the inventory digest of its first version, in the
+          issue's revision set (section C.4), recomputed.
+        </p>
+      </li>
     </ul>
     <h2 id="auto-80"><a id="appendix-a-profiles-normative-for-archives-declaring-them"></a>Appendix A. Profiles (normative for archives declaring
     them)<span style="margin-left: 1em"></span></h2>
@@ -5488,8 +5498,8 @@ keyLog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673
       &quot;name&quot;: &quot;zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q&quot;,
       &quot;owner&quot;: &quot;tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka&quot;,
       &quot;at&quot;: [ &quot;https://journal.example.org/&quot; ],
-      &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 2, &quot;version&quot;: &quot;v1&quot;,
-                       &quot;inventorySha512&quot;: &quot;1c4e62bb1f89510405cbf63998b049f49b8b5349231bc928313ad17ab1e9fd7460aa570e3bbbce70a9627f2ec71440f0f55facd1c4fc1fb5050f23f6127a9a5a&quot; } ],
+      &quot;revisions&quot;: [ { &quot;documentVersion&quot;: 1, &quot;version&quot;: &quot;v1&quot;,
+                       &quot;inventorySha512&quot;: &quot;60c3708f3c4ee14b7201d45be5c12fa20ba9cdb2cb8a43c4231f96ed5918cd8865a7f25f9f72bd51c5793269f8637d1314f4ba525b0f7f580fdeaa6410742e68&quot; } ],
       &quot;cite&quot;: { &quot;title&quot;: &quot;Mass gap for the fractional $\\Phi^4_2$ model&quot;,
                 &quot;creators&quot;: [ &quot;P. Duch&quot;, &quot;M. Gubinelli&quot; ], &quot;year&quot;: 2026, &quot;issued&quot;: &quot;2026-03-02&quot; } },
     { &quot;kind&quot;: &quot;document&quot;,
@@ -5510,7 +5520,9 @@ keyLog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673
       class="verbatim">v2</tt> (sections 9.1 and 9.6). No line of that name is the
       journal's, so the branch takes the genesis name, and its line is <tt
       class="verbatim">sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka</tt>.
-      The first version of a line, it has no <tt class="verbatim">previous</tt>:
+      The first version of a line, it has no <tt class="verbatim">previous</tt>, and it
+      is the branch's document version 1, the authors' document version 2
+      being kept in <tt class="verbatim">parent.documentVersion</tt> (section 9.4):
     </p>
     <div class="language-json">
       <div class="tmweb-code">
@@ -5529,7 +5541,7 @@ keyLog sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673
     &quot;inventorySha512&quot;: &quot;e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25&quot;,
     &quot;url&quot;: &quot;https://mgubi.org/papers/ocfl/56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2/&quot;
   },
-  &quot;documentVersion&quot;: 2,
+  &quot;documentVersion&quot;: 1,
   &quot;mainSource&quot;: &quot;fractional-phi42-mass-gap.tm&quot;,
   &quot;sourceFormat&quot;: &quot;application/x-texmacs&quot;,
   &quot;renditions&quot;: [ { &quot;path&quot;: &quot;fractional-phi42-mass-gap.pdf&quot;, &quot;mediaType&quot;: &quot;application/pdf&quot; } ],
@@ -5647,8 +5659,8 @@ sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2?sha512=e3e1319055b
     the authors' object version v2, which the journal vetted
 sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2?sha512=e3e1319055b967af645713c3baa4dc1974eb8ce02f6b2591bbcce55b068e7a98df54dfa8ab2fd8996d27a2b31df8bee814281d681187014eaa0316f048edbb25&amp;at=https%3A%2F%2Fmgubi.org%2Fpapers%2F
     the same, with a hint
-sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka/v2
-    document version 2 of the journal's line, its accepted copy
+sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka/v1
+    document version 1 of the journal's line, its accepted copy
 sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:*
     the work: the authors' line, the journal's and any other
 sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa
@@ -5656,7 +5668,7 @@ sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa
 sheaf:56wo6cdpjsxk7ddgnqfp2quipfghukhtmvjuahvwzko7m4tkz3pa/v2?sha512=7673bfae6ba91f6e9acf862635649efde7b6af0e1a787f6dc2cb2f2a583d5d4fab7bf236f7284582a4894aebef2769eacbf69d9036f1ecd4f89c07bc31313f84
     version 2 of its key log, as keyLog names it
 sheaf:zzgdggwl/v2
-sheaf:zzgdggwl:tqr6lchn/v2
+sheaf:zzgdggwl:tqr6lchn/v1
     short forms of the second and fifth (section 12.2)
 https://opensheaf.org/sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q/v2
     the second, through a gateway (provisional, #35)</pre>

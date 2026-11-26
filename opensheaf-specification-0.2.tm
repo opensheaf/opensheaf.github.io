@@ -7,7 +7,7 @@
 
   <chapter*|OpenSheaf: an open format for document archives and collections>
 
-  <notes-abstract|Specification, version 0.2 (draft), 24 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
+  <notes-abstract|Specification, version 0.2 (draft), 26 November 2026. OpenSheaf is a common, open format for archives of scholarly documents and for collections of them, built on the Oxford Common File Layout (OCFL 1.1) and the DataCite Metadata Schema (4.7). The text is licensed under CC BY-SA 4.0; the JSON Schemas are dedicated to the public domain (CC0 1.0).>
 
   <os-alert|warning|Warning.|<strong|Draft.> Until version 1.0, any revision may change the format in incompatible ways. Version 0.2 is incompatible with <hlink|version 0.1|opensheaf-specification-0.1.tm>, which is kept as published (section 16.1). The text before its rebuild, with the changelog of every revision of the draft, is kept as the <hlink|reference text|reference/opensheaf-specification-0.1-full.md>.>
 
@@ -1263,6 +1263,8 @@
     <item><strong|0.2 (draft), 23 November 2026:> decided in #79 and #77 (its first point), from the survey of the FAIR principles: <verbatim|rightsList> is required in <verbatim|datacite.json>, with at least one licence or rights statement, a statement saying so where the rights are not known (section 4.4); landing pages of the website profile MUST carry FAIR Signposting links (<verbatim|cite-as>, <verbatim|describedby>, <verbatim|item>, <verbatim|license>, <verbatim|type>, <verbatim|author>) and a schema.org record in JSON-LD whose contents are listed, withdrawn lines included (appendix A.3); a public archive SHOULD be indexed by a searchable service, through the website or Zenodo profile or an OAI-PMH static repository (section 3); the rationale in appendix D.
 
     <item><strong|0.2 (draft), 24 November 2026:> a keeper named by its domain is a DNS name of two labels or more, not an IP address and not a single name such as <verbatim|localhost> (section 6.6); the pattern of <verbatim|keeper> in the schema of genesis records says so.
+
+    <item><strong|0.2 (draft), 26 November 2026:> editorial: the examples of appendix C brought into line with #57. The journal's accepted copy is its document version 1, not 2 (sections C.4, C.5 and C.7), its <verbatim|parent.documentVersion> keeping the authors' 2; the inventory digest of its first version, in the issue's revision set (section C.4), recomputed.
   </itemize>
 
   <section*|Appendix A. Profiles (normative for archives declaring them)><label|appendix-a-profiles-normative-for-archives-declaring-them>
@@ -1841,9 +1843,9 @@
 
     \ \ \ \ \ \ "at": [ "https://journal.example.org/" ],
 
-    \ \ \ \ \ \ "revisions": [ { "documentVersion": 2, "version": "v1",
+    \ \ \ \ \ \ "revisions": [ { "documentVersion": 1, "version": "v1",
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "inventorySha512": "1c4e62bb1f89510405cbf63998b049f49b8b5349231bc928313ad17ab1e9fd7460aa570e3bbbce70a9627f2ec71440f0f55facd1c4fc1fb5050f23f6127a9a5a" } ],
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "inventorySha512": "60c3708f3c4ee14b7201d45be5c12fa20ba9cdb2cb8a43c4231f96ed5918cd8865a7f25f9f72bd51c5793269f8637d1314f4ba525b0f7f580fdeaa6410742e68" } ],
 
     \ \ \ \ \ \ "cite": { "title": "Mass gap for the fractional $\\\\Phi^4_2$ model",
 
@@ -1871,7 +1873,7 @@
 
   <subsection*|C.5 A branch: an accepted copy><label|c5-a-branch-an-accepted-copy>
 
-  The <verbatim|object.json> of the first version of the journal's accepted copy, a branch of the authors' line at their object version <verbatim|v2> (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is <verbatim|sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka>. The first version of a line, it has no <verbatim|previous>:
+  The <verbatim|object.json> of the first version of the journal's accepted copy, a branch of the authors' line at their object version <verbatim|v2> (sections 9.1 and 9.6). No line of that name is the journal's, so the branch takes the genesis name, and its line is <verbatim|sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka>. The first version of a line, it has no <verbatim|previous>, and it is the branch's document version 1, the authors' document version 2 being kept in <verbatim|parent.documentVersion> (section 9.4):
 
   <\html-div-class|language-json>
   <\verbatim-code>
@@ -1903,7 +1905,7 @@
 
     \ \ },
 
-    \ \ "documentVersion": 2,
+    \ \ "documentVersion": 1,
 
     \ \ "mainSource": "fractional-phi42-mass-gap.tm",
 
@@ -2062,9 +2064,9 @@
 
     \ \ \ \ the same, with a hint
 
-    sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka/v2
+    sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:tqr6lchnd2vk7ezskdc5zdxpaidpsiuduo5sqhiis3i55iautdka/v1
 
-    \ \ \ \ document version 2 of the journal's line, its accepted copy
+    \ \ \ \ document version 1 of the journal's line, its accepted copy
 
     sheaf:zzgdggwlldcrw4bdeuvntiaobtw2kge6bc4go737pfekhfc5oz4q:*
 
@@ -2080,7 +2082,7 @@
 
     sheaf:zzgdggwl/v2
 
-    sheaf:zzgdggwl:tqr6lchn/v2
+    sheaf:zzgdggwl:tqr6lchn/v1
 
     \ \ \ \ short forms of the second and fifth (section 12.2)
 

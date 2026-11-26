@@ -2,7 +2,7 @@
 author: Massimiliano Gubinelli
 affiliation: University of Oxford
 email:
-date: 23 November 2026
+date: 26 November 2026
 
 *Scholarly communication bundles several functions: recording, preserving,
 announcing, filtering, distributing and assigning merit. Preprint servers
@@ -74,7 +74,7 @@ which a filter states what it vetted, but who filters, and by what standard,
 is not its business.
 
 OpenSheaf is a proposal for that layer [@spec02]. This paper describes it as
-of 23 November 2026. Version 0.2 of the specification is a draft,
+of 26 November 2026. Version 0.2 of the specification is a draft,
 incompatible with version 0.1; archives made with the draft are rebuilt when
 0.2 is final (specification, section 16.1). We present the principles of the
 layer (Section @sec:principles), the format (Section @sec:format), an
@@ -489,10 +489,9 @@ it is a new document version. Keeping and vetting are different acts. A
 versions; a member may have `follow` set to `latest`, and the catalogue's
 tool then writes a new document version of the catalogue when that member's
 line has a new signed version, never a contested one. A <dfn>selection</dfn>
-vets particular
-versions: each member pins a revision set, the document versions vetted
-(Listing @lst:selection), and later versions by the authors enter only by a
-new version of the selection.
+vets particular versions: each member pins a revision set, the document
+versions vetted (Listing @lst:selection), and later versions by the authors
+enter only by a new version of the selection.
 
 Listing: A selection, an issue of a journal (appendix C.4); `cite` is elided. {#lst:selection}
 
@@ -506,9 +505,9 @@ Listing: A selection, an issue of a journal (appendix C.4); `cite` is elided. {#
     "owner": "tqr6lchn...tdka",
     "at": [ "https://journal.example.org/" ],
     "revisions": [ {
-      "documentVersion": 2,
+      "documentVersion": 1,
       "version": "v1",
-      "inventorySha512": "1c4e...9a5a" } ],
+      "inventorySha512": "60c3...2e68" } ],
     "cite": { ... }
   }, {
     "kind": "document",
@@ -625,8 +624,8 @@ sheaf:zzgdggwl...oz4q/v2
     document version 2 of the authors' line
 sheaf:zzgdggwl...oz4q/v2?sha512=e3e1...bb25
     the authors' object version v2
-sheaf:zzgdggwl...oz4q:tqr6lchn...tdka/v2
-    document version 2 of the journal's line
+sheaf:zzgdggwl...oz4q:tqr6lchn...tdka/v1
+    document version 1 of the journal's line
 sheaf:zzgdggwl...oz4q:*
     the work: every line of it
 sheaf:56wo6cdp...z3pa
@@ -1215,7 +1214,7 @@ is adopted depends on the services built on it.
 - [episciences] Episciences. Publishing model. https://www.episciences.org/publishing-model/
 - [klein2014] M. Klein, H. Van de Sompel, R. Sanderson, H. Shankar, L. Balakireva, K. Zhou and R. Tobin. Scholarly context not found: one in five articles suffers from reference rot. PLoS ONE 9 (12), e115253, 2014. doi:10.1371/journal.pone.0115253
 - [jones2016] S. M. Jones, H. Van de Sompel, H. Shankar, M. Klein, R. Tobin and C. Grover. Scholarly context adrift: three out of four URI references lead to changed content. PLoS ONE 11 (12), e0167475, 2016. doi:10.1371/journal.pone.0167475
-- [spec02] OpenSheaf project. OpenSheaf: an open format for document archives and collections, version 0.2 (draft), 23 November 2026. OpenSheaf, 2026. https://opensheaf.org/opensheaf-specification-0.2
+- [spec02] OpenSheaf project. OpenSheaf: an open format for document archives and collections, version 0.2 (draft), 26 November 2026. OpenSheaf, 2026. https://opensheaf.org/opensheaf-specification-0.2
 - [ocfl] OCFL. Oxford Common File Layout specification, version 1.1. https://ocfl.io/1.1/spec/
 - [datacite] DataCite. DataCite Metadata Schema 4.7. https://schema.datacite.org/meta/kernel-4.7/
 - [keri2019] S. M. Smith. Key Event Receipt Infrastructure (KERI). White paper, 2019. https://arxiv.org/abs/1907.02143

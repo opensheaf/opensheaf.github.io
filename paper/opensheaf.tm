@@ -9,7 +9,7 @@
 
   <doc-data|<doc-title|OpenSheaf: an exchange layer for scholarly
   documents>|<doc-author|<author-data|<author-name|Massimiliano
-  Gubinelli>|<author-affiliation|University of Oxford>>>|<doc-date|23
+  Gubinelli>|<author-affiliation|University of Oxford>>>|<doc-date|26
   November 2026>>
 
   <abstract-data|<\abstract>
@@ -92,7 +92,7 @@
     but who filters, and by what standard, is not its business.
 
     OpenSheaf is a proposal for that layer <cite|spec02>. This paper
-    describes it as of 23 November 2026. Version 0.2 of the specification is
+    describes it as of 26 November 2026. Version 0.2 of the specification is
     a draft, incompatible with version 0.1; archives made with the draft are
     rebuilt when 0.2 is final (specification, section 16.1). We present the
     principles of the layer (Section <reference|sec:principles>), the format
@@ -724,12 +724,12 @@
 
         \ \ \ \ <os-key|"revisions"><os-pun|:> <os-pun|[> <os-pun|{>
 
-        \ \ \ \ \ \ <os-key|"documentVersion"><os-pun|:> 2<os-pun|,>
+        \ \ \ \ \ \ <os-key|"documentVersion"><os-pun|:> 1<os-pun|,>
 
         \ \ \ \ \ \ <os-key|"version"><os-pun|:> <os-str|"v1"><os-pun|,>
 
         \ \ \ \ \ \ <os-key|"inventorySha512"><os-pun|:>
-        <os-str|"1c4e.<no-break>.<no-break>.9a5a"> <os-pun|}>
+        <os-str|"60c3.<no-break>.<no-break>.2e68"> <os-pun|}>
         <os-pun|]><os-pun|,>
 
         \ \ \ \ <os-key|"cite"><os-pun|:> <os-pun|{>
@@ -901,9 +901,9 @@
 
         \ \ \ \ <os-com|the authors' object version v2>
 
-        sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:tqr6lchn.<no-break>.<no-break>.tdka/v2
+        sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:tqr6lchn.<no-break>.<no-break>.tdka/v1
 
-        \ \ \ \ <os-com|document version 2 of the journal's line>
+        \ \ \ \ <os-com|document version 1 of the journal's line>
 
         sheaf:zzgdggwl.<no-break>.<no-break>.oz4q:*
 
@@ -1698,7 +1698,7 @@
       (12), e0167475, 2016. doi:10.1371/journal.pone.0167475
 
       <bibitem*|11><label|bib-spec02>OpenSheaf project. OpenSheaf: an open
-      format for document archives and collections, version 0.2 (draft), 23
+      format for document archives and collections, version 0.2 (draft), 26
       November 2026. OpenSheaf, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>specification-<line-break>0.<line-break>2
 
       <bibitem*|12><label|bib-ocfl>OCFL. Oxford Common File Layout
