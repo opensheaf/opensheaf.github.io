@@ -1,9 +1,5 @@
 # Living knowledge in a time of abundance
 
-A position statement, drafted on 26 November 2026 for a news account, to be
-shortened. Non-normative, like the other working papers; where it describes
-OpenSheaf, the [specification](../opensheaf-specification-0.2.md) holds.
-
 Science and mathematics are entering a period of abundance. Automated
 provers, formal proof libraries, large-scale experiments and AI systems now
 produce results faster than any community can read them: lemmas,
