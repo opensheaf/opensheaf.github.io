@@ -89,7 +89,10 @@ owner, so where they live is the owner's **security level**, chosen with
 
 - `--keys offline` (the default, and the safest). The rotation keys are
   written once, encrypted under a passphrase you choose, to the folder of
-  `--export` (a USB stick), and, with `--print`, printed on sheets. `init`
+  `--export` (a USB stick), one file per key named
+  `rotation-<owner>-<key>.txt` (the first 16 characters of the owner name
+  and of the digest of the key that the key log commits), and, with
+  `--print`, printed on sheets. `init`
   asks you to type back the check of each key once it is put away. They are
   never kept on the computer: store the stick and the sheets apart from it,
   and from each other.
@@ -141,16 +144,22 @@ archive.
   every file of the archive byte for byte (section
   [4.1](opensheaf-git-0.2.md#41-attributes) of
   [OpenSheaf archives in git](opensheaf-git-0.2.md));
+- `.gitignore`, or the lines it lacks added to yours: the working folders
+  of the tools (`texmacs_home/`, `.staging-*`), which are not part of the
+  archive;
 - `ocfl/`: the storage itself, one folder per work, with the key log of the
-  owner at `ocfl/<owner>/<owner>/`; - `opensheaf.json`: the discovery
-  document, which readers and tools start from, with the labels of your
-  papers; beyond a thousand objects, the list of objects moves into pages
-  under `objects/`, so that a deposit rewrites one small file;
-- `names/`, `owners/`, `sha512/`: indexes for looking things up; - the
-  website: `index.html`, a page per paper at `paper/<name>/` (the permanent
-  address the descriptions record) and at `paper/<label>/` (the readable one
-  the pages link to), a page per owner at `owner/<owner>/`, `sitemap.xml`, and
-  the templates they are made from in `templates/`, which you can edit.
+  owner at `ocfl/<owner>/<owner>/`;
+- `opensheaf.json`: the discovery document, which readers and tools start
+  from, with the labels of your papers; beyond a thousand objects, the list
+  of objects moves into pages under `objects/`, so that a deposit rewrites
+  one small file;
+- `names/`, `owners/`, `sha512/`: indexes for looking things up;
+- the website: `index.html`, a page per paper at `paper/<name>/` (the
+  permanent address the descriptions record) and at `paper/<label>/` (the
+  readable one the pages link to), a page per owner at `owner/<owner>/`,
+  `sitemap.xml`, `style.css`, `.nojekyll` (so that GitHub Pages serves the
+  files as they are), and the templates they are made from in
+  `templates/`, which you can edit.
 
 With `--index texmacs`, the home page is instead a TeXmacs document made
 from a template (`--index-template FILE`), with HTML versions of TeXmacs
@@ -189,7 +198,8 @@ are lost is deposited as a PDF alone, saying why:
 
 The options can also come from a YAML or JSON file, with the same names,
 which is handy for papers with many authors or for several deposits at once
-(a list in the file):
+(a list in the file). `new: yes` stands for `--new`; without it, the
+entry adds a version to the paper of that label:
 
 ```sh
 osheaf deposit --from kpz.yaml
@@ -197,6 +207,7 @@ osheaf deposit --from kpz.yaml
 
 ```yaml
 id: kpz-uniqueness
+new: yes
 source: paper.tex
 pdf: paper.pdf
 extra-sources: [refs.bib]
@@ -304,7 +315,9 @@ The website is written again after every command that changes the archive,
 so `osheaf index` is only needed to rewrite everything. `osheaf verify`
 reports errors, warnings and the status of every signature and member;
 `--remote` also checks the members of your collections held in other
-archives, and `--json` prints the findings for a program. The same checks
+archives and the links of owners to their keepers (their ORCID records or
+domains), and `--json` prints the findings for a program. Without
+`--remote`, `verify` reads only the files of the archive. The same checks
 can be run on a published archive from the browser, with the
 [Explorer](https://opensheaf.org/explorer/).
 
@@ -338,6 +351,9 @@ osheaf owner show   # the key log: current keys, rotation keys committed, keeper
 osheaf key list     # what the key wallet holds (never a secret)
 ```
 
+`owner show` reads the keeper's ORCID record or domain to check its link
+to the owner; `--offline` leaves it unchecked.
+
 Wallets and owners are many to many: one wallet may hold the keys of
 several owners (an institution's), several people may share one owner's
 keys in a wallet, each with a passkey of their own, and the keys of one
@@ -350,11 +366,14 @@ owner may be in several wallets. Two lists say where keys are looked for:
   (GitHub wallets only), written by `init`, `owner init` and `owner
   rotate` with `--keys github:...`, and by `key push --wallet github:...`.
 
-The `key` commands look for the keys of an owner in the wallets hinted
-for it, then in yours, in order, and use the first that holds them;
-`OPENSHEAF_WALLET` wins over both, and `--wallet github:OWNER/REPO` (or
-`--wallet command`) names another. A wallet configured under `keys` in
-your file (a command wallet) comes after your `wallets`.
+The `key` commands look for the keys of an owner in your own wallets
+first, in order, then in the wallets `osheaf.json` hints for it, and use
+the first that holds them; `OPENSHEAF_WALLET` wins over both, and
+`--wallet github:OWNER/REPO` (or `--wallet command`) names another. A
+wallet configured under `keys` in your file (a command wallet) comes after
+your `wallets`. Since whoever can change the archive writes its hints,
+`key push` asks before putting keys into a wallet that only `osheaf.json`
+names (`--yes` skips the question).
 
 ```sh
 osheaf key wallet                    # where the keys of the owner are looked for, in order
@@ -378,8 +397,8 @@ rotation keys add to the key log:
 ```sh
 osheaf key new      # on the new computer: prints its did:key
 osheaf owner rotate --add did:key:z6Mk... \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-1.txt \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-2.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-<owner>-<key1>.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-<owner>-<key2>.txt \
   --export /Volumes/USB/opensheaf-keys-2 --print
 ```
 
@@ -531,8 +550,8 @@ current key cannot contest (section
 ```sh
 osheaf key new                                   # prints did:key:NEW
 osheaf owner expose did:key:OLD --add did:key:NEW \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-1.txt \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-2.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-<owner>-<key1>.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-<owner>-<key2>.txt \
   --export /Volumes/USB/opensheaf-keys-2 --print
 ```
 
@@ -545,6 +564,10 @@ made them, sign them again with the new key:
 ```sh
 osheaf sign kpz-uniqueness --version v3
 ```
+
+`sign` shows the version and asks you to type the first 8 characters of
+the digest of its inventory, to confirm that you made it (`--yes` skips the
+question, in scripts).
 
 Publish the result at once, so that readers learn of the exposure.
 
@@ -589,11 +612,14 @@ A member is given by its `sheaf:` URI (shown on its page), with `at` or
 `--at URL` saying where to find it, or by a label of your own archive; only
 verified versions are pinned. In a catalogue, `--follow` (or `osheaf
 collection follow`) follows a paper; `osheaf collection update` then moves
-it to the latest signed version, and for a selection lists the versions
-not yet vetted. `collection remove` removes a member or a revision, and
-`collection sync LABEL --from collection.yaml` writes a whole collection
-from a file. To show a collection first on the home page, set `"featured":
-"reading"` under `index`, `html` in `osheaf.json`.
+it to the latest signed version, and for a selection lists the versions not
+yet vetted. `collection status` and `collection update` resolve every member
+over the network at the addresses it records, your own archive's published
+address (`baseUrl`) included for your own papers. `collection remove`
+removes a member or a revision, and `collection sync LABEL --from
+collection.yaml` writes a whole collection from a file. To show a collection
+first on the home page, set `"featured": "reading"` under `index`, `html` in
+`osheaf.json`.
 
 ### Finding a paper
 
@@ -630,7 +656,8 @@ of your own, keeping the evidence of where it started (section
 journal **accepts** a paper as an accepted copy, a branch listed by one of
 its selections (section [9.6](opensheaf-specification-0.2.md#96-accepted-copies));
 its own typeset version is then deposited as a later version of that copy,
-with `--stage VoR` and `--agreement`. A branch numbers its own versions
+by its label (`--label`, or later `osheaf label`), with `--stage VoR` and
+`--agreement`. A branch numbers its own versions
 from 1: its first version is its version 1, whatever the parent's number,
 which it records. Branching or accepting a later version of the same paper
 again gives the existing branch a new branch point, its next version,
@@ -639,7 +666,8 @@ which keeps the branch's own notices (section
 
 ```sh
 osheaf branch "sheaf:<name>:<owner>/v3" --at https://other.example/papers/ --label kpz-continued
-osheaf accept "sheaf:<name>:<owner>/v2" --at https://other.example/papers/ --selection issue-1
+osheaf accept "sheaf:<name>:<owner>/v2" --at https://other.example/papers/ \
+  --selection issue-1 --label kpz-accepted
 ```
 
 ### Key logs of other owners
@@ -661,7 +689,8 @@ options of `deposit`. **Sealing** makes it a signed paper, version 1.
 
 ```sh
 osheaf draft new notes notes.tex --pdf notes.pdf --title "Notes on KPZ" --author "Doe, Jane"
-osheaf draft deposit notes notes.tex --pdf notes.pdf --replace
+osheaf draft deposit notes notes.tex --pdf notes.pdf --replace \
+  --title "Notes on KPZ" --author "Doe, Jane"
 osheaf seal notes --label kpz-notes --delete-draft
 ```
 
@@ -676,6 +705,9 @@ for a paper that is merely wrong, which is withdrawn instead (section
 ```sh
 osheaf takedown kpz-notes --reason "Deposited by mistake."
 ```
+
+It asks you to type the first 8 characters of the object's name to
+confirm; `--yes` skips the question, in scripts.
 
 ## arXiv and Zenodo
 
@@ -741,7 +773,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `draft new DRAFT`, `deposit`, `delete` | unsigned work in progress |
 | `seal DRAFT` | seal a draft as a new paper (`--label LABEL`) |
 | `label LINE LABEL` | give a paper or collection a new label (`--unset`; `--owner OWNER`: the owner object) |
-| `takedown LABEL` | delete an object, leaving a tombstone |
+| `takedown LABEL` | delete an object, leaving a tombstone, after you type the first 8 characters of its name (`--yes`) |
 | `owner init` | make an owner (done by `init --new-owner`); in an archive, with its owner catalogue |
 | `owner show` | show the key log |
 | `owner rotate` | add or retire current keys, new rotation keys |
@@ -749,9 +781,9 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `owner end` | the last version of the key log |
 | `owner complete` | settle a version of the key log left by an interrupted write |
 | `owner pull URL` | meet another copy of a key log |
-| `sign LABEL` | sign again a version contested by an exposed key (`--version vN`) |
+| `sign LABEL` | sign again a version contested by an exposed key (`--version vN`), after you type the first 8 characters of its digest (`--yes`) |
 | `key new` | a new current key for this computer |
-| `key push`, `pull` | current keys to and from the key wallet (`--wallet WALLET`; a wallet only `osheaf.json` names is used after asking, or with `--yes`) |
+| `key push`, `pull` | current keys to and from the key wallet (`--wallet WALLET`); `push` asks before putting keys into a wallet only `osheaf.json` names (`--yes`) |
 | `key list` | what the key wallet holds |
 | `key wallet` | the wallets an owner's keys are looked for in; hints in `osheaf.json` (`--add`, `--remove`) |
 | `key wallets` | your wallets and the owners each holds (`--add`, `--remove`) |

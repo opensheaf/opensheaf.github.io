@@ -75,7 +75,8 @@ questions are listed at the end of the sections they concern.
   MUST `tombstones` once an object is taken down; no `mainCollection`
   (#72). **Labels**: readable, local,
   not identifiers.
-- **Storage root and layouts** (3.2): the owner-name layout
+- **Storage root and layouts** (3.2): `storageRoot` a path below the
+  discovery document (3.1), never an absolute URL; the owner-name layout
   (`<owner>/<name>/`, drafts at `draft/<id>/`, the key log at
   `<owner>/<owner>/`), default; OCFL `0003` hashed layout with default
   parameters for large archives. `storageLayout` in the discovery document
@@ -318,9 +319,9 @@ the same change in its schema, and the other way round.
   records and pins, #28
   companion documents, #29 private archives and drafts, #32 single-file
   takedowns, #33 takedowns and copies, #34 licences, #35 a gateway, #36
-  registering `sheaf`, #37 resolution through mirrors,
-  #48 and #50 verification details, #54 custody policies,
-  branch numbering, #69 weighted thresholds, #70 witnesses of key logs. Read the relevant issue before
+  registering `sheaf`, #54 custody policies, #69 weighted thresholds,
+  #70 witnesses of key logs, #80 searching for a work (`sheaf:<name>:*`,
+  OPTIONAL for resolvers in 0.2). Read the relevant issue before
   touching its topic; do not settle an open question without agreement.
 
 ## Design principles to keep

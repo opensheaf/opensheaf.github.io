@@ -70,7 +70,7 @@
   An owner has two kinds of keys. <strong|Current keys> sign your papers; each computer has its own. <strong|Rotation keys>, three by default, of which any two are needed, change the current keys: they add a new computer, retire an old one, or declare a stolen one. Whoever holds two rotation keys controls the owner, so where they live is the owner's <strong|security level>, chosen with <verbatim|-<no-break>-keys> when the owner is made:
 
   <\itemize>
-    <item><verbatim|-<no-break>-keys offline> (the default, and the safest). The rotation keys are written once, encrypted under a passphrase you choose, to the folder of <verbatim|-<no-break>-export> (a USB stick), and, with <verbatim|-<no-break>-print>, printed on sheets. <verbatim|init> asks you to type back the check of each key once it is put away. They are never kept on the computer: store the stick and the sheets apart from it, and from each other.
+    <item><verbatim|-<no-break>-keys offline> (the default, and the safest). The rotation keys are written once, encrypted under a passphrase you choose, to the folder of <verbatim|-<no-break>-export> (a USB stick), one file per key named <verbatim|rotation-\<less\>owner\<gtr\>-\<less\>key\<gtr\>.txt> (the first 16 characters of the owner name and of the digest of the key that the key log commits), and, with <verbatim|-<no-break>-print>, printed on sheets. <verbatim|init> asks you to type back the check of each key once it is put away. They are never kept on the computer: store the stick and the sheets apart from it, and from each other.
 
     <item><verbatim|-<no-break>-keys github:OWNER/REPO>, a key wallet in a private GitHub repository of its own (create it by hand first, for instance with <verbatim|gh repo create me/opensheaf-keys -<no-break>-private>; the tools refuse a public one, or the archive's own). The rotation keys and the current keys are kept there, encrypted under the passphrase, and a new computer gets its key from the wallet. It needs the <hlink|GitHub CLI|https://cli.github.com>, signed in once with <verbatim|gh auth login>.
 
@@ -96,9 +96,15 @@
 
     <item><verbatim|.gitattributes>, unless the folder has one already: it tells git to keep every file of the archive byte for byte (section <hlink|4.1|opensheaf-git-0.2.tm#41-attributes> of <hlink|OpenSheaf archives in git|opensheaf-git-0.2.tm>);
 
-    <item><verbatim|ocfl/>: the storage itself, one folder per work, with the key log of the owner at <verbatim|ocfl/\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/>; - <verbatim|opensheaf.json>: the discovery document, which readers and tools start from, with the labels of your papers; beyond a thousand objects, the list of objects moves into pages under <verbatim|objects/>, so that a deposit rewrites one small file;
+    <item><verbatim|.gitignore>, or the lines it lacks added to yours: the working folders of the tools (<verbatim|texmacs_home/>, <verbatim|.staging-*>), which are not part of the archive;
 
-    <item><verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>: indexes for looking things up; - the website: <verbatim|index.html>, a page per paper at <verbatim|paper/\<less\>name\<gtr\>/> (the permanent address the descriptions record) and at <verbatim|paper/\<less\>label\<gtr\>/> (the readable one the pages link to), a page per owner at <verbatim|owner/\<less\>owner\<gtr\>/>, <verbatim|sitemap.xml>, and the templates they are made from in <verbatim|templates/>, which you can edit.
+    <item><verbatim|ocfl/>: the storage itself, one folder per work, with the key log of the owner at <verbatim|ocfl/\<less\>owner\<gtr\>/\<less\>owner\<gtr\>/>;
+
+    <item><verbatim|opensheaf.json>: the discovery document, which readers and tools start from, with the labels of your papers; beyond a thousand objects, the list of objects moves into pages under <verbatim|objects/>, so that a deposit rewrites one small file;
+
+    <item><verbatim|names/>, <verbatim|owners/>, <verbatim|sha512/>: indexes for looking things up;
+
+    <item>the website: <verbatim|index.html>, a page per paper at <verbatim|paper/\<less\>name\<gtr\>/> (the permanent address the descriptions record) and at <verbatim|paper/\<less\>label\<gtr\>/> (the readable one the pages link to), a page per owner at <verbatim|owner/\<less\>owner\<gtr\>/>, <verbatim|sitemap.xml>, <verbatim|style.css>, <verbatim|.nojekyll> (so that GitHub Pages serves the files as they are), and the templates they are made from in <verbatim|templates/>, which you can edit.
   </itemize>
 
   With <verbatim|-<no-break>-index texmacs>, the home page is instead a TeXmacs document made from a template (<verbatim|-<no-break>-index-template FILE>), with HTML versions of TeXmacs papers in <verbatim|site/>; the landing pages are the same. <verbatim|-<no-break>-curated> makes an owner catalogue that you choose by hand rather than one that lists every paper.
@@ -127,7 +133,7 @@
 
   <verbatim|-<no-break>-rights> takes an SPDX key (<verbatim|cc-by-4.0>, <verbatim|cc-by-sa-4.0>, <verbatim|cc0-1.0>, <verbatim|gpl-3.0-only>, <verbatim|gpl-3.0-or-later>) or a statement in plain text; by default a new version keeps the licence of the previous one, and a new paper is "All rights reserved". Any source works (LaTeX, Markdown, ...) with its PDF; a TeXmacs source (<verbatim|.tm>) needs no PDF, since the archive typesets it. A paper whose sources are lost is deposited as a PDF alone, saying why: <verbatim|-<no-break>-no-source "the sources are lost">; <verbatim|osheaf complete LABEL -<no-break>-version N -<no-break>-source paper.tex> adds them later. Files are kept byte for byte.
 
-  The options can also come from a YAML or JSON file, with the same names, which is handy for papers with many authors or for several deposits at once (a list in the file):
+  The options can also come from a YAML or JSON file, with the same names, which is handy for papers with many authors or for several deposits at once (a list in the file). <verbatim|new: yes> stands for <verbatim|-<no-break>-new>; without it, the entry adds a version to the paper of that label:
 
   <\html-div-class|language-bash>
   <\verbatim-code>
@@ -138,6 +144,8 @@
   <\html-div-class|language-yaml>
   <\verbatim-code>
     id: kpz-uniqueness
+
+    new: yes
 
     source: paper.tex
 
@@ -229,7 +237,7 @@
 
   With several owners, the home page lists the papers of all the catalogues together, newest first, each with its owner; with <verbatim|"index": {"owners": "by-owner"}> in <verbatim|osheaf.json> (the default is <verbatim|"together">), it lists them under a heading for each owner, in the order of <verbatim|owners> in <verbatim|opensheaf.json>. With one owner both are the same.
 
-  The website is written again after every command that changes the archive, so <verbatim|osheaf index> is only needed to rewrite everything. <verbatim|osheaf verify> reports errors, warnings and the status of every signature and member; <verbatim|-<no-break>-remote> also checks the members of your collections held in other archives, and <verbatim|-<no-break>-json> prints the findings for a program. The same checks can be run on a published archive from the browser, with the <hlink|Explorer|https://opensheaf.org/explorer/>.
+  The website is written again after every command that changes the archive, so <verbatim|osheaf index> is only needed to rewrite everything. <verbatim|osheaf verify> reports errors, warnings and the status of every signature and member; <verbatim|-<no-break>-remote> also checks the members of your collections held in other archives and the links of owners to their keepers (their ORCID records or domains), and <verbatim|-<no-break>-json> prints the findings for a program. Without <verbatim|-<no-break>-remote>, <verbatim|verify> reads only the files of the archive. The same checks can be run on a published archive from the browser, with the <hlink|Explorer|https://opensheaf.org/explorer/>.
 
   <subsection*|Publishing><label|publishing>
 
@@ -257,6 +265,8 @@
   </verbatim-code>
   </html-div-class>
 
+  <verbatim|owner show> reads the keeper's ORCID record or domain to check its link to the owner; <verbatim|-<no-break>-offline> leaves it unchecked.
+
   Wallets and owners are many to many: one wallet may hold the keys of several owners (an institution's), several people may share one owner's keys in a wallet, each with a passkey of their own, and the keys of one owner may be in several wallets. Two lists say where keys are looked for:
 
   <\itemize>
@@ -265,7 +275,7 @@
     <item>for each owner of an archive, the wallets that hold its keys, as hints in its <verbatim|osheaf.json>, <verbatim|"keys": {"\<less\>owner\<gtr\>": {"wallets": [.<no-break>.<no-break>.]}}> (GitHub wallets only), written by <verbatim|init>, <verbatim|owner init> and <verbatim|owner rotate> with <verbatim|-<no-break>-keys github:.<no-break>.<no-break>.>, and by <verbatim|key push -<no-break>-wallet github:.<no-break>.<no-break>.>.
   </itemize>
 
-  The <verbatim|key> commands look for the keys of an owner in the wallets hinted for it, then in yours, in order, and use the first that holds them; <verbatim|OPENSHEAF_WALLET> wins over both, and <verbatim|-<no-break>-wallet github:OWNER/REPO> (or <verbatim|-<no-break>-wallet command>) names another. A wallet configured under <verbatim|keys> in your file (a command wallet) comes after your <verbatim|wallets>.
+  The <verbatim|key> commands look for the keys of an owner in your own wallets first, in order, then in the wallets <verbatim|osheaf.json> hints for it, and use the first that holds them; <verbatim|OPENSHEAF_WALLET> wins over both, and <verbatim|-<no-break>-wallet github:OWNER/REPO> (or <verbatim|-<no-break>-wallet command>) names another. A wallet configured under <verbatim|keys> in your file (a command wallet) comes after your <verbatim|wallets>. Since whoever can change the archive writes its hints, <verbatim|key push> asks before putting keys into a wallet that only <verbatim|osheaf.json> names (<verbatim|-<no-break>-yes> skips the question).
 
   <\html-div-class|language-bash>
   <\verbatim-code>
@@ -299,9 +309,9 @@
 
     osheaf owner rotate -<no-break>-add did:key:z6Mk.<no-break>.<no-break>. \\
 
-    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-.<no-break>.<no-break>.-1.txt \\
+    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-\<less\>owner\<gtr\>-\<less\>key1\<gtr\>.txt \\
 
-    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-.<no-break>.<no-break>.-2.txt \\
+    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-\<less\>owner\<gtr\>-\<less\>key2\<gtr\>.txt \\
 
     \ \ -<no-break>-export /Volumes/USB/opensheaf-keys-2 -<no-break>-print
   </verbatim-code>
@@ -379,9 +389,9 @@
 
     osheaf owner expose did:key:OLD -<no-break>-add did:key:NEW \\
 
-    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-.<no-break>.<no-break>.-1.txt \\
+    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-\<less\>owner\<gtr\>-\<less\>key1\<gtr\>.txt \\
 
-    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-.<no-break>.<no-break>.-2.txt \\
+    \ \ -<no-break>-rotation-key /Volumes/USB/opensheaf-keys/rotation-\<less\>owner\<gtr\>-\<less\>key2\<gtr\>.txt \\
 
     \ \ -<no-break>-export /Volumes/USB/opensheaf-keys-2 -<no-break>-print
   </verbatim-code>
@@ -394,6 +404,8 @@
     osheaf sign kpz-uniqueness -<no-break>-version v3
   </verbatim-code>
   </html-div-class>
+
+  <verbatim|sign> shows the version and asks you to type the first 8 characters of the digest of its inventory, to confirm that you made it (<verbatim|-<no-break>-yes> skips the question, in scripts).
 
   Publish the result at once, so that readers learn of the exposure.
 
@@ -423,7 +435,7 @@
   </verbatim-code>
   </html-div-class>
 
-  A member is given by its <verbatim|sheaf:> URI (shown on its page), with <verbatim|at> or <verbatim|-<no-break>-at URL> saying where to find it, or by a label of your own archive; only verified versions are pinned. In a catalogue, <verbatim|-<no-break>-follow> (or <verbatim|osheaf collection follow>) follows a paper; <verbatim|osheaf collection update> then moves it to the latest signed version, and for a selection lists the versions not yet vetted. <verbatim|collection remove> removes a member or a revision, and <verbatim|collection sync LABEL -<no-break>-from collection.yaml> writes a whole collection from a file. To show a collection first on the home page, set <verbatim|"featured": "reading"> under <verbatim|index>, <verbatim|html> in <verbatim|osheaf.json>.
+  A member is given by its <verbatim|sheaf:> URI (shown on its page), with <verbatim|at> or <verbatim|-<no-break>-at URL> saying where to find it, or by a label of your own archive; only verified versions are pinned. In a catalogue, <verbatim|-<no-break>-follow> (or <verbatim|osheaf collection follow>) follows a paper; <verbatim|osheaf collection update> then moves it to the latest signed version, and for a selection lists the versions not yet vetted. <verbatim|collection status> and <verbatim|collection update> resolve every member over the network at the addresses it records, your own archive's published address (<verbatim|baseUrl>) included for your own papers. <verbatim|collection remove> removes a member or a revision, and <verbatim|collection sync LABEL -<no-break>-from collection.yaml> writes a whole collection from a file. To show a collection first on the home page, set <verbatim|"featured": "reading"> under <verbatim|index>, <verbatim|html> in <verbatim|osheaf.json>.
 
   <subsection*|Finding a paper><label|finding-a-paper>
 
@@ -447,13 +459,15 @@
 
   <subsection*|Branches and accepted copies><label|branches-and-accepted-copies>
 
-  A <strong|branch> continues a signed version of someone else's paper as a paper of your own, keeping the evidence of where it started (section <hlink|9|opensheaf-specification-0.2.tm#9-branches-and-accepted-copies>). A journal <strong|accepts> a paper as an accepted copy, a branch listed by one of its selections (section <hlink|9.6|opensheaf-specification-0.2.tm#96-accepted-copies>); its own typeset version is then deposited as a later version of that copy, with <verbatim|-<no-break>-stage VoR> and <verbatim|-<no-break>-agreement>. A branch numbers its own versions from 1: its first version is its version 1, whatever the parent's number, which it records. Branching or accepting a later version of the same paper again gives the existing branch a new branch point, its next version, which keeps the branch's own notices (section <hlink|9.4|opensheaf-specification-0.2.tm#94-later-versions-and-new-branch-points>).
+  A <strong|branch> continues a signed version of someone else's paper as a paper of your own, keeping the evidence of where it started (section <hlink|9|opensheaf-specification-0.2.tm#9-branches-and-accepted-copies>). A journal <strong|accepts> a paper as an accepted copy, a branch listed by one of its selections (section <hlink|9.6|opensheaf-specification-0.2.tm#96-accepted-copies>); its own typeset version is then deposited as a later version of that copy, by its label (<verbatim|-<no-break>-label>, or later <verbatim|osheaf label>), with <verbatim|-<no-break>-stage VoR> and <verbatim|-<no-break>-agreement>. A branch numbers its own versions from 1: its first version is its version 1, whatever the parent's number, which it records. Branching or accepting a later version of the same paper again gives the existing branch a new branch point, its next version, which keeps the branch's own notices (section <hlink|9.4|opensheaf-specification-0.2.tm#94-later-versions-and-new-branch-points>).
 
   <\html-div-class|language-bash>
   <\verbatim-code>
     osheaf branch "sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>/v3" -<no-break>-at https://other.example/papers/ -<no-break>-label kpz-continued
 
-    osheaf accept "sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>/v2" -<no-break>-at https://other.example/papers/ -<no-break>-selection issue-1
+    osheaf accept "sheaf:\<less\>name\<gtr\>:\<less\>owner\<gtr\>/v2" -<no-break>-at https://other.example/papers/ \\
+
+    \ \ -<no-break>-selection issue-1 -<no-break>-label kpz-accepted
   </verbatim-code>
   </html-div-class>
 
@@ -475,7 +489,9 @@
   <\verbatim-code>
     osheaf draft new notes notes.tex -<no-break>-pdf notes.pdf -<no-break>-title "Notes on KPZ" -<no-break>-author "Doe, Jane"
 
-    osheaf draft deposit notes notes.tex -<no-break>-pdf notes.pdf -<no-break>-replace
+    osheaf draft deposit notes notes.tex -<no-break>-pdf notes.pdf -<no-break>-replace \\
+
+    \ \ -<no-break>-title "Notes on KPZ" -<no-break>-author "Doe, Jane"
 
     osheaf seal notes -<no-break>-label kpz-notes -<no-break>-delete-draft
   </verbatim-code>
@@ -490,6 +506,8 @@
     osheaf takedown kpz-notes -<no-break>-reason "Deposited by mistake."
   </verbatim-code>
   </html-div-class>
+
+  It asks you to type the first 8 characters of the object's name to confirm; <verbatim|-<no-break>-yes> skips the question, in scripts.
 
   <section*|arXiv and Zenodo><label|arxiv-and-zenodo>
 
@@ -529,7 +547,7 @@
 
   <section*|Command reference><label|command-reference>
 
-  <block|<tformat|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-hyphen|t>|<table|<row|<cell|Command>|<cell|What it does>>|<row|<cell|<verbatim|init>>|<cell|create an archive: <verbatim|osheaf.json>, storage, owner, its owner catalogue>>|<row|<cell|<verbatim|deposit LABEL [SOURCE]>>|<cell|deposit a paper (<verbatim|-<no-break>-new>) or a new version of it>>|<row|<cell|<verbatim|notice LABEL>>|<cell|a notice about a version (<verbatim|-<no-break>-about N -<no-break>-text TEXT>)>>|<row|<cell|<verbatim|describe LABEL>>|<cell|correct the title, abstract, keywords or authors>>|<row|<cell|<verbatim|relicense LABEL>>|<cell|record a new licence, with the authors' agreement>>|<row|<cell|<verbatim|relate LABEL>>|<cell|link the same work elsewhere (arXiv, DOI)>>|<row|<cell|<verbatim|withdraw LABEL>>|<cell|withdraw a paper (<verbatim|-<no-break>-reason TEXT>); the content stays>>|<row|<cell|<verbatim|complete LABEL>>|<cell|add the sources of a version deposited without them>>|<row|<cell|<verbatim|collect>>|<cell|new versions of the owner catalogues, when needed (<verbatim|-<no-break>-owner>: one)>>|<row|<cell|<verbatim|index>>|<cell|rewrite <verbatim|opensheaf.json>, the indexes and the website>>|<row|<cell|<verbatim|verify>>|<cell|check the archive (<verbatim|-<no-break>-remote>, <verbatim|-<no-break>-json>)>>|<row|<cell|<verbatim|collection new LABEL>>|<cell|make a collection (<verbatim|-<no-break>-type>, <verbatim|-<no-break>-title>)>>|<row|<cell|<verbatim|collection add>, <verbatim|remove>>|<cell|add or remove members>>|<row|<cell|<verbatim|collection follow>, <verbatim|update>>|<cell|follow members to their new versions>>|<row|<cell|<verbatim|collection status>, <verbatim|sync>>|<cell|the status of members; write from a file>>|<row|<cell|<verbatim|resolve URI>>|<cell|find and check what a <verbatim|sheaf:> URI names>>|<row|<cell|<verbatim|mirror URI>>|<cell|copy a paper written elsewhere (<verbatim|-<no-break>-all>: update every mirror)>>|<row|<cell|<verbatim|branch URI>>|<cell|continue another owner's version as a paper of yours>>|<row|<cell|<verbatim|accept URI>>|<cell|an accepted copy, listed by a selection>>|<row|<cell|<verbatim|draft new DRAFT>, <verbatim|deposit>, <verbatim|delete>>|<cell|unsigned work in progress>>|<row|<cell|<verbatim|seal DRAFT>>|<cell|seal a draft as a new paper (<verbatim|-<no-break>-label LABEL>)>>|<row|<cell|<verbatim|label LINE LABEL>>|<cell|give a paper or collection a new label (<verbatim|-<no-break>-unset>; <verbatim|-<no-break>-owner OWNER>: the owner object)>>|<row|<cell|<verbatim|takedown LABEL>>|<cell|delete an object, leaving a tombstone>>|<row|<cell|<verbatim|owner init>>|<cell|make an owner (done by <verbatim|init -<no-break>-new-owner>); in an archive, with its owner catalogue>>|<row|<cell|<verbatim|owner show>>|<cell|show the key log>>|<row|<cell|<verbatim|owner rotate>>|<cell|add or retire current keys, new rotation keys>>|<row|<cell|<verbatim|owner expose DID>>|<cell|declare stolen or leaked keys>>|<row|<cell|<verbatim|owner end>>|<cell|the last version of the key log>>|<row|<cell|<verbatim|owner complete>>|<cell|settle a version of the key log left by an interrupted write>>|<row|<cell|<verbatim|owner pull URL>>|<cell|meet another copy of a key log>>|<row|<cell|<verbatim|sign LABEL>>|<cell|sign again a version contested by an exposed key (<verbatim|-<no-break>-version vN>)>>|<row|<cell|<verbatim|key new>>|<cell|a new current key for this computer>>|<row|<cell|<verbatim|key push>, <verbatim|pull>>|<cell|current keys to and from the key wallet (<verbatim|-<no-break>-wallet WALLET>; a wallet only <verbatim|osheaf.json> names is used after asking, or with <verbatim|-<no-break>-yes>)>>|<row|<cell|<verbatim|key list>>|<cell|what the key wallet holds>>|<row|<cell|<verbatim|key wallet>>|<cell|the wallets an owner's keys are looked for in; hints in <verbatim|osheaf.json> (<verbatim|-<no-break>-add>, <verbatim|-<no-break>-remove>)>>|<row|<cell|<verbatim|key wallets>>|<cell|your wallets and the owners each holds (<verbatim|-<no-break>-add>, <verbatim|-<no-break>-remove>)>>|<row|<cell|<verbatim|key forget>>|<cell|remove keys from this computer, after asking (<verbatim|-<no-break>-yes>; <verbatim|-<no-break>-from-wallet>: also from the wallet)>>|<row|<cell|<verbatim|key forget -<no-break>-rp RP>, <verbatim|-<no-break>-passkey CRED>>|<cell|remove the passkey locks of a relying party or a passkey>>|<row|<cell|<verbatim|key export>, <verbatim|import>>|<cell|a key to and from a password manager>>|<row|<cell|<verbatim|key enroll>, <verbatim|unlock>>|<cell|open the keys of the wallet with a passkey>>|<row|<cell|<verbatim|arxiv fetch>>|<cell|download papers from arXiv>>|<row|<cell|<verbatim|arxiv import DOWNLOADS>>|<cell|import them, one signed paper each>>|<row|<cell|<verbatim|zenodo LABEL>>|<cell|a DOI from Zenodo (sandbox, or <verbatim|-<no-break>-production>)>>|<row|<cell|<verbatim|help-config>>|<cell|describe <verbatim|osheaf.json> and <verbatim|~/.config/opensheaf/config.json>>>>>>
+  <block|<tformat|<cwith|1|1|1|-1|font-series|bold>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-hyphen|t>|<table|<row|<cell|Command>|<cell|What it does>>|<row|<cell|<verbatim|init>>|<cell|create an archive: <verbatim|osheaf.json>, storage, owner, its owner catalogue>>|<row|<cell|<verbatim|deposit LABEL [SOURCE]>>|<cell|deposit a paper (<verbatim|-<no-break>-new>) or a new version of it>>|<row|<cell|<verbatim|notice LABEL>>|<cell|a notice about a version (<verbatim|-<no-break>-about N -<no-break>-text TEXT>)>>|<row|<cell|<verbatim|describe LABEL>>|<cell|correct the title, abstract, keywords or authors>>|<row|<cell|<verbatim|relicense LABEL>>|<cell|record a new licence, with the authors' agreement>>|<row|<cell|<verbatim|relate LABEL>>|<cell|link the same work elsewhere (arXiv, DOI)>>|<row|<cell|<verbatim|withdraw LABEL>>|<cell|withdraw a paper (<verbatim|-<no-break>-reason TEXT>); the content stays>>|<row|<cell|<verbatim|complete LABEL>>|<cell|add the sources of a version deposited without them>>|<row|<cell|<verbatim|collect>>|<cell|new versions of the owner catalogues, when needed (<verbatim|-<no-break>-owner>: one)>>|<row|<cell|<verbatim|index>>|<cell|rewrite <verbatim|opensheaf.json>, the indexes and the website>>|<row|<cell|<verbatim|verify>>|<cell|check the archive (<verbatim|-<no-break>-remote>, <verbatim|-<no-break>-json>)>>|<row|<cell|<verbatim|collection new LABEL>>|<cell|make a collection (<verbatim|-<no-break>-type>, <verbatim|-<no-break>-title>)>>|<row|<cell|<verbatim|collection add>, <verbatim|remove>>|<cell|add or remove members>>|<row|<cell|<verbatim|collection follow>, <verbatim|update>>|<cell|follow members to their new versions>>|<row|<cell|<verbatim|collection status>, <verbatim|sync>>|<cell|the status of members; write from a file>>|<row|<cell|<verbatim|resolve URI>>|<cell|find and check what a <verbatim|sheaf:> URI names>>|<row|<cell|<verbatim|mirror URI>>|<cell|copy a paper written elsewhere (<verbatim|-<no-break>-all>: update every mirror)>>|<row|<cell|<verbatim|branch URI>>|<cell|continue another owner's version as a paper of yours>>|<row|<cell|<verbatim|accept URI>>|<cell|an accepted copy, listed by a selection>>|<row|<cell|<verbatim|draft new DRAFT>, <verbatim|deposit>, <verbatim|delete>>|<cell|unsigned work in progress>>|<row|<cell|<verbatim|seal DRAFT>>|<cell|seal a draft as a new paper (<verbatim|-<no-break>-label LABEL>)>>|<row|<cell|<verbatim|label LINE LABEL>>|<cell|give a paper or collection a new label (<verbatim|-<no-break>-unset>; <verbatim|-<no-break>-owner OWNER>: the owner object)>>|<row|<cell|<verbatim|takedown LABEL>>|<cell|delete an object, leaving a tombstone, after you type the first 8 characters of its name (<verbatim|-<no-break>-yes>)>>|<row|<cell|<verbatim|owner init>>|<cell|make an owner (done by <verbatim|init -<no-break>-new-owner>); in an archive, with its owner catalogue>>|<row|<cell|<verbatim|owner show>>|<cell|show the key log>>|<row|<cell|<verbatim|owner rotate>>|<cell|add or retire current keys, new rotation keys>>|<row|<cell|<verbatim|owner expose DID>>|<cell|declare stolen or leaked keys>>|<row|<cell|<verbatim|owner end>>|<cell|the last version of the key log>>|<row|<cell|<verbatim|owner complete>>|<cell|settle a version of the key log left by an interrupted write>>|<row|<cell|<verbatim|owner pull URL>>|<cell|meet another copy of a key log>>|<row|<cell|<verbatim|sign LABEL>>|<cell|sign again a version contested by an exposed key (<verbatim|-<no-break>-version vN>), after you type the first 8 characters of its digest (<verbatim|-<no-break>-yes>)>>|<row|<cell|<verbatim|key new>>|<cell|a new current key for this computer>>|<row|<cell|<verbatim|key push>, <verbatim|pull>>|<cell|current keys to and from the key wallet (<verbatim|-<no-break>-wallet WALLET>); <verbatim|push> asks before putting keys into a wallet only <verbatim|osheaf.json> names (<verbatim|-<no-break>-yes>)>>|<row|<cell|<verbatim|key list>>|<cell|what the key wallet holds>>|<row|<cell|<verbatim|key wallet>>|<cell|the wallets an owner's keys are looked for in; hints in <verbatim|osheaf.json> (<verbatim|-<no-break>-add>, <verbatim|-<no-break>-remove>)>>|<row|<cell|<verbatim|key wallets>>|<cell|your wallets and the owners each holds (<verbatim|-<no-break>-add>, <verbatim|-<no-break>-remove>)>>|<row|<cell|<verbatim|key forget>>|<cell|remove keys from this computer, after asking (<verbatim|-<no-break>-yes>; <verbatim|-<no-break>-from-wallet>: also from the wallet)>>|<row|<cell|<verbatim|key forget -<no-break>-rp RP>, <verbatim|-<no-break>-passkey CRED>>|<cell|remove the passkey locks of a relying party or a passkey>>|<row|<cell|<verbatim|key export>, <verbatim|import>>|<cell|a key to and from a password manager>>|<row|<cell|<verbatim|key enroll>, <verbatim|unlock>>|<cell|open the keys of the wallet with a passkey>>|<row|<cell|<verbatim|arxiv fetch>>|<cell|download papers from arXiv>>|<row|<cell|<verbatim|arxiv import DOWNLOADS>>|<cell|import them, one signed paper each>>|<row|<cell|<verbatim|zenodo LABEL>>|<cell|a DOI from Zenodo (sandbox, or <verbatim|-<no-break>-production>)>>|<row|<cell|<verbatim|help-config>>|<cell|describe <verbatim|osheaf.json> and <verbatim|~/.config/opensheaf/config.json>>>>>>
 
   <section*|Where to go next><label|where-to-go-next>
 

@@ -4,7 +4,7 @@
   <head>
     <title>OpenSheaf archives in git, version 0.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-    <meta name="description" content="Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 22 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a..."></meta>
+    <meta name="description" content="Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 26 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a..."></meta>
     <meta charset="utf-8" content="TeXmacs 2.1.5" name="generator"></meta>
     <link href="resources/notes-base.css" type="text/css" rel="stylesheet"></link>
     <script src="resources/theme.js" language="javascript"></script>
@@ -32,7 +32,7 @@
     </div>
     <h1 id="auto-1">OpenSheaf archives in git<span style="margin-left: 1em"></span></h1>
     <div class="notes-abstract">
-      Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 22
+      Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 26
       November 2026. How to keep an OpenSheaf archive in a git repository,
       publish it from there and copy it, without git changing a byte of what
       the archive holds. It adds nothing to the format: readers of an archive
@@ -147,7 +147,9 @@
       <li>
         <p>
           <dfn>Archive files</dfn>: the files the specification requires to be
-          served byte for byte: the discovery document <tt class="verbatim">opensheaf.json</tt>,
+          served byte for byte: the discovery document <tt class="verbatim">opensheaf.json</tt>
+          and, if it pages its objects, its pages (<tt class="verbatim">objectPages</tt>,
+          section 3.1 of the specification; the tools put them in <tt class="verbatim">objects/</tt>),
           the storage root (by convention <tt class="verbatim">ocfl/</tt>) and, if used,
           the indexes (the folders <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>
           and <tt class="verbatim">sha512/</tt>, which an archive declares in its
@@ -216,14 +218,17 @@
     <h3 id="auto-6"><a id="41-attributes"></a>4.1 Attributes<span style="margin-left: 1em"></span></h3>
     <p>
       The repository MUST contain a <tt class="verbatim">.gitattributes</tt> file at its
-      top with these lines (with the lines of the indexes only if it keeps
-      them, and the paths adjusted if the archive is in a sub-folder):
+      top with these lines (with the folder of the pages of objects in place
+      of <tt class="verbatim">objects/</tt> if <tt class="verbatim">objectPages</tt> puts them
+      elsewhere; the lines of the indexes only if it keeps them; and the paths
+      adjusted if the archive is in a sub-folder):
     </p>
     <div class="tmweb-code">
       <pre class="verbatim" xml:space="preserve">
 # OpenSheaf archive files: stored and checked out byte for byte,
 # never merged as text.
 opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
+objects/**     -text -filter -ident -working-tree-encoding -export-subst -merge
 ocfl/**        -text -filter -ident -working-tree-encoding -export-subst -merge
 indexes.json   -text -filter -ident -working-tree-encoding -export-subst -merge
 names/**       -text -filter -ident -working-tree-encoding -export-subst -merge
@@ -358,8 +363,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       </li>
       <li>
         <p>
-          the replacement of <tt class="verbatim">opensheaf.json</tt>, and files added,
-          replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
+          the replacement of <tt class="verbatim">opensheaf.json</tt>, pages of objects
+          added, replaced or removed (section 3.1 of the specification), and
+          files added, replaced or removed among the indexes (<tt class="verbatim">indexes.json</tt>,
           <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>),
           which are rewritten at every deposit and takedown (section 12.5 of
           the specification);
@@ -395,7 +401,7 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           owner-name layout), including its removal, with the creation of the
           <tt class="verbatim">draft/</tt> folder and its removal when it is left empty:
           drafts are the only objects that may be rewritten or deleted, and
-          are never copied out of the archive;
+          are never copied out of the archive.
         </p>
       </li>
     </ol>
@@ -596,9 +602,9 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
       headers, and serves the storage root from the origin of the presentation
       files, so it cannot keep the files of objects from running scripts
       there, with <tt class="verbatim">Content-Security-Policy: sandbox</tt> or another
-      origin, as section 15.3 of the specification recommends; that section
-      says what presentation files then avoid, and the question is open there.
-      Its limits are in section 8.
+      origin, as section 15.3 of the specification recommends; section 15.3 of
+      the specification says what presentation files then avoid (#64). Its
+      limits are in section 8.
     </p>
     <h3 id="auto-21"><a id="73-other-hosts"></a>7.3 Other hosts<span style="margin-left: 1em"></span></h3>
     <p>
@@ -674,11 +680,12 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
     <ul>
       <li>
         <p>
-          keep only working files and presentation files in git, and the
-          storage root in object storage, whose URL the discovery document
-          gives (<tt class="verbatim">storageRoot</tt>, section 3.1 of the
-          specification); git then no longer keeps the archive, and this
-          document no longer applies to its storage root;
+          keep only working files and presentation files in git, and serve the
+          archive files from object storage, at the archive's base URL, the
+          storage root below it (<tt class="verbatim">storageRoot</tt> is a path below
+          the discovery document, section 3.1 of the specification); git then
+          no longer keeps the archive, and this document no longer applies to
+          its archive files;
         </p>
       </li>
       <li>
@@ -1121,6 +1128,31 @@ sha512/**      -text -filter -ident -working-tree-encoding -export-subst -merge<
           specification (#19): an archive of many objects pages the <tt class="verbatim">objects</tt>
           of its discovery document, so that a deposit rewrites one page
           (section 8); open question 4 restricted to the size of git trees.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> following the
+          specification (#19): the pages of <tt class="verbatim">objects</tt> are
+          archive files, stored byte for byte by <tt class="verbatim">.gitattributes</tt>
+          (<tt class="verbatim">objects/**</tt>), and added, replaced or removed with
+          the discovery document (sections 2, 4.1 and 5.1, item 4).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> following the
+          specification: <tt class="verbatim">storageRoot</tt> is a path below the
+          discovery document, so an archive that leaves git serves its archive
+          files from object storage at its base URL, never the storage root
+          alone at another (section 8).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> editorial: GitHub
+          Pages and section 15.3 of the specification, whose question (#64) is
+          answered (section 7.2); item 8 of section 5.1 ends the list.
         </p>
       </li>
     </ul>

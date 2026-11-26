@@ -1,6 +1,6 @@
 # OpenSheaf archives in git
 
-*Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 22 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.*
+*Companion to the OpenSheaf specification 0.2. Version 0.2 (draft), 26 November 2026. How to keep an OpenSheaf archive in a git repository, publish it from there and copy it, without git changing a byte of what the archive holds. It adds nothing to the format: readers of an archive never need to know that it is kept in git. The text is licensed under CC BY-SA 4.0.*
 
 > [!WARNING]
 > **Draft for discussion.** This document is a first draft. Its open questions are listed in section 13; none of them is settled.
@@ -31,7 +31,7 @@ The principle: git is a store and a transport for the files of the archive. The 
 The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL are to be interpreted as described in BCP 14 (RFC 2119, RFC 8174) when, and only when, they appear in all capitals. Terms of the specification (archive, storage root, discovery document, object, object version, pin, mirror, witness, takedown, tombstone, owner, owner object, key log, draft, signed version, not a version, ended owner, fork of a line, fork of a key log, fork record, current key, rotation key, exposed key) keep their meaning.
 
 - <dfn>Repository</dfn>: a git repository holding one archive.
-- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json`, the storage root (by convention `ocfl/`) and, if used, the indexes (the folders `names/`, `owners/` and `sha512/`, which an archive declares in its discovery document, and `indexes.json`, only in a repository that serves indexes for several archives, as a custodian or a resolver does; section 12.5 of the specification).
+- <dfn>Archive files</dfn>: the files the specification requires to be served byte for byte: the discovery document `opensheaf.json` and, if it pages its objects, its pages (`objectPages`, section 3.1 of the specification; the tools put them in `objects/`), the storage root (by convention `ocfl/`) and, if used, the indexes (the folders `names/`, `owners/` and `sha512/`, which an archive declares in its discovery document, and `indexes.json`, only in a repository that serves indexes for several archives, as a custodian or a resolver does; section 12.5 of the specification).
 - <dfn>Presentation files</dfn>: the website of the archive (appendix A.3 of the specification), generated from the archive files.
 - <dfn>Working files</dfn>: every other file of the repository: settings of tools, descriptions of deposits, sources being prepared, scripts, workflows.
 - <dfn>Published branch</dfn>: the branch from which the archive is served (usually `main`). A <dfn>published commit</dfn> is a commit of its first-parent history.
@@ -51,12 +51,13 @@ The archive files MUST NOT contain symbolic links or git submodules. Members of 
 
 ### 4.1 Attributes
 
-The repository MUST contain a `.gitattributes` file at its top with these lines (with the lines of the indexes only if it keeps them, and the paths adjusted if the archive is in a sub-folder):
+The repository MUST contain a `.gitattributes` file at its top with these lines (with the folder of the pages of objects in place of `objects/` if `objectPages` puts them elsewhere; the lines of the indexes only if it keeps them; and the paths adjusted if the archive is in a sub-folder):
 
 ```
 # OpenSheaf archive files: stored and checked out byte for byte,
 # never merged as text.
 opensheaf.json -text -filter -ident -working-tree-encoding -export-subst -merge
+objects/**     -text -filter -ident -working-tree-encoding -export-subst -merge
 ocfl/**        -text -filter -ident -working-tree-encoding -export-subst -merge
 indexes.json   -text -filter -ident -working-tree-encoding -export-subst -merge
 names/**       -text -filter -ident -working-tree-encoding -export-subst -merge
@@ -96,11 +97,11 @@ Let C be a published commit and C' the next one on the published branch. Between
 1. a new object folder `ocfl/<path>/`, where `<path>` is the object's path in the layout of the storage root (`<owner>/<name>` in the owner-name layout, or the folders of the hash and the encoded identifier in the hashed layout, section 3.2 of the specification), with the folders above it that it needs (a new owner's folder, or folders of the hash), and the files of a complete OCFL object: a new object, or the copy of a line kept elsewhere, up to its latest signed version (its root inventory then that of this version, section 11.1 of the specification);
 2. new version folders `ocfl/<path>/v<N>/` to `ocfl/<path>/v<M>/`, M not less than N, where `v<N-1>` is the head of the object in C, with the replacement of the object's root `inventory.json` and its checksum file by those of `v<M>`, and the versions' signature files in item 3;
 3. files added in an object's `extensions/opensheaf-witnesses/` folder: signature files `<version>/signature-<k>.json` of the line's owner that are not invalid (section 7.3 of the specification), their timestamp files, and others' witnesses. A file there, once published, is never replaced or removed, even when it is not a witness (a stray or malformed file, which is reported and kept), except with its object by a takedown: timestamps are made of the bytes of signature files, and a completed timestamp proof is a new file beside the pending one;
-4. the replacement of `opensheaf.json`, and files added, replaced or removed among the indexes (`indexes.json`, `names/`, `owners/`, `sha512/`), which are rewritten at every deposit and takedown (section 12.5 of the specification);
+4. the replacement of `opensheaf.json`, pages of objects added, replaced or removed (section 3.1 of the specification), and files added, replaced or removed among the indexes (`indexes.json`, `names/`, `owners/`, `sha512/`), which are rewritten at every deposit and takedown (section 12.5 of the specification);
 5. at the creation of the storage root, its own files (`0=ocfl_1.1`; `opensheaf-owner-name-storage-layout.md` in the owner-name layout, which has no `ocfl_layout.json`, or `ocfl_layout.json` and the configuration of the layout extension in the hashed layout; and the loose files allowed by section 3.2 of the specification);
 6. the removal of an object folder, with the folders above it that it leaves empty (an owner's folder, or folders of the hash), by a takedown (section 9);
 7. the repair of a file whose bytes do not match the digest its inventory records (section 5.3);
-8. any change inside the folder of a draft (section 10.1 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal, with the creation of the `draft/` folder and its removal when it is left empty: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive;
+8. any change inside the folder of a draft (section 10.1 of the specification; `ocfl/draft/<id>/` in the owner-name layout), including its removal, with the creation of the `draft/` folder and its removal when it is left empty: drafts are the only objects that may be rewritten or deleted, and are never copied out of the archive.
 
 No other file of the archive changes, and no file of an existing version folder is changed, renamed or removed, except by a repair. Several changes MAY be made in one commit.
 
@@ -159,7 +160,7 @@ GitHub Pages can publish a branch, or the files uploaded by a workflow. Publishi
 
 A branch published directly is served whole, and is processed by Jekyll unless the branch has a `.nojekyll` file at the top of the published folder. Jekyll leaves out files and folders whose names begin with `_` or `.`, which sources often have (`_preamble.tex`, `.latexmkrc`). A repository published from a branch MUST therefore contain `.nojekyll`.
 
-GitHub Pages compresses responses (`Content-Encoding: gzip`); the bytes after decoding are those stored, as the specification requires. It allows cross-origin requests (`Access-Control-Allow-Origin: *`), as the specification recommends. It sets no other response headers, and serves the storage root from the origin of the presentation files, so it cannot keep the files of objects from running scripts there, with `Content-Security-Policy: sandbox` or another origin, as section 15.3 of the specification recommends; that section says what presentation files then avoid, and the question is open there. Its limits are in section 8.
+GitHub Pages compresses responses (`Content-Encoding: gzip`); the bytes after decoding are those stored, as the specification requires. It allows cross-origin requests (`Access-Control-Allow-Origin: *`), as the specification recommends. It sets no other response headers, and serves the storage root from the origin of the presentation files, so it cannot keep the files of objects from running scripts there, with `Content-Security-Policy: sandbox` or another origin, as section 15.3 of the specification recommends; section 15.3 of the specification says what presentation files then avoid (#64). Its limits are in section 8.
 
 ### 7.3 Other hosts
 
@@ -188,7 +189,7 @@ Git stores identical files once, across objects and versions, as OCFL already do
 
 An archive near these limits can:
 
-- keep only working files and presentation files in git, and the storage root in object storage, whose URL the discovery document gives (`storageRoot`, section 3.1 of the specification); git then no longer keeps the archive, and this document no longer applies to its storage root;
+- keep only working files and presentation files in git, and serve the archive files from object storage, at the archive's base URL, the storage root below it (`storageRoot` is a path below the discovery document, section 3.1 of the specification); git then no longer keeps the archive, and this document no longer applies to its archive files;
 - store large files with Git LFS, deployed by a workflow (section 4.2);
 - move to a host with other limits, or to its own server.
 
@@ -261,3 +262,6 @@ A public repository SHOULD be archived by [Software Heritage](https://www.softwa
 - **0.2 (draft), 22 November 2026:** the archive's main catalogue replaced by one owner catalogue per owner hosted, as in the specification (#72): a commit updates an owner catalogue, and merges conflict on the catalogue of an owner both branches changed (sections 6.1 and 6.3).
 - **0.2 (draft), 22 November 2026:** following the specification (#29): an archive in a private repository is a private archive, whose lines are published by copying them, never by pushing them to a public repository (sections 6.2 and 12); a deposit merged from a pull request is `Available` from its deposit (section 6.3); open question 4 removed.
 - **0.2 (draft), 22 November 2026:** following the specification (#19): an archive of many objects pages the `objects` of its discovery document, so that a deposit rewrites one page (section 8); open question 4 restricted to the size of git trees.
+- **0.2 (draft), 26 November 2026:** following the specification (#19): the pages of `objects` are archive files, stored byte for byte by `.gitattributes` (`objects/**`), and added, replaced or removed with the discovery document (sections 2, 4.1 and 5.1, item 4).
+- **0.2 (draft), 26 November 2026:** following the specification: `storageRoot` is a path below the discovery document, so an archive that leaves git serves its archive files from object storage at its base URL, never the storage root alone at another (section 8).
+- **0.2 (draft), 26 November 2026:** editorial: GitHub Pages and section 15.3 of the specification, whose question (#64) is answered (section 7.2); item 8 of section 5.1 ends the list.

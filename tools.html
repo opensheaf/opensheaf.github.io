@@ -144,11 +144,14 @@ cd my-papers</pre>
         <p>
           <tt class="verbatim">--keys offline</tt> (the default, and the safest). The
           rotation keys are written once, encrypted under a passphrase you
-          choose, to the folder of <tt class="verbatim">--export</tt> (a USB stick),
-          and, with <tt class="verbatim">--print</tt>, printed on sheets. <tt class="verbatim">init</tt>
-          asks you to type back the check of each key once it is put away.
-          They are never kept on the computer: store the stick and the sheets
-          apart from it, and from each other.
+          choose, to the folder of <tt class="verbatim">--export</tt> (a USB stick), one
+          file per key named <tt class="verbatim">rotation-&lt;owner&gt;-&lt;key&gt;.txt</tt>
+          (the first 16 characters of the owner name and of the digest of the
+          key that the key log commits), and, with <tt class="verbatim">--print</tt>,
+          printed on sheets. <tt class="verbatim">init</tt> asks you to type back the
+          check of each key once it is put away. They are never kept on the
+          computer: store the stick and the sheets apart from it, and from
+          each other.
         </p>
       </li>
       <li>
@@ -225,9 +228,20 @@ osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://j
       </li>
       <li>
         <p>
+          <tt class="verbatim">.gitignore</tt>, or the lines it lacks added to yours:
+          the working folders of the tools (<tt class="verbatim">texmacs_home/</tt>, <tt
+          class="verbatim">.staging-*</tt>), which are not part of the archive;
+        </p>
+      </li>
+      <li>
+        <p>
           <tt class="verbatim">ocfl/</tt>: the storage itself, one folder per work, with
           the key log of the owner at <tt class="verbatim">ocfl/&lt;owner&gt;/&lt;owner&gt;/</tt>;
-          - <tt class="verbatim">opensheaf.json</tt>: the discovery document, which
+        </p>
+      </li>
+      <li>
+        <p>
+          <tt class="verbatim">opensheaf.json</tt>: the discovery document, which
           readers and tools start from, with the labels of your papers; beyond
           a thousand objects, the list of objects moves into pages under <tt
           class="verbatim">objects/</tt>, so that a deposit rewrites one small file;
@@ -236,12 +250,19 @@ osheaf init my-papers --name &quot;Papers of Jane Doe&quot; --base-url https://j
       <li>
         <p>
           <tt class="verbatim">names/</tt>, <tt class="verbatim">owners/</tt>, <tt class="verbatim">sha512/</tt>:
-          indexes for looking things up; - the website: <tt class="verbatim">index.html</tt>,
-          a page per paper at <tt class="verbatim">paper/&lt;name&gt;/</tt> (the
-          permanent address the descriptions record) and at <tt class="verbatim">paper/&lt;label&gt;/</tt>
+          indexes for looking things up;
+        </p>
+      </li>
+      <li>
+        <p>
+          the website: <tt class="verbatim">index.html</tt>, a page per paper at <tt
+          class="verbatim">paper/&lt;name&gt;/</tt> (the permanent address the
+          descriptions record) and at <tt class="verbatim">paper/&lt;label&gt;/</tt>
           (the readable one the pages link to), a page per owner at <tt class="verbatim">owner/&lt;owner&gt;/</tt>,
-          <tt class="verbatim">sitemap.xml</tt>, and the templates they are made from in
-          <tt class="verbatim">templates/</tt>, which you can edit.
+          <tt class="verbatim">sitemap.xml</tt>, <tt class="verbatim">style.css</tt>, <tt class="verbatim">.nojekyll</tt>
+          (so that GitHub Pages serves the files as they are), and the
+          templates they are made from in <tt class="verbatim">templates/</tt>, which
+          you can edit.
         </p>
       </li>
     </ul>
@@ -291,7 +312,9 @@ osheaf deposit kpz-uniqueness paper.tex --pdf paper.pdf --new \
     <p>
       The options can also come from a YAML or JSON file, with the same names,
       which is handy for papers with many authors or for several deposits at
-      once (a list in the file):
+      once (a list in the file). <tt class="verbatim">new: yes</tt> stands for <tt
+      class="verbatim">--new</tt>; without it, the entry adds a version to the paper of
+      that label:
     </p>
     <div class="language-bash">
       <div class="tmweb-code">
@@ -303,6 +326,7 @@ osheaf deposit --from kpz.yaml</pre>
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 id: kpz-uniqueness
+new: yes
 source: paper.tex
 pdf: paper.pdf
 extra-sources: [refs.bib]
@@ -428,9 +452,12 @@ osheaf verify    # check everything, as section 14 of the specification asks</pr
       archive, so <tt class="verbatim">osheaf index</tt> is only needed to rewrite
       everything. <tt class="verbatim">osheaf verify</tt> reports errors, warnings and
       the status of every signature and member; <tt class="verbatim">--remote</tt> also
-      checks the members of your collections held in other archives, and <tt
-      class="verbatim">--json</tt> prints the findings for a program. The same checks
-      can be run on a published archive from the browser, with the <a href="https://opensheaf.org/explorer/">Explorer</a>.
+      checks the members of your collections held in other archives and the
+      links of owners to their keepers (their ORCID records or domains), and
+      <tt class="verbatim">--json</tt> prints the findings for a program. Without <tt
+      class="verbatim">--remote</tt>, <tt class="verbatim">verify</tt> reads only the files of the
+      archive. The same checks can be run on a published archive from the
+      browser, with the <a href="https://opensheaf.org/explorer/">Explorer</a>.
     </p>
     <h3 id="auto-12"><a id="publishing"></a>Publishing<span style="margin-left: 1em"></span></h3>
     <p>
@@ -470,6 +497,11 @@ osheaf key list     # what the key wallet holds (never a secret)</pre>
       </div>
     </div>
     <p>
+      <tt class="verbatim">owner show</tt> reads the keeper's ORCID record or domain to
+      check its link to the owner; <tt class="verbatim">--offline</tt> leaves it
+      unchecked.
+    </p>
+    <p>
       Wallets and owners are many to many: one wallet may hold the keys of
       several owners (an institution's), several people may share one owner's
       keys in a wallet, each with a passkey of their own, and the keys of one
@@ -498,12 +530,16 @@ osheaf key list     # what the key wallet holds (never a secret)</pre>
       </li>
     </ul>
     <p>
-      The <tt class="verbatim">key</tt> commands look for the keys of an owner in the
-      wallets hinted for it, then in yours, in order, and use the first that
-      holds them; <tt class="verbatim">OPENSHEAF_WALLET</tt> wins over both, and <tt
-      class="verbatim">--wallet github:OWNER/REPO</tt> (or <tt class="verbatim">--wallet
-      command</tt>) names another. A wallet configured under <tt class="verbatim">keys</tt>
-      in your file (a command wallet) comes after your <tt class="verbatim">wallets</tt>.
+      The <tt class="verbatim">key</tt> commands look for the keys of an owner in your
+      own wallets first, in order, then in the wallets <tt class="verbatim">osheaf.json</tt>
+      hints for it, and use the first that holds them; <tt class="verbatim">OPENSHEAF_WALLET</tt>
+      wins over both, and <tt class="verbatim">--wallet github:OWNER/REPO</tt> (or <tt
+      class="verbatim">--wallet command</tt>) names another. A wallet configured under
+      <tt class="verbatim">keys</tt> in your file (a command wallet) comes after your
+      <tt class="verbatim">wallets</tt>. Since whoever can change the archive writes its
+      hints, <tt class="verbatim">key push</tt> asks before putting keys into a wallet
+      that only <tt class="verbatim">osheaf.json</tt> names (<tt class="verbatim">--yes</tt> skips
+      the question).
     </p>
     <div class="language-bash">
       <div class="tmweb-code">
@@ -534,8 +570,8 @@ osheaf key pull     # asks the passphrase (or the passkey), keeps the key here</
         <pre class="verbatim" xml:space="preserve">
 osheaf key new      # on the new computer: prints its did:key
 osheaf owner rotate --add did:key:z6Mk... \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-1.txt \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-2.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-&lt;owner&gt;-&lt;key1&gt;.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-&lt;owner&gt;-&lt;key2&gt;.txt \
   --export /Volumes/USB/opensheaf-keys-2 --print</pre>
       </div>
     </div>
@@ -718,8 +754,8 @@ osheaf key forget --from-wallet --used</pre>
         <pre class="verbatim" xml:space="preserve">
 osheaf key new                                   # prints did:key:NEW
 osheaf owner expose did:key:OLD --add did:key:NEW \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-1.txt \
-  --rotation-key /Volumes/USB/opensheaf-keys/rotation-...-2.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-&lt;owner&gt;-&lt;key1&gt;.txt \
+  --rotation-key /Volumes/USB/opensheaf-keys/rotation-&lt;owner&gt;-&lt;key2&gt;.txt \
   --export /Volumes/USB/opensheaf-keys-2 --print</pre>
       </div>
     </div>
@@ -737,6 +773,11 @@ osheaf owner expose did:key:OLD --add did:key:NEW \
 osheaf sign kpz-uniqueness --version v3</pre>
       </div>
     </div>
+    <p>
+      <tt class="verbatim">sign</tt> shows the version and asks you to type the first 8
+      characters of the digest of its inventory, to confirm that you made it
+      (<tt class="verbatim">--yes</tt> skips the question, in scripts).
+    </p>
     <p>
       Publish the result at once, so that readers learn of the exposure.
     </p>
@@ -787,9 +828,13 @@ osheaf collection status reading</pre>
       collection follow</tt>) follows a paper; <tt class="verbatim">osheaf collection
       update</tt> then moves it to the latest signed version, and for a
       selection lists the versions not yet vetted. <tt class="verbatim">collection
-      remove</tt> removes a member or a revision, and <tt class="verbatim">collection
-      sync LABEL --from collection.yaml</tt> writes a whole collection from a
-      file. To show a collection first on the home page, set <tt class="verbatim">&quot;featured&quot;:
+      status</tt> and <tt class="verbatim">collection update</tt> resolve every member
+      over the network at the addresses it records, your own archive's
+      published address (<tt class="verbatim">baseUrl</tt>) included for your own
+      papers. <tt class="verbatim">collection remove</tt> removes a member or a
+      revision, and <tt class="verbatim">collection sync LABEL --from
+      collection.yaml</tt> writes a whole collection from a file. To show a
+      collection first on the home page, set <tt class="verbatim">&quot;featured&quot;:
       &quot;reading&quot;</tt> under <tt class="verbatim">index</tt>, <tt class="verbatim">html</tt>
       in <tt class="verbatim">osheaf.json</tt>.
     </p>
@@ -832,18 +877,20 @@ osheaf mirror &quot;sheaf:&lt;name&gt;:&lt;owner&gt;&quot; --at https://mgubi.or
       (section <a href="opensheaf-specification-0.2.html#9-branches-and-accepted-copies">9</a>). A journal <strong>accepts</strong> a paper as
       an accepted copy, a branch listed by one of its selections (section <a
       href="opensheaf-specification-0.2.html#96-accepted-copies">9.6</a>); its own typeset version is then deposited as a later
-      version of that copy, with <tt class="verbatim">--stage VoR</tt> and <tt class="verbatim">--agreement</tt>.
-      A branch numbers its own versions from 1: its first version is its
-      version 1, whatever the parent's number, which it records. Branching or
-      accepting a later version of the same paper again gives the existing
-      branch a new branch point, its next version, which keeps the branch's
-      own notices (section <a href="opensheaf-specification-0.2.html#94-later-versions-and-new-branch-points">9.4</a>).
+      version of that copy, by its label (<tt class="verbatim">--label</tt>, or later
+      <tt class="verbatim">osheaf label</tt>), with <tt class="verbatim">--stage VoR</tt> and <tt
+      class="verbatim">--agreement</tt>. A branch numbers its own versions from 1: its
+      first version is its version 1, whatever the parent's number, which it
+      records. Branching or accepting a later version of the same paper again
+      gives the existing branch a new branch point, its next version, which
+      keeps the branch's own notices (section <a href="opensheaf-specification-0.2.html#94-later-versions-and-new-branch-points">9.4</a>).
     </p>
     <div class="language-bash">
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 osheaf branch &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v3&quot; --at https://other.example/papers/ --label kpz-continued
-osheaf accept &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://other.example/papers/ --selection issue-1</pre>
+osheaf accept &quot;sheaf:&lt;name&gt;:&lt;owner&gt;/v2&quot; --at https://other.example/papers/ \
+  --selection issue-1 --label kpz-accepted</pre>
       </div>
     </div>
     <h3 id="auto-26"><a id="key-logs-of-other-owners"></a>Key logs of other owners<span style="margin-left: 1em"></span></h3>
@@ -869,7 +916,8 @@ osheaf owner pull https://other.example/papers/ --owner &lt;owner&gt;</pre>
       <div class="tmweb-code">
         <pre class="verbatim" xml:space="preserve">
 osheaf draft new notes notes.tex --pdf notes.pdf --title &quot;Notes on KPZ&quot; --author &quot;Doe, Jane&quot;
-osheaf draft deposit notes notes.tex --pdf notes.pdf --replace
+osheaf draft deposit notes notes.tex --pdf notes.pdf --replace \
+  --title &quot;Notes on KPZ&quot; --author &quot;Doe, Jane&quot;
 osheaf seal notes --label kpz-notes --delete-draft</pre>
       </div>
     </div>
@@ -887,6 +935,10 @@ osheaf seal notes --label kpz-notes --delete-draft</pre>
 osheaf takedown kpz-notes --reason &quot;Deposited by mistake.&quot;</pre>
       </div>
     </div>
+    <p>
+      It asks you to type the first 8 characters of the object's name to
+      confirm; <tt class="verbatim">--yes</tt> skips the question, in scripts.
+    </p>
     <h2 id="auto-29"><a id="arxiv-and-zenodo"></a>arXiv and Zenodo<span style="margin-left: 1em"></span></h2>
     <h3 id="auto-30"><a id="importing-from-arxiv"></a>Importing from arXiv<span style="margin-left: 1em"></span></h3>
     <p>
@@ -1017,7 +1069,8 @@ osheaf zenodo kpz-uniqueness --production</pre>
           <tt class="verbatim">--owner OWNER</tt>: the owner object)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">takedown LABEL</tt></td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">delete an object, leaving a tombstone</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">delete an object, leaving a tombstone, after you type the
+          first 8 characters of its name (<tt class="verbatim">--yes</tt>)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner init</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">make an owner (done by <tt class="verbatim">init --new-owner</tt>);
@@ -1044,15 +1097,16 @@ osheaf zenodo kpz-uniqueness --production</pre>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">sign LABEL</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">sign again a version contested by an exposed key (<tt
-          class="verbatim">--version vN</tt>)</td>
+          class="verbatim">--version vN</tt>), after you type the first 8 characters of
+          its digest (<tt class="verbatim">--yes</tt>)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key new</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">a new current key for this computer</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key push</tt>, <tt class="verbatim">pull</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">current keys to and from the key wallet (<tt class="verbatim">--wallet
-          WALLET</tt>; a wallet only <tt class="verbatim">osheaf.json</tt> names is used
-          after asking, or with <tt class="verbatim">--yes</tt>)</td>
+          WALLET</tt>); <tt class="verbatim">push</tt> asks before putting keys into a
+          wallet only <tt class="verbatim">osheaf.json</tt> names (<tt class="verbatim">--yes</tt>)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">key list</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">what the key wallet holds</td>

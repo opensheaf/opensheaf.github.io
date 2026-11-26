@@ -132,13 +132,16 @@
       resolved against the URL of that file. Digests are written in lowercase
       hexadecimal unless stated otherwise. DOIs are written bare (<tt class="verbatim">10.5281/zenodo.123</tt>),
       without a resolver prefix. Terms are defined where they are first
-      introduced, written <dfn>thus</dfn>. Numbers in the JSON files this
-      specification defines are integers, written without a fraction or an
-      exponent, of absolute value at most 2^53 - 1, so that every reader
-      parses them exactly; in a genesis record and in <tt class="verbatim">keys.json</tt>,
-      whose values are compared and recomputed byte for byte (sections 5.1 and
-      6.1), this holds for every number, in the data of extensions included,
-      and a file breaking it is malformed.
+      introduced, written <dfn>thus</dfn>. Every number in every JSON file
+      this specification defines (the discovery document and its pages, <tt
+      class="verbatim">object.json</tt>, <tt class="verbatim">members.json</tt>, genesis records,
+      <tt class="verbatim">keys.json</tt>, signature files, a keeper's file and index
+      files), in the data of extensions included, is an integer, written
+      without a fraction or an exponent, of absolute value at most 2^53 - 1,
+      so that every reader parses it exactly, and values compared or
+      recomputed byte for byte (sections 5.1 and 6.1) are read alike by every
+      reader; a file with any other number is malformed. Extensions write
+      other numbers as strings.
     </p>
     <p>
       <strong>Conformance classes.</strong> An archive, an object or a program
@@ -226,14 +229,14 @@
       root (appendix A).
     </p>
     <p>
-      <strong>Serving.</strong> The discovery document, the storage root and
-      the indexes MUST be served byte for byte, as stored: no conversion of
-      line endings or character sets, and no compression that changes the
-      bytes delivered after decoding. Archives SHOULD be served over HTTPS,
-      and SHOULD allow cross-origin requests to these files (<tt class="verbatim">Access-Control-Allow-Origin:
-      *</tt>), so that tools in a browser can read them. Any static web server
-      will do; an archive kept in git follows <a href="opensheaf-git-0.2.html">OpenSheaf archives in
-      git</a>.
+      <strong>Serving.</strong> The discovery document and its pages (section
+      3.1), the storage root and the indexes MUST be served byte for byte, as
+      stored: no conversion of line endings or character sets, and no
+      compression that changes the bytes delivered after decoding. Archives
+      SHOULD be served over HTTPS, and SHOULD allow cross-origin requests to
+      these files (<tt class="verbatim">Access-Control-Allow-Origin: *</tt>), so that
+      tools in a browser can read them. Any static web server will do; an
+      archive kept in git follows <a href="opensheaf-git-0.2.html">OpenSheaf archives in git</a>.
     </p>
     <p>
       <strong>Being found.</strong> How readers and services learn of an
@@ -276,8 +279,12 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">storageRoot</tt>: the URL of the storage root, ending
-          with <tt class="verbatim">/</tt> (it may be relative);
+          <tt class="verbatim">storageRoot</tt>: the URL of the storage root, a path
+          relative to the discovery document that stays below it, ending with
+          <tt class="verbatim">/</tt> (no scheme or <tt class="verbatim">:</tt>, no leading <tt
+          class="verbatim">/</tt>, no empty, <tt class="verbatim">.</tt> or <tt class="verbatim">..</tt>
+          segment; by convention <tt class="verbatim">ocfl/</tt>), so that the storage
+          root moves with the archive;
         </p>
       </li>
       <li>
@@ -367,16 +374,17 @@
       pages: in place of <tt class="verbatim">objects</tt>, <tt class="verbatim">objectPages</tt>,
       a non-empty list of the paths of page files, relative to the discovery
       document (no scheme, no leading <tt class="verbatim">/</tt>, no <tt class="verbatim">.</tt>
-      or <tt class="verbatim">..</tt> segment). A page is a JSON file with <tt class="verbatim">format</tt>,
-      <tt class="verbatim">&quot;opensheaf-objects/0.2&quot;</tt>, and <tt class="verbatim">objects</tt>,
-      a non-empty list of entries of the form above; every object is in
-      exactly one page, and labels are unique across the pages. Wherever this
-      specification speaks of <tt class="verbatim">objects</tt>, it means the entries of
-      the pages for an archive that pages them. Pages SHOULD group objects by
-      a prefix of their name, so that a deposit rewrites one page, and hold
-      about a thousand entries each (some 0.5 MB); tools SHOULD page <tt
-      class="verbatim">objects</tt> beyond about a thousand objects. Readers MUST accept
-      both forms.
+      or <tt class="verbatim">..</tt> segment), each ending with <tt class="verbatim">.json</tt>;
+      pages are served byte for byte, as the discovery document is (section
+      3). A page is a JSON file with <tt class="verbatim">format</tt>, <tt class="verbatim">&quot;opensheaf-objects/0.2&quot;</tt>,
+      and <tt class="verbatim">objects</tt>, a non-empty list of entries of the form
+      above; every object is in exactly one page, and labels are unique across
+      the pages. Wherever this specification speaks of <tt class="verbatim">objects</tt>,
+      it means the entries of the pages for an archive that pages them. Pages
+      SHOULD group objects by a prefix of their name, so that a deposit
+      rewrites one page, and hold about a thousand entries each (some 0.5 MB);
+      tools SHOULD page <tt class="verbatim">objects</tt> beyond about a thousand
+      objects. Readers MUST accept both forms.
     </p>
     <h3 id="auto-6"><a id="32-the-storage-root"></a>3.2 The storage root<span style="margin-left: 1em"></span></h3>
     <p>
@@ -664,12 +672,14 @@
       <strong>Completion.</strong> A document version deposited with <tt
       class="verbatim">sourcesMissing</tt> (section 4.3) MAY be completed, keeping its
       number, by object versions that add its sources, possibly with
-      renditions made from them (named in <tt class="verbatim">mainSource</tt>, <tt
-      class="verbatim">sourceFormat</tt>, <tt class="verbatim">renditions</tt> and <tt class="verbatim">toolchain</tt>),
-      and change or remove no file of the version. It keeps <tt class="verbatim">sourcesMissing</tt>
-      until the sources are complete; the object version that completes them
-      names the main source and drops <tt class="verbatim">sourcesMissing</tt>, and the
-      version is then fixed like any other.
+      renditions made from them, and change or remove no file of the version.
+      It keeps <tt class="verbatim">sourcesMissing</tt> until the sources are complete:
+      an object version that adds sources without completing them MAY add to
+      <tt class="verbatim">renditions</tt> and <tt class="verbatim">toolchain</tt>, and has no <tt
+      class="verbatim">mainSource</tt> or <tt class="verbatim">sourceFormat</tt>; the object
+      version that completes them names the main source in <tt class="verbatim">mainSource</tt>
+      and its format in <tt class="verbatim">sourceFormat</tt>, and drops <tt class="verbatim">sourcesMissing</tt>,
+      and the version is then fixed like any other.
     </p>
     <p>
       <strong>History.</strong> The <dfn>history</dfn> of a document is the
@@ -1099,8 +1109,9 @@
       </li>
       <li>
         <p>
-          <tt class="verbatim">nonce</tt>: at least 128 bits from a cryptographically
-          secure random generator, in lowercase hexadecimal;
+          <tt class="verbatim">nonce</tt>: at least 128 bits (16 bytes) from a
+          cryptographically secure random generator, written as whole bytes in
+          lowercase hexadecimal (an even number of digits, at least 32);
         </p>
       </li>
       <li>
@@ -3042,9 +3053,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     </p>
     <p>
       <strong>The work.</strong> <tt class="verbatim">sheaf:&lt;name&gt;:*</tt> names
-      every line of the work (section 12.4). It takes <tt class="verbatim">at</tt>, but
-      a resolver rejects it with a version or <tt class="verbatim">sha512</tt>, since
-      every line has its own document versions.
+      every line of the work, which a resolver MAY search for (section 12.4).
+      It takes <tt class="verbatim">at</tt>, but a resolver rejects it with a version or
+      <tt class="verbatim">sha512</tt>, since every line has its own document versions.
     </p>
     <p>
       <strong>The version.</strong> <tt class="verbatim">/v&lt;n&gt;</tt> is a document
@@ -3181,20 +3192,23 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
     <p>
       Resolving one line needs no search (the originator's line is always
       named by algorithm 0). But the lines of a work may carry any of the 16
-      names of its genesis record (section 5.2). To find them all (for <tt
-      class="verbatim">:*</tt>, or a search by work), a resolver obtains the genesis
-      record from any copy or index entry found under the name, checked
-      against it; computes its 16 names and looks each up in the indexes it
-      knows; keeps only the entries whose genesis record is byte for byte the
-      one obtained, discarding others as collisions (removed entries without a
-      genesis record are listed apart, as removed lines of those names, and
-      removed entries that kept it are marked removed); and keeps only the
-      lines that pass the checks of section 12.3 and hold back to the origin:
-      the originator's line signed by its originator, and branches whose
-      branch points are confirmed (section 9.3). A reused genesis record thus
-      yields no line (section 5.4), and no hash is assumed free of collisions.
-      If several genesis records have the URI's name, the URI is ambiguous:
-      the resolver lists them with their originators.
+      names of its genesis record (section 5.2). A resolver MAY search for
+      them all (for <tt class="verbatim">:*</tt>, or a search by work); one that does
+      not says that it does not resolve <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>,
+      and resolves every other form as section 12.3 says. To search, a
+      resolver obtains the genesis record from any copy or index entry found
+      under the name, checked against it; computes its 16 names and looks each
+      up in the indexes it knows; keeps only the entries whose genesis record
+      is byte for byte the one obtained, discarding others as collisions
+      (removed entries without a genesis record are listed apart, as removed
+      lines of those names, and removed entries that kept it are marked
+      removed); and keeps only the lines that pass the checks of section 12.3
+      and hold back to the origin: the originator's line signed by its
+      originator, and branches whose branch points are confirmed (section
+      9.3). A reused genesis record thus yields no line (section 5.4), and no
+      hash is assumed free of collisions. If several genesis records have the
+      URI's name, the URI is ambiguous: the resolver lists them with their
+      originators.
     </p>
     <h3 id="auto-57"><a id="125-indexes"></a>12.5 Indexes<span style="margin-left: 1em"></span></h3>
     <p>
@@ -3342,6 +3356,13 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           version's inventory file, its checksum file and its signature files
           (a Zenodo record version uploading them, a member's <tt class="verbatim">swhid</tt>)
           (#22).
+        </p>
+      </li>
+      <li>
+        <p>
+          Whether resolvers, or index services, are required to search for a
+          work, <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>, and how far they look
+          (section 12.4) (#80).
         </p>
       </li>
     </ul>
@@ -3659,7 +3680,8 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           that every later version but a fork record holds <tt class="verbatim">keys.json</tt>,
-          and that each later version is signed (section 7.3);
+          and that each later version other than a fork record is signed
+          (section 7.3);
         </p>
       </li>
       <li>
@@ -3982,7 +4004,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           SHOULD bound the size of what it fetches or unpacks, the number of
           objects, versions, files and members, the depth of chains and
           collections (section 9.3) and its time, and reports where it stops
-          (section 14.1);
+          (section 14.1); its bounds are its own choice, not part of the
+          format, and a copy or a file it does not read because of one is
+          unavailable to it (section 8.5), never not a version (section 7.3);
         </p>
       </li>
       <li>
@@ -4026,7 +4050,9 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       secrets of a review), MUST NOT be stored in an archive: in an object, a
       witness folder, a draft, presentation files, or the repository of an
       archive kept in git. Whatever an archive holds, a private archive
-      included (section 3.1), may be made public and copied.
+      included (section 3.1), may be made public and copied. A private key
+      that a verifier finds in an archive, in a form it recognises, is an
+      error (section 14.1), never a warning.
     </p>
     <h3 id="auto-75"><a id="155-privacy"></a>15.5 Privacy<span style="margin-left: 1em"></span></h3>
     <p>
@@ -4098,14 +4124,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       <li>
         <p>
           Tying owners to ORCID iDs and domains beyond the keeper (#41).
-        </p>
-      </li>
-      <li>
-        <p>
-          How an archive on a host that sets no response headers (GitHub
-          Pages) keeps the files of its objects from running scripts in the
-          origin of its presentation files, while search engines want its PDFs
-          on the host of its landing pages (section 15.3, appendix A.3) (#64).
         </p>
       </li>
     </ul>
@@ -4324,7 +4342,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           7.3); owner tools sign over versions not signed only once the owner
           acknowledges them (section 7.3); files beside carried signatures
           read as witnesses, and carried inventories checked by their
-          signatures only (section 6.3); <tt class="verbatim">parent.signatures/</tt>
+          signatures only (section 6.3); <tt class="verbatim">parent/signatures/</tt>
           holds good signature files only (section 9.2); a branch of the same
           parent line at the same or an earlier point refused, not renamed
           (section 9.4); selections of one owner share its accepted copy
@@ -4387,6 +4405,38 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           fork, and verifiers report the key-log version they judged against
           (section 6.5); weighted thresholds (#69) and witnesses of the
           versions of key logs seen first (#70) are left for after 0.2.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 21 November 2026:</strong> decided in #23: a
+          new document version is made when the own files differ from those of
+          the current version, compared by logical path and digest, so that a
+          rename is a change; an object version holding an existing document
+          version holds exactly its files; files of an earlier version
+          deposited again are a revert, a new document version (section 4.2,
+          appendix D).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 22 November 2026:</strong> decided in #72: each
+          owner an archive hosts has an owner catalogue there, a catalogue of
+          that owner created when the owner is set up, listing the documents
+          of its own lines in the archive, branches included, and changed by
+          that owner only; it replaces the archive's main catalogue, and is
+          never mirrored (sections 8.1, 9 and 11.1); <tt class="verbatim">owners</tt> of
+          the discovery document becomes recommended (made required in the
+          follow-up) and names each owner with its catalogue, in the order of
+          presentation, and <tt class="verbatim">mainCollection</tt> is dropped (section
+          3.1, appendix B); the index page presents the owner catalogues in
+          that order (appendix A.3); verifiers check <tt class="verbatim">owners</tt>
+          and the owner catalogues (section 14.6); a takedown is followed by a
+          version of the owner catalogue that listed the line (section 13.2);
+          appendix C and the rationale (appendix D) updated. Binding a
+          catalogue to its archive, keys an archive requires to create lines,
+          and an archive-wide selection over the owner catalogues are left
+          open (#72).
         </p>
       </li>
       <li>
@@ -4585,37 +4635,6 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
-          <strong>0.2 (draft), 21 November 2026:</strong> decided in #23: a
-          new document version is made when the own files differ from those of
-          the current version, compared by logical path and digest, so that a
-          rename is a change; an object version holding an existing document
-          version holds exactly its files; files of an earlier version
-          deposited again are a revert, a new document version (section 4.2,
-          appendix D).
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>0.2 (draft), 22 November 2026:</strong> decided in #72: each
-          owner an archive hosts has an owner catalogue there, a catalogue of
-          that owner created when the owner is set up, listing the documents
-          of its own lines in the archive, branches included, and changed by
-          that owner only; it replaces the archive's main catalogue, and is
-          never mirrored (sections 8.1, 9 and 11.1); <tt class="verbatim">owners</tt> of
-          the discovery document becomes recommended and names each owner with
-          its catalogue, in the order of presentation, and <tt class="verbatim">mainCollection</tt>
-          is dropped (section 3.1, appendix B); the index page presents the
-          owner catalogues in that order (appendix A.3); verifiers check <tt
-          class="verbatim">owners</tt> and the owner catalogues (section 14.6); a
-          takedown is followed by a version of the owner catalogue that listed
-          the line (section 13.2); appendix C and the rationale (appendix D)
-          updated. Binding a catalogue to its archive, keys an archive
-          requires to create lines, and an archive-wide selection over the
-          owner catalogues are left open (#72).
-        </p>
-      </li>
-      <li>
-        <p>
           <strong>0.2 (draft), 23 November 2026:</strong> decided in #79 and
           #77 (its first point), from the survey of the FAIR principles: <tt
           class="verbatim">rightsList</tt> is required in <tt class="verbatim">datacite.json</tt>,
@@ -4647,6 +4666,93 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           and C.7), its <tt class="verbatim">parent.documentVersion</tt> keeping the
           authors' 2; the inventory digest of its first version, in the
           issue's revision set (section C.4), recomputed.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review before 0.2: a completion names <tt class="verbatim">mainSource</tt> and
+          <tt class="verbatim">sourceFormat</tt> only in the object version that
+          completes the sources and drops <tt class="verbatim">sourcesMissing</tt>,
+          versions adding sources before it adding only to <tt class="verbatim">renditions</tt>
+          and <tt class="verbatim">toolchain</tt>, as the schema already said (section
+          4.2).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review: under the website profile, every line of an owner the
+          archive hosts that has a signed version has a landing page, listed
+          by an owner catalogue or not, so that the <tt class="verbatim">url</tt> of <tt
+          class="verbatim">datacite.json</tt> always leads to one (appendix A.3); the
+          canonical form is cited from section 12.1.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review: <tt class="verbatim">storageRoot</tt> is a path relative to the
+          discovery document that stays below it, never an absolute URL, so
+          that the storage root moves with the archive (section 3.1, the
+          schema of the discovery document, and <a href="opensheaf-git-0.2.html">OpenSheaf archives in
+          git</a>, section 8).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review: the bounds a reader puts on what it reads are its own
+          choice, and a copy or file not read because of one is unavailable,
+          never not a version (section 15.2).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review: searching for a work, <tt class="verbatim">sheaf:&lt;name&gt;:*</tt>,
+          is OPTIONAL for resolvers, which say when they do not resolve it;
+          whether to require it is left for after 0.2 (sections 12.1 and 12.4,
+          #80).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review: a private key a verifier finds in an archive is an error,
+          never a warning (section 15.4).
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review: the pages of <tt class="verbatim">objects</tt> (#19) are served byte
+          for byte, as the discovery document is, and their paths end with <tt
+          class="verbatim">.json</tt>, as the schema already said (sections 3 and 3.1);
+          the git companion lists them among the archive files.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> from the final
+          review: the rule on numbers holds for every number of every JSON
+          file of the format, the data of extensions included, not only in
+          genesis records and <tt class="verbatim">keys.json</tt> (section 2); the
+          schemas bound integers to 2^53 - 1, and appendix B lists the lexical
+          form of numbers among what verifiers check beyond the schemas.
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>0.2 (draft), 26 November 2026:</strong> editorial, from the
+          final review: the nonce of a genesis record is written as whole
+          bytes (section 5.1), as its schema says; a fork record is the one
+          later version of a key log that is not signed (section 14.3); the
+          open question of #64, answered by section 15.3, removed (section
+          15.6); the changelog put in date order, and <tt class="verbatim">parent/signatures/</tt>
+          spelt so in the entry of 20 November; the titles and comments of the
+          schemas harmonised, and <tt class="verbatim">previous</tt> named among the
+          fields of an owner object in the object schema (appendix B).
         </p>
       </li>
     </ul>
@@ -4839,24 +4945,27 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       </li>
       <li>
         <p>
-          <strong>Landing pages.</strong> Each line listed by an owner
-          catalogue has one landing page, at an address of the archive's
-          choice built from its name, followed by its owner name unless the
-          owner is the originator of the work, as in the canonical form of its
-          <tt class="verbatim">sheaf:</tt> URI (section 12.2): distinct for each line,
-          not an identifier, and the address that <tt class="verbatim">url</tt> (section
-          4.4) and every other fixed file record, which never changes. A line
-          with a label (section 3.1) MAY also have an address built from the
-          label, leading to the same page (a redirect, or a copy giving the
-          address from the name, or from the label, as canonical); it is a
-          convenience, given in links and to search engines, and may go or
-          pass to another line when the label changes. It never takes the
-          address of another line's page. The landing page is for its current
-          version (section 4.2), giving the full <tt class="verbatim">sheaf:</tt> URI of
-          the line in canonical form (sections 12.1 and 12.2) and every signed
-          document version in the order of the history, each with its external
-          labels, stage, change note, notices, renditions, sources and DOI,
-          and the withdrawal if any (sections 4.2, 4.3 and 13.1).
+          <strong>Landing pages.</strong> Each line of an owner the archive
+          hosts that has a signed version (section 7.3) has one landing page,
+          whether an owner catalogue lists it or not, so that the <tt class="verbatim">url</tt>
+          its versions record (section 4.4) leads to a page; it is at an
+          address of the archive's choice built from its name, followed by its
+          owner name unless the owner is the originator of the work, as in the
+          canonical form of its <tt class="verbatim">sheaf:</tt> URI (section 12.1):
+          distinct for each line, not an identifier, and the address that <tt
+          class="verbatim">url</tt> (section 4.4) and every other fixed file record,
+          which never changes. A line with a label (section 3.1) MAY also have
+          an address built from the label, leading to the same page (a
+          redirect, or a copy giving the address from the name, or from the
+          label, as canonical); it is a convenience, given in links and to
+          search engines, and may go or pass to another line when the label
+          changes. It never takes the address of another line's page. The
+          landing page is for its current version (section 4.2), giving the
+          full <tt class="verbatim">sheaf:</tt> URI of the line in canonical form
+          (sections 12.1 and 12.2) and every signed document version in the
+          order of the history, each with its external labels, stage, change
+          note, notices, renditions, sources and DOI, and the withdrawal if
+          any (sections 4.2, 4.3 and 13.1).
         </p>
       </li>
       <li>
@@ -4906,7 +5015,7 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
           <tt class="verbatim">version</tt>, <tt class="verbatim">license</tt> (each licence URL,
           or the text of a rights statement), <tt class="verbatim">encoding</tt> for
           each rendition, <tt class="verbatim">identifier</tt> (the full <tt class="verbatim">sheaf:</tt>
-          URI of the line in canonical form, section 12.2, and the DOI and
+          URI of the line in canonical form, section 12.1, and the DOI and
           concept DOI if any), <tt class="verbatim">sameAs</tt> (the URLs of the same
           work elsewhere, from <tt class="verbatim">IsIdenticalTo</tt> in <tt class="verbatim">relatedIdentifiers</tt>),
           <tt class="verbatim">abstract</tt> and <tt class="verbatim">keywords</tt> where <tt
@@ -5019,7 +5128,10 @@ sheaf:&lt;owner&gt;/v&lt;n&gt;?sha512=&lt;digest&gt;            a version of its
       whatever relates it to another file, its place, a digest or a key (names
       and identifiers, <tt class="verbatim">documentVersion</tt> and <tt class="verbatim">datacite.json</tt>,
       thresholds, signatures, fork records, uniqueness across entries, index
-      prefixes) is checked by verifiers (section 14).
+      prefixes) is checked by verifiers (section 14), and so is the lexical
+      form of numbers (section 2), which a schema cannot see: <tt class="verbatim">2.0</tt>
+      and <tt class="verbatim">2e0</tt> validate as the integer 2. The schemas bound
+      integers to the values section 2 allows.
     </p>
     <p>
       <strong>Open questions.</strong>
