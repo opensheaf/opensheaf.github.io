@@ -965,11 +965,12 @@
     <reference|lst:resolve>). It tries the locations it has, in any order,
     checks every copy found, and uses the latest signed version among the
     copies that agree, reporting forks, ended owners, exposed keys and
-    tombstones (specification, section 12.3). To find every line of a work,
-    it looks up all 16 names and keeps only entries whose genesis record is
-    byte for byte the same, so no hash is assumed free of collisions
-    (specification, section 12.4). An archive should keep indexes by name, by
-    owner and by inventory digest; custodians may keep them for many
+    tombstones (specification, section 12.3). A resolver may also search for
+    every line of a work; it then looks up all 16 names and keeps only
+    entries whose genesis record is byte for byte the same, so no hash is
+    assumed free of collisions (specification, section 12.4). Whether to
+    require this search is open (#80). An archive should keep indexes by
+    name, by owner and by inventory digest; custodians may keep them for many
     archives. A <dfn|gateway> serves URIs as web links, with a page or a
     temporary redirect only to a copy it has checked (specification, section
     12.6). External deposits, such as a Zenodo record, are witnesses, not
@@ -1818,7 +1819,7 @@
       OpenSheaf specification 0.2, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>timestamps-<line-break>0.<line-break>2
 
       <bibitem*|21><label|bib-git02>OpenSheaf project. OpenSheaf archives in
-      git, version 0.2 (draft), 22 November 2026. Companion to the OpenSheaf
+      git, version 0.2 (draft), 26 November 2026. Companion to the OpenSheaf
       specification 0.2, 2026. https://<line-break>opensheaf.<line-break>org/<line-break>opensheaf-<line-break>git-<line-break>0.<line-break>2
 
       <bibitem*|22><label|bib-tools>OpenSheaf project. opensheaf-py, a
@@ -2136,34 +2137,34 @@
     <associate|auto-21|<tuple|3.4|4>>
     <associate|auto-22|<tuple|5|4>>
     <associate|auto-23|<tuple|1|4>>
-    <associate|auto-24|<tuple|2|5>>
+    <associate|auto-24|<tuple|2|4>>
     <associate|auto-25|<tuple|3.5|5>>
     <associate|auto-26|<tuple|6|5>>
     <associate|auto-27|<tuple|3.6|5>>
     <associate|auto-28|<tuple|7|5>>
     <associate|auto-29|<tuple|3|5>>
     <associate|auto-3|<tuple|2|2>>
-    <associate|auto-30|<tuple|3.7|6>>
+    <associate|auto-30|<tuple|3.7|5>>
     <associate|auto-31|<tuple|3.8|6>>
     <associate|auto-32|<tuple|3.9|6>>
     <associate|auto-33|<tuple|8|6>>
     <associate|auto-34|<tuple|9|6>>
     <associate|auto-35|<tuple|10|6>>
-    <associate|auto-36|<tuple|3.10|7>>
+    <associate|auto-36|<tuple|3.10|6>>
     <associate|auto-37|<tuple|3.11|7>>
     <associate|auto-38|<tuple|3.12|7>>
     <associate|auto-39|<tuple|4|7>>
     <associate|auto-4|<tuple|1|2>>
     <associate|auto-40|<tuple|4.1|7>>
     <associate|auto-41|<tuple|11|7>>
-    <associate|auto-42|<tuple|4.2|8>>
+    <associate|auto-42|<tuple|4.2|7>>
     <associate|auto-43|<tuple|4.3|8>>
     <associate|auto-44|<tuple|4.4|8>>
     <associate|auto-45|<tuple|4.5|8>>
     <associate|auto-46|<tuple|1|8>>
     <associate|auto-47|<tuple|2|8>>
     <associate|auto-48|<tuple|3|8>>
-    <associate|auto-49|<tuple|5|9>>
+    <associate|auto-49|<tuple|5|8>>
     <associate|auto-5|<tuple|2|2>>
     <associate|auto-50|<tuple|4|9>>
     <associate|auto-51|<tuple|5.1|9>>
@@ -2173,7 +2174,7 @@
     <associate|auto-55|<tuple|5.5|10>>
     <associate|auto-56|<tuple|5.6|10>>
     <associate|auto-57|<tuple|5.7|10>>
-    <associate|auto-58|<tuple|5.8|11>>
+    <associate|auto-58|<tuple|5.8|10>>
     <associate|auto-59|<tuple|5.9|11>>
     <associate|auto-6|<tuple|3|2>>
     <associate|auto-60|<tuple|5|11>>
@@ -2183,7 +2184,7 @@
     <associate|auto-64|<tuple|2|11>>
     <associate|auto-65|<tuple|3|11>>
     <associate|auto-66|<tuple|4|11>>
-    <associate|auto-67|<tuple|5|12>>
+    <associate|auto-67|<tuple|5|11>>
     <associate|auto-68|<tuple|6|12>>
     <associate|auto-69|<tuple|7|12>>
     <associate|auto-7|<tuple|4|2>>
@@ -2199,14 +2200,14 @@
     <associate|bib-arxivlicense|<tuple|90|14>>
     <associate|bib-arxivreplace|<tuple|87|14>>
     <associate|bib-atproto|<tuple|28|13>>
-    <associate|bib-bagit|<tuple|55|14>>
+    <associate|bib-bagit|<tuple|55|13>>
     <associate|bib-brierley2022|<tuple|34|13>>
     <associate|bib-capadisli2017|<tuple|66|14>>
     <associate|bib-capadisli2020|<tuple|67|14>>
-    <associate|bib-ceramic2025|<tuple|58|14>>
+    <associate|bib-ceramic2025|<tuple|58|13>>
     <associate|bib-coarnotify|<tuple|79|14>>
     <associate|bib-datacite|<tuple|17|12>>
-    <associate|bib-descinodes|<tuple|57|14>>
+    <associate|bib-descinodes|<tuple|57|13>>
     <associate|bib-dicosmo2018|<tuple|53|13>>
     <associate|bib-dokieli|<tuple|68|14>>
     <associate|bib-elife|<tuple|6|12>>
@@ -2214,9 +2215,9 @@
     <associate|bib-ellerman2024b|<tuple|48|13>>
     <associate|bib-episciences|<tuple|8|12>>
     <associate|bib-evaldata|<tuple|93|14>>
-    <associate|bib-explorer|<tuple|23|13>>
+    <associate|bib-explorer|<tuple|23|12>>
     <associate|bib-funsearch2024|<tuple|12|12>>
-    <associate|bib-git02|<tuple|21|13>>
+    <associate|bib-git02|<tuple|21|12>>
     <associate|bib-groth2010|<tuple|43|13>>
     <associate|bib-hartgerink2019|<tuple|59|14>>
     <associate|bib-hexagon|<tuple|13|12>>
@@ -2268,7 +2269,7 @@
     <associate|bib-researchequals|<tuple|61|14>>
     <associate|bib-rfc6962|<tuple|49|13>>
     <associate|bib-rfc7089|<tuple|29|13>>
-    <associate|bib-rocrate2022|<tuple|56|14>>
+    <associate|bib-rocrate2022|<tuple|56|13>>
     <associate|bib-roosendaal1997|<tuple|1|12>>
     <associate|bib-shumailov2024|<tuple|14|12>>
     <associate|bib-signposting2023|<tuple|42|13>>
@@ -2277,7 +2278,7 @@
     <associate|bib-spec02|<tuple|15|12>>
     <associate|bib-template|<tuple|25|13>>
     <associate|bib-timestamps02|<tuple|20|12>>
-    <associate|bib-tools|<tuple|22|13>>
+    <associate|bib-tools|<tuple|22|12>>
     <associate|bib-tuf|<tuple|86|14>>
     <associate|bib-underlayprotocol|<tuple|52|13>>
     <associate|bib-vandesompel2004|<tuple|2|12>>
@@ -2297,13 +2298,13 @@
     <associate|lst:uriforms|<tuple|8|6>>
     <associate|lst:uris|<tuple|9|6>>
     <associate|sec:archives|<tuple|3.1|2>>
-    <associate|sec:branches|<tuple|3.7|6>>
+    <associate|sec:branches|<tuple|3.7|5>>
     <associate|sec:collections|<tuple|3.6|5>>
     <associate|sec:conclusion|<tuple|7|12>>
     <associate|sec:dl|<tuple|5.1|9>>
     <associate|sec:drafts|<tuple|3.8|6>>
     <associate|sec:eval|<tuple|6|11>>
-    <associate|sec:explorer|<tuple|4.2|8>>
+    <associate|sec:explorer|<tuple|4.2|7>>
     <associate|sec:format|<tuple|3|2>>
     <associate|sec:impl|<tuple|4|7>>
     <associate|sec:intro|<tuple|1|1>>
@@ -2317,11 +2318,11 @@
     <associate|sec:papers|<tuple|4.4|8>>
     <associate|sec:principles|<tuple|2|2>>
     <associate|sec:profiles|<tuple|3.12|7>>
-    <associate|sec:related|<tuple|5|9>>
+    <associate|sec:related|<tuple|5|8>>
     <associate|sec:tools|<tuple|4.1|7>>
     <associate|sec:uris|<tuple|3.9|6>>
     <associate|sec:verification|<tuple|3.11|7>>
-    <associate|sec:withdrawal|<tuple|3.10|7>>
+    <associate|sec:withdrawal|<tuple|3.10|6>>
     <associate|tab:compare|<tuple|4|9>>
     <associate|tab:files|<tuple|2|3>>
     <associate|tab:functions|<tuple|1|1>>

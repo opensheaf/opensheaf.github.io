@@ -679,9 +679,11 @@ A <dfn>resolver</dfn> finds and checks what a URI names (Listing
 @lst:resolve). It tries the locations it has, in any order, checks every copy
 found, and uses the latest signed version among the copies that agree,
 reporting forks, ended owners, exposed keys and tombstones (specification,
-section 12.3). To find every line of a work, it looks up all 16 names and
-keeps only entries whose genesis record is byte for byte the same, so no hash
-is assumed free of collisions (specification, section 12.4). An archive should
+section 12.3). A resolver may also search for every line of a work; it
+then looks up all 16 names and keeps only entries whose genesis record is
+byte for byte the same, so no hash is assumed free of collisions
+(specification, section 12.4). Whether to require this search is open (#80).
+An archive should
 keep indexes by name, by owner and by inventory digest; custodians may keep
 them for many archives. A <dfn>gateway</dfn> serves URIs as web links, with a
 page or a temporary redirect only to a copy it has checked (specification,
@@ -1301,7 +1303,7 @@ is adopted depends on the services built on it.
 - [keri2019] S. M. Smith. Key Event Receipt Infrastructure (KERI). White paper, 2019. https://arxiv.org/abs/1907.02143
 - [opentimestamps] OpenTimestamps. https://opentimestamps.org/
 - [timestamps02] OpenSheaf project. OpenSheaf timestamps, version 0.2 (draft), 21 November 2026. Extension to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-timestamps-0.2
-- [git02] OpenSheaf project. OpenSheaf archives in git, version 0.2 (draft), 22 November 2026. Companion to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-git-0.2
+- [git02] OpenSheaf project. OpenSheaf archives in git, version 0.2 (draft), 26 November 2026. Companion to the OpenSheaf specification 0.2, 2026. https://opensheaf.org/opensheaf-git-0.2
 - [tools] OpenSheaf project. opensheaf-py, a literate program, and its guide, The command-line tools. 2026. https://github.com/opensheaf/opensheaf-py and https://opensheaf.org/tools
 - [explorer] OpenSheaf project. The OpenSheaf Explorer. Literate program, 2026. https://opensheaf.org/explorer/ (source: https://github.com/opensheaf/explorer)
 - [manager] OpenSheaf project. The OpenSheaf Manager. 2026. https://manager.opensheaf.org/ (source: https://github.com/opensheaf/manager)
