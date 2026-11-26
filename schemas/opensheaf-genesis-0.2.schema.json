@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-genesis-0.2.schema.json",
-  "title": "OpenSheaf genesis record (genesis.json), version 0.2",
-  "$comment": "Section 5 of the specification. Dedicated to the public domain under CC0 1.0.",
+  "title": "OpenSheaf genesis record (genesis.json), format opensheaf-genesis/0.2",
+  "$comment": "Section 5 of the specification. Part of OpenSheaf 0.2 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -47,7 +47,8 @@
     },
     "threshold": {
       "type": "integer",
-      "minimum": 1
+      "minimum": 1,
+      "maximum": 9007199254740991
     },
     "next": {
       "type": "array",
@@ -61,7 +62,8 @@
     },
     "nextThreshold": {
       "type": "integer",
-      "minimum": 1
+      "minimum": 1,
+      "maximum": 9007199254740991
     },
     "keeper": {
       "type": "array",

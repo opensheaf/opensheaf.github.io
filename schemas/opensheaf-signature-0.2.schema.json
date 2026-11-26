@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://opensheaf.org/schemas/opensheaf-signature-0.2.schema.json",
-  "title": "OpenSheaf signature file, version 0.2",
-  "$comment": "Section 7.2 of the specification (the signed message is defined there). Dedicated to the public domain under CC0 1.0.",
+  "title": "OpenSheaf signature file (signature-<k>.json, witness-<label>.json), format opensheaf-signature/0.2",
+  "$comment": "Section 7.2 of the specification (the signed message is defined there). Part of OpenSheaf 0.2 (https://opensheaf.org). Dedicated to the public domain under CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/",
   "type": "object",
   "required": [
     "format",

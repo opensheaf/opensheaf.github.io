@@ -26,7 +26,8 @@
     },
     "documentVersion": {
       "type": "integer",
-      "minimum": 1
+      "minimum": 1,
+      "maximum": 9007199254740991
     },
     "mainSource": {
       "type": "string",
@@ -129,7 +130,8 @@
             "properties": {
               "documentVersion": {
                 "type": "integer",
-                "minimum": 1
+                "minimum": 1,
+                "maximum": 9007199254740991
               },
               "date": {
                 "type": "string",
@@ -138,6 +140,7 @@
               "replaces": {
                 "type": "integer",
                 "minimum": 1,
+                "maximum": 9007199254740991,
                 "$comment": "section 4.2: the number of an earlier notice of the line, its position in notices counted from 1"
               }
             }
@@ -219,7 +222,9 @@
                   "pattern": "^[0-9a-f]{32}$"
                 },
                 "bytes": {
-                  "type": "integer"
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
                 }
               }
             }
@@ -301,7 +306,8 @@
         },
         "documentVersion": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "maximum": 9007199254740991
         },
         "inventorySha512": {
           "type": "string",
@@ -485,7 +491,7 @@
         }
       },
       "then": {
-        "$comment": "section 4.3: an owner object records only format, specification, kind, name, owner and status, and optionally extensions",
+        "$comment": "section 4.3: an owner object records only format, specification, kind, name, owner, status and, from its second version, previous, and optionally extensions",
         "required": [
           "name",
           "owner"

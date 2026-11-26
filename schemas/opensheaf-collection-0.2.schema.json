@@ -69,7 +69,9 @@
                 }
               },
               "year": {
-                "type": "integer"
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
               },
               "issued": {
                 "type": "string"
@@ -92,7 +94,8 @@
               "properties": {
                 "documentVersion": {
                   "type": "integer",
-                  "minimum": 1
+                  "minimum": 1,
+                  "maximum": 9007199254740991
                 },
                 "version": {
                   "type": "string",

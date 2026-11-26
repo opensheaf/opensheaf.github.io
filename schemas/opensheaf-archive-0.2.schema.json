@@ -43,7 +43,8 @@
     "storageRoot": {
       "type": "string",
       "format": "uri-reference",
-      "pattern": "/$"
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.?/)(?!.*//)[^:?#\\\\]+/$",
+      "$comment": "section 3.1: a path relative to the discovery document that stays below it, ending with / (no scheme or :, no leading /, no empty, . or .. segment)"
     },
     "storageLayout": {
       "enum": [
