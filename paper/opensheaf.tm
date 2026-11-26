@@ -32,10 +32,10 @@
     specification, a draft; its reference tools; a formal model in Lean; and
     a first archive of 83 documents, whose format overhead is 2.4% of its
     content and which two independent implementations verify alike, each in
-    under 2.5 s. We compare OpenSheaf with more than forty earlier systems
-    and standards. Most of its parts exist elsewhere; their combination was
-    not found. Adoption, incentives, key management and discovery remain
-    open.
+    under 2.5 s from a local copy. We compare OpenSheaf with more than forty
+    earlier systems and standards. Most of its parts exist elsewhere; their
+    combination was not found. Adoption, incentives, key management and
+    discovery remain open.
   </abstract>|<abstract-keywords|scholarly communication|digital
   preservation|content addressing|signatures|key
   rotation|OCFL|DataCite|overlay journals>>
@@ -100,12 +100,12 @@
     <cite|mathlib2020>, programs guided by language models find new
     constructions <cite|funsearch2024>, and repositories accept papers
     written with or by such models <cite|hexagon>. Much of this output is
-    raw: checked or not, redundant, written in many idioms and seldom related
-    to what is already known. Turning it into knowledge is the old work of
-    distillation, unification and normalisation, done by surveys, textbooks,
-    referees and formal libraries, and that work grows with the material.
-    Machines that learn from the record are a second reader with the same
-    need: models trained on their own unfiltered output degrade
+    raw: often unchecked, redundant, written in many idioms and seldom
+    related to what is already known. Turning it into knowledge is the old
+    work of distillation, unification and normalisation, done by surveys,
+    textbooks, referees and formal libraries, and that work grows with the
+    material. Machines that learn from the record are a second reader with
+    the same need: models trained on their own unfiltered output degrade
     <cite|shumailov2024>, so what they read gains from being curated and
     traceable. An exchange layer cannot judge such material, and OpenSheaf
     records neither how a text was made nor typed relations between texts,
@@ -123,8 +123,8 @@
     readings must nevertheless stay in dialogue: claims attributable,
     versions comparable, corrections visible, disagreements traceable, and
     lines of work able to cite one another exactly. An exchange layer serves
-    both. Anyone can keep, continue or select, as lines, branches and
-    collections (Sections <reference|sec:collections> and
+    freedom and dialogue at once. Anyone can keep, continue or select, as
+    lines, branches and collections (Sections <reference|sec:collections> and
     <reference|sec:branches>), and what each keeps is named, fixed and
     signed, so that the others can rely on it and answer it.
 
@@ -1258,9 +1258,9 @@
     The first archive is the author's, at
     <verbatim|https://<line-break>mgubi.<line-break>org/<line-break>papers/<line-break>>,
     kept in the git repository mgubi/papers with these tools <cite|papers>.
-    It follows version 0.2 since its rebuild on 20 November 2026, and keeps
-    TeXmacs sources, HTML versions and PDFs. It holds 83 documents, 81 of
-    which have versions imported from arXiv, 154 arXiv versions in all
+    It has followed version 0.2 since its rebuild on 20 November 2026, and
+    keeps TeXmacs sources, HTML versions and PDFs. It holds 83 documents, 81
+    of which have versions imported from arXiv, 154 arXiv versions in all
     <cite|papers>. The import records arXiv as an external record of role
     <no-break-start><verbatim|source><no-break-end>, arXiv's
     <no-break-start><verbatim|vN><no-break-end> as a label, the SHA-512
@@ -1589,10 +1589,10 @@
     other parties' versions as signed objects, keeping whole objects apart
     from vetting versions; rules for withdrawal, takedown and the rights of
     copies in a federation where no archive binds another; and static files
-    as the whole requirement. Each closest design has parts OpenSheaf lacks:
-    nanopublications a working network with trust and quotas, the Underlay
-    salted commitments and packs, DSGL the simplicity of one git history per
-    document.
+    as the whole requirement. Each of the closest designs has parts OpenSheaf
+    lacks: nanopublications a working network with trust and quotas, the
+    Underlay salted commitments and packs, DSGL the simplicity of one git
+    history per document.
 
     <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|11|11|1|-1|cell-background|#f2f4f7>|<cwith|13|13|1|-1|cell-background|#f2f4f7>|<cwith|15|15|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Element>>|<cell|<with|par-mode|left|Earlier
     work>>>|<row|<cell|<with|par-mode|left|names from content
@@ -1635,19 +1635,20 @@
 
     <paragraph|Measurements>We measured the first archive at commit 1ac6db6
     on an Apple M4 laptop (Table <reference|tab:measure>; scripts and numbers
-    in the paper's repository). Its storage root holds 83 documents, the
-    owner's key log and its catalogue: 169 object versions in 1,826 files.
-    The format adds 3.2 MB to 131.5 MB of content, 2.4%; two thirds of that
-    are inventories, since each version keeps a copy of the inventory, which
+    in <cite|evaldata>). Its storage root holds 83 documents, the owner's key
+    log and its catalogue: 169 object versions in 1,826 files. The format
+    adds 3.2 MB to 131.5 MB of content, 2.4%; two thirds of that are
+    inventories, since each version keeps a copy of the inventory, which
     lists every earlier version. A version of a document adds a median of 11
     kB: an inventory with its checksum file, 6.3 kB; identity files, 4.0 kB;
     a signature, 0.8 kB. The reference tools verify the whole archive from
-    disk, hashing every file, in 2.2 s, about a third of it in the generic
-    OCFL validator. The Explorer, an independent implementation in
-    JavaScript, verifies it over a local web server in 1.4 s with content
-    digests, and in 155 s from the public site without them, bound by the
-    network. Both give each of the 168 signed versions of the 84 signed lines
-    the same status, and report the same findings.
+    disk, hashing every file, in 2.2 s, about half of it in the generic OCFL
+    validator. The Explorer, an independent implementation in JavaScript,
+    verifies it over a local web server in 1.4 s with content digests, and in
+    155 s from the public site without them, bound by the network. Both give
+    each of the 168 signed versions of the 84 signed lines the same status,
+    and report the same findings, but for a note of the reference tools that
+    the keeper was not checked.
 
     <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Measure>>|<cell|<with|par-mode|left|Value>>>|<row|<cell|<with|par-mode|left|content>>|<cell|<with|par-mode|left|131.5
     MB, 638 files>>>|<row|<cell|<with|par-mode|left|format
@@ -1664,8 +1665,9 @@
     site>>|<cell|<with|par-mode|left|155 s>>>|<row|<cell|<with|par-mode|left|resolve
     one line, local HTTP>>|<cell|<with|par-mode|left|99
     ms>>>|<row|<cell|<with|par-mode|left|deposit a new paper,
-    local>>|<cell|<with|par-mode|left|0.2 s>>>>>>|The first archive measured
-    (medians of five runs).<label|tab:measure>>
+    local>>|<cell|<with|par-mode|left|0.2 s>>>>>>|The first archive measured;
+    times are medians of five runs, except the public site (one run) and
+    resolution (the mean over the 84 lines).<label|tab:measure>>
 
     <paragraph|Adoption>An exchange layer is worth something only when
     several parties use it, and OpenSheaf has one real archive. Networks of
@@ -1733,7 +1735,7 @@
 
     <section*|References>
 
-    <\bib-list|93>
+    <\bib-list|94>
       <bibitem*|1><label|bib-roosendaal1997>H. E. Roosendaal and P. A. Th. M.
       Geurts. Forces and functions in scientific communication: an analysis
       of their interplay. CRISP 97, Cooperative Research Information Systems
@@ -2092,7 +2094,11 @@
       <bibitem*|92><label|bib-alphaxiv>alphaXiv.
       https://<line-break>www.<line-break>alphaxiv.<line-break>org/<line-break>
 
-      <bibitem*|93><label|bib-elife2026>eLife. The eLife model: three-year
+      <bibitem*|93><label|bib-evaldata>OpenSheaf project. Measurements of the
+      first archive: scripts and results. 2026.
+      https://<line-break>github.<line-break>com/<line-break>opensheaf/<line-break>opensheaf.<line-break>github.<line-break>io/<line-break>tree/<line-break>main/<line-break>paper/<line-break>eval
+
+      <bibitem*|94><label|bib-elife2026>eLife. The eLife model: three-year
       update. 2026. https://<line-break>elifesciences.<line-break>org/<line-break>inside-<line-break>elife/<line-break>7da92a51/<line-break>the-<line-break>elife-<line-break>model-<line-break>three-<line-break>year-<line-break>update
     </bib-list>
   </with>
@@ -2193,7 +2199,7 @@
     <associate|bib-arxivlicense|<tuple|90|14>>
     <associate|bib-arxivreplace|<tuple|87|14>>
     <associate|bib-atproto|<tuple|28|13>>
-    <associate|bib-bagit|<tuple|55|13>>
+    <associate|bib-bagit|<tuple|55|14>>
     <associate|bib-brierley2022|<tuple|34|13>>
     <associate|bib-capadisli2017|<tuple|66|14>>
     <associate|bib-capadisli2020|<tuple|67|14>>
@@ -2204,12 +2210,13 @@
     <associate|bib-dicosmo2018|<tuple|53|13>>
     <associate|bib-dokieli|<tuple|68|14>>
     <associate|bib-elife|<tuple|6|12>>
-    <associate|bib-elife2026|<tuple|93|14>>
+    <associate|bib-elife2026|<tuple|94|14>>
     <associate|bib-ellerman2024b|<tuple|48|13>>
     <associate|bib-episciences|<tuple|8|12>>
+    <associate|bib-evaldata|<tuple|93|14>>
     <associate|bib-explorer|<tuple|23|13>>
     <associate|bib-funsearch2024|<tuple|12|12>>
-    <associate|bib-git02|<tuple|21|12>>
+    <associate|bib-git02|<tuple|21|13>>
     <associate|bib-groth2010|<tuple|43|13>>
     <associate|bib-hartgerink2019|<tuple|59|14>>
     <associate|bib-hexagon|<tuple|13|12>>
@@ -2545,6 +2552,8 @@
 
       alphaxiv
 
+      evaldata
+
       kuhn2026
 
       groth2010
@@ -2633,7 +2642,8 @@
       what is not, among the systems we examined.>|<pageref|auto-60>>
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|6>||The first archive
-      measured (medians of five runs).>|<pageref|auto-63>>
+      measured; times are medians of five runs, except the public site (one
+      run) and resolution (the mean over the 84 lines).>|<pageref|auto-63>>
     </associate>
     <\associate|toc>
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>Introduction>

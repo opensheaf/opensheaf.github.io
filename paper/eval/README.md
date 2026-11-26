@@ -19,3 +19,7 @@ macOS 15.7.1).
   `statuses_osheaf.json`, `statuses_explorer.json`: the numbers measured.
 
 Sizes are apparent bytes; OCFL stores each file once across versions.
+
+The share of the OCFL validator was measured by running `osheaf verify` in
+the archive with ocfl-py hidden (`sys.modules['ocfl'] = None`): 1.1 s
+against 2.2 s with it (26 November 2026, same machine).

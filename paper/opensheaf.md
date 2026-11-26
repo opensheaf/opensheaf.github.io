@@ -22,7 +22,8 @@ any archive, are objects of the same format. Any copy can be checked
 anywhere. We describe version 0.2 of the specification, a draft; its
 reference tools; a formal model in Lean; and a first archive of 83
 documents, whose format overhead is 2.4% of its content and which two
-independent implementations verify alike, each in under 2.5 s. We compare OpenSheaf with more than forty earlier systems and
+independent implementations verify alike, each in under 2.5 s from a local
+copy. We compare OpenSheaf with more than forty earlier systems and
 standards. Most of its parts exist elsewhere; their combination was not
 found. Adoption, incentives, key management and discovery remain open.*
 
@@ -61,8 +62,9 @@ that stay where their authors put them. But they rest on archives they do
 not control: a selection of arXiv papers can name the version it vetted
 (`arXiv:NNNN.NNNNNv2`), yet only arXiv vouches for the bytes behind that
 name, and we found no published digest of the vetted version in the
-documentation of the overlays we examined [@elife; @pci; @episciences]. Beyond the archives, the links of
-scholarly articles rot and their targets drift [@klein2014; @jones2016].
+documentation of the overlays we examined [@elife; @pci; @episciences].
+Beyond the archives, the links of scholarly articles rot and their targets
+drift [@klein2014; @jones2016].
 
 Our thesis is that what has been missing is a common form in which separated
 parties exchange what they handle, so that each can rely on what the others
@@ -80,7 +82,7 @@ The need is sharper now. Machine-assisted research adds to the literature by
 new means: formal libraries grow as collective projects
 [@mathlib2020], programs guided by language models find new constructions
 [@funsearch2024], and repositories accept papers written with or by such
-models [@hexagon]. Much of this output is raw: checked or not, redundant,
+models [@hexagon]. Much of this output is raw: often unchecked, redundant,
 written in many idioms and seldom related to what is already known. Turning
 it into knowledge is the old work of distillation, unification and
 normalisation, done by surveys, textbooks, referees and formal libraries,
@@ -102,7 +104,8 @@ direction, selecting what one thinks matters. A central platform tends to
 fix one reading and one set of gatekeepers. The many readings must
 nevertheless stay in dialogue: claims attributable, versions comparable,
 corrections visible, disagreements traceable, and lines of work able to cite
-one another exactly. An exchange layer serves both. Anyone can keep,
+one another exactly. An exchange layer serves freedom and dialogue at once.
+Anyone can keep,
 continue or select, as lines, branches and collections (Sections
 @sec:collections and @sec:branches), and what each keeps is named, fixed
 and signed, so that the others can rely on it and answer it.
@@ -381,8 +384,9 @@ print(name(g, 1))
 
 A genesis record thus has 16 names; its <dfn>genesis name</dfn>, by algorithm
 0, names every line of the work; only a branch renamed after a clash of
-names, and branches of that branch, take one of the other 15. The <dfn>originator</dfn>'s line has no parent, and
-its first version must be signed by the originator; every other line of the
+names, and branches of that branch, take one of the other 15. The
+<dfn>originator</dfn>'s line has no parent, and its first version must be
+signed by the originator; every other line of the
 record is a branch (specification, section 5.3). Clashes arise only when a
 line is made, and are resolved there: the originator's tool draws a new nonce,
 and a branch whose line is taken takes the smallest free algorithm number
@@ -407,8 +411,8 @@ once, committed in one version only, and never becomes a current key;
 current keys never sign the key log. The first version is computed from the
 owner's genesis record: it holds that record, and an `object.json`, a
 `keys.json` and an inventory written in the JSON Canonicalization Scheme,
-so that every copy has the same bytes. It is never signed, and the owner name commits to the first current keys and
-to the digests of the first rotation keys (Listing @lst:owner). The
+so that every copy has the same bytes. It is never signed, and the owner
+name commits to the first current keys and to the digests of the first rotation keys (Listing @lst:owner). The
 specification advises one current key per device and three rotation keys
 kept apart with a `nextThreshold` of 2, which survive the loss of one or the
 theft of one (specification, section 6.2).
@@ -441,8 +445,8 @@ Listing: The genesis record of the authors' owner (appendix C.1); the data of th
 #### Exposure, ending and forks
 When current keys that could reach the `threshold` may have been exposed,
 the owner at once signs with rotation keys a new version of the key log that
-lists them in `exposed`, or ends the owner. Whoever holds the current keys can neither prevent nor
-contest it. There is no revocation: signatures carry no time, so nothing
+lists them in `exposed`, or ends the owner. Whoever holds the current keys
+can neither prevent nor contest it. There is no revocation: signatures carry no time, so nothing
 tells what a key signed before it leaked from what a thief signs after;
 signatures stay good, and what needs an exposed key becomes contested
 (Section @sec:lines). An owner ends by signing a last version with `ended`
@@ -880,7 +884,7 @@ not glue, a fork of the line is the reason.
 ### The first archive {#sec:papers}
 
 The first archive is the author's, at `https://mgubi.org/papers/`, kept in
-the git repository mgubi/papers with these tools [@papers]. It follows
+the git repository mgubi/papers with these tools [@papers]. It has followed
 version 0.2 since its rebuild on 20 November 2026, and keeps TeXmacs sources,
 HTML versions and PDFs. It holds 83 documents, 81 of which have versions
 imported from arXiv, 154 arXiv versions in all [@papers]. The import
@@ -1148,7 +1152,7 @@ owners with key logs and pre-rotation; collections that pin other parties'
 versions as signed objects, keeping whole objects apart from vetting versions;
 rules for withdrawal, takedown and the rights of copies in a federation where
 no archive binds another; and static files as the whole requirement. Each
-closest design has parts OpenSheaf lacks: nanopublications a working network
+of the closest designs has parts OpenSheaf lacks: nanopublications a working network
 with trust and quotas, the Underlay salted commitments and packs, DSGL the
 simplicity of one git history per document.
 
@@ -1182,21 +1186,22 @@ funding, discussed below.
 
 #### Measurements
 We measured the first archive at commit 1ac6db6 on an Apple M4 laptop
-(Table @tab:measure; scripts and numbers in the paper's repository). Its
+(Table @tab:measure; scripts and numbers in [@evaldata]). Its
 storage root holds 83 documents, the owner's key log and its catalogue: 169
 object versions in 1,826 files. The format adds 3.2 MB to 131.5 MB of
 content, 2.4%; two thirds of that are inventories, since each version keeps
 a copy of the inventory, which lists every earlier version. A version of a
 document adds a median of 11 kB: an inventory with its checksum file, 6.3
 kB; identity files, 4.0 kB; a signature, 0.8 kB. The reference tools verify
-the whole archive from disk, hashing every file, in 2.2 s, about a third of it in
-the generic OCFL validator. The Explorer, an independent implementation in
-JavaScript, verifies it over a local web server in 1.4 s with content
+the whole archive from disk, hashing every file, in 2.2 s, about half of it
+in the generic OCFL validator. The Explorer, an independent implementation
+in JavaScript, verifies it over a local web server in 1.4 s with content
 digests, and in 155 s from the public site without them, bound by the
 network. Both give each of the 168 signed versions of the 84 signed lines
-the same status, and report the same findings.
+the same status, and report the same findings, but for a note of the
+reference tools that the keeper was not checked.
 
-Table: The first archive measured (medians of five runs). {#tab:measure}
+Table: The first archive measured; times are medians of five runs, except the public site (one run) and resolution (the mean over the 84 lines). {#tab:measure}
 
 | Measure | Value |
 |---|---|
@@ -1215,14 +1220,14 @@ An exchange layer is worth something only when several parties use it, and
 OpenSheaf has one real archive. Networks of this kind grow slowly: the
 current Nanopub Registry, which accepts only signed nanopublications,
 counted 79,672 of them by 616 signing agents in May 2026 [@kuhn2026], more
-than fifteen years after nanopublications were proposed [@groth2010]. What is needed next is a service
-people use on top: an announcement service for a field, or an overlay
+than fifteen years after nanopublications were proposed [@groth2010]. What
+is needed next is a service people use on top: an announcement service for a field, or an overlay
 journal on authors' own archives.
 
 #### Incentives
 Researchers publish where evaluation counts: eLife's submissions fell by 55%
-from 2024 to 2025, after its indexing changed [@elife2026]. An OpenSheaf archive counts
-for nothing by itself, and reaches the indexes only through DOIs, landing
+from 2024 to 2025, after its indexing changed [@elife2026]. An OpenSheaf
+archive counts for nothing by itself, and reaches the indexes only through DOIs, landing
 pages for search engines, and overlays that do count. DOIs with an archive's
 own prefix are open (#8).
 
@@ -1368,4 +1373,5 @@ is adopted depends on the services built on it.
 - [arxivlicense] arXiv. arXiv's licence to distribute. https://info.arxiv.org/help/license/index.html
 - [antieau2026] B. Antieau. Hexagon. 2026. https://antieau.github.io/2026/10/05/hexagon.html
 - [alphaxiv] alphaXiv. https://www.alphaxiv.org/
+- [evaldata] OpenSheaf project. Measurements of the first archive: scripts and results. 2026. https://github.com/opensheaf/opensheaf.github.io/tree/main/paper/eval
 - [elife2026] eLife. The eLife model: three-year update. 2026. https://elifesciences.org/inside-elife/7da92a51/the-elife-model-three-year-update
