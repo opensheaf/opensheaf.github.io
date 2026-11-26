@@ -7,9 +7,11 @@ date: 26 November 2026
 *Scholarly communication bundles several functions: recording, preserving,
 announcing, filtering, distributing and assigning merit. Preprint servers
 and publishers each hold a bundle of them, and the case for separating them
-is old. We argue that what has been missing is a common, verifiable form in
-which separate parties exchange documents and statements about them: an
-exchange layer. OpenSheaf is a format for that layer. An archive is a set of
+is old. Machine-assisted research, which multiplies raw results that many
+parties must distil and that machines read in turn, makes it pressing. We
+argue that what has been missing is a common, verifiable form in which
+separate parties exchange documents and statements about them: an exchange
+layer. OpenSheaf is a format for that layer. An archive is a set of
 plain files on a static web server, stored in OCFL 1.1 and described in
 DataCite 4.7. Every version of a document is fixed by SHA-512 inventories
 and pinned by the digest of its inventory. Works and owners are named by
@@ -72,6 +74,34 @@ found and checked, and how statements about documents are expressed. It
 defines the forms of statements, not the acts: a selection is the form in
 which a filter states what it vetted, but who filters, and by what standard,
 is not its business.
+
+The need is sharper now. Machine-assisted research produces results faster
+than communities can read them: formal libraries grow as collective projects
+[@mathlib2020], programs guided by language models find new constructions
+[@funsearch2024], and repositories accept papers written with or by such
+models [@hexagon]. Much of this output is raw: checked or not, redundant,
+written in many idioms and seldom related to what is already known. Turning
+it into knowledge is the old work of distillation, unification and
+normalisation, done by surveys, textbooks, referees and formal libraries,
+and that work grows with the material. Machines that learn from the record
+need its results as well, as a clean signal: versions that are fixed,
+authors and origins that are known, and relations between texts
+(correction, extension, endorsement, disagreement) that are recorded rather
+than inferred. Models trained on their own unfiltered output degrade
+[@shumailov2024].
+
+No single party can or should do this work. Distillation involves choices of
+definitions, presentation and emphasis, on which schools and communities
+reasonably differ, and academic freedom includes taking the same material
+another way: reorganising a field, continuing another's work in another
+direction, selecting what one thinks matters. A central platform tends to
+fix one reading and one set of gatekeepers. The many readings must
+nevertheless stay in dialogue: claims attributable, versions comparable,
+corrections visible, disagreements traceable, and lines of work able to cite
+one another exactly. An exchange layer serves both. Anyone can keep,
+continue or select, as lines, branches and collections (Sections
+@sec:collections and @sec:branches), and what each keeps is named, fixed
+and signed, so that the others can rely on it and answer it.
 
 OpenSheaf is a proposal for that layer [@spec02]. This paper describes it as
 of 26 November 2026. Version 0.2 of the specification is a draft,
@@ -1198,8 +1228,11 @@ named apart from their hosts and keys, owners who sign their lines and can
 answer the theft of a signing key, and catalogues and selections that are
 themselves fixed and checkable. On it, recording can stay with authors,
 preservation can be shared by institutions, and announcing, filtering and
-assigning merit can be built by anyone, without asking the archives. Version
-0.2 is a draft, with tools, a formal model and a first archive; whether it
+assigning merit can be built by anyone, without asking the archives. The
+same form lets many parties distil a growing mass of results in their own
+ways while still citing, correcting and answering one another, and gives
+machines a record whose versions and origins they can check. Version 0.2 is
+a draft, with tools, a formal model and a first archive; whether it
 is adopted depends on the services built on it.
 
 ## References
@@ -1214,6 +1247,10 @@ is adopted depends on the services built on it.
 - [episciences] Episciences. Publishing model. https://www.episciences.org/publishing-model/
 - [klein2014] M. Klein, H. Van de Sompel, R. Sanderson, H. Shankar, L. Balakireva, K. Zhou and R. Tobin. Scholarly context not found: one in five articles suffers from reference rot. PLoS ONE 9 (12), e115253, 2014. doi:10.1371/journal.pone.0115253
 - [jones2016] S. M. Jones, H. Van de Sompel, H. Shankar, M. Klein, R. Tobin and C. Grover. Scholarly context adrift: three out of four URI references lead to changed content. PLoS ONE 11 (12), e0167475, 2016. doi:10.1371/journal.pone.0167475
+- [mathlib2020] The mathlib Community. The Lean mathematical library. Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs (CPP 2020), 367-381, 2020. doi:10.1145/3372885.3373824
+- [funsearch2024] B. Romera-Paredes, M. Barekatain, A. Novikov, M. Balog, M. P. Kumar, E. Dupont, F. J. R. Ruiz, J. S. Ellenberg, P. Wang, O. Fawzi, P. Kohli and A. Fawzi. Mathematical discoveries from program search with large language models. Nature 625 (7995), 468-475, 2024. doi:10.1038/s41586-023-06924-6
+- [hexagon] Hexagon. https://hexagonmath.org/
+- [shumailov2024] I. Shumailov, Z. Shumaylov, Y. Zhao, N. Papernot, R. Anderson and Y. Gal. AI models collapse when trained on recursively generated data. Nature 631 (8022), 755-759, 2024. doi:10.1038/s41586-024-07566-y
 - [spec02] OpenSheaf project. OpenSheaf: an open format for document archives and collections, version 0.2 (draft), 26 November 2026. OpenSheaf, 2026. https://opensheaf.org/opensheaf-specification-0.2
 - [ocfl] OCFL. Oxford Common File Layout specification, version 1.1. https://ocfl.io/1.1/spec/
 - [datacite] DataCite. DataCite Metadata Schema 4.7. https://schema.datacite.org/meta/kernel-4.7/
@@ -1291,6 +1328,5 @@ is adopted depends on the services built on it.
 - [arxivdoi] arXiv. arXiv DOIs. https://info.arxiv.org/help/doi.html
 - [arxivlicense] arXiv. arXiv's licence to distribute. https://info.arxiv.org/help/license/index.html
 - [antieau2026] B. Antieau. Hexagon. 2026. https://antieau.github.io/2026/10/05/hexagon.html
-- [hexagon] Hexagon. https://hexagonmath.org/
 - [alphaxiv] alphaXiv. https://www.alphaxiv.org/
 - [elife2026] eLife. The eLife model: three-year update. 2026. https://elifesciences.org/inside-elife/7da92a51/the-elife-model-three-year-update
