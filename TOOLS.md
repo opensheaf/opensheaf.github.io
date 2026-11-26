@@ -578,6 +578,8 @@ rotation keys, for instance when the work moves to another owner
 (`--successor OWNER`), or when rotation keys may have been stolen, which is
 the one thing an exposure cannot repair; `--expose DID` also exposes keys.
 An ended owner signs nothing more; what it signed before stays good.
+This cannot be undone, so the command asks you to type the first 8
+characters of the owner's name; `--yes` skips the question (scripts).
 
 ### If writing the key log was interrupted
 
@@ -778,7 +780,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `owner show` | show the key log |
 | `owner rotate` | add or retire current keys, new rotation keys |
 | `owner expose DID` | declare stolen or leaked keys |
-| `owner end` | the last version of the key log |
+| `owner end` | the last version of the key log (asks, `--yes`) |
 | `owner complete` | settle a version of the key log left by an interrupted write |
 | `owner pull URL` | meet another copy of a key log |
 | `sign LABEL` | sign again a version contested by an exposed key (`--version vN`), after you type the first 8 characters of its digest (`--yes`) |

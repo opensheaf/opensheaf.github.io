@@ -788,7 +788,9 @@ osheaf sign kpz-uniqueness --version v3</pre>
       owner (<tt class="verbatim">--successor OWNER</tt>), or when rotation keys may
       have been stolen, which is the one thing an exposure cannot repair; <tt
       class="verbatim">--expose DID</tt> also exposes keys. An ended owner signs nothing
-      more; what it signed before stays good.
+      more; what it signed before stays good. This cannot be undone, so the
+      command asks you to type the first 8 characters of the owner's name; <tt
+      class="verbatim">--yes</tt> skips the question (scripts).
     </p>
     <h3 id="auto-20"><a id="if-writing-the-key-log-was-interrupted"></a>If writing the key log was interrupted<span style="margin-left: 1em"></span></h3>
     <p>
@@ -1086,7 +1088,7 @@ osheaf zenodo kpz-uniqueness --production</pre>
           <td style="border-right: 1px solid; border-bottom: 1px solid">declare stolen or leaked keys</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner end</tt></td>
-          <td style="border-right: 1px solid; border-bottom: 1px solid">the last version of the key log</td>
+          <td style="border-right: 1px solid; border-bottom: 1px solid">the last version of the key log (asks, <tt class="verbatim">--yes</tt>)</td>
         </tr><tr>
           <td style="border-right: 1px solid; border-bottom: 1px solid; border-left: 1px solid"><tt class="verbatim">owner complete</tt></td>
           <td style="border-right: 1px solid; border-bottom: 1px solid">settle a version of the key log left by an interrupted
