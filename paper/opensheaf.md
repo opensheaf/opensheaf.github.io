@@ -7,8 +7,8 @@ date: 26 November 2026
 *Scholarly communication bundles several functions: recording, preserving,
 announcing, filtering, distributing and assigning merit. Preprint servers
 and publishers each hold a bundle of them, and the case for separating them
-is old. Machine-assisted research, which multiplies raw results that many
-parties must distil and that machines read in turn, makes it pressing. We
+is old. Machine-assisted research makes it more pressing: it multiplies raw
+results that many parties must distil and that machines read in turn. We
 argue that what has been missing is a common, verifiable form in which
 separate parties exchange documents and statements about them: an exchange
 layer. OpenSheaf is a format for that layer. An archive is a set of
@@ -21,7 +21,8 @@ version of their lines. Collections, which pin versions of documents held in
 any archive, are objects of the same format. Any copy can be checked
 anywhere. We describe version 0.2 of the specification, a draft; its
 reference tools; a formal model in Lean; and a first archive of 83
-documents. We compare OpenSheaf with some forty earlier systems and
+documents, whose format overhead is 2.4% of its content and which two
+independent implementations verify alike, each in under 2.5 s. We compare OpenSheaf with more than forty earlier systems and
 standards. Most of its parts exist elsewhere; their combination was not
 found. Adoption, incentives, key management and discovery remain open.*
 
@@ -59,8 +60,8 @@ actors exist. Overlay journals, Peer Community In and SciPost vet documents
 that stay where their authors put them. But they rest on archives they do
 not control: a selection of arXiv papers can name the version it vetted
 (`arXiv:NNNN.NNNNNv2`), yet only arXiv vouches for the bytes behind that
-name, and none of the overlays we examined publishes a digest of the version
-it vetted [@elife; @pci; @episciences]. Beyond the archives, the links of
+name, and we found no published digest of the vetted version in the
+documentation of the overlays we examined [@elife; @pci; @episciences]. Beyond the archives, the links of
 scholarly articles rot and their targets drift [@klein2014; @jones2016].
 
 Our thesis is that what has been missing is a common form in which separated
@@ -75,8 +76,8 @@ defines the forms of statements, not the acts: a selection is the form in
 which a filter states what it vetted, but who filters, and by what standard,
 is not its business.
 
-The need is sharper now. Machine-assisted research produces results faster
-than communities can read them: formal libraries grow as collective projects
+The need is sharper now. Machine-assisted research adds to the literature by
+new means: formal libraries grow as collective projects
 [@mathlib2020], programs guided by language models find new constructions
 [@funsearch2024], and repositories accept papers written with or by such
 models [@hexagon]. Much of this output is raw: checked or not, redundant,
@@ -84,11 +85,14 @@ written in many idioms and seldom related to what is already known. Turning
 it into knowledge is the old work of distillation, unification and
 normalisation, done by surveys, textbooks, referees and formal libraries,
 and that work grows with the material. Machines that learn from the record
-need its results as well, as a clean signal: versions that are fixed,
-authors and origins that are known, and relations between texts
-(correction, extension, endorsement, disagreement) that are recorded rather
-than inferred. Models trained on their own unfiltered output degrade
-[@shumailov2024].
+are a second reader with the same need: models trained on their own
+unfiltered output degrade [@shumailov2024], so what they read gains from
+being curated and traceable. An exchange layer cannot judge such material,
+and OpenSheaf records neither how a text was made nor typed relations
+between texts, which are open (Section @sec:eval). What it gives distillers
+and machine readers alike is a substrate: versions fixed and citable
+exactly, each signed by keys of a key log that names who answers for it,
+and selections that state which versions someone vetted.
 
 No single party can or should do this work. Distillation involves choices of
 definitions, presentation and emphasis, on which schools and communities
@@ -109,9 +113,10 @@ incompatible with version 0.1; archives made with the draft are rebuilt when
 0.2 is final (specification, section 16.1). We present the principles of the
 layer (Section @sec:principles), the format (Section @sec:format), an
 implementation with reference tools, a formal model in Lean and a first
-archive (Section @sec:impl), and a comparison with some forty earlier
+archive (Section @sec:impl), and a comparison with more than forty earlier
 systems and standards, which shows what is new and what is not (Section
-@sec:related). Section @sec:eval discusses limitations and open questions.
+@sec:related). Section @sec:eval measures the first archive and discusses
+limitations and open questions.
 
 ## Design principles {#sec:principles}
 
@@ -186,7 +191,7 @@ web servers cannot list folders (Listing @lst:discovery). It names the
 storage root and its layout, the profiles followed, the owners hosted with
 their owner catalogues, every object but drafts with its head version, the
 digest of its head inventory and its status, and the tombstones of objects
-taken down. Beyond about a thousand objects the list moves into pages. It is
+taken down. A large list may be paged. It is
 a map, not a witness: verifiers check it against the storage root
 (specification, section 3.1). A <dfn>label</dfn> is a readable name the
 archive may give a line for its website, never an identifier.
@@ -267,6 +272,7 @@ Table: The files of an object and of its versions (specification, sections 4 to 
 | `members.json` | a collection's member list |
 | `keys.json` | an owner's key-log version |
 | `parent/` | a branch's evidence |
+| `forked/` | the other side of a key-log fork |
 | `inventory.json` | OCFL inventory, per version |
 | witness folder | signatures, outside versions |
 
@@ -326,7 +332,8 @@ sealed or an owner created (specification, section 5). For a document it
 holds a kind, a creation time, a nonce of at least 128 random bits and the
 `originator`, the owner of the first line (Listing @lst:genesis). The record
 is part of every version of the work and of its branches, byte for byte, and
-is never re-serialised, so no canonical form of JSON is needed.
+is never re-serialised, so no canonical form of JSON is needed for it; only
+the computed first version of a key log uses one (Section @sec:owners).
 
 Listing: The genesis record of the example paper (appendix C.2). {#lst:genesis}
 
@@ -373,8 +380,8 @@ print(name(g, 1))
 ```
 
 A genesis record thus has 16 names; its <dfn>genesis name</dfn>, by algorithm
-0, names every line of the work except a branch renamed after a clash and the
-branches named after it. The <dfn>originator</dfn>'s line has no parent, and
+0, names every line of the work; only a branch renamed after a clash of
+names, and branches of that branch, take one of the other 15. The <dfn>originator</dfn>'s line has no parent, and
 its first version must be signed by the originator; every other line of the
 record is a branch (specification, section 5.3). Clashes arise only when a
 line is made, and are resolved there: the originator's tool draws a new nonce,
@@ -398,9 +405,9 @@ version of the key log; each version commits to them in advance by their
 SHA-256 digests in `next`, with a `nextThreshold`. A rotation key is used
 once, committed in one version only, and never becomes a current key;
 current keys never sign the key log. The first version is computed from the
-owner's genesis record, its `object.json`, `keys.json` and inventory written
-in the JSON Canonicalization Scheme so that every copy has the same bytes,
-and is never signed, so the owner name commits to the first current keys and
+owner's genesis record: it holds that record, and an `object.json`, a
+`keys.json` and an inventory written in the JSON Canonicalization Scheme,
+so that every copy has the same bytes. It is never signed, and the owner name commits to the first current keys and
 to the digests of the first rotation keys (Listing @lst:owner). The
 specification advises one current key per device and three rotation keys
 kept apart with a `nextThreshold` of 2, which survive the loss of one or the
@@ -432,9 +439,9 @@ Listing: The genesis record of the authors' owner (appendix C.1); the data of th
 ```
 
 #### Exposure, ending and forks
-An owner whose current keys may have been exposed, and could reach the
-`threshold`, signs at once, with rotation keys, a version listing them in
-`exposed`, or ends. Whoever holds the current keys can neither prevent nor
+When current keys that could reach the `threshold` may have been exposed,
+the owner at once signs with rotation keys a new version of the key log that
+lists them in `exposed`, or ends the owner. Whoever holds the current keys can neither prevent nor
 contest it. There is no revocation: signatures carry no time, so nothing
 tells what a key signed before it leaked from what a thief signs after;
 signatures stay good, and what needs an exposed key becomes contested
@@ -660,8 +667,8 @@ sheaf:zzgdggwl...oz4q:*
     the work: every line of it
 sheaf:56wo6cdp...z3pa
     the authors' owner: its key log
-sheaf:zzgdggwl/v2
-    a short form of the second
+sheaf:zzgdggwlldcrw4bd/v2
+    a short form of the second URI
 ```
 
 A <dfn>resolver</dfn> finds and checks what a URI names (Listing
@@ -872,7 +879,7 @@ not glue, a fork of the line is the reason.
 
 ### The first archive {#sec:papers}
 
-The first archive is the author's, at `mgubi.org/papers`, kept in
+The first archive is the author's, at `https://mgubi.org/papers/`, kept in
 the git repository mgubi/papers with these tools [@papers]. It follows
 version 0.2 since its rebuild on 20 November 2026, and keeps TeXmacs sources,
 HTML versions and PDFs. It holds 83 documents, 81 of which have versions
@@ -929,11 +936,11 @@ This section sets OpenSheaf first against the digital-library literature on
 versions, links and identifiers, then against our survey of decentralised
 and federated publishing, made from the systems' own documents and code,
 which are cited here; what we could not verify is marked so. Table
-@tab:compare sets OpenSheaf against ten systems, among them the three we
-found closest: nanopublications, Document Succession Identifiers and the
-Underlay.
+@tab:compare sets OpenSheaf against eleven systems, among them the three we
+found closest in purpose: nanopublications, Document Succession Identifiers
+and the Underlay.
 
-Table*: OpenSheaf against ten systems, some sharing a row. {#tab:compare}
+Table*: OpenSheaf against eleven systems, some sharing a row. {#tab:compare}
 
 | System | Fixity | Names | Who writes | Copies | Identity | Requires |
 |---|---|---|---|---|---|---|
@@ -1006,7 +1013,7 @@ has no name across its versions, and the documented queries count a
 supersession only under the same key [@nanopubdocs]. Nanopublications are a
 natural form for statements about OpenSheaf versions, which are open (#21).
 
-**Document Succession Identifiers** are the closest design in premises
+**Document Succession Identifiers** are, of the three, the closest in premises
 [@ellerman2024b]: a succession of editions is a git history named from its
 initial commit, each later commit signed with an SSH key listed in the
 succession. Authority rests on keys, so a succession moves between hosts.
@@ -1097,7 +1104,8 @@ not fix bytes; a pin says which bytes a DOI's work is.
 
 **ActivityPub** needs a running server per node and binds identity to a
 domain [@activitypub]; it suits announcement, which the layer leaves to
-others. **The AT Protocol** is the closest in architecture, with signed user
+others. Among general federated systems, **the AT Protocol** is the closest in
+architecture, with signed user
 repositories, relays and third-party feeds [@atproto], but its repositories
 are mutable and its main identity method depends on a directory; an
 OpenSheaf owner needs none, and pays with the rule that a fork ends it.
@@ -1158,31 +1166,62 @@ Table: What is new and what is not, among the systems we examined. {#tab:new}
 | overlays over versions held elsewhere | PCI, Episciences, eLife |
 | packaging with digests | BagIt, OCFL, RO-Crate |
 | static files or a git host only | DSGL, BagIt, OCFL, ResearchEquals' static archive |
-| a work name shared by several owners | not found |
+| a work name shared by several owners | Radicle (a namespace per peer), not for documents |
 | owner key logs with pre-rotation | KERI, not for documents |
-| collections pinning others' versions | not found |
+| collections pinning others' versions | git submodules, unsigned, by commit |
 | rules for takedown in a federation | not found |
-| all of the above as static files | not found |
+| all of the above, as static files | not found |
 
 ## Evaluation and limitations {#sec:eval}
 
 Some earlier designs ended, or nearly ended, for lack of funding, as
 PubPub's hosted services did for a time, or by depending on a token, a
 chain, peers online or a service run by someone else (Section
-@sec:related); the most successful remains small. OpenSheaf avoids these
-dependencies but not the need for funding; we weigh it against them.
+@sec:related). OpenSheaf avoids these dependencies, but not the need for
+funding, discussed below.
+
+#### Measurements
+We measured the first archive at commit 1ac6db6 on an Apple M4 laptop
+(Table @tab:measure; scripts and numbers in the paper's repository). Its
+storage root holds 83 documents, the owner's key log and its catalogue: 169
+object versions in 1,826 files. The format adds 3.2 MB to 131.5 MB of
+content, 2.4%; two thirds of that are inventories, since each version keeps
+a copy of the inventory, which lists every earlier version. A version of a
+document adds a median of 11 kB: an inventory with its checksum file, 6.3
+kB; identity files, 4.0 kB; a signature, 0.8 kB. The reference tools verify
+the whole archive from disk, hashing every file, in 2.2 s, about a third of it in
+the generic OCFL validator. The Explorer, an independent implementation in
+JavaScript, verifies it over a local web server in 1.4 s with content
+digests, and in 155 s from the public site without them, bound by the
+network. Both give each of the 168 signed versions of the 84 signed lines
+the same status, and report the same findings.
+
+Table: The first archive measured (medians of five runs). {#tab:measure}
+
+| Measure | Value |
+|---|---|
+| content | 131.5 MB, 638 files |
+| format overhead | 3.2 MB, 2.4% |
+| of which inventories | 2.1 MB |
+| per document version | 11 kB, 1.8% |
+| verify, `osheaf`, disk | 2.2 s |
+| verify, Explorer, local HTTP | 1.4 s |
+| verify, Explorer, public site | 155 s |
+| resolve one line, local HTTP | 99 ms |
+| deposit a new paper, local | 0.2 s |
 
 #### Adoption
 An exchange layer is worth something only when several parties use it, and
-OpenSheaf has one real archive. The most successful decentralised design
-found, nanopublications, counts some 80,000 records by some 600 signers
-after more than fifteen years [@kuhn2026]. What is needed next is a service
+OpenSheaf has one real archive. Networks of this kind grow slowly: the
+current Nanopub Registry, which accepts only signed nanopublications,
+counted 79,672 of them by 616 signing agents in May 2026 [@kuhn2026], more
+than fifteen years after nanopublications were proposed [@groth2010]. What is needed next is a service
 people use on top: an announcement service for a field, or an overlay
 journal on authors' own archives.
 
 #### Incentives
-Researchers publish where evaluation counts: eLife's submissions fell by more
-than half after its indexing changed [@elife2026]. An OpenSheaf archive counts
+Researchers publish where evaluation counts: eLife's submissions fell by 55%
+from 2024 to 2025, after its indexing changed [@elife2026]. An OpenSheaf archive counts
 for nothing by itself, and reaches the indexes only through DOIs, landing
 pages for search engines, and overlays that do count. DOIs with an archive's
 own prefix are open (#8).
@@ -1211,7 +1250,7 @@ specification if every OpenSheaf tool stops. Copies need rights, and in the
 first archive few lines can be copied without the authors' agreement.
 
 #### Open questions
-As of 23 November 2026 every open issue of the specification is marked as an
+As of 26 November 2026 every open issue of the specification is marked as an
 addition after 0.2 or as a task. Besides those above, they include: external
 records that resolve pins (#22); reviews, comments and relations between
 documents (#21); statements by collections about their members (#40); owner

@@ -16,9 +16,9 @@
     Scholarly communication bundles several functions: recording, preserving,
     announcing, filtering, distributing and assigning merit. Preprint servers
     and publishers each hold a bundle of them, and the case for separating
-    them is old. Machine-assisted research, which multiplies raw results that
-    many parties must distil and that machines read in turn, makes it
-    pressing. We argue that what has been missing is a common, verifiable
+    them is old. Machine-assisted research makes it more pressing: it
+    multiplies raw results that many parties must distil and that machines
+    read in turn. We argue that what has been missing is a common, verifiable
     form in which separate parties exchange documents and statements about
     them: an exchange layer. OpenSheaf is a format for that layer. An archive
     is a set of plain files on a static web server, stored in OCFL 1.1 and
@@ -30,10 +30,12 @@
     versions of documents held in any archive, are objects of the same
     format. Any copy can be checked anywhere. We describe version 0.2 of the
     specification, a draft; its reference tools; a formal model in Lean; and
-    a first archive of 83 documents. We compare OpenSheaf with some forty
-    earlier systems and standards. Most of its parts exist elsewhere; their
-    combination was not found. Adoption, incentives, key management and
-    discovery remain open.
+    a first archive of 83 documents, whose format overhead is 2.4% of its
+    content and which two independent implementations verify alike, each in
+    under 2.5 s. We compare OpenSheaf with more than forty earlier systems
+    and standards. Most of its parts exist elsewhere; their combination was
+    not found. Adoption, incentives, key management and discovery remain
+    open.
   </abstract>|<abstract-keywords|scholarly communication|digital
   preservation|content addressing|signatures|key
   rotation|OCFL|DataCite|overlay journals>>
@@ -76,8 +78,8 @@
     them. But they rest on archives they do not control: a selection of arXiv
     papers can name the version it vetted
     (<verbatim|arXiv:<line-break>NNNN.<line-break>NNNNNv2>), yet only arXiv
-    vouches for the bytes behind that name, and none of the overlays we
-    examined publishes a digest of the version it vetted
+    vouches for the bytes behind that name, and we found no published digest
+    of the vetted version in the documentation of the overlays we examined
     <cite|elife|pci|episciences>. Beyond the archives, the links of scholarly
     articles rot and their targets drift <cite|klein2014|jones2016>.
 
@@ -93,20 +95,24 @@
     acts: a selection is the form in which a filter states what it vetted,
     but who filters, and by what standard, is not its business.
 
-    The need is sharper now. Machine-assisted research produces results
-    faster than communities can read them: formal libraries grow as
-    collective projects <cite|mathlib2020>, programs guided by language
-    models find new constructions <cite|funsearch2024>, and repositories
-    accept papers written with or by such models <cite|hexagon>. Much of this
-    output is raw: checked or not, redundant, written in many idioms and
-    seldom related to what is already known. Turning it into knowledge is the
-    old work of distillation, unification and normalisation, done by surveys,
-    textbooks, referees and formal libraries, and that work grows with the
-    material. Machines that learn from the record need its results as well,
-    as a clean signal: versions that are fixed, authors and origins that are
-    known, and relations between texts (correction, extension, endorsement,
-    disagreement) that are recorded rather than inferred. Models trained on
-    their own unfiltered output degrade <cite|shumailov2024>.
+    The need is sharper now. Machine-assisted research adds to the literature
+    by new means: formal libraries grow as collective projects
+    <cite|mathlib2020>, programs guided by language models find new
+    constructions <cite|funsearch2024>, and repositories accept papers
+    written with or by such models <cite|hexagon>. Much of this output is
+    raw: checked or not, redundant, written in many idioms and seldom related
+    to what is already known. Turning it into knowledge is the old work of
+    distillation, unification and normalisation, done by surveys, textbooks,
+    referees and formal libraries, and that work grows with the material.
+    Machines that learn from the record are a second reader with the same
+    need: models trained on their own unfiltered output degrade
+    <cite|shumailov2024>, so what they read gains from being curated and
+    traceable. An exchange layer cannot judge such material, and OpenSheaf
+    records neither how a text was made nor typed relations between texts,
+    which are open (Section <reference|sec:eval>). What it gives distillers
+    and machine readers alike is a substrate: versions fixed and citable
+    exactly, each signed by keys of a key log that names who answers for it,
+    and selections that state which versions someone vetted.
 
     No single party can or should do this work. Distillation involves choices
     of definitions, presentation and emphasis, on which schools and
@@ -129,10 +135,10 @@
     principles of the layer (Section <reference|sec:principles>), the format
     (Section <reference|sec:format>), an implementation with reference tools,
     a formal model in Lean and a first archive (Section
-    <reference|sec:impl>), and a comparison with some forty earlier systems
-    and standards, which shows what is new and what is not (Section
-    <reference|sec:related>). Section <reference|sec:eval> discusses
-    limitations and open questions.
+    <reference|sec:impl>), and a comparison with more than forty earlier
+    systems and standards, which shows what is new and what is not (Section
+    <reference|sec:related>). Section <reference|sec:eval> measures the first
+    archive and discusses limitations and open questions.
 
     <section|Design principles><label|sec:principles>
 
@@ -209,11 +215,10 @@
     <reference|lst:discovery>). It names the storage root and its layout, the
     profiles followed, the owners hosted with their owner catalogues, every
     object but drafts with its head version, the digest of its head inventory
-    and its status, and the tombstones of objects taken down. Beyond about a
-    thousand objects the list moves into pages. It is a map, not a witness:
-    verifiers check it against the storage root (specification, section 3.1).
-    A <dfn|label> is a readable name the archive may give a line for its
-    website, never an identifier.
+    and its status, and the tombstones of objects taken down. A large list
+    may be paged. It is a map, not a witness: verifiers check it against the
+    storage root (specification, section 3.1). A <dfn|label> is a readable
+    name the archive may give a line for its website, never an identifier.
 
     <\big-listing>
       <\os-code>
@@ -334,7 +339,7 @@
     versions by pins. Table <reference|tab:files> lists the files of an
     object.
 
-    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|File>>|<cell|<with|par-mode|left|Role>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|genesis.json><no-break-end>>>|<cell|<with|par-mode|left|fixes
+    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|11|11|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|File>>|<cell|<with|par-mode|left|Role>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|genesis.json><no-break-end>>>|<cell|<with|par-mode|left|fixes
     the name; every version>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|object.json><no-break-end>>>|<cell|<with|par-mode|left|identity,
     versions, state>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|datacite.json><no-break-end>>>|<cell|<with|par-mode|left|description;
     not for owners>>>|<row|<cell|<with|par-mode|left|sources,
@@ -342,7 +347,8 @@
     files>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|members.json><no-break-end>>>|<cell|<with|par-mode|left|a
     collection's member list>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|keys.json><no-break-end>>>|<cell|<with|par-mode|left|an
     owner's key-log version>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|parent/><no-break-end>>>|<cell|<with|par-mode|left|a
-    branch's evidence>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|inventory.json><no-break-end>>>|<cell|<with|par-mode|left|OCFL
+    branch's evidence>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|forked/><no-break-end>>>|<cell|<with|par-mode|left|the
+    other side of a key-log fork>>>|<row|<cell|<with|par-mode|left|<no-break-start><verbatim|inventory.json><no-break-end>>>|<cell|<with|par-mode|left|OCFL
     inventory, per version>>>|<row|<cell|<with|par-mode|left|witness
     folder>>|<cell|<with|par-mode|left|signatures, outside versions>>>>>>|The
     files of an object and of its versions (specification, sections 4 to
@@ -449,7 +455,9 @@
     128 random bits and the <no-break-start><verbatim|originator><no-break-end>,
     the owner of the first line (Listing <reference|lst:genesis>). The record
     is part of every version of the work and of its branches, byte for byte,
-    and is never re-serialised, so no canonical form of JSON is needed.
+    and is never re-serialised, so no canonical form of JSON is needed for
+    it; only the computed first version of a key log uses one (Section
+    <reference|sec:owners>).
 
     <\big-listing>
       <\os-code>
@@ -530,16 +538,16 @@
     </big-listing>
 
     A genesis record thus has 16 names; its <dfn|genesis name>, by algorithm
-    0, names every line of the work except a branch renamed after a clash and
-    the branches named after it. The <dfn|originator>'s line has no parent,
-    and its first version must be signed by the originator; every other line
-    of the record is a branch (specification, section 5.3). Clashes arise
-    only when a line is made, and are resolved there: the originator's tool
-    draws a new nonce, and a branch whose line is taken takes the smallest
-    free algorithm number above its parent's. A genesis record reused for
-    another work gives no valid line, and there are no aliases: a work
-    refused for a reused record is sealed anew (specification, section 5.4
-    and appendix D.2).
+    0, names every line of the work; only a branch renamed after a clash of
+    names, and branches of that branch, take one of the other 15. The
+    <dfn|originator>'s line has no parent, and its first version must be
+    signed by the originator; every other line of the record is a branch
+    (specification, section 5.3). Clashes arise only when a line is made, and
+    are resolved there: the originator's tool draws a new nonce, and a branch
+    whose line is taken takes the smallest free algorithm number above its
+    parent's. A genesis record reused for another work gives no valid line,
+    and there are no aliases: a work refused for a reused record is sealed
+    anew (specification, section 5.4 and appendix D.2).
 
     <subsection|Owners and key logs><label|sec:owners>
 
@@ -560,10 +568,11 @@
     <no-break-start><verbatim|nextThreshold><no-break-end>. A rotation key is
     used once, committed in one version only, and never becomes a current
     key; current keys never sign the key log. The first version is computed
-    from the owner's genesis record, its <no-break-start><verbatim|object.json><no-break-end>,
-    <no-break-start><verbatim|keys.json><no-break-end> and inventory written
-    in the JSON Canonicalization Scheme so that every copy has the same
-    bytes, and is never signed, so the owner name commits to the first
+    from the owner's genesis record: it holds that record, and an
+    <no-break-start><verbatim|object.json><no-break-end>, a
+    <no-break-start><verbatim|keys.json><no-break-end> and an inventory
+    written in the JSON Canonicalization Scheme, so that every copy has the
+    same bytes. It is never signed, and the owner name commits to the first
     current keys and to the digests of the first rotation keys (Listing
     <reference|lst:owner>). The specification advises one current key per
     device and three rotation keys kept apart with a
@@ -618,17 +627,16 @@
       the timestamps extension is elided.<label|lst:owner>
     </big-listing>
 
-    <paragraph|Exposure, ending and forks>An owner whose current keys may
-    have been exposed, and could reach the
-    <no-break-start><verbatim|threshold><no-break-end>, signs at once, with
-    rotation keys, a version listing them in
-    <no-break-start><verbatim|exposed><no-break-end>, or ends. Whoever holds
-    the current keys can neither prevent nor contest it. There is no
-    revocation: signatures carry no time, so nothing tells what a key signed
-    before it leaked from what a thief signs after; signatures stay good, and
-    what needs an exposed key becomes contested (Section
-    <reference|sec:lines>). An owner ends by signing a last version with
-    <no-break-start><verbatim|ended><no-break-end> and, optionally, a
+    <paragraph|Exposure, ending and forks>When current keys that could reach
+    the <no-break-start><verbatim|threshold><no-break-end> may have been
+    exposed, the owner at once signs with rotation keys a new version of the
+    key log that lists them in <no-break-start><verbatim|exposed><no-break-end>,
+    or ends the owner. Whoever holds the current keys can neither prevent nor
+    contest it. There is no revocation: signatures carry no time, so nothing
+    tells what a key signed before it leaked from what a thief signs after;
+    signatures stay good, and what needs an exposed key becomes contested
+    (Section <reference|sec:lines>). An owner ends by signing a last version
+    with <no-break-start><verbatim|ended><no-break-end> and, optionally, a
     successor. Two signed versions of a key log with one number and different
     inventories are a <dfn|fork of the key log>; only rotation keys can make
     one, stolen before use or kept after it. The format cannot tell which
@@ -944,9 +952,9 @@
 
         \ \ \ \ <os-com|the authors' owner: its key log>
 
-        sheaf:zzgdggwl/v2
+        sheaf:zzgdggwlldcrw4bd/v2
 
-        \ \ \ \ <os-com|a short form of the second>
+        \ \ \ \ <os-com|a short form of the second URI>
       </os-code>
     <|big-listing>
       Some of the URIs of the paper, of the accepted copy and of the owner
@@ -1248,12 +1256,12 @@
     <subsection|The first archive><label|sec:papers>
 
     The first archive is the author's, at
-    <no-break-start><verbatim|mgubi.org/papers><no-break-end>, kept in the
-    git repository mgubi/papers with these tools <cite|papers>. It follows
-    version 0.2 since its rebuild on 20 November 2026, and keeps TeXmacs
-    sources, HTML versions and PDFs. It holds 83 documents, 81 of which have
-    versions imported from arXiv, 154 arXiv versions in all <cite|papers>.
-    The import records arXiv as an external record of role
+    <verbatim|https://<line-break>mgubi.<line-break>org/<line-break>papers/<line-break>>,
+    kept in the git repository mgubi/papers with these tools <cite|papers>.
+    It follows version 0.2 since its rebuild on 20 November 2026, and keeps
+    TeXmacs sources, HTML versions and PDFs. It holds 83 documents, 81 of
+    which have versions imported from arXiv, 154 arXiv versions in all
+    <cite|papers>. The import records arXiv as an external record of role
     <no-break-start><verbatim|source><no-break-end>, arXiv's
     <no-break-start><verbatim|vN><no-break-end> as a label, the SHA-512
     digests of the files received, and relations to the versioned arXiv
@@ -1312,9 +1320,9 @@
     on versions, links and identifiers, then against our survey of
     decentralised and federated publishing, made from the systems' own
     documents and code, which are cited here; what we could not verify is
-    marked so. Table <reference|tab:compare> sets OpenSheaf against ten
-    systems, among them the three we found closest: nanopublications,
-    Document Succession Identifiers and the Underlay.
+    marked so. Table <reference|tab:compare> sets OpenSheaf against eleven
+    systems, among them the three we found closest in purpose:
+    nanopublications, Document Succession Identifiers and the Underlay.
   </with>
 
   <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<cwith|1|-1|3|3|cell-hpart|1>|<cwith|1|-1|4|4|cell-hpart|1>|<cwith|1|-1|5|5|cell-hpart|1>|<cwith|1|-1|6|6|cell-hpart|1>|<cwith|1|-1|7|7|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|System>>|<cell|<with|par-mode|left|Fixity>>|<cell|<with|par-mode|left|Names>>|<cell|<with|par-mode|left|Who
@@ -1372,7 +1380,7 @@
   owner>>|<cell|<with|par-mode|left|any archive,
   checked>>|<cell|<with|par-mode|left|key log,
   pre-rotation>>|<cell|<with|par-mode|left|a static web
-  server>>>>>>|OpenSheaf against ten systems, some sharing a
+  server>>>>>>|OpenSheaf against eleven systems, some sharing a
   row.<label|tab:compare>>
 
   <\with|par-columns|2>
@@ -1437,15 +1445,16 @@
     under the same key <cite|nanopubdocs>. Nanopublications are a natural
     form for statements about OpenSheaf versions, which are open (#21).
 
-    <strong|Document Succession Identifiers> are the closest design in
-    premises <cite|ellerman2024b>: a succession of editions is a git history
-    named from its initial commit, each later commit signed with an SSH key
-    listed in the succession. Authority rests on keys, so a succession moves
-    between hosts. As we read it, a listed key can sign a commit that changes
-    the list, so a thief holding one could extend and contest the succession;
-    pre-rotation exists to prevent this, at the cost of more keys. A DSI
-    names one succession, rests on SHA-1, and has no owners shared across
-    documents, no branches of other owners, no collections and no withdrawal.
+    <strong|Document Succession Identifiers> are, of the three, the closest
+    in premises <cite|ellerman2024b>: a succession of editions is a git
+    history named from its initial commit, each later commit signed with an
+    SSH key listed in the succession. Authority rests on keys, so a
+    succession moves between hosts. As we read it, a listed key can sign a
+    commit that changes the list, so a thief holding one could extend and
+    contest the succession; pre-rotation exists to prevent this, at the cost
+    of more keys. A DSI names one succession, rests on SHA-1, and has no
+    owners shared across documents, no branches of other owners, no
+    collections and no withdrawal.
 
     <strong|The Underlay> keeps collections of content-addressed records with
     immutable, sequential versions, append-only logs signed by the server
@@ -1534,23 +1543,24 @@
 
     <strong|ActivityPub> needs a running server per node and binds identity
     to a domain <cite|activitypub>; it suits announcement, which the layer
-    leaves to others. <strong|The AT Protocol> is the closest in
-    architecture, with signed user repositories, relays and third-party feeds
-    <cite|atproto>, but its repositories are mutable and its main identity
-    method depends on a directory; an OpenSheaf owner needs none, and pays
-    with the rule that a fork ends it. <strong|Nostr> signs at the source,
-    but its identity is the key itself <cite|nostr>. <strong|IPFS> fetches
-    content by hash <cite|ipfs>; an OpenSheaf pin also fixes all earlier
-    versions, and, unlike a pin in IPFS, keeps nothing available.
-    <strong|Distributed hash tables> <cite|kademlia2002> answer where a copy
-    is, which pins do not, and could serve as optional resolvers (#20).
-    <strong|Git> links commits by hashes, SHA-1 in most repositories;
-    OpenSheaf uses it as a store, its integrity staying in OCFL inventories
-    <cite|git02>. <strong|Radicle> names repositories by a digest and peers
-    by keys, each peer writing only its own namespace, with delegates changed
-    by a threshold of the previous ones <cite|radicle>; OpenSheaf took from
-    it, as from The Update Framework <cite|tuf>, a key log signed by keys of
-    the version before, and added pre-rotation and plain files.
+    leaves to others. Among general federated systems, <strong|the AT
+    Protocol> is the closest in architecture, with signed user repositories,
+    relays and third-party feeds <cite|atproto>, but its repositories are
+    mutable and its main identity method depends on a directory; an OpenSheaf
+    owner needs none, and pays with the rule that a fork ends it.
+    <strong|Nostr> signs at the source, but its identity is the key itself
+    <cite|nostr>. <strong|IPFS> fetches content by hash <cite|ipfs>; an
+    OpenSheaf pin also fixes all earlier versions, and, unlike a pin in IPFS,
+    keeps nothing available. <strong|Distributed hash tables>
+    <cite|kademlia2002> answer where a copy is, which pins do not, and could
+    serve as optional resolvers (#20). <strong|Git> links commits by hashes,
+    SHA-1 in most repositories; OpenSheaf uses it as a store, its integrity
+    staying in OCFL inventories <cite|git02>. <strong|Radicle> names
+    repositories by a digest and peers by keys, each peer writing only its
+    own namespace, with delegates changed by a threshold of the previous ones
+    <cite|radicle>; OpenSheaf took from it, as from The Update Framework
+    <cite|tuf>, a key log signed by keys of the version before, and added
+    pre-rotation and plain files.
 
     <subsection|arXiv, Hexagon and alphaXiv>
 
@@ -1604,14 +1614,14 @@
     RO-Crate>>>|<row|<cell|<with|par-mode|left|static files or a git host
     only>>|<cell|<with|par-mode|left|DSGL, BagIt, OCFL, ResearchEquals'
     static archive>>>|<row|<cell|<with|par-mode|left|a work name shared by
-    several owners>>|<cell|<with|par-mode|left|not
-    found>>>|<row|<cell|<with|par-mode|left|owner key logs with
-    pre-rotation>>|<cell|<with|par-mode|left|KERI, not for
+    several owners>>|<cell|<with|par-mode|left|Radicle (a namespace per
+    peer), not for documents>>>|<row|<cell|<with|par-mode|left|owner key logs
+    with pre-rotation>>|<cell|<with|par-mode|left|KERI, not for
     documents>>>|<row|<cell|<with|par-mode|left|collections pinning others'
-    versions>>|<cell|<with|par-mode|left|not
-    found>>>|<row|<cell|<with|par-mode|left|rules for takedown in a
+    versions>>|<cell|<with|par-mode|left|git submodules, unsigned, by
+    commit>>>|<row|<cell|<with|par-mode|left|rules for takedown in a
     federation>>|<cell|<with|par-mode|left|not
-    found>>>|<row|<cell|<with|par-mode|left|all of the above as static
+    found>>>|<row|<cell|<with|par-mode|left|all of the above, as static
     files>>|<cell|<with|par-mode|left|not found>>>>>>|What is new and what is
     not, among the systems we examined.<label|tab:new>>
 
@@ -1620,24 +1630,58 @@
     Some earlier designs ended, or nearly ended, for lack of funding, as
     PubPub's hosted services did for a time, or by depending on a token, a
     chain, peers online or a service run by someone else (Section
-    <reference|sec:related>); the most successful remains small. OpenSheaf
-    avoids these dependencies but not the need for funding; we weigh it
-    against them.
+    <reference|sec:related>). OpenSheaf avoids these dependencies, but not
+    the need for funding, discussed below.
+
+    <paragraph|Measurements>We measured the first archive at commit 1ac6db6
+    on an Apple M4 laptop (Table <reference|tab:measure>; scripts and numbers
+    in the paper's repository). Its storage root holds 83 documents, the
+    owner's key log and its catalogue: 169 object versions in 1,826 files.
+    The format adds 3.2 MB to 131.5 MB of content, 2.4%; two thirds of that
+    are inventories, since each version keeps a copy of the inventory, which
+    lists every earlier version. A version of a document adds a median of 11
+    kB: an inventory with its checksum file, 6.3 kB; identity files, 4.0 kB;
+    a signature, 0.8 kB. The reference tools verify the whole archive from
+    disk, hashing every file, in 2.2 s, about a third of it in the generic
+    OCFL validator. The Explorer, an independent implementation in
+    JavaScript, verifies it over a local web server in 1.4 s with content
+    digests, and in 155 s from the public site without them, bound by the
+    network. Both give each of the 168 signed versions of the 84 signed lines
+    the same status, and report the same findings.
+
+    <big-table|<with|font-size|0.84|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-valign|top>|<cwith|1|-1|1|-1|cell-halign|l>|<cwith|1|-1|1|-1|cell-lsep|0.3em>|<cwith|1|-1|1|-1|cell-rsep|0.3em>|<cwith|1|1|1|-1|font-series|bold>|<cwith|3|3|1|-1|cell-background|#f2f4f7>|<cwith|5|5|1|-1|cell-background|#f2f4f7>|<cwith|7|7|1|-1|cell-background|#f2f4f7>|<cwith|9|9|1|-1|cell-background|#f2f4f7>|<cwith|1|1|1|-1|cell-background|#dde4ee>|<cwith|1|-1|1|-1|cell-tsep|0.25em>|<cwith|1|-1|1|-1|cell-bsep|0.25em>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|0.5ln>|<cwith|-1|-1|1|-1|cell-bborder|1ln>|<cwith|1|-1|1|1|cell-hpart|1>|<cwith|1|-1|2|2|cell-hpart|1>|<table|<row|<cell|<with|par-mode|left|Measure>>|<cell|<with|par-mode|left|Value>>>|<row|<cell|<with|par-mode|left|content>>|<cell|<with|par-mode|left|131.5
+    MB, 638 files>>>|<row|<cell|<with|par-mode|left|format
+    overhead>>|<cell|<with|par-mode|left|3.2 MB,
+    2.4%>>>|<row|<cell|<with|par-mode|left|of which
+    inventories>>|<cell|<with|par-mode|left|2.1
+    MB>>>|<row|<cell|<with|par-mode|left|per document
+    version>>|<cell|<with|par-mode|left|11 kB,
+    1.8%>>>|<row|<cell|<with|par-mode|left|verify,
+    <no-break-start><verbatim|osheaf><no-break-end>,
+    disk>>|<cell|<with|par-mode|left|2.2 s>>>|<row|<cell|<with|par-mode|left|verify,
+    Explorer, local HTTP>>|<cell|<with|par-mode|left|1.4
+    s>>>|<row|<cell|<with|par-mode|left|verify, Explorer, public
+    site>>|<cell|<with|par-mode|left|155 s>>>|<row|<cell|<with|par-mode|left|resolve
+    one line, local HTTP>>|<cell|<with|par-mode|left|99
+    ms>>>|<row|<cell|<with|par-mode|left|deposit a new paper,
+    local>>|<cell|<with|par-mode|left|0.2 s>>>>>>|The first archive measured
+    (medians of five runs).<label|tab:measure>>
 
     <paragraph|Adoption>An exchange layer is worth something only when
-    several parties use it, and OpenSheaf has one real archive. The most
-    successful decentralised design found, nanopublications, counts some
-    80,000 records by some 600 signers after more than fifteen years
-    <cite|kuhn2026>. What is needed next is a service people use on top: an
-    announcement service for a field, or an overlay journal on authors' own
-    archives.
+    several parties use it, and OpenSheaf has one real archive. Networks of
+    this kind grow slowly: the current Nanopub Registry, which accepts only
+    signed nanopublications, counted 79,672 of them by 616 signing agents in
+    May 2026 <cite|kuhn2026>, more than fifteen years after nanopublications
+    were proposed <cite|groth2010>. What is needed next is a service people
+    use on top: an announcement service for a field, or an overlay journal on
+    authors' own archives.
 
     <paragraph|Incentives>Researchers publish where evaluation counts:
-    eLife's submissions fell by more than half after its indexing changed
-    <cite|elife2026>. An OpenSheaf archive counts for nothing by itself, and
-    reaches the indexes only through DOIs, landing pages for search engines,
-    and overlays that do count. DOIs with an archive's own prefix are open
-    (#8).
+    eLife's submissions fell by 55% from 2024 to 2025, after its indexing
+    changed <cite|elife2026>. An OpenSheaf archive counts for nothing by
+    itself, and reaches the indexes only through DOIs, landing pages for
+    search engines, and overlays that do count. DOIs with an archive's own
+    prefix are open (#8).
 
     <paragraph|Key management>OpenSheaf asks more of authors than the
     comparable designs we examined (dokieli, DSGL, nanopublications): a
@@ -1662,7 +1706,7 @@
     stops. Copies need rights, and in the first archive few lines can be
     copied without the authors' agreement.
 
-    <paragraph|Open questions>As of 23 November 2026 every open issue of the
+    <paragraph|Open questions>As of 26 November 2026 every open issue of the
     specification is marked as an addition after 0.2 or as a task. Besides
     those above, they include: external records that resolve pins (#22);
     reviews, comments and relations between documents (#21); statements by
@@ -2079,7 +2123,7 @@
     <associate|auto-15|<tuple|3.2|3>>
     <associate|auto-16|<tuple|2|3>>
     <associate|auto-17|<tuple|2|3>>
-    <associate|auto-18|<tuple|3.3|4>>
+    <associate|auto-18|<tuple|3.3|3>>
     <associate|auto-19|<tuple|3|4>>
     <associate|auto-2|<tuple|1|1>>
     <associate|auto-20|<tuple|4|4>>
@@ -2129,14 +2173,16 @@
     <associate|auto-60|<tuple|5|11>>
     <associate|auto-61|<tuple|6|11>>
     <associate|auto-62|<tuple|1|11>>
-    <associate|auto-63|<tuple|2|11>>
-    <associate|auto-64|<tuple|3|11>>
-    <associate|auto-65|<tuple|4|11>>
-    <associate|auto-66|<tuple|5|11>>
-    <associate|auto-67|<tuple|6|11>>
-    <associate|auto-68|<tuple|7|12>>
+    <associate|auto-63|<tuple|6|11>>
+    <associate|auto-64|<tuple|2|11>>
+    <associate|auto-65|<tuple|3|11>>
+    <associate|auto-66|<tuple|4|11>>
+    <associate|auto-67|<tuple|5|12>>
+    <associate|auto-68|<tuple|6|12>>
     <associate|auto-69|<tuple|7|12>>
     <associate|auto-7|<tuple|4|2>>
+    <associate|auto-70|<tuple|7|12>>
+    <associate|auto-71|<tuple|7|12>>
     <associate|auto-8|<tuple|5|2>>
     <associate|auto-9|<tuple|6|2>>
     <associate|bib-activitypub|<tuple|81|14>>
@@ -2146,26 +2192,26 @@
     <associate|bib-arxivdoi|<tuple|89|14>>
     <associate|bib-arxivlicense|<tuple|90|14>>
     <associate|bib-arxivreplace|<tuple|87|14>>
-    <associate|bib-atproto|<tuple|28|12>>
+    <associate|bib-atproto|<tuple|28|13>>
     <associate|bib-bagit|<tuple|55|13>>
     <associate|bib-brierley2022|<tuple|34|13>>
     <associate|bib-capadisli2017|<tuple|66|14>>
     <associate|bib-capadisli2020|<tuple|67|14>>
-    <associate|bib-ceramic2025|<tuple|58|13>>
+    <associate|bib-ceramic2025|<tuple|58|14>>
     <associate|bib-coarnotify|<tuple|79|14>>
     <associate|bib-datacite|<tuple|17|12>>
-    <associate|bib-descinodes|<tuple|57|13>>
+    <associate|bib-descinodes|<tuple|57|14>>
     <associate|bib-dicosmo2018|<tuple|53|13>>
     <associate|bib-dokieli|<tuple|68|14>>
     <associate|bib-elife|<tuple|6|12>>
     <associate|bib-elife2026|<tuple|93|14>>
     <associate|bib-ellerman2024b|<tuple|48|13>>
     <associate|bib-episciences|<tuple|8|12>>
-    <associate|bib-explorer|<tuple|23|12>>
+    <associate|bib-explorer|<tuple|23|13>>
     <associate|bib-funsearch2024|<tuple|12|12>>
     <associate|bib-git02|<tuple|21|12>>
     <associate|bib-groth2010|<tuple|43|13>>
-    <associate|bib-hartgerink2019|<tuple|59|13>>
+    <associate|bib-hartgerink2019|<tuple|59|14>>
     <associate|bib-hexagon|<tuple|13|12>>
     <associate|bib-hochstenbach2023|<tuple|70|14>>
     <associate|bib-ipfs|<tuple|83|14>>
@@ -2186,10 +2232,10 @@
     <associate|bib-kuhn2016|<tuple|45|13>>
     <associate|bib-kuhn2026|<tuple|46|13>>
     <associate|bib-kunze2026|<tuple|38|13>>
-    <associate|bib-lean|<tuple|26|12>>
+    <associate|bib-lean|<tuple|26|13>>
     <associate|bib-ledger|<tuple|65|14>>
     <associate|bib-lockss|<tuple|78|14>>
-    <associate|bib-manager|<tuple|24|12>>
+    <associate|bib-manager|<tuple|24|13>>
     <associate|bib-maniatis2003|<tuple|77|14>>
     <associate|bib-mathlib2020|<tuple|11|12>>
     <associate|bib-mcdowell2021|<tuple|73|14>>
@@ -2202,29 +2248,29 @@
     <associate|bib-opentimestamps|<tuple|19|12>>
     <associate|bib-oric2pa|<tuple|72|14>>
     <associate|bib-orvium|<tuple|63|14>>
-    <associate|bib-p2pcommons|<tuple|60|13>>
-    <associate|bib-papers|<tuple|27|12>>
+    <associate|bib-p2pcommons|<tuple|60|14>>
+    <associate|bib-papers|<tuple|27|13>>
     <associate|bib-paskin2010|<tuple|37|13>>
     <associate|bib-pci|<tuple|7|12>>
     <associate|bib-pep740|<tuple|71|14>>
-    <associate|bib-pluto2019|<tuple|62|13>>
+    <associate|bib-pluto2019|<tuple|62|14>>
     <associate|bib-priem2012|<tuple|4|12>>
     <associate|bib-pubfair2019|<tuple|5|12>>
     <associate|bib-pubpubcode|<tuple|74|14>>
     <associate|bib-radicle|<tuple|85|14>>
-    <associate|bib-researchequals|<tuple|61|13>>
+    <associate|bib-researchequals|<tuple|61|14>>
     <associate|bib-rfc6962|<tuple|49|13>>
     <associate|bib-rfc7089|<tuple|29|13>>
-    <associate|bib-rocrate2022|<tuple|56|13>>
+    <associate|bib-rocrate2022|<tuple|56|14>>
     <associate|bib-roosendaal1997|<tuple|1|12>>
     <associate|bib-shumailov2024|<tuple|14|12>>
     <associate|bib-signposting2023|<tuple|42|13>>
     <associate|bib-smith1999|<tuple|3|12>>
     <associate|bib-solid|<tuple|69|14>>
     <associate|bib-spec02|<tuple|15|12>>
-    <associate|bib-template|<tuple|25|12>>
+    <associate|bib-template|<tuple|25|13>>
     <associate|bib-timestamps02|<tuple|20|12>>
-    <associate|bib-tools|<tuple|22|12>>
+    <associate|bib-tools|<tuple|22|13>>
     <associate|bib-tuf|<tuple|86|14>>
     <associate|bib-underlayprotocol|<tuple|52|13>>
     <associate|bib-vandesompel2004|<tuple|2|12>>
@@ -2257,7 +2303,7 @@
     <associate|sec:lean|<tuple|4.3|8>>
     <associate|sec:lessons|<tuple|4.5|8>>
     <associate|sec:lines|<tuple|3.5|5>>
-    <associate|sec:names|<tuple|3.3|4>>
+    <associate|sec:names|<tuple|3.3|3>>
     <associate|sec:new|<tuple|5.9|11>>
     <associate|sec:objects|<tuple|3.2|3>>
     <associate|sec:owners|<tuple|3.4|4>>
@@ -2272,6 +2318,7 @@
     <associate|tab:compare|<tuple|4|9>>
     <associate|tab:files|<tuple|2|3>>
     <associate|tab:functions|<tuple|1|1>>
+    <associate|tab:measure|<tuple|6|11>>
     <associate|tab:new|<tuple|5|11>>
     <associate|tab:status|<tuple|3|5>>
   </collection>
@@ -2500,6 +2547,8 @@
 
       kuhn2026
 
+      groth2010
+
       elife2026
     </associate>
     <\associate|listing>
@@ -2578,10 +2627,13 @@
       8.5).>|<pageref|auto-29>>
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|4>||OpenSheaf against
-      ten systems, some sharing a row.>|<pageref|auto-50>>
+      eleven systems, some sharing a row.>|<pageref|auto-50>>
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|5>||What is new and
       what is not, among the systems we examined.>|<pageref|auto-60>>
+
+      <tuple|normal|<surround|<hidden-binding|<tuple>|6>||The first archive
+      measured (medians of five runs).>|<pageref|auto-63>>
     </associate>
     <\associate|toc>
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>Introduction>
@@ -2764,37 +2816,41 @@
       and limitations> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-61><vspace|0.5fn>
 
-      <with|par-left|<quote|3tab>|Adoption
+      <with|par-left|<quote|3tab>|Measurements
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-62>>
 
-      <with|par-left|<quote|3tab>|Incentives
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-63>>
-
-      <with|par-left|<quote|3tab>|Key management
+      <with|par-left|<quote|3tab>|Adoption
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-64>>
 
-      <with|par-left|<quote|3tab>|Discovery and scale
+      <with|par-left|<quote|3tab>|Incentives
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-65>>
 
-      <with|par-left|<quote|3tab>|Funding and rights
+      <with|par-left|<quote|3tab>|Key management
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-66>>
 
-      <with|par-left|<quote|3tab>|Open questions
+      <with|par-left|<quote|3tab>|Discovery and scale
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-67>>
 
+      <with|par-left|<quote|3tab>|Funding and rights
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-68>>
+
+      <with|par-left|<quote|3tab>|Open questions
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-69>>
+
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|7<space|2spc>Conclusion>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-68><vspace|0.5fn>
+      <no-break><pageref|auto-70><vspace|0.5fn>
 
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|References>
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-69><vspace|0.5fn>
+      <no-break><pageref|auto-71><vspace|0.5fn>
     </associate>
   </collection>
 </auxiliary>

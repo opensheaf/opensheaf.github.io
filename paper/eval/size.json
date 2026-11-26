@@ -1,0 +1,211 @@
+{
+ "objects_by_kind": {
+  "document": 83,
+  "owner": 1,
+  "collection": 1
+ },
+ "object_versions_by_kind": {
+  "document": 166,
+  "owner": 1,
+  "collection": 2
+ },
+ "document_versions_distinct": 160,
+ "bytes_by_category": {
+  "storage root declarations (0=ocfl_1.1, layout description)": 128,
+  "inventories + sidecars (+ object declaration)": 2124308,
+  "witnesses: signatures": 134064,
+  "identity files (genesis/object/datacite.json)": 677639,
+  "payload: renditions (PDF)": 86497162,
+  "payload: sources": 37017650,
+  "payload: other sources (TeXmacs .tm, .bib outside source/)": 7947474,
+  "key log (keys.json)": 305,
+  "catalogue members (members.json)": 59544
+ },
+ "files_by_category": {
+  "storage root declarations (0=ocfl_1.1, layout description)": 2,
+  "inventories + sidecars (+ object declaration)": 593,
+  "witnesses: signatures": 168,
+  "identity files (genesis/object/datacite.json)": 422,
+  "payload: renditions (PDF)": 160,
+  "payload: sources": 443,
+  "payload: other sources (TeXmacs .tm, .bib outside source/)": 35,
+  "key log (keys.json)": 1,
+  "catalogue members (members.json)": 2
+ },
+ "bytes_by_object_kind": {
+  "document": 134376947,
+  "owner": 3732,
+  "collection": 77467
+ },
+ "files_by_object_kind": {
+  "document": 1800,
+  "owner": 8,
+  "collection": 16
+ },
+ "other_payload_names": {
+  "biblio-ebp.bib": 1,
+  "singular-spde-lectures.tm": 1,
+  "texmacs/generic-mixing-6-max.tm": 1,
+  "texmacs/myBiblio.bib": 2,
+  "texmacs/prevalence-ode-3.tm": 1,
+  "texmacs/prevalence-ode-revised.tm": 1,
+  "biblio.bib": 1,
+  "phi43-weak-universality.tm": 1,
+  "texmacs/weak_phi4_PTRF_revised.tm": 1,
+  "texmacs/girsanov-phi43-1.tm": 1,
+  "texmacs/qft-drift.bib": 2,
+  "texmacs/girsanov-phi43-3.tm": 1,
+  "texmacs/elliptic-stoch-quant2.bib": 1,
+  "texmacs/elliptic-stochastic-quant-19-fra.tm": 1,
+  "fractional-phi42-mass-gap.tm": 1,
+  "texmacs/NSGen-submitted.tm": 1,
+  "texmacs/labib.bib": 1,
+  "texmacs/NSGen-fullspace-v06.tm": 1,
+  "bib/all.bib": 1,
+  "paracontrolled-distributions.tm": 1,
+  "texmacs/qft-drift-10.tm": 1,
+  "texmacs/variational-qft-16.tm": 1,
+  "fractional-phi43.tm": 1,
+  "texmacs/quasi-linear-5-as-arxiv-v1.tm": 1,
+  "texmacs/quasi-linear.bib": 1,
+  "texmacs/quasi-linear-final-revision-1.tm": 1,
+  "texmacs/quasi-linear-feb2017.tm": 1,
+  "texmacs/quasi-linear-aop-r1.tm": 1,
+  "texmacs/energy-uniqueness-8-stripped-arxiv.tm": 1,
+  "texmacs/energy-uniqueness.bib": 1,
+  "texmacs/wilson-ito-prl-draft-20-max.tm": 1,
+  "library1.bib": 1,
+  "sine-gordon-composite-observables.tm": 1
+ },
+ "ocfl_total_files": 1826,
+ "ocfl_total_bytes": 134458274,
+ "payload_bytes": 131462286,
+ "overhead_in_ocfl_bytes": 2995988,
+ "outside_ocfl_format": {
+  "discovery document (opensheaf.json)": {
+   "files": 1,
+   "bytes": 47507
+  },
+  "index names/": {
+   "files": 83,
+   "bytes": 65410
+  },
+  "index owners/": {
+   "files": 1,
+   "bytes": 5626
+  },
+  "index sha512/": {
+   "files": 127,
+   "bytes": 68211
+  }
+ },
+ "overhead_total_bytes": 3182742,
+ "overhead_pct_of_payload": 2.421030469529489,
+ "outside_ocfl_not_format": {
+  ".gitattributes": 765,
+  ".gitattributes #files": 1,
+  ".gitignore": 66,
+  ".gitignore #files": 1,
+  ".nojekyll": 0,
+  ".nojekyll #files": 1,
+  ".texmacs-noconvert": 0,
+  ".texmacs-noconvert #files": 1,
+  "README.md": 6263,
+  "README.md #files": 1,
+  "index-template.tm": 1119,
+  "index-template.tm #files": 1,
+  "index.html": 179247,
+  "index.html #files": 1,
+  "index.tm": 238743,
+  "index.tm #files": 1,
+  "notes-meta.ts": 1564,
+  "notes-meta.ts #files": 1,
+  "osheaf.json": 1071,
+  "osheaf.json #files": 1,
+  "owner": 19672,
+  "owner #files": 1,
+  "paper": 2211394,
+  "paper #files": 168,
+  "paper-html.ts": 982,
+  "paper-html.ts #files": 1,
+  "resources": 2302490,
+  "resources #files": 24,
+  "site": 4884099,
+  "site #files": 45,
+  "sitemap.xml": 11590,
+  "sitemap.xml #files": 1,
+  "style.css": 7486,
+  "style.css #files": 1,
+  "templates": 3297,
+  "templates #files": 1,
+  "texmacs-init.scm": 335,
+  "texmacs-init.scm #files": 1
+ },
+ "per_document_version_all": {
+  "payload_stored": {
+   "median": 667163.0,
+   "mean": 791941.4819277108,
+   "min": 0,
+   "max": 3403672,
+   "n": 166
+  },
+  "overhead_stored": {
+   "median": 10972.5,
+   "mean": 13049.174698795181,
+   "min": 7147,
+   "max": 60432,
+   "n": 166
+  },
+  "signature": {
+   "median": 798.0,
+   "mean": 798,
+   "min": 798,
+   "max": 798,
+   "n": 166
+  },
+  "identity": {
+   "median": 3978.5,
+   "mean": 4058.6867469879517,
+   "min": 2773,
+   "max": 5433,
+   "n": 166
+  },
+  "inventory_copy": {
+   "median": 6287.0,
+   "mean": 8192.487951807228,
+   "min": 3563,
+   "max": 55731,
+   "n": 166
+  },
+  "logical_state_bytes": {
+   "median": 677826.0,
+   "mean": 838315.126506024,
+   "min": 69182,
+   "max": 3408388,
+   "n": 166
+  }
+ },
+ "per_document_version_with_new_payload": {
+  "payload_stored": {
+   "median": 678150.0,
+   "mean": 821639.2875,
+   "min": 64597,
+   "max": 3403672,
+   "n": 160
+  },
+  "overhead_stored": {
+   "median": 10959.0,
+   "mean": 13037.18125,
+   "min": 7147,
+   "max": 60432,
+   "n": 160
+  }
+ },
+ "per_document_version_overhead_pct_median": 1.775000181220978,
+ "description_only_versions": 6,
+ "per_document_object": {
+  "payload_median": 961431,
+  "overhead_median": 25792,
+  "overhead_pct_median": 2.776856580663704
+ }
+}
