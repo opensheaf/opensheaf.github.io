@@ -301,7 +301,14 @@ branches included
 (section [8.1](opensheaf-specification-0.2.md#81-catalogues-and-selections)).
 `osheaf collect` gives a new version only to the catalogues whose papers
 changed, each signed by its own owner; `--owner OWNER` takes one owner's
-catalogue alone. The catalogue of the archive's first owner is labelled
+catalogue alone. Without `--owner`, an owner whose keys this computer does
+not hold is skipped with a warning: the other catalogues are collected and
+the website is written, and the command then ends with an error naming the
+owners skipped. Like a deposit, `collect` does not extend a catalogue whose
+versions are not all signed, or are contested, unless `--i-know` says they
+were looked at (section
+[7.3](opensheaf-specification-0.2.md#73-statuses)). The
+catalogue of the archive's first owner is labelled
 `main`; that of another owner `<label>-catalogue`, when the owner has a
 label, which `osheaf label --owner` gives or changes with the owner's.
 
@@ -761,7 +768,7 @@ the credential store under `zenodo-sandbox-token` and `zenodo-token`.
 | `relate LABEL` | link the same work elsewhere (arXiv, DOI) |
 | `withdraw LABEL` | withdraw a paper (`--reason TEXT`); the content stays |
 | `complete LABEL` | add the sources of a version deposited without them |
-| `collect` | new versions of the owner catalogues, when needed (`--owner`: one) |
+| `collect` | new versions of the owner catalogues, when needed (`--owner`: one; `--i-know`) |
 | `index` | rewrite `opensheaf.json`, the indexes and the website |
 | `verify` | check the archive (`--remote`, `--json`) |
 | `collection new LABEL` | make a collection (`--type`, `--title`) |
