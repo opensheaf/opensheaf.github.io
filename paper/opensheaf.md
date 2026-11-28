@@ -1340,7 +1340,7 @@ is adopted depends on the services built on it.
 - [bagit] J. Kunze, J. Littman, E. Madden, J. Scancella and C. Adams. The BagIt file packaging format (V1.0). RFC 8493, 2018. doi:10.17487/RFC8493
 - [rocrate2022] S. Soiland-Reyes and others. Packaging research artefacts with RO-Crate. Data Science 5 (2), 97-138, 2022. doi:10.3233/DS-210053
 - [descinodes] DeSci Labs. DeSci Nodes and Codex. 2026. https://github.com/desci-labs/nodes
-- [ceramic2025] Ceramic. The future of Ceramic. 2025. https://blog.ceramic.network/the-future-of-ceramic-focusing-on-recall/
+- [ceramic2025] Ceramic. The future of Ceramic. 2025. https://blog.ceramic.network/the-future-of-ceramic-focusing-on-recall/ (no longer served; archived at https://web.archive.org/web/20260718060309/https://blog.ceramic.network/the-future-of-ceramic-focusing-on-recall/)
 - [hartgerink2019] C. H. J. Hartgerink. Verified, shared, modular, and provenance based research communication with the Dat protocol. Publications 7 (2), 40, 2019. doi:10.3390/publications7020040
 - [p2pcommons] Liberate Science. @p2pcommons/sdk-js, npm package. https://www.npmjs.com/package/@p2pcommons/sdk-js
 - [researchequals] Liberate Science. archive.researchequals.com, a static archive of ResearchEquals. https://github.com/libscie/archive.researchequals.com

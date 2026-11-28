@@ -1971,6 +1971,7 @@
 
       <bibitem*|58><label|bib-ceramic2025>Ceramic. The future of Ceramic.
       2025. https://<line-break>blog.<line-break>ceramic.<line-break>network/<line-break>the-<line-break>future-<line-break>of-<line-break>ceramic-<line-break>focusing-<line-break>on-<line-break>recall/<line-break>
+      (no longer served; archived at https://<line-break>web.<line-break>archive.<line-break>org/<line-break>web/<line-break>20260718060309/<line-break>https://<line-break>blog.<line-break>ceramic.<line-break>network/<line-break>the-<line-break>future-<line-break>of-<line-break>ceramic-<line-break>focusing-<line-break>on-<line-break>recall/<line-break>)
 
       <bibitem*|59><label|bib-hartgerink2019>C. H. J. Hartgerink. Verified,
       shared, modular, and provenance based research communication with the
@@ -2204,10 +2205,10 @@
     <associate|bib-brierley2022|<tuple|34|13>>
     <associate|bib-capadisli2017|<tuple|66|14>>
     <associate|bib-capadisli2020|<tuple|67|14>>
-    <associate|bib-ceramic2025|<tuple|58|13>>
+    <associate|bib-ceramic2025|<tuple|58|14>>
     <associate|bib-coarnotify|<tuple|79|14>>
     <associate|bib-datacite|<tuple|17|12>>
-    <associate|bib-descinodes|<tuple|57|13>>
+    <associate|bib-descinodes|<tuple|57|14>>
     <associate|bib-dicosmo2018|<tuple|53|13>>
     <associate|bib-dokieli|<tuple|68|14>>
     <associate|bib-elife|<tuple|6|12>>
@@ -2215,7 +2216,7 @@
     <associate|bib-ellerman2024b|<tuple|48|13>>
     <associate|bib-episciences|<tuple|8|12>>
     <associate|bib-evaldata|<tuple|93|14>>
-    <associate|bib-explorer|<tuple|23|12>>
+    <associate|bib-explorer|<tuple|23|13>>
     <associate|bib-funsearch2024|<tuple|12|12>>
     <associate|bib-git02|<tuple|21|12>>
     <associate|bib-groth2010|<tuple|43|13>>
@@ -2269,7 +2270,7 @@
     <associate|bib-researchequals|<tuple|61|14>>
     <associate|bib-rfc6962|<tuple|49|13>>
     <associate|bib-rfc7089|<tuple|29|13>>
-    <associate|bib-rocrate2022|<tuple|56|13>>
+    <associate|bib-rocrate2022|<tuple|56|14>>
     <associate|bib-roosendaal1997|<tuple|1|12>>
     <associate|bib-shumailov2024|<tuple|14|12>>
     <associate|bib-signposting2023|<tuple|42|13>>
@@ -2278,7 +2279,7 @@
     <associate|bib-spec02|<tuple|15|12>>
     <associate|bib-template|<tuple|25|13>>
     <associate|bib-timestamps02|<tuple|20|12>>
-    <associate|bib-tools|<tuple|22|12>>
+    <associate|bib-tools|<tuple|22|13>>
     <associate|bib-tuf|<tuple|86|14>>
     <associate|bib-underlayprotocol|<tuple|52|13>>
     <associate|bib-vandesompel2004|<tuple|2|12>>
